@@ -2,6 +2,20 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://samkuo.me/about/</loc>
+    
+    <lastmod>2020-05-03T22:16:19.872Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2016/04/containerized-app-continuous-delivery/</loc>
+    
+    <lastmod>2020-05-03T22:00:22.904Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://samkuo.me/post/2020/03/why-i-work-for-startups/</loc>
     
     <lastmod>2020-05-03T21:38:22.958Z</lastmod>
@@ -33,13 +47,6 @@
     <loc>https://samkuo.me/post/2020/04/multipass-k3s-kubernetes-dev-env/</loc>
     
     <lastmod>2020-04-06T04:30:48.336Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://samkuo.me/about/</loc>
-    
-    <lastmod>2020-03-24T13:22:41.522Z</lastmod>
     
   </url>
   
@@ -488,13 +495,6 @@
     <loc>https://samkuo.me/post/2016/04/docker-golang-awesome/</loc>
     
     <lastmod>2018-08-29T11:38:00.751Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://samkuo.me/post/2016/04/containerized-app-continuous-delivery/</loc>
-    
-    <lastmod>2018-08-29T11:30:29.158Z</lastmod>
     
   </url>
   
