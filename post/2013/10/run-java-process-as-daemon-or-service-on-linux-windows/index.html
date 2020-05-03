@@ -19,7 +19,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"/images/logo32.png"},"articleBody":"對於在 Java 平台上，部署過後台服務器的人來說，讓 Java 程式以 Windows/Linux 服務(daemon)形式執行，是一個常見的問題，這裡的以“服務方式”是指該程式會隨系統啓動而自動執行，甚至更好的話，該程式如果異常結束會被重新執行。過去，山姆鍋跟多數的人一樣，選擇 Java Service Wrapper，不過自從它在 3.2.3 版本以後改了授權，雖然仍可以繼續使用 3.2.3 版本，但相信很多人也跟我一樣想尋找其他替代方案。\n\n由於「影化身科技」的部署環境只在 Linux 系統，因此，本文著重在 Linux 系統上的解決方案，對於想要在 Windows 系統執行 Java 服務的人，您的選擇相對較少。底下針對幾個替代方案，山姆鍋整理了他們各自的優缺點供您參考。\n\n1. 使用 Shell script\n這個方法基本上就是使用一個 init script(通常位於/etc/init.d/目錄)來負責 Java 程式的啓動與終止，好一點的還可以查看 Java 程式是否在執行中(但無法知道是否正常提供服務)。\n對於想要在 Unix-like 系統，像是 Linux, FreeBSD 等，執行 Java 服務的人，這是個簡單的方案，雖然少了監控 Java 服務在異常的情況下重新執行的功能。\n優點：\n\n只需要一個 Shell script。\n適用大部份 Unix-like 系統。\n也適用 Java 以外的程式。\n\n缺點：\n\n缺少監控的功能。\n不適用 Windows 系統。\n\n對於有其他行程(process)監控方法且只需在 Unix-like 系統上執行 Java 服務的人，建議採用這個方案。\n2. 使用 Shell script + Monit\n對於想採用第一種方案，但又想有異常監控功能的人，可以採用這個方案。簡單地說：就是使用 Monit來補足所欠缺的監控功能。Monit 提供的監控功能明顯比 Java service wrapper 多。\n優點：\n\n具備方案 1 的所有優點。\n擁有完整的監控與警告功能。\n\n缺點：\n\nMonit 的設定並不直覺。\n不適用 Windows 系統。\n\n對於只需要在 Unix-like 系統執行 Java 服務的人，建議採用這個方案。\n3. 使用 YAJSW\nYAJSW的目的一開始就是要取代 Java service wrapper，這點從它的名稱：”Yet Another Java Service Wrapper”可以得知。跟 Java Service Wrapper 很大不同點在於：YAJSW 採用 Java 與 Native 混合方式實作，不像 JSW 是 native 程式。\n優點：\n\n支援多個平台。\n可以使用 Groovy 客制化。\n可以監控 Java 程式，必要時可以發出警告或重啓。\n支援 Mac OS 的 Launchd。\n\n缺點：\n\n如果 JVM 的實作本身有問題，可能會跟被監控的程式一起發生故障。\n耗用較多系統資源。\n\n對於同時需要在 Unix-like 系統外執行 Java 服務，或者需要客制化功能的人，建議採用此方案。\n4. 使用其他工具\n其他方案，像是 Jsvc, Procrun等，都有它們各自的問題導致不符合需要，像 Procrun 只支援 Windows 系統，而 Jsvc 可能會要自行編譯 C 程式。雖然這些工具不符合「影化身科技」的需求，但提出來供符合需要人參考。\n小結\n在目前階段，對於要讓 Java 程式以服務形式執行又不想使用 Java service wrapper 的人，如果看了上面的介紹還是不清楚哪個方案適合您，山姆鍋統一推薦方案 3: YAJSW。但請注意：「影化身科技」採用的是方案 2，也就是 Shell script + Monit！因為，本文一開始就強調：「影化身科技」只需要在 Linux 系統上部署 Java 服務。\n","dateCreated":"2013-10-09T09:37:00+08:00","dateModified":"2020-03-08T09:59:07+08:00","datePublished":"2013-10-09T09:37:00+08:00","description":"對於在 Java 平台上，部署過後台服務器的人來說，讓 Java 程式以 Windows/Linux 服務(daemon)形式執行，是一個常見的問題，這裡的以“服務方式”是指該程式會隨系統啓動而自動執行，甚至更好的話，該程式如果異常結束會被重新執行。過去，山姆鍋跟多數的人一樣，選擇 Java Service Wrapper，不過自從它在 3.2.3 版本以後改了授權，雖然仍可以繼續使用 3.2.3 版本，但相信很多人也跟我一樣想尋找其他替代方案。","headline":"在Linux/Windows系統上，以服務方式執行Java程式","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/10/run-java-process-as-daemon-or-service-on-linux-windows/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"/images/logo32.png","logo":{"@type":"ImageObject","url":"/images/logo32.png"}},"url":"https://samkuo.me/post/2013/10/run-java-process-as-daemon-or-service-on-linux-windows/","keywords":"Operations, Java"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"對於在 Java 平台上，部署過後台服務器的人來說，讓 Java 程式以 Windows/Linux 服務(daemon)形式執行，是一個常見的問題，這裡的以“服務方式”是指該程式會隨系統啓動而自動執行，甚至更好的話，該程式如果異常結束會被重新執行。過去，山姆鍋跟多數的人一樣，選擇 Java Service Wrapper，不過自從它在 3.2.3 版本以後改了授權，雖然仍可以繼續使用 3.2.3 版本，但相信很多人也跟我一樣想尋找其他替代方案。\n\n由於「影化身科技」的部署環境只在 Linux 系統，因此，本文著重在 Linux 系統上的解決方案，對於想要在 Windows 系統執行 Java 服務的人，您的選擇相對較少。底下針對幾個替代方案，山姆鍋整理了他們各自的優缺點供您參考。\n\n1. 使用 Shell script\n這個方法基本上就是使用一個 init script(通常位於/etc/init.d/目錄)來負責 Java 程式的啓動與終止，好一點的還可以查看 Java 程式是否在執行中(但無法知道是否正常提供服務)。\n對於想要在 Unix-like 系統，像是 Linux, FreeBSD 等，執行 Java 服務的人，這是個簡單的方案，雖然少了監控 Java 服務在異常的情況下重新執行的功能。\n優點：\n\n只需要一個 Shell script。\n適用大部份 Unix-like 系統。\n也適用 Java 以外的程式。\n\n缺點：\n\n缺少監控的功能。\n不適用 Windows 系統。\n\n對於有其他行程(process)監控方法且只需在 Unix-like 系統上執行 Java 服務的人，建議採用這個方案。\n2. 使用 Shell script + Monit\n對於想採用第一種方案，但又想有異常監控功能的人，可以採用這個方案。簡單地說：就是使用 Monit來補足所欠缺的監控功能。Monit 提供的監控功能明顯比 Java service wrapper 多。\n優點：\n\n具備方案 1 的所有優點。\n擁有完整的監控與警告功能。\n\n缺點：\n\nMonit 的設定並不直覺。\n不適用 Windows 系統。\n\n對於只需要在 Unix-like 系統執行 Java 服務的人，建議採用這個方案。\n3. 使用 YAJSW\nYAJSW的目的一開始就是要取代 Java service wrapper，這點從它的名稱：”Yet Another Java Service Wrapper”可以得知。跟 Java Service Wrapper 很大不同點在於：YAJSW 採用 Java 與 Native 混合方式實作，不像 JSW 是 native 程式。\n優點：\n\n支援多個平台。\n可以使用 Groovy 客制化。\n可以監控 Java 程式，必要時可以發出警告或重啓。\n支援 Mac OS 的 Launchd。\n\n缺點：\n\n如果 JVM 的實作本身有問題，可能會跟被監控的程式一起發生故障。\n耗用較多系統資源。\n\n對於同時需要在 Unix-like 系統外執行 Java 服務，或者需要客制化功能的人，建議採用此方案。\n4. 使用其他工具\n其他方案，像是 Jsvc, Procrun等，都有它們各自的問題導致不符合需要，像 Procrun 只支援 Windows 系統，而 Jsvc 可能會要自行編譯 C 程式。雖然這些工具不符合「影化身科技」的需求，但提出來供符合需要人參考。\n小結\n在目前階段，對於要讓 Java 程式以服務形式執行又不想使用 Java service wrapper 的人，如果看了上面的介紹還是不清楚哪個方案適合您，山姆鍋統一推薦方案 3: YAJSW。但請注意：「影化身科技」採用的是方案 2，也就是 Shell script + Monit！因為，本文一開始就強調：「影化身科技」只需要在 Linux 系統上部署 Java 服務。\n","dateCreated":"2013-10-09T09:37:00+08:00","dateModified":"2020-03-08T09:59:07+08:00","datePublished":"2013-10-09T09:37:00+08:00","description":"對於在 Java 平台上，部署過後台服務器的人來說，讓 Java 程式以 Windows/Linux 服務(daemon)形式執行，是一個常見的問題，這裡的以“服務方式”是指該程式會隨系統啓動而自動執行，甚至更好的話，該程式如果異常結束會被重新執行。過去，山姆鍋跟多數的人一樣，選擇 Java Service Wrapper，不過自從它在 3.2.3 版本以後改了授權，雖然仍可以繼續使用 3.2.3 版本，但相信很多人也跟我一樣想尋找其他替代方案。","headline":"在Linux/Windows系統上，以服務方式執行Java程式","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/10/run-java-process-as-daemon-or-service-on-linux-windows/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2013/10/run-java-process-as-daemon-or-service-on-linux-windows/","keywords":"Operations, Java"}</script>
     <meta name="description" content="本文說明在Linux&#x2F;Windows系統上，如何將Java程式以服務(daemon)形式執行的可行方案。">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="在Linux&#x2F;Windows系統上，以服務方式執行Java程式">
@@ -44,7 +44,7 @@
         
     
     
-        <meta property="og:image" content="https://www.gravatar.com/avatar/2b44878cb27d093ac9c72a495ea642cf?s=640"/>
+        <meta property="og:image" content="https://samkuo.me/images/logo.png"/>
     
     
     
@@ -107,6 +107,8 @@
             <!-- Define author's picture -->
 
 
+
+        
     
 
 <nav id="sidebar" data-behavior="4">
@@ -117,7 +119,7 @@
                     href="/#about"
                     aria-label="閱讀有關作者的更多信息"
                 >
-                    <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/2b44878cb27d093ac9c72a495ea642cf?s=110" alt="作者的圖片"/>
+                    <img class="sidebar-profile-picture" src="/images/logo.png" alt="作者的圖片"/>
                 </a>
                 <h4 class="sidebar-profile-name">Sampot (山姆鍋)</h4>
                 
@@ -690,6 +692,8 @@
 
 
     
+        
+    
 
 <div id="about">
     <div id="about-card">
@@ -697,7 +701,7 @@
             <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="https://www.gravatar.com/avatar/2b44878cb27d093ac9c72a495ea642cf?s=110" alt="作者的圖片"/>
+            <img id="about-card-picture" src="/images/logo.png" alt="作者的圖片"/>
         
             <h4 id="about-card-name">Sampot (山姆鍋)</h4>
         

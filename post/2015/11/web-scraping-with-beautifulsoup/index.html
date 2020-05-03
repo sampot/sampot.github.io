@@ -17,7 +17,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"/images/logo32.png"},"articleBody":"原本只是為了作為 《我.影化身》 的範例， 嚐試使用 BeautifulSoup 來擷取「台灣期貨交易所」提供的報價網頁內容， 在過程中，覺得 Python 使用在網頁擷取(web scraping)真的是一大亮點！\n\n本文並不是 BeautifulSoup 的教學文章，目的僅在分享一個快速有效的方法來取得期貨報價。\n資料來源\n這個腳本的資料來自此網頁：http://info512.taifex.com.tw/Future/FusaQuote_Norl.aspx ，資料更新 5 秒鐘，與實際的價格時間差不清楚，但作為價格監控的目的已經夠用。\n程式腳本\n擷取網頁內容需要根據內容結構來實驗跟調整選擇條件， BeautifulSoup 提供許多高階簡單的方法可以過濾跟查詢 網頁元素，搭配 IPython 這種互動式介面，就可以得到一個快速有效(quick and dirty)的腳本：\nmonitor_tw_futures.pyview raw1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950515253545556575859606162636465666768697071727374757677# -*- coding: utf-8 -*-from __future__ import absolute_import, division, print_function, unicode_literalsimport urllib2import timefrom datetime import datetimefrom bs4 import BeautifulSoupTXF_NAME = u'臺指現'TE_NAME = u'電子現'TF_NAME = u'金融現'targets = set()targets.add(TXF_NAME)targets.add(TE_NAME)targets.add(TF_NAME)quotes = dict()url = 'http://info512.taifex.com.tw/Future/FusaQuote_Norl.aspx'class Quote(object):    def __init__(self):        self.name = None        self.trade_time = None        self.trade_price = None        self.change = None        self.open = None        self.high = None        self.low = None    def __str__(self):        res = list()        res.append(self.name)        res.append(self.trade_time.strftime(\"%H:%M:%S\"))        res.append(self.trade_price)        res.append(self.change)        res.append(self.open)        res.append(self.high)        res.append(self.low)        return str(res)while True:    # 應該要限制在有交易的時間內執行，但為了示範起見，使用無窮迴圈。    html_data = urllib2.urlopen(url).read()    soup = BeautifulSoup(html_data, 'html.parser')    rows = soup.find_all('tr', {\"class\": \"custDataGridRow\", \"bgcolor\": \"White\"})    for row in rows:        # print(row)        items = row.find_all('td')        name = items[0].a.text.strip()        if name in targets:            quote = Quote()            quote.name = name            quote.trade_price = float(items[6].font.text.replace(',', ''))            quote.change = float(items[7].font.text)            quote.trade_time = datetime.strptime(items[14].font.text, \"%H:%M:%S\")            quote.open = float(items[10].font.text.replace(',', ''))            quote.high = float(items[11].font.text.replace(',', ''))            quote.low = float(items[12].font.text.replace(',', ''))            quotes[name] = quote            print(quote)    # 根據取得的報價判斷條件，條件自訂。    # 條件符合時通知使用者，如何通知？    time.sleep(5)\n您可以看出來程式幾乎沒有做任何錯誤檢查與處理，對於一個隨時會失效的腳本似乎也不太需要。\n免責聲明\n山姆鍋不對此程式的正確性與即時性做任何保證，原始網頁結構的任何更動都可能讓此腳本無法正常運作， 山姆鍋不負責您基於此程式的報價交易所造成的任何損失。\n結語\n有了一個能夠自動即時監控期貨報價的程式腳本，當有符合條件的情形發生時要怎麼辦？撇開自動交易這種專業訴求不談， 通知使用者應該是最基本的功能了。需要一個可以在背景幫您做客製化即時監控，可以通知重要事件的軟體？ 這剛好是山姆鍋開發 《我.影化身》 這個開源專案的主要動機。\n","dateCreated":"2015-11-06T08:43:00+08:00","dateModified":"2018-08-29T00:48:39+08:00","datePublished":"2015-11-06T08:43:00+08:00","description":"原本只是為了作為 《我.影化身》 的範例， 嚐試使用 BeautifulSoup 來擷取「台灣期貨交易所」提供的報價網頁內容， 在過程中，覺得 Python 使用在網頁擷取(web scraping)真的是一大亮點！","headline":"台灣期貨指數即時報價 - 使用 BeautifulSoup4","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2015/11/web-scraping-with-beautifulsoup/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"/images/logo32.png","logo":{"@type":"ImageObject","url":"/images/logo32.png"}},"url":"https://samkuo.me/post/2015/11/web-scraping-with-beautifulsoup/","keywords":"Python, BS4, BeautifulSoup"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"原本只是為了作為 《我.影化身》 的範例， 嚐試使用 BeautifulSoup 來擷取「台灣期貨交易所」提供的報價網頁內容， 在過程中，覺得 Python 使用在網頁擷取(web scraping)真的是一大亮點！\n\n本文並不是 BeautifulSoup 的教學文章，目的僅在分享一個快速有效的方法來取得期貨報價。\n資料來源\n這個腳本的資料來自此網頁：http://info512.taifex.com.tw/Future/FusaQuote_Norl.aspx ，資料更新 5 秒鐘，與實際的價格時間差不清楚，但作為價格監控的目的已經夠用。\n程式腳本\n擷取網頁內容需要根據內容結構來實驗跟調整選擇條件， BeautifulSoup 提供許多高階簡單的方法可以過濾跟查詢 網頁元素，搭配 IPython 這種互動式介面，就可以得到一個快速有效(quick and dirty)的腳本：\nmonitor_tw_futures.pyview raw1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950515253545556575859606162636465666768697071727374757677# -*- coding: utf-8 -*-from __future__ import absolute_import, division, print_function, unicode_literalsimport urllib2import timefrom datetime import datetimefrom bs4 import BeautifulSoupTXF_NAME = u'臺指現'TE_NAME = u'電子現'TF_NAME = u'金融現'targets = set()targets.add(TXF_NAME)targets.add(TE_NAME)targets.add(TF_NAME)quotes = dict()url = 'http://info512.taifex.com.tw/Future/FusaQuote_Norl.aspx'class Quote(object):    def __init__(self):        self.name = None        self.trade_time = None        self.trade_price = None        self.change = None        self.open = None        self.high = None        self.low = None    def __str__(self):        res = list()        res.append(self.name)        res.append(self.trade_time.strftime(\"%H:%M:%S\"))        res.append(self.trade_price)        res.append(self.change)        res.append(self.open)        res.append(self.high)        res.append(self.low)        return str(res)while True:    # 應該要限制在有交易的時間內執行，但為了示範起見，使用無窮迴圈。    html_data = urllib2.urlopen(url).read()    soup = BeautifulSoup(html_data, 'html.parser')    rows = soup.find_all('tr', {\"class\": \"custDataGridRow\", \"bgcolor\": \"White\"})    for row in rows:        # print(row)        items = row.find_all('td')        name = items[0].a.text.strip()        if name in targets:            quote = Quote()            quote.name = name            quote.trade_price = float(items[6].font.text.replace(',', ''))            quote.change = float(items[7].font.text)            quote.trade_time = datetime.strptime(items[14].font.text, \"%H:%M:%S\")            quote.open = float(items[10].font.text.replace(',', ''))            quote.high = float(items[11].font.text.replace(',', ''))            quote.low = float(items[12].font.text.replace(',', ''))            quotes[name] = quote            print(quote)    # 根據取得的報價判斷條件，條件自訂。    # 條件符合時通知使用者，如何通知？    time.sleep(5)\n您可以看出來程式幾乎沒有做任何錯誤檢查與處理，對於一個隨時會失效的腳本似乎也不太需要。\n免責聲明\n山姆鍋不對此程式的正確性與即時性做任何保證，原始網頁結構的任何更動都可能讓此腳本無法正常運作， 山姆鍋不負責您基於此程式的報價交易所造成的任何損失。\n結語\n有了一個能夠自動即時監控期貨報價的程式腳本，當有符合條件的情形發生時要怎麼辦？撇開自動交易這種專業訴求不談， 通知使用者應該是最基本的功能了。需要一個可以在背景幫您做客製化即時監控，可以通知重要事件的軟體？ 這剛好是山姆鍋開發 《我.影化身》 這個開源專案的主要動機。\n","dateCreated":"2015-11-06T08:43:00+08:00","dateModified":"2018-08-29T00:48:39+08:00","datePublished":"2015-11-06T08:43:00+08:00","description":"原本只是為了作為 《我.影化身》 的範例， 嚐試使用 BeautifulSoup 來擷取「台灣期貨交易所」提供的報價網頁內容， 在過程中，覺得 Python 使用在網頁擷取(web scraping)真的是一大亮點！","headline":"台灣期貨指數即時報價 - 使用 BeautifulSoup4","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2015/11/web-scraping-with-beautifulsoup/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2015/11/web-scraping-with-beautifulsoup/","keywords":"Python, BS4, BeautifulSoup"}</script>
     <meta name="description" content="原本只是為了作為 《我.影化身》 的範例， 嚐試使用 BeautifulSoup 來擷取「台灣期貨交易所」提供的報價網頁內容， 在過程中，覺得 Python 使用在網頁擷取(web scraping)真的是一大亮點！">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="台灣期貨指數即時報價 - 使用 BeautifulSoup4">
@@ -39,7 +39,7 @@
         
     
     
-        <meta property="og:image" content="https://www.gravatar.com/avatar/2b44878cb27d093ac9c72a495ea642cf?s=640"/>
+        <meta property="og:image" content="https://samkuo.me/images/logo.png"/>
     
     
     
@@ -102,6 +102,8 @@
             <!-- Define author's picture -->
 
 
+
+        
     
 
 <nav id="sidebar" data-behavior="4">
@@ -112,7 +114,7 @@
                     href="/#about"
                     aria-label="閱讀有關作者的更多信息"
                 >
-                    <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/2b44878cb27d093ac9c72a495ea642cf?s=110" alt="作者的圖片"/>
+                    <img class="sidebar-profile-picture" src="/images/logo.png" alt="作者的圖片"/>
                 </a>
                 <h4 class="sidebar-profile-name">Sampot (山姆鍋)</h4>
                 
@@ -647,6 +649,8 @@
 
 
     
+        
+    
 
 <div id="about">
     <div id="about-card">
@@ -654,7 +658,7 @@
             <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="https://www.gravatar.com/avatar/2b44878cb27d093ac9c72a495ea642cf?s=110" alt="作者的圖片"/>
+            <img id="about-card-picture" src="/images/logo.png" alt="作者的圖片"/>
         
             <h4 id="about-card-name">Sampot (山姆鍋)</h4>
         

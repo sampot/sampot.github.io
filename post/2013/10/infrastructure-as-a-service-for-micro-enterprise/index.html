@@ -19,7 +19,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"/images/logo32.png"},"articleBody":"「基礎設施即服務」提供執行軟體所需的計算、儲存與通訊資源，通常透過虛擬化技術來將底層硬體的差異予以隱藏，讓軟體可以平順地執行。在過去需要從取得服務器硬體、連上電源與網路、安裝作業系統的需求，現在只要提供需要何種作業系統、需要的記憶體與硬碟空間，幾分鐘就可以準備好一台全新服務器。雖然聽起來很不錯，但是對微型企業來說，選擇供應商該注意哪些事項？本文屬於 「善用雲端服務，微型企業的自強之道」系列文章之一。\n\n說到「基礎設施即服務」，最有名的當然就屬 Amazon EC2 了。隨著時間的演進，有越來越多的廠商投入這個領域，讓「基礎設施即服務」成為目前雲端服務最成熟的商務模式之一。為了方便討論，對於「基礎設施」，山姆鍋只限制在像 EC2 這樣的服務。其中，最主要的特點有：\n\n按照使用量收費(usage-based charge)。\n提供 API 可以隨時隨地啟用與釋放資源。\n可以安裝各種軟體。\n\n因此，虛擬主機不在考慮範圍內，而 VPS 供應商只要有提供上述的特點，也會被列入考慮。網路上有許多供應商，下面只是「影化身科技」目前考慮採用的三家，不代表他們一定優於其他廠商：\nAmazon EC2\nAmazon Web Services 中的 EC2(Elastic Compute Cloud)算是最早期提供這類服務的廠商，除了基本的 EC2，它現在更提供許多相關的基礎服務，對於想要一站式(one-stop)服務的公司，Amazon Web Service 可以說是目前不二選擇。\n\n多種服務器規格可以選擇。\n支援眾多的基礎服務。\n涵括許多資料中心。\n支援服務器負載均衡服務。\n提供高可用性備援機制。\n\n就算不使用 EC2，它的其餘服務對於微型企業來說也很有吸引力，例如：Amazon S3 可說是便宜又好用的儲存服務。對於無法完全採用「平台即服務」來部署系統的微型企業，Amazon Web Services 絕對是值得去熟悉的服務。\nLinode\n性價比算是很高的 VPS 供應商，後來因應雲端計算的趨勢也開放 API 以及按時間收費模式。多數用戶對其客戶服務給予高度肯定，但最近幾次的安全漏洞以及 DigitalOcean 開始威脅到它的市場。Linode 的主要特點有：\n\n提供許多資料中心可以選擇。\n提供服務器負載均衡服務(load balancing service)。\n提供雙機故障備援(IP failover,需要客服協助)。\n對於像「影化身平台」這種需要全球部署的雲端服務而言，Linode 算是經濟實惠的選擇。\n\nDigitalOcean\n跟 Linode 一樣是一家 VPS 供應商，也提供 API 以及採用按時收費模式。跟 Linode 比較，最大特點在於它全部的服務器使用的都是 SSD 硬碟，對於資料存取，理論上是比傳統硬碟快上許多。另外，由於在同樣價格下，提供的規格通常也比 Linode 優惠，所以，應該會讓 Linode 開始緊張才對。\n相對於 Linode，DigitalOcean 目前有下列的限制：\n\n不支援負載均衡服務(load balancing service)。\n不支持雙機故障備援。\n可以選擇的資料中心很少。\n\n吸引山姆鍋的當然是它同樣規格比較便宜且採用的是 SSD 硬碟這點，對於支援性質的服務器會優先考慮採用。\n小結\n最近 Google 也開始提供它自己的 Compute Engine 服務，對於微型企業來說這可是好事，畢竟越多競爭者就越能確保提供經濟實惠的服務。\n","dateCreated":"2013-10-25T20:29:00+08:00","dateModified":"2020-03-08T09:49:39+08:00","datePublished":"2013-10-25T20:29:00+08:00","description":"「基礎設施即服務」提供執行軟體所需的計算、儲存與通訊資源，通常透過虛擬化技術來將底層硬體的差異予以隱藏，讓軟體可以平順地執行。在過去需要從取得服務器硬體、連上電源與網路、安裝作業系統的需求，現在只要提供需要何種作業系統、需要的記憶體與硬碟空間，幾分鐘就可以準備好一台全新服務器。雖然聽起來很不錯，但是對微型企業來說，選擇供應商該注意哪些事項？本文屬於 「善用雲端服務，微型企業的自強之道」系列文章之一。","headline":"微型企業之雲端虛擬服務器","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/10/infrastructure-as-a-service-for-micro-enterprise/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"/images/logo32.png","logo":{"@type":"ImageObject","url":"/images/logo32.png"}},"url":"https://samkuo.me/post/2013/10/infrastructure-as-a-service-for-micro-enterprise/","keywords":"Infrastructure, IaaS"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"「基礎設施即服務」提供執行軟體所需的計算、儲存與通訊資源，通常透過虛擬化技術來將底層硬體的差異予以隱藏，讓軟體可以平順地執行。在過去需要從取得服務器硬體、連上電源與網路、安裝作業系統的需求，現在只要提供需要何種作業系統、需要的記憶體與硬碟空間，幾分鐘就可以準備好一台全新服務器。雖然聽起來很不錯，但是對微型企業來說，選擇供應商該注意哪些事項？本文屬於 「善用雲端服務，微型企業的自強之道」系列文章之一。\n\n說到「基礎設施即服務」，最有名的當然就屬 Amazon EC2 了。隨著時間的演進，有越來越多的廠商投入這個領域，讓「基礎設施即服務」成為目前雲端服務最成熟的商務模式之一。為了方便討論，對於「基礎設施」，山姆鍋只限制在像 EC2 這樣的服務。其中，最主要的特點有：\n\n按照使用量收費(usage-based charge)。\n提供 API 可以隨時隨地啟用與釋放資源。\n可以安裝各種軟體。\n\n因此，虛擬主機不在考慮範圍內，而 VPS 供應商只要有提供上述的特點，也會被列入考慮。網路上有許多供應商，下面只是「影化身科技」目前考慮採用的三家，不代表他們一定優於其他廠商：\nAmazon EC2\nAmazon Web Services 中的 EC2(Elastic Compute Cloud)算是最早期提供這類服務的廠商，除了基本的 EC2，它現在更提供許多相關的基礎服務，對於想要一站式(one-stop)服務的公司，Amazon Web Service 可以說是目前不二選擇。\n\n多種服務器規格可以選擇。\n支援眾多的基礎服務。\n涵括許多資料中心。\n支援服務器負載均衡服務。\n提供高可用性備援機制。\n\n就算不使用 EC2，它的其餘服務對於微型企業來說也很有吸引力，例如：Amazon S3 可說是便宜又好用的儲存服務。對於無法完全採用「平台即服務」來部署系統的微型企業，Amazon Web Services 絕對是值得去熟悉的服務。\nLinode\n性價比算是很高的 VPS 供應商，後來因應雲端計算的趨勢也開放 API 以及按時間收費模式。多數用戶對其客戶服務給予高度肯定，但最近幾次的安全漏洞以及 DigitalOcean 開始威脅到它的市場。Linode 的主要特點有：\n\n提供許多資料中心可以選擇。\n提供服務器負載均衡服務(load balancing service)。\n提供雙機故障備援(IP failover,需要客服協助)。\n對於像「影化身平台」這種需要全球部署的雲端服務而言，Linode 算是經濟實惠的選擇。\n\nDigitalOcean\n跟 Linode 一樣是一家 VPS 供應商，也提供 API 以及採用按時收費模式。跟 Linode 比較，最大特點在於它全部的服務器使用的都是 SSD 硬碟，對於資料存取，理論上是比傳統硬碟快上許多。另外，由於在同樣價格下，提供的規格通常也比 Linode 優惠，所以，應該會讓 Linode 開始緊張才對。\n相對於 Linode，DigitalOcean 目前有下列的限制：\n\n不支援負載均衡服務(load balancing service)。\n不支持雙機故障備援。\n可以選擇的資料中心很少。\n\n吸引山姆鍋的當然是它同樣規格比較便宜且採用的是 SSD 硬碟這點，對於支援性質的服務器會優先考慮採用。\n小結\n最近 Google 也開始提供它自己的 Compute Engine 服務，對於微型企業來說這可是好事，畢竟越多競爭者就越能確保提供經濟實惠的服務。\n","dateCreated":"2013-10-25T20:29:00+08:00","dateModified":"2020-03-08T09:49:39+08:00","datePublished":"2013-10-25T20:29:00+08:00","description":"「基礎設施即服務」提供執行軟體所需的計算、儲存與通訊資源，通常透過虛擬化技術來將底層硬體的差異予以隱藏，讓軟體可以平順地執行。在過去需要從取得服務器硬體、連上電源與網路、安裝作業系統的需求，現在只要提供需要何種作業系統、需要的記憶體與硬碟空間，幾分鐘就可以準備好一台全新服務器。雖然聽起來很不錯，但是對微型企業來說，選擇供應商該注意哪些事項？本文屬於 「善用雲端服務，微型企業的自強之道」系列文章之一。","headline":"微型企業之雲端虛擬服務器","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/10/infrastructure-as-a-service-for-micro-enterprise/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2013/10/infrastructure-as-a-service-for-micro-enterprise/","keywords":"Infrastructure, IaaS"}</script>
     <meta name="description" content="山姆鍋針對「影化身科技」這種微型企業的需求，選擇三家「基礎設施即服務」供應商。">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="微型企業之雲端虛擬服務器">
@@ -40,7 +40,7 @@
         
     
     
-        <meta property="og:image" content="https://www.gravatar.com/avatar/2b44878cb27d093ac9c72a495ea642cf?s=640"/>
+        <meta property="og:image" content="https://samkuo.me/images/logo.png"/>
     
     
     
@@ -103,6 +103,8 @@
             <!-- Define author's picture -->
 
 
+
+        
     
 
 <nav id="sidebar" data-behavior="4">
@@ -113,7 +115,7 @@
                     href="/#about"
                     aria-label="閱讀有關作者的更多信息"
                 >
-                    <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/2b44878cb27d093ac9c72a495ea642cf?s=110" alt="作者的圖片"/>
+                    <img class="sidebar-profile-picture" src="/images/logo.png" alt="作者的圖片"/>
                 </a>
                 <h4 class="sidebar-profile-name">Sampot (山姆鍋)</h4>
                 
@@ -673,6 +675,8 @@
 
 
     
+        
+    
 
 <div id="about">
     <div id="about-card">
@@ -680,7 +684,7 @@
             <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="https://www.gravatar.com/avatar/2b44878cb27d093ac9c72a495ea642cf?s=110" alt="作者的圖片"/>
+            <img id="about-card-picture" src="/images/logo.png" alt="作者的圖片"/>
         
             <h4 id="about-card-name">Sampot (山姆鍋)</h4>
         

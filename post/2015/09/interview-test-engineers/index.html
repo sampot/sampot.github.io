@@ -17,7 +17,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"/images/logo32.png"},"articleBody":"面試工程師，除了一定要做的實際筆試之外，山姆鍋為了進一步了解候選人(candidate)的能力，會再口頭提問幾個問題。 這些問題對某些人來說，可能覺得不難，但山姆鍋的經驗發現，能夠正確回答出這些問題的比例比預想的少許多。 甚至可以說：會這些題目的工程師，能力已經在水準之上。\n\n山姆鍋面試的習慣之一是在對方筆試結束，如果認為 Candidate 筆試結果不錯，\n初步面談覺得會錄取時，會再問下列問題。\n面試題目\n\n一個樹狀結構，除了根節點沒有外，其餘節點都有且只有一個父節點；任一節點可以有不定個數的子節點，請定義類別(class) Node 及屬性 ( attribute)來表示這個樹節點。\n欲將題目 1 的類別對應到關連式資料庫表格，請設計這個表格的 schema。\n請修改題目 2 的 schema\n使得查詢任一節點的所有直接跟間接子節點只需要一個 SQL\n敘述(statement)。也就是回傳子節點，子節點的子節點，以此類推。\n\n參考答案\n底下是各個題目的參考解答：\n\n類別 Node 需有兩個屬性(attribute)/欄位(field)，分別表示它的父節點以及子結點。\n\n123456public class Node &#123;    Integer  id;        // 也可以使用 int    Node parent;    List&lt;Node&gt; children;    String name;        // 作為節點其它屬性的代表。&#125;\n\n將類別 Node 對應到一個關連式資料庫表格\n\n123456CREATE TABLE node (    id          INT NOT NULL,    parent_id   INT,    name        VARCHAR(255) NOT NULL,    PRIMARY KEY(id));\n給定一個節點 ID, nid, 可以使用下列 SQL 查詢其直接子節點：\n1SELECT * FROM node WHERE parent_id=nid;\n其中，nid 要置換成實際的值。\n\n這題基本上除非之前就看過，不然不會是很正常的。老實說，山姆鍋是先看到方法，才知道答案的。 這題其實真正的目的只是想看 candidate 如何解題以及遇到問題的處理態度。也就是說，根本就沒有預期 candidate 會答對！ 至於解答，Simon Asika 有一篇寫得很好的文章可以參考。 山姆鍋當初發現這個方法時，都還沒有一個正式稱呼。\n\n結語\n根據山姆鍋的經驗，只要會前兩題已經是水準之上，會第三題就算高手了。 山姆鍋是在確認對方已經適任時，才額外使用這些問題用來判斷對方程度到哪裏，希望大家不要弄錯先後順序。 還有順便分享一下：遇到不會的問題，最忌諱直接回答說不會，解決問題的過程遠比答案重要， 這也是為何這些問題採用口試的主因。\n因為這些題目的答案在網路上越來越普遍，已經無法達到當初使用的目的，山姆鍋未來也不會再用了。\n參考資料\n\nStoring Hierarchical Data in a Database, Part 2: http://www.sitepoint.com/hierarchical-data-database-2/\n山姆鍋最原始參考的資料應該是這篇文章。\n\n","dateCreated":"2015-09-21T20:12:00+08:00","dateModified":"2018-08-28T10:42:32+08:00","datePublished":"2015-09-21T20:12:00+08:00","description":"面試工程師，除了一定要做的實際筆試之外，山姆鍋為了進一步了解候選人(candidate)的能力，會再口頭提問幾個問題。 這些問題對某些人來說，可能覺得不難，但山姆鍋的經驗發現，能夠正確回答出這些問題的比例比預想的少許多。 甚至可以說：會這些題目的工程師，能力已經在水準之上。","headline":"山姆鍋過去常用的口試考題","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2015/09/interview-test-engineers/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"/images/logo32.png","logo":{"@type":"ImageObject","url":"/images/logo32.png"}},"url":"https://samkuo.me/post/2015/09/interview-test-engineers/","keywords":"interview, SQL, tree"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"面試工程師，除了一定要做的實際筆試之外，山姆鍋為了進一步了解候選人(candidate)的能力，會再口頭提問幾個問題。 這些問題對某些人來說，可能覺得不難，但山姆鍋的經驗發現，能夠正確回答出這些問題的比例比預想的少許多。 甚至可以說：會這些題目的工程師，能力已經在水準之上。\n\n山姆鍋面試的習慣之一是在對方筆試結束，如果認為 Candidate 筆試結果不錯，\n初步面談覺得會錄取時，會再問下列問題。\n面試題目\n\n一個樹狀結構，除了根節點沒有外，其餘節點都有且只有一個父節點；任一節點可以有不定個數的子節點，請定義類別(class) Node 及屬性 ( attribute)來表示這個樹節點。\n欲將題目 1 的類別對應到關連式資料庫表格，請設計這個表格的 schema。\n請修改題目 2 的 schema\n使得查詢任一節點的所有直接跟間接子節點只需要一個 SQL\n敘述(statement)。也就是回傳子節點，子節點的子節點，以此類推。\n\n參考答案\n底下是各個題目的參考解答：\n\n類別 Node 需有兩個屬性(attribute)/欄位(field)，分別表示它的父節點以及子結點。\n\n123456public class Node &#123;    Integer  id;        // 也可以使用 int    Node parent;    List&lt;Node&gt; children;    String name;        // 作為節點其它屬性的代表。&#125;\n\n將類別 Node 對應到一個關連式資料庫表格\n\n123456CREATE TABLE node (    id          INT NOT NULL,    parent_id   INT,    name        VARCHAR(255) NOT NULL,    PRIMARY KEY(id));\n給定一個節點 ID, nid, 可以使用下列 SQL 查詢其直接子節點：\n1SELECT * FROM node WHERE parent_id=nid;\n其中，nid 要置換成實際的值。\n\n這題基本上除非之前就看過，不然不會是很正常的。老實說，山姆鍋是先看到方法，才知道答案的。 這題其實真正的目的只是想看 candidate 如何解題以及遇到問題的處理態度。也就是說，根本就沒有預期 candidate 會答對！ 至於解答，Simon Asika 有一篇寫得很好的文章可以參考。 山姆鍋當初發現這個方法時，都還沒有一個正式稱呼。\n\n結語\n根據山姆鍋的經驗，只要會前兩題已經是水準之上，會第三題就算高手了。 山姆鍋是在確認對方已經適任時，才額外使用這些問題用來判斷對方程度到哪裏，希望大家不要弄錯先後順序。 還有順便分享一下：遇到不會的問題，最忌諱直接回答說不會，解決問題的過程遠比答案重要， 這也是為何這些問題採用口試的主因。\n因為這些題目的答案在網路上越來越普遍，已經無法達到當初使用的目的，山姆鍋未來也不會再用了。\n參考資料\n\nStoring Hierarchical Data in a Database, Part 2: http://www.sitepoint.com/hierarchical-data-database-2/\n山姆鍋最原始參考的資料應該是這篇文章。\n\n","dateCreated":"2015-09-21T20:12:00+08:00","dateModified":"2018-08-28T10:42:32+08:00","datePublished":"2015-09-21T20:12:00+08:00","description":"面試工程師，除了一定要做的實際筆試之外，山姆鍋為了進一步了解候選人(candidate)的能力，會再口頭提問幾個問題。 這些問題對某些人來說，可能覺得不難，但山姆鍋的經驗發現，能夠正確回答出這些問題的比例比預想的少許多。 甚至可以說：會這些題目的工程師，能力已經在水準之上。","headline":"山姆鍋過去常用的口試考題","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2015/09/interview-test-engineers/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2015/09/interview-test-engineers/","keywords":"interview, SQL, tree"}</script>
     <meta name="description" content="面試工程師，除了一定要做的實際筆試之外，山姆鍋為了進一步了解候選人(candidate)的能力，會再口頭提問幾個問題。 這些問題對某些人來說，可能覺得不難，但山姆鍋的經驗發現，能夠正確回答出這些問題的比例比預想的少許多。 甚至可以說：會這些題目的工程師，能力已經在水準之上。">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="山姆鍋過去常用的口試考題">
@@ -39,7 +39,7 @@
         
     
     
-        <meta property="og:image" content="https://www.gravatar.com/avatar/2b44878cb27d093ac9c72a495ea642cf?s=640"/>
+        <meta property="og:image" content="https://samkuo.me/images/logo.png"/>
     
     
     
@@ -102,6 +102,8 @@
             <!-- Define author's picture -->
 
 
+
+        
     
 
 <nav id="sidebar" data-behavior="4">
@@ -112,7 +114,7 @@
                     href="/#about"
                     aria-label="閱讀有關作者的更多信息"
                 >
-                    <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/2b44878cb27d093ac9c72a495ea642cf?s=110" alt="作者的圖片"/>
+                    <img class="sidebar-profile-picture" src="/images/logo.png" alt="作者的圖片"/>
                 </a>
                 <h4 class="sidebar-profile-name">Sampot (山姆鍋)</h4>
                 
@@ -670,6 +672,8 @@
 
 
     
+        
+    
 
 <div id="about">
     <div id="about-card">
@@ -677,7 +681,7 @@
             <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="https://www.gravatar.com/avatar/2b44878cb27d093ac9c72a495ea642cf?s=110" alt="作者的圖片"/>
+            <img id="about-card-picture" src="/images/logo.png" alt="作者的圖片"/>
         
             <h4 id="about-card-name">Sampot (山姆鍋)</h4>
         

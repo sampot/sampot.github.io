@@ -17,7 +17,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"/images/logo32.png"},"articleBody":"最近山姆鍋在思考一個大型網路系統架構設計的問題，為什麼是大型網路？因為沒有機會實作，只好紙上談兵幻想一下。 這裡所指的「大型網路」是指可擴展到支持上萬個以上節點(node)的網路架構，為什麼要設計這樣的架構？\n\n系統架構理所當然是為了支援軟體應用的需要而設計，針對軟體應用的特性才能選擇適當的架構。 山姆鍋在思考的問題是一個可以執行不同任務 (task execution) 的網路服務。首先，來看看服務的簡單描述。\n關聯文章：利用 BitTorrent DHT 來控制殭屍網路\n服務描述\n這個軟體服務允許客戶端部署(deploy)不定個數的代理人(agent)到隨機或者特定節點(或稱主機)， 代理人，也可以稱為工作者(worker)，實際負責任務的執行。代理人具備下列特性：\n\n\n\n單一任務導向：\n每個不同的代理人專注在單一目的，如：擷取網頁內容。代理人的執行邏輯由一個腳本(script)所提供， 這裡假設腳本使用的是 Python [1] 。\n\n\n\n\n可以有限數量地派生(spawn)其他代理人：\n此代理人成為被派生的代理人的監管人(supervisor)。\n\n\n\n\n只可以與其他代理人透過訊息(message)溝通：\n代理人只可以透過其他代理人的「參考(reference)」來傳送訊息，「參考」隱藏代理人的通訊位址等資訊。\n\n\n\n聽起來是不是有點熟悉？沒錯，代理人採用的正是「參與者模式 (Actor model) [2] 」。 比較特別的一點：客戶端(client)，也就是派遣代理人到此服務的程式，會被視為整個代理人樹狀階層的根節點(root)。\n由於系統架構通常是用來達成軟體的非功能需求(non-functional requirements)，因此，\n先來了解一下這樣的軟體服務，山姆鍋設定了哪些需求？ [3]\n非功能需求\n\n\n負載均衡(load distribution):\n\n代理人要盡可能平均分散到不同的節點。雖然每個代理人所執行的任務(task)對於系統的負載不同， 但將代理人隨機分散到不同的節點，從長遠來看，可以盡可能善用系統資源。\n\n\n\n高可用性(highly available):\n\n如果一個代理人故障或逾時，監管人(上層代理人)會收到通知，監管人可以決定是否派生其他代理人來取代。\n客戶端是整個代理人階層(hierarchy)的最高監管人，所以，高可用性最終需要客戶端軟體配合。\n\n\n\n高可擴展性(highly scalable)：\n\n整個服務需要可以同時支持大量的客戶端，根據客戶端以及代理人數量可以擴充節點來容納需求。\n\n\n\n容忍網路分割(network partition)：\n\n服務節點組成的網路間可以有網路分割的情形出現，整體服務應該要不受影響，也就是說：不影響可用性。\n\n\n\n支援跨資料中心(cross data centers):\n\n在雲端軟體服務時代，跨資料中心的支援應該列入考慮。這也是第 4 點需求重要的原因。\n\n\n\n代理人間可以位置無關(location transparency)方式溝通:\n\n雖然代理人不需要支援在節點間移動(mobile)，但為了負載均衡，代理人的所在節點可以是隨機決定的。\n\n\n\n結語\n山姆鍋最終目的是要設計一個高可擴展、高可用的的系統架構來支持一個提供任務執行的軟體服務。 本文只簡單描述一下這樣服務的用法與非功能需求。\n架構設計續篇: 高可擴展的任務執行架構設計\n參考資料\n\n參與者模式。\n\n\n\n\n為什麼假設腳本使用 Python？其中一個原因是山姆鍋只知道如何用 Python 實現一個超輕量級沙盒(sandbox)環境， 每個代理人一個軟體容器(Software container)的模式，如 Docker，還是太過耗費資源。 ↩︎\n\nActor model: https://en.wikipedia.org/wiki/Actor_model ↩︎\n\n因為是紙上談兵，山姆鍋只好自己當起客戶代表。 ↩︎\n\n\n\n","dateCreated":"2015-09-25T09:43:00+08:00","dateModified":"2020-03-08T10:21:37+08:00","datePublished":"2015-09-25T09:43:00+08:00","description":"最近山姆鍋在思考一個大型網路系統架構設計的問題，為什麼是大型網路？因為沒有機會實作，只好紙上談兵幻想一下。 這裡所指的「大型網路」是指可擴展到支持上萬個以上節點(node)的網路架構，為什麼要設計這樣的架構？","headline":"高可擴展的任務執行架構需求","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2015/09/architecture-requirements-of-highly-scalable-task-execution/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"/images/logo32.png","logo":{"@type":"ImageObject","url":"/images/logo32.png"}},"url":"https://samkuo.me/post/2015/09/architecture-requirements-of-highly-scalable-task-execution/","keywords":"Grid, Agent"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"最近山姆鍋在思考一個大型網路系統架構設計的問題，為什麼是大型網路？因為沒有機會實作，只好紙上談兵幻想一下。 這裡所指的「大型網路」是指可擴展到支持上萬個以上節點(node)的網路架構，為什麼要設計這樣的架構？\n\n系統架構理所當然是為了支援軟體應用的需要而設計，針對軟體應用的特性才能選擇適當的架構。 山姆鍋在思考的問題是一個可以執行不同任務 (task execution) 的網路服務。首先，來看看服務的簡單描述。\n關聯文章：利用 BitTorrent DHT 來控制殭屍網路\n服務描述\n這個軟體服務允許客戶端部署(deploy)不定個數的代理人(agent)到隨機或者特定節點(或稱主機)， 代理人，也可以稱為工作者(worker)，實際負責任務的執行。代理人具備下列特性：\n\n\n\n單一任務導向：\n每個不同的代理人專注在單一目的，如：擷取網頁內容。代理人的執行邏輯由一個腳本(script)所提供， 這裡假設腳本使用的是 Python [1] 。\n\n\n\n\n可以有限數量地派生(spawn)其他代理人：\n此代理人成為被派生的代理人的監管人(supervisor)。\n\n\n\n\n只可以與其他代理人透過訊息(message)溝通：\n代理人只可以透過其他代理人的「參考(reference)」來傳送訊息，「參考」隱藏代理人的通訊位址等資訊。\n\n\n\n聽起來是不是有點熟悉？沒錯，代理人採用的正是「參與者模式 (Actor model) [2] 」。 比較特別的一點：客戶端(client)，也就是派遣代理人到此服務的程式，會被視為整個代理人樹狀階層的根節點(root)。\n由於系統架構通常是用來達成軟體的非功能需求(non-functional requirements)，因此，\n先來了解一下這樣的軟體服務，山姆鍋設定了哪些需求？ [3]\n非功能需求\n\n\n負載均衡(load distribution):\n\n代理人要盡可能平均分散到不同的節點。雖然每個代理人所執行的任務(task)對於系統的負載不同， 但將代理人隨機分散到不同的節點，從長遠來看，可以盡可能善用系統資源。\n\n\n\n高可用性(highly available):\n\n如果一個代理人故障或逾時，監管人(上層代理人)會收到通知，監管人可以決定是否派生其他代理人來取代。\n客戶端是整個代理人階層(hierarchy)的最高監管人，所以，高可用性最終需要客戶端軟體配合。\n\n\n\n高可擴展性(highly scalable)：\n\n整個服務需要可以同時支持大量的客戶端，根據客戶端以及代理人數量可以擴充節點來容納需求。\n\n\n\n容忍網路分割(network partition)：\n\n服務節點組成的網路間可以有網路分割的情形出現，整體服務應該要不受影響，也就是說：不影響可用性。\n\n\n\n支援跨資料中心(cross data centers):\n\n在雲端軟體服務時代，跨資料中心的支援應該列入考慮。這也是第 4 點需求重要的原因。\n\n\n\n代理人間可以位置無關(location transparency)方式溝通:\n\n雖然代理人不需要支援在節點間移動(mobile)，但為了負載均衡，代理人的所在節點可以是隨機決定的。\n\n\n\n結語\n山姆鍋最終目的是要設計一個高可擴展、高可用的的系統架構來支持一個提供任務執行的軟體服務。 本文只簡單描述一下這樣服務的用法與非功能需求。\n架構設計續篇: 高可擴展的任務執行架構設計\n參考資料\n\n參與者模式。\n\n\n\n\n為什麼假設腳本使用 Python？其中一個原因是山姆鍋只知道如何用 Python 實現一個超輕量級沙盒(sandbox)環境， 每個代理人一個軟體容器(Software container)的模式，如 Docker，還是太過耗費資源。 ↩︎\n\nActor model: https://en.wikipedia.org/wiki/Actor_model ↩︎\n\n因為是紙上談兵，山姆鍋只好自己當起客戶代表。 ↩︎\n\n\n\n","dateCreated":"2015-09-25T09:43:00+08:00","dateModified":"2020-03-08T10:21:37+08:00","datePublished":"2015-09-25T09:43:00+08:00","description":"最近山姆鍋在思考一個大型網路系統架構設計的問題，為什麼是大型網路？因為沒有機會實作，只好紙上談兵幻想一下。 這裡所指的「大型網路」是指可擴展到支持上萬個以上節點(node)的網路架構，為什麼要設計這樣的架構？","headline":"高可擴展的任務執行架構需求","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2015/09/architecture-requirements-of-highly-scalable-task-execution/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2015/09/architecture-requirements-of-highly-scalable-task-execution/","keywords":"Grid, Agent"}</script>
     <meta name="description" content="最近山姆鍋在思考一個大型網路系統架構設計的問題，為什麼是大型網路？因為沒有機會實作，只好紙上談兵幻想一下。 這裡所指的「大型網路」是指可擴展到支持上萬個以上節點(node)的網路架構，為什麼要設計這樣的架構？">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="高可擴展的任務執行架構需求">
@@ -38,7 +38,7 @@
         
     
     
-        <meta property="og:image" content="https://www.gravatar.com/avatar/2b44878cb27d093ac9c72a495ea642cf?s=640"/>
+        <meta property="og:image" content="https://samkuo.me/images/logo.png"/>
     
     
     
@@ -101,6 +101,8 @@
             <!-- Define author's picture -->
 
 
+
+        
     
 
 <nav id="sidebar" data-behavior="4">
@@ -111,7 +113,7 @@
                     href="/#about"
                     aria-label="閱讀有關作者的更多信息"
                 >
-                    <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/2b44878cb27d093ac9c72a495ea642cf?s=110" alt="作者的圖片"/>
+                    <img class="sidebar-profile-picture" src="/images/logo.png" alt="作者的圖片"/>
                 </a>
                 <h4 class="sidebar-profile-name">Sampot (山姆鍋)</h4>
                 
@@ -720,6 +722,8 @@
 
 
     
+        
+    
 
 <div id="about">
     <div id="about-card">
@@ -727,7 +731,7 @@
             <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="https://www.gravatar.com/avatar/2b44878cb27d093ac9c72a495ea642cf?s=110" alt="作者的圖片"/>
+            <img id="about-card-picture" src="/images/logo.png" alt="作者的圖片"/>
         
             <h4 id="about-card-name">Sampot (山姆鍋)</h4>
         

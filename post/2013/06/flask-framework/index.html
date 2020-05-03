@@ -19,7 +19,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"/images/logo32.png"},"articleBody":"「影化身科技」的後台的技術框架中，針對Web應用/服務，採用的是Flask這套應用框架。您也許會疑問：為什麼不使用較流行的Django? 甚至為什麼選擇Python？山姆鍋在這篇文章會分享當初做這樣的決策的主要原因。\n\nEDIT: 2013/10/28: 雖然在某些情況下還會使用，但Flask以經不再是「影化身科技」主要的web應用框架。\n為何使用 Python?\n認識山姆鍋的人都知道，我從事Java後台與Web應用開發多年。照理說，應該是要選擇Java相關的技術或框架。會選擇Python的主要原因是希望利用市場上現有的PaaS服務，其中最重要的是Google App Engine。使用Java平台，執行時期需要的資源相對較高，況且「影化身」並不使用傳統關聯式資料庫，像是JPA/Hibernate這樣的程式庫基本上是用不著。既不想用Java，也需要在Google App Engine上部署軟體，又希望能夠在其他PaaS開發。按照這個思路，Python是很自然的選擇。\n為何選擇 Flask?\n既然選擇Python作為主要(在影化身，我們混合不同技術作開發與部署環境)後端語言，下一步自然是選擇應用框架。過程就不細說了，山姆鍋選擇技術方案憑藉的絕對不會是最科學的方法，往往是因為喜不喜歡來決定。其實應該這樣說：只要能符合要求，其他就看個人喜好。對於Web應用框架，山姆鍋主要的需求如下：\n\n支援RESTful服務/API開發。\n可以根據需要選擇模組。\n支援Google App Engine。\n小而美，容易理解。\n\n這裡需要再說明一點：後端主要是要提供服務給前端客戶端，不會有複雜的用戶界面。不管過程是怎樣，Flask作為「影化身」重要的技術框架之一已經是確定的事。山姆鍋對Django或其他框架不熟悉，沒有資格評論它們的優缺點。選擇Flask的很大原因，真的只是我比較喜歡。如果您是想找關於Flask的優缺點分析，抱歉讓您失望了！\n","dateCreated":"2013-06-18T11:06:00+08:00","dateModified":"2018-08-22T23:54:17+08:00","datePublished":"2013-06-18T11:06:00+08:00","description":"「影化身科技」的後台的技術框架中，針對Web應用/服務，採用的是Flask這套應用框架。您也許會疑問：為什麼不使用較流行的Django? 甚至為什麼選擇Python？山姆鍋在這篇文章會分享當初做這樣的決策的主要原因。","headline":"為何要用Flask Web應用框架","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/06/flask-framework/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"/images/logo32.png","logo":{"@type":"ImageObject","url":"/images/logo32.png"}},"url":"https://samkuo.me/post/2013/06/flask-framework/","keywords":"Python, Flask, Web"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"「影化身科技」的後台的技術框架中，針對Web應用/服務，採用的是Flask這套應用框架。您也許會疑問：為什麼不使用較流行的Django? 甚至為什麼選擇Python？山姆鍋在這篇文章會分享當初做這樣的決策的主要原因。\n\nEDIT: 2013/10/28: 雖然在某些情況下還會使用，但Flask以經不再是「影化身科技」主要的web應用框架。\n為何使用 Python?\n認識山姆鍋的人都知道，我從事Java後台與Web應用開發多年。照理說，應該是要選擇Java相關的技術或框架。會選擇Python的主要原因是希望利用市場上現有的PaaS服務，其中最重要的是Google App Engine。使用Java平台，執行時期需要的資源相對較高，況且「影化身」並不使用傳統關聯式資料庫，像是JPA/Hibernate這樣的程式庫基本上是用不著。既不想用Java，也需要在Google App Engine上部署軟體，又希望能夠在其他PaaS開發。按照這個思路，Python是很自然的選擇。\n為何選擇 Flask?\n既然選擇Python作為主要(在影化身，我們混合不同技術作開發與部署環境)後端語言，下一步自然是選擇應用框架。過程就不細說了，山姆鍋選擇技術方案憑藉的絕對不會是最科學的方法，往往是因為喜不喜歡來決定。其實應該這樣說：只要能符合要求，其他就看個人喜好。對於Web應用框架，山姆鍋主要的需求如下：\n\n支援RESTful服務/API開發。\n可以根據需要選擇模組。\n支援Google App Engine。\n小而美，容易理解。\n\n這裡需要再說明一點：後端主要是要提供服務給前端客戶端，不會有複雜的用戶界面。不管過程是怎樣，Flask作為「影化身」重要的技術框架之一已經是確定的事。山姆鍋對Django或其他框架不熟悉，沒有資格評論它們的優缺點。選擇Flask的很大原因，真的只是我比較喜歡。如果您是想找關於Flask的優缺點分析，抱歉讓您失望了！\n","dateCreated":"2013-06-18T11:06:00+08:00","dateModified":"2018-08-22T23:54:17+08:00","datePublished":"2013-06-18T11:06:00+08:00","description":"「影化身科技」的後台的技術框架中，針對Web應用/服務，採用的是Flask這套應用框架。您也許會疑問：為什麼不使用較流行的Django? 甚至為什麼選擇Python？山姆鍋在這篇文章會分享當初做這樣的決策的主要原因。","headline":"為何要用Flask Web應用框架","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/06/flask-framework/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2013/06/flask-framework/","keywords":"Python, Flask, Web"}</script>
     <meta name="description" content="介紹採用Flask這個Python web應用框架的原因。">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="為何要用Flask Web應用框架">
@@ -41,7 +41,7 @@
         
     
     
-        <meta property="og:image" content="https://www.gravatar.com/avatar/2b44878cb27d093ac9c72a495ea642cf?s=640"/>
+        <meta property="og:image" content="https://samkuo.me/images/logo.png"/>
     
     
     
@@ -104,6 +104,8 @@
             <!-- Define author's picture -->
 
 
+
+        
     
 
 <nav id="sidebar" data-behavior="4">
@@ -114,7 +116,7 @@
                     href="/#about"
                     aria-label="閱讀有關作者的更多信息"
                 >
-                    <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/2b44878cb27d093ac9c72a495ea642cf?s=110" alt="作者的圖片"/>
+                    <img class="sidebar-profile-picture" src="/images/logo.png" alt="作者的圖片"/>
                 </a>
                 <h4 class="sidebar-profile-name">Sampot (山姆鍋)</h4>
                 
@@ -650,6 +652,8 @@
 
 
     
+        
+    
 
 <div id="about">
     <div id="about-card">
@@ -657,7 +661,7 @@
             <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="https://www.gravatar.com/avatar/2b44878cb27d093ac9c72a495ea642cf?s=110" alt="作者的圖片"/>
+            <img id="about-card-picture" src="/images/logo.png" alt="作者的圖片"/>
         
             <h4 id="about-card-name">Sampot (山姆鍋)</h4>
         

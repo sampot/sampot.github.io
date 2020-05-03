@@ -17,7 +17,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"/images/logo32.png"},"articleBody":"過去這段時間，使用 Vagrant/Puppet 來實驗不同的 DevOps 相關技術，也著實有不少收獲。\n也許太過習慣 Vagrant 帶來的便利，山姆鍋都快把使用 Puppet 來配置系統視為理所當然。\n但所謂「魔鬼藏在細節裡」，不同的雲端虛擬機供應商可提供的系統映像(VM\nimage)以及其它差異， 導致從虛擬機建立到\nPuppet(或其它系統配置工具)能夠接手中間出現了一些阻礙！\n\n\n關聯文章: 讓 Vagrant 部署虛擬機到 DigitalOcean\n平台\n\n使用 Vagrant/Puppet 以及雲端虛擬機的部署方式可以簡化成下列步驟：\n\n決定虛擬機使用的系統映像(image)。\n建立(create)虛擬機實例(instance)。\n根據此虛擬機的角色(roles)與責任(responsibilities)來配置系統。\n\n理想上，同一個系統的服務器使用的系統映像應該是同一個。系統根據當下需要的功能來配置新建立的虛擬機，\n這樣可以避免因為映像包含應用套件而導致組合爆炸的問題。當然系統映像還是會更換，但是頻率較低且間隔也較長。\nPacker\n這類工具的出現，雖然簡化建構虛擬映像的負擔，\n但畢竟雲端虛擬機部署映像的方式每家供應商都不太相同，山姆鍋不傾向使用這種方式。\n問題\n要知道如何解決之前，需要先知道雲端虛擬機供應商之間的一些差異造成的問題：\n\n不是所有供應商都允許客戶使用客制的系統映像。\n提供的系統映像未必有預先安裝像 Puppet/Chef 這類系統配置工具。\n就算有預裝系統配置工具，可能版本太舊或是與公司使用的不同。\n要如何讓剛啓動的虛擬機知道要它該負責的角色？\n\n首先，也許您會問：「為什麼不使用同一家符合要求的供應商就好？」這樣，的確是可以省掉很多麻煩，\n但這樣做不好的基本原因就在供應商套牢(Vedor\nLock-in)的問題。為了選擇的彈性，\n山姆鍋通常不喜歡只有一家公司的產品或服務可以選擇。既然決定採用可以適用最多供應商的做法，\n我們就來看看上述這些問題該如何處理。\n關於第 1 點，在不使用客制的系統映像的條件下，我們只好選擇通用的作業系統來因應。\n「影化身科技」採用 Ubuntu 12.04 LTS\n64-bit 系統，應該所有供應商都有對應的映像可以選擇，\n所以，問題不大。由於一些通用的系統套件不能預先安裝，不能使用客制映像會讓系統配置需要花費較長時間。\n要處理第 2 跟第 3 點，雖然有點違反直覺，但還不至於難處理。利用 Shell\n腳本來設定系統以及安裝 Puppet 後，\n讓 Puppet 接手後續配置的工作。幸好 Vagrant 支援使用 Shell\n腳本來做系統配置的工作。 雖然\ncloud-init\n也可以用來做系統配置的初始化工作，但不是所有系統映像都有內建支援它，\n所以，使用 Shell\n腳本還是比較實際。因為不想針對不同的虛擬機使用不同的 Shell 腳本，我們還需要解決第 4 點的問題。\n有了 shell\n腳本打先鋒建立一個可以用 Puppet 配置的虛擬機之後，要如何讓 Puppet 知道此虛擬機需要扮演的角色？\nAmazon\n針對這點提供所謂 User-data 的機制。User-data 是在虛擬機建立實例時指定的參數，\n在虛擬機執行時內部程式可以讀取這些參數。借由 User-data，我們可以讓 Puppet 知道虛擬機該以何種角色配置。\n因為，Puppet 已經有我們提供關於不同角色的配置方法，所以，需要傳遞的 User-data 量並不多，基本上，\n只是虛擬機所屬的環境(測試、UAT 等等)以及它要負責的角色(web, db, etc.)。\n看到這裡，您可能會以為問題就此解決了！很不幸的是，同樣不是所有供應商都支援 User-data 或類似的機制。\n方案\n假如您同山姆鍋一樣使用 Vagrant 來作為虛擬機整備工作，解決方法在上面有稍微提到:\n使用 Vagrant 的\nShell 腳本來配置。Vagrant 提供的 Shell 腳本配置方法同時允許我們傳遞額外的參數，\n如此就可以有一個跨雲端平台(供應商)的方法可以讓 Puppet 知道虛擬機要扮演的角色了！\n由於只需要 SSH 服務跟 Python，其實 Ansible 應該也可以把虛擬機整備成適合 Puppet 管理的狀態。\n不過，Ansible\n本身算是完整的配置管理方案，學習上門檻比使用 shell 高些，況且跟 Puppet 一起使用，\n之間重疊的功能太多。\n結語\n雖然很希望只使用單一個系統映像，建立後直接使用 Puppet 或是其它系統配置工具來做完系統整備與配置工作。\n但是，畢竟現實跟理想總會有些差距，面對現實問題，我們也只能想辦法解決。\n","dateCreated":"2013-11-11T09:51:00+08:00","dateModified":"2018-08-22T18:59:51+08:00","datePublished":"2013-11-11T09:51:00+08:00","description":"過去這段時間，使用 Vagrant/Puppet 來實驗不同的 DevOps 相關技術，也著實有不少收獲。\n也許太過習慣 Vagrant 帶來的便利，山姆鍋都快把使用 Puppet 來配置系統視為理所當然。\n但所謂「魔鬼藏在細節裡」，不同的雲端虛擬機供應商可提供的系統映像(VM\nimage)以及其它差異， 導致從虛擬機建立到\nPuppet(或其它系統配置工具)能夠接手中間出現了一些阻礙！","headline":"跨出雲端虛擬機部署的第一步","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/11/the-baby-step-of-vm-provisioning-in-the-cloud/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"/images/logo32.png","logo":{"@type":"ImageObject","url":"/images/logo32.png"}},"url":"https://samkuo.me/post/2013/11/the-baby-step-of-vm-provisioning-in-the-cloud/","keywords":"Vagrant, cloud-init"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"過去這段時間，使用 Vagrant/Puppet 來實驗不同的 DevOps 相關技術，也著實有不少收獲。\n也許太過習慣 Vagrant 帶來的便利，山姆鍋都快把使用 Puppet 來配置系統視為理所當然。\n但所謂「魔鬼藏在細節裡」，不同的雲端虛擬機供應商可提供的系統映像(VM\nimage)以及其它差異， 導致從虛擬機建立到\nPuppet(或其它系統配置工具)能夠接手中間出現了一些阻礙！\n\n\n關聯文章: 讓 Vagrant 部署虛擬機到 DigitalOcean\n平台\n\n使用 Vagrant/Puppet 以及雲端虛擬機的部署方式可以簡化成下列步驟：\n\n決定虛擬機使用的系統映像(image)。\n建立(create)虛擬機實例(instance)。\n根據此虛擬機的角色(roles)與責任(responsibilities)來配置系統。\n\n理想上，同一個系統的服務器使用的系統映像應該是同一個。系統根據當下需要的功能來配置新建立的虛擬機，\n這樣可以避免因為映像包含應用套件而導致組合爆炸的問題。當然系統映像還是會更換，但是頻率較低且間隔也較長。\nPacker\n這類工具的出現，雖然簡化建構虛擬映像的負擔，\n但畢竟雲端虛擬機部署映像的方式每家供應商都不太相同，山姆鍋不傾向使用這種方式。\n問題\n要知道如何解決之前，需要先知道雲端虛擬機供應商之間的一些差異造成的問題：\n\n不是所有供應商都允許客戶使用客制的系統映像。\n提供的系統映像未必有預先安裝像 Puppet/Chef 這類系統配置工具。\n就算有預裝系統配置工具，可能版本太舊或是與公司使用的不同。\n要如何讓剛啓動的虛擬機知道要它該負責的角色？\n\n首先，也許您會問：「為什麼不使用同一家符合要求的供應商就好？」這樣，的確是可以省掉很多麻煩，\n但這樣做不好的基本原因就在供應商套牢(Vedor\nLock-in)的問題。為了選擇的彈性，\n山姆鍋通常不喜歡只有一家公司的產品或服務可以選擇。既然決定採用可以適用最多供應商的做法，\n我們就來看看上述這些問題該如何處理。\n關於第 1 點，在不使用客制的系統映像的條件下，我們只好選擇通用的作業系統來因應。\n「影化身科技」採用 Ubuntu 12.04 LTS\n64-bit 系統，應該所有供應商都有對應的映像可以選擇，\n所以，問題不大。由於一些通用的系統套件不能預先安裝，不能使用客制映像會讓系統配置需要花費較長時間。\n要處理第 2 跟第 3 點，雖然有點違反直覺，但還不至於難處理。利用 Shell\n腳本來設定系統以及安裝 Puppet 後，\n讓 Puppet 接手後續配置的工作。幸好 Vagrant 支援使用 Shell\n腳本來做系統配置的工作。 雖然\ncloud-init\n也可以用來做系統配置的初始化工作，但不是所有系統映像都有內建支援它，\n所以，使用 Shell\n腳本還是比較實際。因為不想針對不同的虛擬機使用不同的 Shell 腳本，我們還需要解決第 4 點的問題。\n有了 shell\n腳本打先鋒建立一個可以用 Puppet 配置的虛擬機之後，要如何讓 Puppet 知道此虛擬機需要扮演的角色？\nAmazon\n針對這點提供所謂 User-data 的機制。User-data 是在虛擬機建立實例時指定的參數，\n在虛擬機執行時內部程式可以讀取這些參數。借由 User-data，我們可以讓 Puppet 知道虛擬機該以何種角色配置。\n因為，Puppet 已經有我們提供關於不同角色的配置方法，所以，需要傳遞的 User-data 量並不多，基本上，\n只是虛擬機所屬的環境(測試、UAT 等等)以及它要負責的角色(web, db, etc.)。\n看到這裡，您可能會以為問題就此解決了！很不幸的是，同樣不是所有供應商都支援 User-data 或類似的機制。\n方案\n假如您同山姆鍋一樣使用 Vagrant 來作為虛擬機整備工作，解決方法在上面有稍微提到:\n使用 Vagrant 的\nShell 腳本來配置。Vagrant 提供的 Shell 腳本配置方法同時允許我們傳遞額外的參數，\n如此就可以有一個跨雲端平台(供應商)的方法可以讓 Puppet 知道虛擬機要扮演的角色了！\n由於只需要 SSH 服務跟 Python，其實 Ansible 應該也可以把虛擬機整備成適合 Puppet 管理的狀態。\n不過，Ansible\n本身算是完整的配置管理方案，學習上門檻比使用 shell 高些，況且跟 Puppet 一起使用，\n之間重疊的功能太多。\n結語\n雖然很希望只使用單一個系統映像，建立後直接使用 Puppet 或是其它系統配置工具來做完系統整備與配置工作。\n但是，畢竟現實跟理想總會有些差距，面對現實問題，我們也只能想辦法解決。\n","dateCreated":"2013-11-11T09:51:00+08:00","dateModified":"2018-08-22T18:59:51+08:00","datePublished":"2013-11-11T09:51:00+08:00","description":"過去這段時間，使用 Vagrant/Puppet 來實驗不同的 DevOps 相關技術，也著實有不少收獲。\n也許太過習慣 Vagrant 帶來的便利，山姆鍋都快把使用 Puppet 來配置系統視為理所當然。\n但所謂「魔鬼藏在細節裡」，不同的雲端虛擬機供應商可提供的系統映像(VM\nimage)以及其它差異， 導致從虛擬機建立到\nPuppet(或其它系統配置工具)能夠接手中間出現了一些阻礙！","headline":"跨出雲端虛擬機部署的第一步","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/11/the-baby-step-of-vm-provisioning-in-the-cloud/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2013/11/the-baby-step-of-vm-provisioning-in-the-cloud/","keywords":"Vagrant, cloud-init"}</script>
     <meta name="description" content="過去這段時間，使用 Vagrant&#x2F;Puppet 來實驗不同的 DevOps 相關技術，也著實有不少收獲。 也許太過習慣 Vagrant 帶來的便利，山姆鍋都快把使用 Puppet 來配置系統視為理所當然。 但所謂「魔鬼藏在細節裡」，不同的雲端虛擬機供應商可提供的系統映像(VM image)以及其它差異， 導致從虛擬機建立到 Puppet(或其它系統配置工具)能夠接手中間出現了一些阻礙！">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="跨出雲端虛擬機部署的第一步">
@@ -38,7 +38,7 @@
         
     
     
-        <meta property="og:image" content="https://www.gravatar.com/avatar/2b44878cb27d093ac9c72a495ea642cf?s=640"/>
+        <meta property="og:image" content="https://samkuo.me/images/logo.png"/>
     
     
     
@@ -101,6 +101,8 @@
             <!-- Define author's picture -->
 
 
+
+        
     
 
 <nav id="sidebar" data-behavior="4">
@@ -111,7 +113,7 @@
                     href="/#about"
                     aria-label="閱讀有關作者的更多信息"
                 >
-                    <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/2b44878cb27d093ac9c72a495ea642cf?s=110" alt="作者的圖片"/>
+                    <img class="sidebar-profile-picture" src="/images/logo.png" alt="作者的圖片"/>
                 </a>
                 <h4 class="sidebar-profile-name">Sampot (山姆鍋)</h4>
                 
@@ -699,6 +701,8 @@ Shell 腳本來配置。Vagrant 提供的 Shell 腳本配置方法同時允許�
 
 
     
+        
+    
 
 <div id="about">
     <div id="about-card">
@@ -706,7 +710,7 @@ Shell 腳本來配置。Vagrant 提供的 Shell 腳本配置方法同時允許�
             <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="https://www.gravatar.com/avatar/2b44878cb27d093ac9c72a495ea642cf?s=110" alt="作者的圖片"/>
+            <img id="about-card-picture" src="/images/logo.png" alt="作者的圖片"/>
         
             <h4 id="about-card-name">Sampot (山姆鍋)</h4>
         
