@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="我是山姆鍋">
-    <title>建構自己的雲端持續整合系統(中) - 我是山姆鍋</title>
+    <title>建構自己的雲端持續整合系統 (中) - 我是山姆鍋</title>
     <meta name="author" content="Sampot (山姆鍋)">
     
         <meta name="keywords" content="continuous integraton,Jenkins,Vagrant,Puppet,持續交付">
@@ -19,17 +19,17 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"featured_image.jpg"},"articleBody":"\n\n\n\nPhoto Credit: freddie boy via Compfight cc\n\n本文延續 上篇文章說明一個山姆鍋利用 Jenkins 建構的持續整合系統，這個系統跟 Google Apps for Business 認證整合(或者也可以使用其它 OpenID providers)。按照建議的架構，採用 Master-slave 叢集方式，團隊可以視需要增減 slave 服務器。\n運用的 Jenkins 插件\n除了完成認證整合與叢集架構所需的插件外，山姆鍋也將日後比較常用的一併安裝。下面是讓整個架構變成可能的兩個插件：\nOpenID 插件\n這個插件讓 Jenkins 可以使用 OpenID 來認證用戶身份，它對 Google Apps for Business 也有直接支援。\nSwarm 插件\n這個插件的目的就是要讓從屬服務器可以動態地加入叢集中。這個插件需要裝在 Master 服務器上，Slave 服務器會在啟動時自動跟 Master 服務器註冊並開始接受工作。\n網路架構\n為了跟實際運用比較接近，以一台主服務器加上兩台從屬服務器爲網路架構。\n主服務器\n123網域名稱: master.example.comPuppet配置檔：master-node.ppIP位址： 192.168.33.10\n從屬服務器 1\n123網域名稱: ci-slave-1.example.comPuppet配置檔：slave-node.ppIP位址： 192.168.33.11\n從屬服務器 2\n123網域名稱: ci-slave-2.example.comPuppet配置檔：slave-node.ppIP位址： 192.168.33.12\nMaster 服務器配置\n要讓 Jenkins 可以跟 Google Apps for Business 整合，需要兩個基本資料：\n\nGoogle Apps for Business 的域名。\n作為系統管理員的用戶 Email，其實也就是登入使用的 ID。\n除了這位系統管理員外，其他經過認證的用戶的權限是由’authenticated’這個特殊用戶決定。所以，您可以根據需要調整’authenticated’用戶的權限。\n\n注意：目前那兩個設定都被註解掉，沒有這兩個設定的話，預設是不會做身份認證。\n123456789101112131415161718192021222324252627282930313233class &#123; 'apt':&#125;class &#123; 'java':&#125;package &#123;'git':    ensure =&gt; 'installed',&#125;class &#123;'jenkins':    version =&gt; '1.509.4',    install_java =&gt; false,    lts =&gt; true,#    domain =&gt; 'example.com',#    admin_email =&gt; 'admin@example.com',    plugin_hash =&gt; &#123;     'git' =&gt; &#123; version =&gt; '2.0' &#125;,     'parameterized-trigger' =&gt; &#123; version =&gt; '2.21' &#125;,     'credentials' =&gt; &#123; version =&gt; '1.9.1', pinned =&gt; true, override =&gt; true &#125;,     'ssh-credentials' =&gt; &#123; version =&gt; '1.5.1', pinned =&gt; true, override =&gt; true &#125;,     'git-client' =&gt; &#123; version =&gt; '1.4.6' &#125;,     'scm-api' =&gt; &#123; version =&gt; '0.2' &#125;,     'multiple-scms' =&gt; &#123; version =&gt; '0.2' &#125;,     'promoted-builds' =&gt; &#123; version =&gt; '2.14' &#125;,     'token-macro' =&gt; &#123; version =&gt; '1.9' &#125;,     'gradle' =&gt; &#123; version =&gt; '1.23' &#125;,     'openid' =&gt; &#123; version =&gt; '1.7' &#125;,     'build-pipeline-plugin' =&gt; &#123; version =&gt; '1.4.2' &#125;,     'build-name-setter' =&gt; &#123; version =&gt; '1.3' &#125;,     'jacoco' =&gt; &#123; version =&gt; '1.0.13' &#125;,     'clone-workspace-scm' =&gt; &#123; version =&gt; '0.6' &#125;,   &#125;\nJenkins 預設就帶有’credentials’以及’ssh-credentials’這兩個套件，如果只是使用一般方式安裝，在重開機後，Jenkins 就會用內建的版本覆蓋掉新版本。要避免這樣的行為，需要在插件安裝目錄建一個定錨檔(pinned)，例如：插件名稱是’plugin_name’，則定錨檔會是 $JENKINS_HOME/plugins/plugin_name.jpi.pinned。'pinned=&gt;true’的目的就是為了產生定錨檔，讓 Jenkins 不要覆蓋。\n插件安裝會從網路上下載後解開到插件安裝路徑，但是如果安裝路徑已經有相關的插件則不會進行。'override=&gt;true’設定是要強迫下載後覆蓋已經存在的插件。\n配置裡面的插件說明，您可以參考 Jenkins 的 Wiki。\nSlave 服務器配置\nSlave 服務器的配置相對簡單很多，因為它基本上是透過 Web Start 機制從 Master 服務器下載與安裝所需的程式。\n123456789101112class &#123; 'apt':&#125;class &#123; 'java':&#125;class &#123; 'jenkins::slave':    masterurl =&gt; 'http://192.168.33.10:8080',    ui_user =&gt; 'ADMIN_USER',    ui_pass =&gt; 'API_KEY',    install_java =&gt; false,&#125;\n其中的 'ADMIN_USER’就是預設擁有系統管理權限的用戶; 'API_KEY’是 Jenkins 配發給該用戶的 API Key。為什麼需要使用 API KEY 呢？由於我們採用 OpenID 來做用戶認證，導致 slave 服務器無法使用預設的簡單認證(basic authentication)機制。但沒有認證，slave 是無法加入叢集的，為了解決這樣的問題，Jenkins 針對程式提供一個通用的認證方式。這樣不管用戶的認證方式爲何，都不會影響的系統間的認證機制。\n系統啟動順序\n雖然山姆鍋也想做到不管 Master 或 Slave 服務器誰先開都無所謂，最終都要可以形成叢集。但是由於 slave 服務器上需要設定一個註冊的時候用的認證資料，也就是配置說明中的’ADMIN_USER’以及’API_KEY’。雖然’ADMIN_USER’可以預先得知，但’API_KEY’是在 master 服務器啟動完成後才能得知。所以，啟動這個系統需要按照下列順序：\n\n開啓 master 服務器：在 Vagrant 環境下，透過下列指令：\n\n1$ vagrant up master\n這樣，Vagrant 只會啟動 master 服務器。\n\n\nMaster 服務器正常啟動後，登入到 Jenkins 頁面，選擇右上方出現的用戶名稱聯結後，在左邊選單選擇&quot;設定&quot;(setting)出現該用戶的設定頁，從這頁可以取得該用戶的 API Key。\n\n\n將取得 API KEY 設定到 slave 的 Puppet 配置檔後，根據需要開啓所需數量的 slave 服務器。\n\n\n小結\n利用 Vagrant 來整備(provision)需要的服務器，再運用 Puppet(或您偏好的配置管理系統)來自動安裝跟部署需要的軟體套件，這樣的組合真的是很有力的工具。透過這個工具，山姆鍋提供一個方案來建置一個適合生產環境使用的持續整合系統。雖然，使用這樣的方式不代表說您就可以不需要了解背後的運作原理，但至少在急需的時候，有機會可以如法炮製。","dateCreated":"2013-11-15T15:11:00+08:00","dateModified":"2020-03-08T10:22:33+08:00","datePublished":"2013-11-15T15:11:00+08:00","description":"本文延續 上篇文章說明一個山姆鍋利用 Jenkins 建構的持續整合系統，這個系統跟 Google Apps for Business 認證整合(或者也可以使用其它 OpenID providers)。按照建議的架構，採用 Master-slave 叢集方式，團隊可以視需要增減 slave 服務器。","headline":"建構自己的雲端持續整合系統(中)","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/11/build-own-cloud-continuous-integration-system-p2/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"featured_image.jpg","logo":{"@type":"ImageObject","url":"featured_image.jpg"}},"url":"https://samkuo.me/post/2013/11/build-own-cloud-continuous-integration-system-p2/","keywords":"Jenkins, Vagrant, Puppet, DevOps, Operations"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"\n\n\n\nPhoto Credit: freddie boy via Compfight cc\n\n本文延續 上篇文章說明一個山姆鍋利用 Jenkins 建構的持續整合系統，這個系統跟 Google Apps for Business 認證整合 (或者也可以使用其它 OpenID providers)。按照建議的架構，採用 Master-slave 叢集方式，團隊可以視需要增減 slave 服務器。\n運用的 Jenkins 插件\n除了完成認證整合與叢集架構所需的插件外，山姆鍋也將日後比較常用的一併安裝。下面是讓整個架構變成可能的兩個插件：\nOpenID 插件\n這個插件讓 Jenkins 可以使用 OpenID 來認證用戶身份，它對 Google Apps for Business 也有直接支援。\nSwarm 插件\n這個插件的目的就是要讓從屬服務器可以動態地加入叢集中。這個插件需要裝在 Master 服務器上，Slave 服務器會在啟動時自動跟 Master 服務器註冊並開始接受工作。\n網路架構\n為了跟實際運用比較接近，以一台主服務器加上兩台從屬服務器爲網路架構。\n主服務器\n123網域名稱: master.example.comPuppet配置檔：master-node.ppIP位址： 192.168.33.10\n從屬服務器 1\n123網域名稱: ci-slave-1.example.comPuppet配置檔：slave-node.ppIP位址： 192.168.33.11\n從屬服務器 2\n123網域名稱: ci-slave-2.example.comPuppet配置檔：slave-node.ppIP位址： 192.168.33.12\nMaster 服務器配置\n要讓 Jenkins 可以跟 Google Apps for Business 整合，需要兩個基本資料：\n\nGoogle Apps for Business 的域名。\n作為系統管理員的用戶 Email，其實也就是登入使用的 ID。\n除了這位系統管理員外，其他經過認證的用戶的權限是由’authenticated’這個特殊用戶決定。所以，您可以根據需要調整’authenticated’用戶的權限。\n\n注意：目前那兩個設定都被註解掉，沒有這兩個設定的話，預設是不會做身份認證。\n123456789101112131415161718192021222324252627282930313233class { 'apt':}class { 'java':}package {'git':    ensure =&gt; 'installed',}class {'jenkins':    version =&gt; '1.509.4',    install_java =&gt; false,    lts =&gt; true,#    domain =&gt; 'example.com',#    admin_email =&gt; 'admin@example.com',    plugin_hash =&gt; {     'git' =&gt; { version =&gt; '2.0' },     'parameterized-trigger' =&gt; { version =&gt; '2.21' },     'credentials' =&gt; { version =&gt; '1.9.1', pinned =&gt; true, override =&gt; true },     'ssh-credentials' =&gt; { version =&gt; '1.5.1', pinned =&gt; true, override =&gt; true },     'git-client' =&gt; { version =&gt; '1.4.6' },     'scm-api' =&gt; { version =&gt; '0.2' },     'multiple-scms' =&gt; { version =&gt; '0.2' },     'promoted-builds' =&gt; { version =&gt; '2.14' },     'token-macro' =&gt; { version =&gt; '1.9' },     'gradle' =&gt; { version =&gt; '1.23' },     'openid' =&gt; { version =&gt; '1.7' },     'build-pipeline-plugin' =&gt; { version =&gt; '1.4.2' },     'build-name-setter' =&gt; { version =&gt; '1.3' },     'jacoco' =&gt; { version =&gt; '1.0.13' },     'clone-workspace-scm' =&gt; { version =&gt; '0.6' },   }\nJenkins 預設就帶有’credentials’以及’ssh-credentials’這兩個套件，如果只是使用一般方式安裝，在重開機後，Jenkins 就會用內建的版本覆蓋掉新版本。要避免這樣的行為，需要在插件安裝目錄建一個定錨檔 (pinned)，例如：插件名稱是’plugin_name’，則定錨檔會是 $JENKINS_HOME/plugins/plugin_name.jpi.pinned。'pinned=&gt;true’的目的就是為了產生定錨檔，讓 Jenkins 不要覆蓋。\n插件安裝會從網路上下載後解開到插件安裝路徑，但是如果安裝路徑已經有相關的插件則不會進行。'override=&gt;true’設定是要強迫下載後覆蓋已經存在的插件。\n配置裡面的插件說明，您可以參考 Jenkins 的 Wiki。\nSlave 服務器配置\nSlave 服務器的配置相對簡單很多，因為它基本上是透過 Web Start 機制從 Master 服務器下載與安裝所需的程式。\n123456789101112class { 'apt':}class { 'java':}class { 'jenkins::slave':    masterurl =&gt; 'http://192.168.33.10:8080',    ui_user =&gt; 'ADMIN_USER',    ui_pass =&gt; 'API_KEY',    install_java =&gt; false,}\n其中的 'ADMIN_USER’就是預設擁有系統管理權限的用戶；'API_KEY’是 Jenkins 配發給該用戶的 API Key。為什麼需要使用 API KEY 呢？由於我們採用 OpenID 來做用戶認證，導致 slave 服務器無法使用預設的簡單認證 (basic authentication) 機制。但沒有認證，slave 是無法加入叢集的，為了解決這樣的問題，Jenkins 針對程式提供一個通用的認證方式。這樣不管用戶的認證方式爲何，都不會影響的系統間的認證機制。\n系統啟動順序\n雖然山姆鍋也想做到不管 Master 或 Slave 服務器誰先開都無所謂，最終都要可以形成叢集。但是由於 slave 服務器上需要設定一個註冊的時候用的認證資料，也就是配置說明中的’ADMIN_USER’以及’API_KEY’。雖然’ADMIN_USER’可以預先得知，但’API_KEY’是在 master 服務器啟動完成後才能得知。所以，啟動這個系統需要按照下列順序：\n\n開啓 master 服務器：在 Vagrant 環境下，透過下列指令：\n\n1$ vagrant up master\n這樣，Vagrant 只會啟動 master 服務器。\n\n\nMaster 服務器正常啟動後，登入到 Jenkins 頁面，選擇右上方出現的用戶名稱聯結後，在左邊選單選擇 \"設定\"(setting) 出現該用戶的設定頁，從這頁可以取得該用戶的 API Key。\n\n\n將取得 API KEY 設定到 slave 的 Puppet 配置檔後，根據需要開啓所需數量的 slave 服務器。\n\n\n小結\n利用 Vagrant 來整備 (provision) 需要的服務器，再運用 Puppet (或您偏好的配置管理系統) 來自動安裝跟部署需要的軟體套件，這樣的組合真的是很有力的工具。透過這個工具，山姆鍋提供一個方案來建置一個適合生產環境使用的持續整合系統。雖然，使用這樣的方式不代表說您就可以不需要了解背後的運作原理，但至少在急需的時候，有機會可以如法炮製。","dateCreated":"2013-11-15T15:11:00+08:00","dateModified":"2020-05-04T06:45:46+08:00","datePublished":"2013-11-15T15:11:00+08:00","description":"本文延續 上篇文章說明一個山姆鍋利用 Jenkins 建構的持續整合系統，這個系統跟 Google Apps for Business 認證整合 (或者也可以使用其它 OpenID providers)。按照建議的架構，採用 Master-slave 叢集方式，團隊可以視需要增減 slave 服務器。","headline":"建構自己的雲端持續整合系統 (中)","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/11/build-own-cloud-continuous-integration-system-p2/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2013/11/build-own-cloud-continuous-integration-system-p2/","keywords":"Jenkins, Vagrant, Puppet, DevOps, Operations"}</script>
     <meta name="description" content="山姆鍋分享如何使用Jenkins快速建構一個雲端持續整合系統。">
 <meta property="og:type" content="blog">
-<meta property="og:title" content="建構自己的雲端持續整合系統(中)">
+<meta property="og:title" content="建構自己的雲端持續整合系統 (中)">
 <meta property="og:url" content="https://samkuo.me/post/2013/11/build-own-cloud-continuous-integration-system-p2/">
 <meta property="og:site_name" content="我是山姆鍋">
 <meta property="og:description" content="山姆鍋分享如何使用Jenkins快速建構一個雲端持續整合系統。">
 <meta property="og:locale" content="zh_TW">
 <meta property="og:image" content="https://samkuo.me/post/2013/11/build-own-cloud-continuous-integration-system-p2/5171061659.jpg">
 <meta property="article:published_time" content="2013-11-15T07:11:00.000Z">
-<meta property="article:modified_time" content="2020-03-08T02:22:33.632Z">
+<meta property="article:modified_time" content="2020-05-03T22:45:46.230Z">
 <meta property="article:author" content="Sampot (山姆鍋)">
 <meta property="article:tag" content="continuous integraton">
 <meta property="article:tag" content="Jenkins">
@@ -44,9 +44,7 @@
     
         
     
-    
-        <meta property="og:image" content="https://samkuo.me/images/featured_image.jpg"/>
-    
+    <meta property="og:image" content="https://samkuo.me/images/featured_image.jpg"/>
     
     
     
@@ -120,7 +118,7 @@
                     href="/#about"
                     aria-label="閱讀有關作者的更多信息"
                 >
-                    <img class="sidebar-profile-picture" src="/images/featured_image.jpg" alt="作者的圖片"/>
+                    <img class="sidebar-profile-picture" src="/images/logo.png" alt="作者的圖片"/>
                 </a>
                 <h4 class="sidebar-profile-name">Sampot (山姆鍋)</h4>
                 
@@ -293,10 +291,10 @@
                                 target="_blank"
                             
                             rel="noopener"
-                            title="Email"
+                            title="聯絡"
                         >
                         <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Email</span>
+                        <span class="sidebar-button-desc">聯絡</span>
                     </a>
             </li>
             
@@ -349,7 +347,7 @@
         <div class="post-header main-content-wrap text-left">
     
         <h1 class="post-title">
-            建構自己的雲端持續整合系統(中)
+            建構自己的雲端持續整合系統 (中)
         </h1>
     
     
@@ -380,7 +378,7 @@
 
 <div align="center">Photo Credit: <a href="https://www.flickr.com/photos/36307913@N00/5171061659/" target="_blank" rel="noopener">freddie boy</a> via <a href="http://compfight.com" target="_blank" rel="noopener">Compfight</a> <a href="https://creativecommons.org/licenses/by-sa/2.0/" target="_blank" rel="noopener">cc</a></div>
 
-<p>本文延續 <a href="/post/2013/11/build-own-cloud-continuous-integration-system">上篇文章</a>說明一個山姆鍋利用 Jenkins 建構的持續整合系統，這個系統跟 Google Apps for Business 認證整合(或者也可以使用其它 OpenID providers)。按照建議的架構，採用 Master-slave 叢集方式，團隊可以視需要增減 slave 服務器。</p>
+<p>本文延續 <a href="/post/2013/11/build-own-cloud-continuous-integration-system">上篇文章</a>說明一個山姆鍋利用 Jenkins 建構的持續整合系統，這個系統跟 Google Apps for Business 認證整合 (或者也可以使用其它 OpenID providers)。按照建議的架構，採用 Master-slave 叢集方式，團隊可以視需要增減 slave 服務器。</p>
 <h3 id="運用的-Jenkins-插件">運用的 Jenkins 插件</h3>
 <p>除了完成認證整合與叢集架構所需的插件外，山姆鍋也將日後比較常用的一併安裝。下面是讓整個架構變成可能的兩個插件：</p>
 <h4 id="OpenID-插件">OpenID 插件</h4>
@@ -390,11 +388,11 @@
 <h3 id="網路架構">網路架構</h3>
 <p>為了跟實際運用比較接近，以一台主服務器加上兩台從屬服務器爲網路架構。</p>
 <h4 id="主服務器">主服務器</h4>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">網域名稱: master.example.com</span><br><span class="line">Puppet配置檔：master-node.pp</span><br><span class="line">IP位址： 192.168.33.10</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">網域名稱: master.example.com</span><br><span class="line">Puppet配置檔：master-node.pp</span><br><span class="line">IP位址： 192.168.33.10</span><br></pre></td></tr></tbody></table></figure>
 <h4 id="從屬服務器-1">從屬服務器 1</h4>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">網域名稱: ci-slave-1.example.com</span><br><span class="line">Puppet配置檔：slave-node.pp</span><br><span class="line">IP位址： 192.168.33.11</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">網域名稱: ci-slave-1.example.com</span><br><span class="line">Puppet配置檔：slave-node.pp</span><br><span class="line">IP位址： 192.168.33.11</span><br></pre></td></tr></tbody></table></figure>
 <h4 id="從屬服務器-2">從屬服務器 2</h4>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">網域名稱: ci-slave-2.example.com</span><br><span class="line">Puppet配置檔：slave-node.pp</span><br><span class="line">IP位址： 192.168.33.12</span><br></pre></td></tr></table></figure>
+<figure class="highlight yaml"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">網域名稱:</span> <span class="string">ci-slave-2.example.com</span></span><br><span class="line"><span class="string">Puppet配置檔：slave-node.pp</span></span><br><span class="line"><span class="string">IP位址：</span> <span class="number">192.168</span><span class="number">.33</span><span class="number">.12</span></span><br></pre></td></tr></tbody></table></figure>
 <h3 id="Master-服務器配置">Master 服務器配置</h3>
 <p>要讓 Jenkins 可以跟 Google Apps for Business 整合，需要兩個基本資料：</p>
 <ol>
@@ -403,31 +401,31 @@
 除了這位系統管理員外，其他經過認證的用戶的權限是由’authenticated’這個特殊用戶決定。所以，您可以根據需要調整’authenticated’用戶的權限。</li>
 </ol>
 <p><em>注意：目前那兩個設定都被註解掉，沒有這兩個設定的話，預設是不會做身份認證。</em></p>
-<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> &#123; '<span class="title">apt</span>':</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> &#123; '<span class="title">java</span>':</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">package &#123;<span class="string">'git'</span><span class="symbol">:</span></span><br><span class="line">    <span class="keyword">ensure</span> =&gt; <span class="string">'installed'</span>,</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> &#123;'<span class="title">jenkins</span>':</span></span><br><span class="line">    version =&gt; <span class="string">'1.509.4'</span>,</span><br><span class="line">    install_java =&gt; <span class="literal">false</span>,</span><br><span class="line">    lts =&gt; <span class="literal">true</span>,</span><br><span class="line"><span class="comment">#    domain =&gt; 'example.com',</span></span><br><span class="line"><span class="comment">#    admin_email =&gt; 'admin<span class="doctag">@example</span>.com',</span></span><br><span class="line">    plugin_hash =&gt; &#123;</span><br><span class="line">     <span class="string">'git'</span> =&gt; &#123; version =&gt; <span class="string">'2.0'</span> &#125;,</span><br><span class="line">     <span class="string">'parameterized-trigger'</span> =&gt; &#123; version =&gt; <span class="string">'2.21'</span> &#125;,</span><br><span class="line">     <span class="string">'credentials'</span> =&gt; &#123; version =&gt; <span class="string">'1.9.1'</span>, pinned =&gt; <span class="literal">true</span>, override =&gt; <span class="literal">true</span> &#125;,</span><br><span class="line">     <span class="string">'ssh-credentials'</span> =&gt; &#123; version =&gt; <span class="string">'1.5.1'</span>, pinned =&gt; <span class="literal">true</span>, override =&gt; <span class="literal">true</span> &#125;,</span><br><span class="line">     <span class="string">'git-client'</span> =&gt; &#123; version =&gt; <span class="string">'1.4.6'</span> &#125;,</span><br><span class="line">     <span class="string">'scm-api'</span> =&gt; &#123; version =&gt; <span class="string">'0.2'</span> &#125;,</span><br><span class="line">     <span class="string">'multiple-scms'</span> =&gt; &#123; version =&gt; <span class="string">'0.2'</span> &#125;,</span><br><span class="line">     <span class="string">'promoted-builds'</span> =&gt; &#123; version =&gt; <span class="string">'2.14'</span> &#125;,</span><br><span class="line">     <span class="string">'token-macro'</span> =&gt; &#123; version =&gt; <span class="string">'1.9'</span> &#125;,</span><br><span class="line">     <span class="string">'gradle'</span> =&gt; &#123; version =&gt; <span class="string">'1.23'</span> &#125;,</span><br><span class="line">     <span class="string">'openid'</span> =&gt; &#123; version =&gt; <span class="string">'1.7'</span> &#125;,</span><br><span class="line">     <span class="string">'build-pipeline-plugin'</span> =&gt; &#123; version =&gt; <span class="string">'1.4.2'</span> &#125;,</span><br><span class="line">     <span class="string">'build-name-setter'</span> =&gt; &#123; version =&gt; <span class="string">'1.3'</span> &#125;,</span><br><span class="line">     <span class="string">'jacoco'</span> =&gt; &#123; version =&gt; <span class="string">'1.0.13'</span> &#125;,</span><br><span class="line">     <span class="string">'clone-workspace-scm'</span> =&gt; &#123; version =&gt; <span class="string">'0.6'</span> &#125;,</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
-<p>Jenkins 預設就帶有’credentials’以及’ssh-credentials’這兩個套件，如果只是使用一般方式安裝，在重開機後，Jenkins 就會用內建的版本覆蓋掉新版本。要避免這樣的行為，需要在插件安裝目錄建一個定錨檔(pinned)，例如：插件名稱是’plugin_name’，則定錨檔會是 $JENKINS_HOME/plugins/plugin_name.jpi.pinned。'pinned=&gt;true’的目的就是為了產生定錨檔，讓 Jenkins 不要覆蓋。</p>
+<figure class="highlight ruby"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> { '<span class="title">apt</span>':</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> { '<span class="title">java</span>':</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">package {<span class="string">'git'</span><span class="symbol">:</span></span><br><span class="line">    <span class="keyword">ensure</span> =&gt; <span class="string">'installed'</span>,</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> {'<span class="title">jenkins</span>':</span></span><br><span class="line">    version =&gt; <span class="string">'1.509.4'</span>,</span><br><span class="line">    install_java =&gt; <span class="literal">false</span>,</span><br><span class="line">    lts =&gt; <span class="literal">true</span>,</span><br><span class="line"><span class="comment">#    domain =&gt; 'example.com',</span></span><br><span class="line"><span class="comment">#    admin_email =&gt; 'admin<span class="doctag">@example</span>.com',</span></span><br><span class="line">    plugin_hash =&gt; {</span><br><span class="line">     <span class="string">'git'</span> =&gt; { version =&gt; <span class="string">'2.0'</span> },</span><br><span class="line">     <span class="string">'parameterized-trigger'</span> =&gt; { version =&gt; <span class="string">'2.21'</span> },</span><br><span class="line">     <span class="string">'credentials'</span> =&gt; { version =&gt; <span class="string">'1.9.1'</span>, pinned =&gt; <span class="literal">true</span>, override =&gt; <span class="literal">true</span> },</span><br><span class="line">     <span class="string">'ssh-credentials'</span> =&gt; { version =&gt; <span class="string">'1.5.1'</span>, pinned =&gt; <span class="literal">true</span>, override =&gt; <span class="literal">true</span> },</span><br><span class="line">     <span class="string">'git-client'</span> =&gt; { version =&gt; <span class="string">'1.4.6'</span> },</span><br><span class="line">     <span class="string">'scm-api'</span> =&gt; { version =&gt; <span class="string">'0.2'</span> },</span><br><span class="line">     <span class="string">'multiple-scms'</span> =&gt; { version =&gt; <span class="string">'0.2'</span> },</span><br><span class="line">     <span class="string">'promoted-builds'</span> =&gt; { version =&gt; <span class="string">'2.14'</span> },</span><br><span class="line">     <span class="string">'token-macro'</span> =&gt; { version =&gt; <span class="string">'1.9'</span> },</span><br><span class="line">     <span class="string">'gradle'</span> =&gt; { version =&gt; <span class="string">'1.23'</span> },</span><br><span class="line">     <span class="string">'openid'</span> =&gt; { version =&gt; <span class="string">'1.7'</span> },</span><br><span class="line">     <span class="string">'build-pipeline-plugin'</span> =&gt; { version =&gt; <span class="string">'1.4.2'</span> },</span><br><span class="line">     <span class="string">'build-name-setter'</span> =&gt; { version =&gt; <span class="string">'1.3'</span> },</span><br><span class="line">     <span class="string">'jacoco'</span> =&gt; { version =&gt; <span class="string">'1.0.13'</span> },</span><br><span class="line">     <span class="string">'clone-workspace-scm'</span> =&gt; { version =&gt; <span class="string">'0.6'</span> },</span><br><span class="line">   }</span><br></pre></td></tr></tbody></table></figure>
+<p>Jenkins 預設就帶有’credentials’以及’ssh-credentials’這兩個套件，如果只是使用一般方式安裝，在重開機後，Jenkins 就會用內建的版本覆蓋掉新版本。要避免這樣的行為，需要在插件安裝目錄建一個定錨檔 (pinned)，例如：插件名稱是’plugin_name’，則定錨檔會是 $JENKINS_HOME/plugins/plugin_name.jpi.pinned。'pinned=&gt;true’的目的就是為了產生定錨檔，讓 Jenkins 不要覆蓋。</p>
 <p>插件安裝會從網路上下載後解開到插件安裝路徑，但是如果安裝路徑已經有相關的插件則不會進行。'override=&gt;true’設定是要強迫下載後覆蓋已經存在的插件。</p>
 <p>配置裡面的插件說明，您可以參考 <a href="https://wiki.jenkins-ci.org/display/JENKINS/Plugins" target="_blank" rel="noopener">Jenkins 的 Wiki</a>。</p>
 <h3 id="Slave-服務器配置">Slave 服務器配置</h3>
 <p>Slave 服務器的配置相對簡單很多，因為它基本上是透過 Web Start 機制從 Master 服務器下載與安裝所需的程式。</p>
-<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> &#123; '<span class="title">apt</span>':</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> &#123; '<span class="title">java</span>':</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> &#123; '<span class="title">jenkins::slave</span>':</span></span><br><span class="line">    masterurl =&gt; <span class="string">'http://192.168.33.10:8080'</span>,</span><br><span class="line">    ui_user =&gt; <span class="string">'ADMIN_USER'</span>,</span><br><span class="line">    ui_pass =&gt; <span class="string">'API_KEY'</span>,</span><br><span class="line">    install_java =&gt; <span class="literal">false</span>,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>其中的 'ADMIN_USER’就是預設擁有系統管理權限的用戶; 'API_KEY’是 Jenkins 配發給該用戶的 API Key。為什麼需要使用 API KEY 呢？由於我們採用 OpenID 來做用戶認證，導致 slave 服務器無法使用預設的簡單認證(basic authentication)機制。但沒有認證，slave 是無法加入叢集的，為了解決這樣的問題，Jenkins 針對程式提供一個通用的認證方式。這樣不管用戶的認證方式爲何，都不會影響的系統間的認證機制。</p>
+<figure class="highlight ruby"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> { '<span class="title">apt</span>':</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> { '<span class="title">java</span>':</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> { '<span class="title">jenkins::slave</span>':</span></span><br><span class="line">    masterurl =&gt; <span class="string">'http://192.168.33.10:8080'</span>,</span><br><span class="line">    ui_user =&gt; <span class="string">'ADMIN_USER'</span>,</span><br><span class="line">    ui_pass =&gt; <span class="string">'API_KEY'</span>,</span><br><span class="line">    install_java =&gt; <span class="literal">false</span>,</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+<p>其中的 'ADMIN_USER’就是預設擁有系統管理權限的用戶；'API_KEY’是 Jenkins 配發給該用戶的 API Key。為什麼需要使用 API KEY 呢？由於我們採用 OpenID 來做用戶認證，導致 slave 服務器無法使用預設的簡單認證 (basic authentication) 機制。但沒有認證，slave 是無法加入叢集的，為了解決這樣的問題，Jenkins 針對程式提供一個通用的認證方式。這樣不管用戶的認證方式爲何，都不會影響的系統間的認證機制。</p>
 <h3 id="系統啟動順序">系統啟動順序</h3>
 <p>雖然山姆鍋也想做到不管 Master 或 Slave 服務器誰先開都無所謂，最終都要可以形成叢集。但是由於 slave 服務器上需要設定一個註冊的時候用的認證資料，也就是配置說明中的’ADMIN_USER’以及’API_KEY’。雖然’ADMIN_USER’可以預先得知，但’API_KEY’是在 master 服務器啟動完成後才能得知。所以，啟動這個系統需要按照下列順序：</p>
 <ol>
 <li>開啓 master 服務器：在 Vagrant 環境下，透過下列指令：</li>
 </ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ vagrant up master</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ vagrant up master</span><br></pre></td></tr></tbody></table></figure>
 <p>這樣，Vagrant 只會啟動 master 服務器。</p>
-<ol start="2">
+<ol>
 <li>
-<p>Master 服務器正常啟動後，登入到 Jenkins 頁面，選擇右上方出現的用戶名稱聯結後，在左邊選單選擇&quot;設定&quot;(setting)出現該用戶的設定頁，從這頁可以取得該用戶的 API Key。</p>
+<p>Master 服務器正常啟動後，登入到 Jenkins 頁面，選擇右上方出現的用戶名稱聯結後，在左邊選單選擇 "設定"(setting) 出現該用戶的設定頁，從這頁可以取得該用戶的 API Key。</p>
 </li>
 <li>
 <p>將取得 API KEY 設定到 slave 的 Puppet 配置檔後，根據需要開啓所需數量的 slave 服務器。</p>
 </li>
 </ol>
 <h3 id="小結">小結</h3>
-<p>利用 Vagrant 來整備(provision)需要的服務器，再運用 Puppet(或您偏好的配置管理系統)來自動安裝跟部署需要的軟體套件，這樣的組合真的是很有力的工具。透過這個工具，山姆鍋提供一個方案來建置一個適合生產環境使用的持續整合系統。雖然，使用這樣的方式不代表說您就可以不需要了解背後的運作原理，但至少在急需的時候，有機會可以如法炮製。</p>
+<p>利用 Vagrant 來整備 (provision) 需要的服務器，再運用 Puppet (或您偏好的配置管理系統) 來自動安裝跟部署需要的軟體套件，這樣的組合真的是很有力的工具。透過這個工具，山姆鍋提供一個方案來建置一個適合生產環境使用的持續整合系統。雖然，使用這樣的方式不代表說您就可以不需要了解背後的運作原理，但至少在急需的時候，有機會可以如法炮製。</p>
             
 
 
@@ -452,8 +450,8 @@
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
                     href="/post/2013/11/build-own-cloud-continuous-integration-system-p3/"
-                    data-tooltip="建構自己的雲端持續整合系統(下)"
-                    aria-label="上一篇: 建構自己的雲端持續整合系統(下)"
+                    data-tooltip="建構自己的雲端持續整合系統 (下)"
+                    aria-label="上一篇: 建構自己的雲端持續整合系統 (下)"
                 >
                     
                         <i class="fa fa-angle-left" aria-hidden="true"></i>
@@ -481,7 +479,7 @@
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Diesen Beitrag teilen"
+                aria-label="Share this post"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -519,7 +517,7 @@
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Kommentieren"
+                        aria-label="Leave a comment"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -528,7 +526,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -568,8 +566,8 @@
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
                     href="/post/2013/11/build-own-cloud-continuous-integration-system-p3/"
-                    data-tooltip="建構自己的雲端持續整合系統(下)"
-                    aria-label="上一篇: 建構自己的雲端持續整合系統(下)"
+                    data-tooltip="建構自己的雲端持續整合系統 (下)"
+                    aria-label="上一篇: 建構自己的雲端持續整合系統 (下)"
                 >
                     
                         <i class="fa fa-angle-left" aria-hidden="true"></i>
@@ -597,7 +595,7 @@
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Diesen Beitrag teilen"
+                aria-label="Share this post"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -635,7 +633,7 @@
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Kommentieren"
+                        aria-label="Leave a comment"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -644,7 +642,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -704,7 +702,7 @@
             <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="/images/featured_image.jpg" alt="作者的圖片"/>
+            <img id="about-card-picture" src="/images/logo.png" alt="作者的圖片"/>
         
             <h4 id="about-card-name">Sampot (山姆鍋)</h4>
         
@@ -766,10 +764,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>本文簡單說明如何設定兩台 MySQL<br>
-server，讓它們彼此互相備份資料(Master-master<br>
-模式)。雖然這樣的設定通常是支援高可用性(high availability)<br>
-平台的一部分，但本文不包含如何完成其他 HA 的工作。設定兩台 MySQL 伺服器互相備份，主要目的就是要確認資料的安全性；同時也提高可用性。</p></div>
+                        <div class="media-content hide-xs font-merryweather"><p>本文簡單說明如何設定兩台 MySQL server，讓它們彼此互相備份資料 (Master-master 模式)。雖然這樣的設定通常是支援高可用性 (high availability) 平台的一部分，但本文不包含如何完成其他 HA 的工作。設定兩台 MySQL 伺服器互相備份，主要目的就是要確認資料的安全性；同時也提高可用性。</p></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>

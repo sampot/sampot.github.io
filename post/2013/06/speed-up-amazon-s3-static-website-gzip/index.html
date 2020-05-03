@@ -19,7 +19,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"featured_image.jpg"},"articleBody":"山姆鍋曾經提到，影化身網站是放置在 Amazon S3 上，也利用 CloudFront來減少存取的延遲。 但是，好還可以更好，山姆鍋在本文會分享如何減少 HTTP 要求數量，壓縮網頁內容來加快存取速度。\n\nAmazon S3 雖然方便，但因為不是設計來支援動態內容，有幾個限制會影響到存取效率的最佳化(優化)，像是不支援執行時期 GZip encoding。雖然不支援動態壓縮，但是我們可以預先把內容做 GZip 壓縮來達到同樣效果。底下將說明如何透過 s3cmd 這個工具來達到減少 HTTP 請求數量以及資料量的目的。對了！請注意山姆鍋用的工作環境是 Mac OS X。\n準備工具 s3cmd\n本文使用的 s3cmd 版本需要是 1.1 以上。\n安裝 s3cmd\n到官方網站下載s3cmd並解壓縮後，執行下列指令來安裝：\n1$ python setup.py install\n設定 s3cmd\n要讓 s3cmd 能夠正確連到 Amazon S3 服務，需要做些設定。在命令列執行下列指令並安照提示輸入您 S3 的認證資訊：\n1$ s3cmd --configure\n驗證 s3cmd 安裝完成\n執行下列指令，確定 s3cmd 已經可以正確連到 Amazon S3:\n123$ s3cmd ls2013-05-22 10:24  s3://aaa.eavatar.com2013-06-05 02:30  s3://blog.eavatar.com\n如果有看到之前建好的 bucket 就表示安裝設定正常。\n預先對 HTML, JS, 以及 CSS 檔案做 GZip 壓縮\n之前提過 Amazon S3 不支援動態做檔案的 GZip 壓縮，但我們可以預先壓好檔案在上傳到 S3。除了預先壓縮外，還要告訴 S3，這些壓縮過的檔案該使用的 HTTP 標頭。\n設定壓縮腳本\n在 Rakefile 中，加入下列腳本：\n1234567891011121314151617181920212223242526272829303132333435desc &quot;GZip HTML&quot;task :gzip_html do  puts &quot;## GZipping HTML&quot;  system &#39;find public&#x2F; -type f -name \\*.html -exec gzip -9 &#123;&#125; \\;&#39;  # Batch rename .html.gz to .html  Dir[&#39;**&#x2F;*.html.gz&#39;].each do |f|    test(?f, f) and File.rename(f, f.gsub(&#x2F;\\.html\\.gz&#x2F;, &#39;.html&#39;))  endenddesc &quot;GZip CSS&quot;task :gzip_css do  puts &quot;## GZipping CSS&quot;  styles_dir &#x3D; &quot;#&#123;public_dir&#125;&#x2F;assets&quot;  system &#39;find public&#x2F;assets -maxdepth 1 -type f -name \\*.css -exec gzip -9 &#123;&#125; \\;&#39;  # Batch rename .css.gz to .css  Dir[&#39;public&#x2F;assets&#x2F;*.css.gz&#39;].each do |f|    test(?f, f) and File.rename(f, f.gsub(&#x2F;\\.css\\.gz&#x2F;, &#39;.css&#39;))  endenddesc &quot;GZip JS&quot;task :gzip_js do  puts &quot;## GZipping JS&quot;  styles_dir &#x3D; &quot;#&#123;public_dir&#125;&#x2F;assets&quot;  system &#39;find public&#x2F;assets -maxdepth 1 -type f -name \\*.js -exec gzip -9 &#123;&#125; \\;&#39;  # Batch rename .js.gz to .js  Dir[&#39;public&#x2F;assets&#x2F;*.js.gz&#39;].each do |f|    test(?f, f) and File.rename(f, f.gsub(&#x2F;\\.js\\.gz&#x2F;, &#39;.js&#39;))  endenddesc &quot;GZip All&quot;task :gzip &#x3D;&gt; [:gzip_html, :gzip_css, :gzip_js] doend\n同樣是 Rakefile，修改 generate 任務確保每次產生檔案時同時作壓縮。修改後的 generate 任務看起來應該像：\n12345678910desc &quot;Generate jekyll site&quot;task :generate do  raise &quot;### You haven&#39;t set anything up yet. First run &#96;rake install&#96; to set up an Octopress theme.&quot; unless File.directory?(source_dir)  puts &quot;## Generating Site with Jekyll&quot;  system &quot;compass compile --css-dir #&#123;source_dir&#125;&#x2F;assets&quot;  system &quot;jekyll&quot;  Rake::Task[:gzip_html].execute  Rake::Task[:gzip_css].execute  Rake::Task[:gzip_js].executeend\n注意，上述腳本山姆鍋只在 Mac OS X 上測試過，不過理論上，Linux 系統應該也可以執行。基本上，這個腳本會把 HTML, CSS 以及 JS 檔案使用 gzip 壓縮，並將’js’從檔名中移除。另外，您要根據您 JS/CSS 輸出的路徑，修改’public/assets’成實際放置 JS/CSS 的路徑。\n修改部署腳本來設定適當 HTTP 標頭\n修改 Rakefile 中，S3 的部署腳本，針對 HTML, JS 以及 CSS 檔案做不同的配置。\n12345678910111213desc &quot;Deploy staging website via s3cmd&quot;task :s3_dev do  puts &quot;## Deploying staging website via s3cmd&quot;  # sync gzipped html files  # NOTE: Setting charset in header for faster browser rendering  ok_failed system(&quot;s3cmd sync  --acl-public -P --reduced-redundancy public&#x2F;* s3:&#x2F;&#x2F;#&#123;s3_bucket_dev&#125;&#x2F; --mime-type&#x3D;&#39;text&#x2F;html; charset&#x3D;utf-8&#39; --add-header &#39;Content-Encoding: gzip&#39; --exclude &#39;*.*&#39; --include &#39;*.html&#39;&quot;)  # sync non gzipped, non js&#x2F;css&#x2F;image files  ok_failed system(&quot;s3cmd sync --guess-mime-type --acl-public -P --reduced-redundancy public&#x2F;* s3:&#x2F;&#x2F;#&#123;s3_bucket_dev&#125;&#x2F; --exclude &#39;images&#x2F;&#39; --exclude &#39;*.css&#39; --exclude &#39;*.js&#39;  --exclude &#39;*.html&#39;&quot;)  # sync gzipped css and js  ok_failed system(&quot;s3cmd sync --guess-mime-type --acl-public -P --reduced-redundancy public&#x2F;* s3:&#x2F;&#x2F;#&#123;s3_bucket_dev&#125;&#x2F; --add-header &#39;Content-Encoding: gzip&#39; --add-header &#39;Cache-Control: public, max-age&#x3D;31600000&#39; --exclude &#39;*.*&#39; --include &#39;*.js&#39; --include &#39;*.css&#39;&quot;)  # sync all images  ok_failed system(&quot;s3cmd sync --guess-mime-type --acl-public -P --reduced-redundancy  --add-header &#39;Cache-Control: public, max-age&#x3D;31600000&#39; public&#x2F;images&#x2F;* s3:&#x2F;&#x2F;#&#123;s3_bucket_dev&#125;&#x2F;images&#x2F;&quot;)end\n其中，請把#{s3_bucket_dev}換成您使用的 S3 bucket 名稱。\n底下是幾個重要的 s3cmd 參數說明：\n\n–add-header 參數告訴 s3cmd，當那些檔案被下載時，要設定相對應的 HTTP 標題。\n–mime-type 指定該檔案要回傳給瀏覽器的 Mime 型別。Amazon S3 對於 HTML 檔案預設並不會有 utf-8 這個編碼設定，但沒有這個設定，瀏覽器要等比較久的時間才能決定網頁內容的正確編碼，甚至使用了錯誤的編碼。\n\n除了設定’Content-Encoding: gzip’這個標頭讓瀏覽器知道回傳的內容經過 gzip 壓縮外，同時也設定’Cache-Control’標頭來讓瀏覽器或者 CloudFront 知道這些內容該緩存的時間。針對 JS、圖檔、或者 CSS 這類靜態檔案，我們希望緩存的時間越長越好。但是 HTML 或者ＸＭＬ檔案，因為，會需要比較快更新，山姆鍋在這裡設為緩存 1 小時()，您可以根據需要自行調整。\n小結\n作為靜態網站服務器，Amazon S3 不支援動態 GZip，的確是不方便。不過它提供的額外特性以及跟 CloudFront 整合，讓它仍舊是相當好的選擇。\n參考資料\n\ns3cmd\nMaking Octopress Fast\n\n","dateCreated":"2013-06-15T10:18:00+08:00","dateModified":"2018-08-19T21:45:49+08:00","datePublished":"2013-06-15T10:18:00+08:00","description":"山姆鍋曾經提到，影化身網站是放置在 Amazon S3 上，也利用 CloudFront來減少存取的延遲。 但是，好還可以更好，山姆鍋在本文會分享如何減少 HTTP 要求數量，壓縮網頁內容來加快存取速度。","headline":"加快 Amazon S3 上靜態網站的存取","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/06/speed-up-amazon-s3-static-website-gzip/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"featured_image.jpg","logo":{"@type":"ImageObject","url":"featured_image.jpg"}},"url":"https://samkuo.me/post/2013/06/speed-up-amazon-s3-static-website-gzip/","keywords":"Amazon S3, Cloud service, Octopress, Operations, CloudFront"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"山姆鍋曾經提到，影化身網站是放置在 Amazon S3 上，也利用 CloudFront來減少存取的延遲。 但是，好還可以更好，山姆鍋在本文會分享如何減少 HTTP 要求數量，壓縮網頁內容來加快存取速度。\n\nAmazon S3 雖然方便，但因為不是設計來支援動態內容，有幾個限制會影響到存取效率的最佳化(優化)，像是不支援執行時期 GZip encoding。雖然不支援動態壓縮，但是我們可以預先把內容做 GZip 壓縮來達到同樣效果。底下將說明如何透過 s3cmd 這個工具來達到減少 HTTP 請求數量以及資料量的目的。對了！請注意山姆鍋用的工作環境是 Mac OS X。\n準備工具 s3cmd\n本文使用的 s3cmd 版本需要是 1.1 以上。\n安裝 s3cmd\n到官方網站下載s3cmd並解壓縮後，執行下列指令來安裝：\n1$ python setup.py install\n設定 s3cmd\n要讓 s3cmd 能夠正確連到 Amazon S3 服務，需要做些設定。在命令列執行下列指令並安照提示輸入您 S3 的認證資訊：\n1$ s3cmd --configure\n驗證 s3cmd 安裝完成\n執行下列指令，確定 s3cmd 已經可以正確連到 Amazon S3:\n123$ s3cmd ls2013-05-22 10:24  s3://aaa.eavatar.com2013-06-05 02:30  s3://blog.eavatar.com\n如果有看到之前建好的 bucket 就表示安裝設定正常。\n預先對 HTML, JS, 以及 CSS 檔案做 GZip 壓縮\n之前提過 Amazon S3 不支援動態做檔案的 GZip 壓縮，但我們可以預先壓好檔案在上傳到 S3。除了預先壓縮外，還要告訴 S3，這些壓縮過的檔案該使用的 HTTP 標頭。\n設定壓縮腳本\n在 Rakefile 中，加入下列腳本：\n1234567891011121314151617181920212223242526272829303132333435desc &quot;GZip HTML&quot;task :gzip_html do  puts &quot;## GZipping HTML&quot;  system &#39;find public&#x2F; -type f -name \\*.html -exec gzip -9 &#123;&#125; \\;&#39;  # Batch rename .html.gz to .html  Dir[&#39;**&#x2F;*.html.gz&#39;].each do |f|    test(?f, f) and File.rename(f, f.gsub(&#x2F;\\.html\\.gz&#x2F;, &#39;.html&#39;))  endenddesc &quot;GZip CSS&quot;task :gzip_css do  puts &quot;## GZipping CSS&quot;  styles_dir &#x3D; &quot;#&#123;public_dir&#125;&#x2F;assets&quot;  system &#39;find public&#x2F;assets -maxdepth 1 -type f -name \\*.css -exec gzip -9 &#123;&#125; \\;&#39;  # Batch rename .css.gz to .css  Dir[&#39;public&#x2F;assets&#x2F;*.css.gz&#39;].each do |f|    test(?f, f) and File.rename(f, f.gsub(&#x2F;\\.css\\.gz&#x2F;, &#39;.css&#39;))  endenddesc &quot;GZip JS&quot;task :gzip_js do  puts &quot;## GZipping JS&quot;  styles_dir &#x3D; &quot;#&#123;public_dir&#125;&#x2F;assets&quot;  system &#39;find public&#x2F;assets -maxdepth 1 -type f -name \\*.js -exec gzip -9 &#123;&#125; \\;&#39;  # Batch rename .js.gz to .js  Dir[&#39;public&#x2F;assets&#x2F;*.js.gz&#39;].each do |f|    test(?f, f) and File.rename(f, f.gsub(&#x2F;\\.js\\.gz&#x2F;, &#39;.js&#39;))  endenddesc &quot;GZip All&quot;task :gzip &#x3D;&gt; [:gzip_html, :gzip_css, :gzip_js] doend\n同樣是 Rakefile，修改 generate 任務確保每次產生檔案時同時作壓縮。修改後的 generate 任務看起來應該像：\n12345678910desc &quot;Generate jekyll site&quot;task :generate do  raise &quot;### You haven&#39;t set anything up yet. First run &#96;rake install&#96; to set up an Octopress theme.&quot; unless File.directory?(source_dir)  puts &quot;## Generating Site with Jekyll&quot;  system &quot;compass compile --css-dir #&#123;source_dir&#125;&#x2F;assets&quot;  system &quot;jekyll&quot;  Rake::Task[:gzip_html].execute  Rake::Task[:gzip_css].execute  Rake::Task[:gzip_js].executeend\n注意，上述腳本山姆鍋只在 Mac OS X 上測試過，不過理論上，Linux 系統應該也可以執行。基本上，這個腳本會把 HTML, CSS 以及 JS 檔案使用 gzip 壓縮，並將’js’從檔名中移除。另外，您要根據您 JS/CSS 輸出的路徑，修改’public/assets’成實際放置 JS/CSS 的路徑。\n修改部署腳本來設定適當 HTTP 標頭\n修改 Rakefile 中，S3 的部署腳本，針對 HTML, JS 以及 CSS 檔案做不同的配置。\n12345678910111213desc &quot;Deploy staging website via s3cmd&quot;task :s3_dev do  puts &quot;## Deploying staging website via s3cmd&quot;  # sync gzipped html files  # NOTE: Setting charset in header for faster browser rendering  ok_failed system(&quot;s3cmd sync  --acl-public -P --reduced-redundancy public&#x2F;* s3:&#x2F;&#x2F;#&#123;s3_bucket_dev&#125;&#x2F; --mime-type&#x3D;&#39;text&#x2F;html; charset&#x3D;utf-8&#39; --add-header &#39;Content-Encoding: gzip&#39; --exclude &#39;*.*&#39; --include &#39;*.html&#39;&quot;)  # sync non gzipped, non js&#x2F;css&#x2F;image files  ok_failed system(&quot;s3cmd sync --guess-mime-type --acl-public -P --reduced-redundancy public&#x2F;* s3:&#x2F;&#x2F;#&#123;s3_bucket_dev&#125;&#x2F; --exclude &#39;images&#x2F;&#39; --exclude &#39;*.css&#39; --exclude &#39;*.js&#39;  --exclude &#39;*.html&#39;&quot;)  # sync gzipped css and js  ok_failed system(&quot;s3cmd sync --guess-mime-type --acl-public -P --reduced-redundancy public&#x2F;* s3:&#x2F;&#x2F;#&#123;s3_bucket_dev&#125;&#x2F; --add-header &#39;Content-Encoding: gzip&#39; --add-header &#39;Cache-Control: public, max-age&#x3D;31600000&#39; --exclude &#39;*.*&#39; --include &#39;*.js&#39; --include &#39;*.css&#39;&quot;)  # sync all images  ok_failed system(&quot;s3cmd sync --guess-mime-type --acl-public -P --reduced-redundancy  --add-header &#39;Cache-Control: public, max-age&#x3D;31600000&#39; public&#x2F;images&#x2F;* s3:&#x2F;&#x2F;#&#123;s3_bucket_dev&#125;&#x2F;images&#x2F;&quot;)end\n其中，請把#{s3_bucket_dev}換成您使用的 S3 bucket 名稱。\n底下是幾個重要的 s3cmd 參數說明：\n\n–add-header 參數告訴 s3cmd，當那些檔案被下載時，要設定相對應的 HTTP 標題。\n–mime-type 指定該檔案要回傳給瀏覽器的 Mime 型別。Amazon S3 對於 HTML 檔案預設並不會有 utf-8 這個編碼設定，但沒有這個設定，瀏覽器要等比較久的時間才能決定網頁內容的正確編碼，甚至使用了錯誤的編碼。\n\n除了設定’Content-Encoding: gzip’這個標頭讓瀏覽器知道回傳的內容經過 gzip 壓縮外，同時也設定’Cache-Control’標頭來讓瀏覽器或者 CloudFront 知道這些內容該緩存的時間。針對 JS、圖檔、或者 CSS 這類靜態檔案，我們希望緩存的時間越長越好。但是 HTML 或者ＸＭＬ檔案，因為，會需要比較快更新，山姆鍋在這裡設為緩存 1 小時()，您可以根據需要自行調整。\n小結\n作為靜態網站服務器，Amazon S3 不支援動態 GZip，的確是不方便。不過它提供的額外特性以及跟 CloudFront 整合，讓它仍舊是相當好的選擇。\n參考資料\n\ns3cmd\nMaking Octopress Fast\n\n","dateCreated":"2013-06-15T10:18:00+08:00","dateModified":"2018-08-19T21:45:49+08:00","datePublished":"2013-06-15T10:18:00+08:00","description":"山姆鍋曾經提到，影化身網站是放置在 Amazon S3 上，也利用 CloudFront來減少存取的延遲。 但是，好還可以更好，山姆鍋在本文會分享如何減少 HTTP 要求數量，壓縮網頁內容來加快存取速度。","headline":"加快 Amazon S3 上靜態網站的存取","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/06/speed-up-amazon-s3-static-website-gzip/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2013/06/speed-up-amazon-s3-static-website-gzip/","keywords":"Amazon S3, Cloud service, Octopress, Operations, CloudFront"}</script>
     <meta name="description" content="利用 GZip, 最小化 JS&#x2F;CSS 的存取來加快在 Amazon S3 上網頁的存取。">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="加快 Amazon S3 上靜態網站的存取">
@@ -40,9 +40,7 @@
     
         
     
-    
-        <meta property="og:image" content="https://samkuo.me/images/featured_image.jpg"/>
-    
+    <meta property="og:image" content="https://samkuo.me/images/featured_image.jpg"/>
     
     
     
@@ -116,7 +114,7 @@
                     href="/#about"
                     aria-label="閱讀有關作者的更多信息"
                 >
-                    <img class="sidebar-profile-picture" src="/images/featured_image.jpg" alt="作者的圖片"/>
+                    <img class="sidebar-profile-picture" src="/images/logo.png" alt="作者的圖片"/>
                 </a>
                 <h4 class="sidebar-profile-name">Sampot (山姆鍋)</h4>
                 
@@ -289,10 +287,10 @@
                                 target="_blank"
                             
                             rel="noopener"
-                            title="Email"
+                            title="聯絡"
                         >
                         <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Email</span>
+                        <span class="sidebar-button-desc">聯絡</span>
                     </a>
             </li>
             
@@ -464,7 +462,7 @@
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Diesen Beitrag teilen"
+                aria-label="Share this post"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -502,7 +500,7 @@
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Kommentieren"
+                        aria-label="Leave a comment"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -511,7 +509,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -580,7 +578,7 @@
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Diesen Beitrag teilen"
+                aria-label="Share this post"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -618,7 +616,7 @@
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Kommentieren"
+                        aria-label="Leave a comment"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -627,7 +625,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -687,7 +685,7 @@
             <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="/images/featured_image.jpg" alt="作者的圖片"/>
+            <img id="about-card-picture" src="/images/logo.png" alt="作者的圖片"/>
         
             <h4 id="about-card-name">Sampot (山姆鍋)</h4>
         
@@ -749,10 +747,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>本文簡單說明如何設定兩台 MySQL<br>
-server，讓它們彼此互相備份資料(Master-master<br>
-模式)。雖然這樣的設定通常是支援高可用性(high availability)<br>
-平台的一部分，但本文不包含如何完成其他 HA 的工作。設定兩台 MySQL 伺服器互相備份，主要目的就是要確認資料的安全性；同時也提高可用性。</p></div>
+                        <div class="media-content hide-xs font-merryweather"><p>本文簡單說明如何設定兩台 MySQL server，讓它們彼此互相備份資料 (Master-master 模式)。雖然這樣的設定通常是支援高可用性 (high availability) 平台的一部分，但本文不包含如何完成其他 HA 的工作。設定兩台 MySQL 伺服器互相備份，主要目的就是要確認資料的安全性；同時也提高可用性。</p></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>

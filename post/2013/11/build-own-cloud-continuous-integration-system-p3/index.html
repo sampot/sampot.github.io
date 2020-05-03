@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="我是山姆鍋">
-    <title>建構自己的雲端持續整合系統(下) - 我是山姆鍋</title>
+    <title>建構自己的雲端持續整合系統 (下) - 我是山姆鍋</title>
     <meta name="author" content="Sampot (山姆鍋)">
     
     
@@ -17,17 +17,17 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"featured_image.jpg"},"articleBody":"\n\n\nPhoto Credit : freddie boy via Compfight cc\n\n有了建構持續整合系統後，那要如何管理軟體建構工作(build jobs)？ 大部份的人可能都習慣使用 Jenkins 提供的使用者界面， 但既然我們透過 Puppet 來管理 Jenkins 系統，沒道理不能用它來管理建構工作。本文山姆鍋以使用 Puppet 配置 Jenkins 工作來總結&quot;建構自己的雲端持續整合系統&quot;這一系列文章。\n原理說明\nJenkins 安裝在/var/lib/jenkins 這個目錄，相關的建構工作放在/var/lib/jenkins/jobs/${job_name}。\n每個工作都在自己的子目錄，跟該工作相關的資料也都存在該目錄中。因為這樣的設計，其實管理 Jenkins 的建構工作，\n說穿了，就是建立相關的目錄以及設定檔。\n山姆鍋提供的 Jenkins 這個模組，其中定義了 jenkins::job 這種資源讓您可以使用 Puppet 來定義工作，\n這個資源定義是由 pgr0ss\n提供。\n所有的工作定義都是由這個資源來提供，也就是說：如果您在 Puppet 的配置檔中刪除其中一個工作定義，\n對應的 Jenkins 工作也會被刪除。同樣的，當工作定義有變動時，Jenkins 服務也會被重新啟動以讓變動生效。\n配置範例\n底下是原作者提供的兩個工作定義範例：\n.Ruby&#125;1234567891011121314jenkins::job &#123; &quot;app1_master&quot;:    git_repo &#x3D;&gt; &quot;https:&#x2F;&#x2F;github.com&#x2F;user&#x2F;app1&quot;,    git_branch &#x3D;&gt; &quot;master&quot;,    command &#x3D;&gt; &quot;.&#x2F;ci.sh&quot;,    triggers &#x3D;&gt; [&quot;app1_master_integration&quot;]&#125;jenkins::job &#123; &quot;app1_master_integration&quot;:    git_repo &#x3D;&gt; &quot;https:&#x2F;&#x2F;github.com&#x2F;user&#x2F;app1&quot;,    git_branch &#x3D;&gt; &quot;master&quot;,    command &#x3D;&gt; &quot;.&#x2F;ci.sh integration&quot;,    poll &#x3D;&gt; false,    build_schedule &#x3D;&gt; &quot;H H * * *&quot;&#125;\n限制\n雖說是限制，其實是故意這樣設計。由於假設 Jenkins 持續整合系統是隨時可以建構或銷毀，\n因此，設計上就不假設會有長久性的資料放置在上面。也就是說，對於後續要用到的資料或檔案要放到別的服務器。\n例如：將產生的安裝套件上載到 Maven 套件庫。\n結語\n這個方案在寫這篇文章的時候，山姆鍋還沒有開始實際使用，後續會再根據實際使用狀況來調整。","dateCreated":"2013-11-18T10:40:04+08:00","dateModified":"2018-08-29T19:12:53+08:00","datePublished":"2013-11-18T10:40:04+08:00","description":"有了建構持續整合系統後，那要如何管理軟體建構工作(build jobs)？ 大部份的人可能都習慣使用 Jenkins 提供的使用者界面， 但既然我們透過 Puppet 來管理 Jenkins 系統，沒道理不能用它來管理建構工作。本文山姆鍋以使用 Puppet 配置 Jenkins 工作來總結&quot;建構自己的雲端持續整合系統&quot;這一系列文章。","headline":"建構自己的雲端持續整合系統(下)","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/11/build-own-cloud-continuous-integration-system-p3/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"featured_image.jpg","logo":{"@type":"ImageObject","url":"featured_image.jpg"}},"url":"https://samkuo.me/post/2013/11/build-own-cloud-continuous-integration-system-p3/","keywords":"Jenkins, Vagrant, Puppet"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"\n\n\nPhoto Credit : freddie boy via Compfight cc\n\n有了建構持續整合系統後，那要如何管理軟體建構工作 (build jobs)？ 大部份的人可能都習慣使用 Jenkins 提供的使用者界面， 但既然我們透過 Puppet 來管理 Jenkins 系統，沒道理不能用它來管理建構工作。本文山姆鍋以使用 Puppet 配置 Jenkins 工作來總結 \"建構自己的雲端持續整合系統\" 這一系列文章。\n原理說明\nJenkins 安裝在 /var/lib/jenkins 這個目錄，相關的建構工作放在 /var/lib/jenkins/jobs/${job_name}。每個工作都在自己的子目錄，跟該工作相關的資料也都存在該目錄中。因為這樣的設計，其實管理 Jenkins 的建構工作，說穿了，就是建立相關的目錄以及設定檔。\n山姆鍋提供的 Jenkins 這個模組，其中定義了 jenkins::job 這種資源讓您可以使用 Puppet 來定義工作，這個資源定義是由 pgr0ss 提供。所有的工作定義都是由這個資源來提供，也就是說：如果您在 Puppet 的配置檔中刪除其中一個工作定義，對應的 Jenkins 工作也會被刪除。同樣的，當工作定義有變動時，Jenkins 服務也會被重新啟動以讓變動生效。\n配置範例\n底下是原作者提供的兩個工作定義範例：\n1234567891011121314jenkins::job { \"app1_master\":    git_repo =&gt; \"https://github.com/user/app1\",    git_branch =&gt; \"master\",    command =&gt; \"./ci.sh\",    triggers =&gt; [\"app1_master_integration\"]}jenkins::job { \"app1_master_integration\":    git_repo =&gt; \"https://github.com/user/app1\",    git_branch =&gt; \"master\",    command =&gt; \"./ci.sh integration\",    poll =&gt; false,    build_schedule =&gt; \"H H * * *\"}\n限制\n雖說是限制，其實是故意這樣設計。由於假設 Jenkins 持續整合系統是隨時可以建構或銷毀，因此，設計上就不假設會有長久性的資料放置在上面。也就是說，對於後續要用到的資料或檔案要放到別的服務器。例如：將產生的安裝套件上載到 Maven 套件庫。\n結語\n這個方案在寫這篇文章的時候，山姆鍋還沒有開始實際使用，後續會再根據實際使用狀況來調整。","dateCreated":"2013-11-18T10:40:04+08:00","dateModified":"2020-05-04T06:46:35+08:00","datePublished":"2013-11-18T10:40:04+08:00","description":"有了建構持續整合系統後，那要如何管理軟體建構工作 (build jobs)？ 大部份的人可能都習慣使用 Jenkins 提供的使用者界面， 但既然我們透過 Puppet 來管理 Jenkins 系統，沒道理不能用它來管理建構工作。本文山姆鍋以使用 Puppet 配置 Jenkins 工作來總結 \"建構自己的雲端持續整合系統\" 這一系列文章。","headline":"建構自己的雲端持續整合系統 (下)","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/11/build-own-cloud-continuous-integration-system-p3/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2013/11/build-own-cloud-continuous-integration-system-p3/","keywords":"Jenkins, Vagrant, Puppet"}</script>
     <meta name="description" content="山姆鍋分享如何使用 Jenkins 快速建構一個雲端持續整合系統。">
 <meta property="og:type" content="blog">
-<meta property="og:title" content="建構自己的雲端持續整合系統(下)">
+<meta property="og:title" content="建構自己的雲端持續整合系統 (下)">
 <meta property="og:url" content="https://samkuo.me/post/2013/11/build-own-cloud-continuous-integration-system-p3/">
 <meta property="og:site_name" content="我是山姆鍋">
 <meta property="og:description" content="山姆鍋分享如何使用 Jenkins 快速建構一個雲端持續整合系統。">
 <meta property="og:locale" content="zh_TW">
 <meta property="og:image" content="https://samkuo.me/post/2013/11/build-own-cloud-continuous-integration-system-p3/5171061659.jpg">
 <meta property="article:published_time" content="2013-11-18T02:40:04.000Z">
-<meta property="article:modified_time" content="2018-08-29T11:12:53.947Z">
+<meta property="article:modified_time" content="2020-05-03T22:46:35.084Z">
 <meta property="article:author" content="Sampot (山姆鍋)">
 <meta property="article:tag" content="Jenkins">
 <meta property="article:tag" content="Vagrant">
@@ -40,9 +40,7 @@
     
         
     
-    
-        <meta property="og:image" content="https://samkuo.me/images/featured_image.jpg"/>
-    
+    <meta property="og:image" content="https://samkuo.me/images/featured_image.jpg"/>
     
     
     
@@ -116,7 +114,7 @@
                     href="/#about"
                     aria-label="閱讀有關作者的更多信息"
                 >
-                    <img class="sidebar-profile-picture" src="/images/featured_image.jpg" alt="作者的圖片"/>
+                    <img class="sidebar-profile-picture" src="/images/logo.png" alt="作者的圖片"/>
                 </a>
                 <h4 class="sidebar-profile-name">Sampot (山姆鍋)</h4>
                 
@@ -289,10 +287,10 @@
                                 target="_blank"
                             
                             rel="noopener"
-                            title="Email"
+                            title="聯絡"
                         >
                         <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Email</span>
+                        <span class="sidebar-button-desc">聯絡</span>
                     </a>
             </li>
             
@@ -345,7 +343,7 @@
         <div class="post-header main-content-wrap text-left">
     
         <h1 class="post-title">
-            建構自己的雲端持續整合系統(下)
+            建構自己的雲端持續整合系統 (下)
         </h1>
     
     
@@ -375,23 +373,15 @@
 <div align="center">
 Photo Credit : <a href="https://www.flickrcom/photos/36307913@N00/5171061659/" target="_blank" rel="noopener">freddie boy</a> via <a href="http://compfight.com" target="_blank" rel="noopener">Compfight</a> <a href="https://creativecommons.org/licenses/by-sa/2.0/" target="_blank" rel="noopener">cc</a>
 </div>
-<p>有了建構持續整合系統後，那要如何管理軟體建構工作(build jobs)？ 大部份的人可能都習慣使用 Jenkins 提供的使用者界面， 但既然我們透過 Puppet 來管理 Jenkins 系統，沒道理不能用它來管理建構工作。本文山姆鍋以使用 Puppet 配置 Jenkins 工作來總結&quot;建構自己的雲端持續整合系統&quot;這一系列文章。</p>
+<p>有了建構持續整合系統後，那要如何管理軟體建構工作 (build jobs)？ 大部份的人可能都習慣使用 Jenkins 提供的使用者界面， 但既然我們透過 Puppet 來管理 Jenkins 系統，沒道理不能用它來管理建構工作。本文山姆鍋以使用 Puppet 配置 Jenkins 工作來總結 "建構自己的雲端持續整合系統" 這一系列文章。</p>
 <h2 id="原理說明">原理說明</h2>
-<p>Jenkins 安裝在/var/lib/jenkins 這個目錄，相關的建構工作放在/var/lib/jenkins/jobs/${job_name}。<br>
-每個工作都在自己的子目錄，跟該工作相關的資料也都存在該目錄中。因為這樣的設計，其實管理 Jenkins 的建構工作，<br>
-說穿了，就是建立相關的目錄以及設定檔。</p>
-<p>山姆鍋提供的 Jenkins 這個模組，其中定義了 jenkins::job 這種資源讓您可以使用 Puppet 來定義工作，<br>
-這個資源定義是由 <a href="https://github.com/pgr0ss/puppet-jenkins" target="_blank" rel="noopener">pgr0ss</a><br>
-提供。<br>
-所有的工作定義都是由這個資源來提供，也就是說：如果您在 Puppet 的配置檔中刪除其中一個工作定義，<br>
-對應的 Jenkins 工作也會被刪除。同樣的，當工作定義有變動時，Jenkins 服務也會被重新啟動以讓變動生效。</p>
+<p>Jenkins 安裝在 /var/lib/jenkins 這個目錄，相關的建構工作放在 /var/lib/jenkins/jobs/${job_name}。每個工作都在自己的子目錄，跟該工作相關的資料也都存在該目錄中。因為這樣的設計，其實管理 Jenkins 的建構工作，說穿了，就是建立相關的目錄以及設定檔。</p>
+<p>山姆鍋提供的 Jenkins 這個模組，其中定義了 jenkins::job 這種資源讓您可以使用 Puppet 來定義工作，這個資源定義是由 <a href="https://github.com/pgr0ss/puppet-jenkins" target="_blank" rel="noopener">pgr0ss</a> 提供。所有的工作定義都是由這個資源來提供，也就是說：如果您在 Puppet 的配置檔中刪除其中一個工作定義，對應的 Jenkins 工作也會被刪除。同樣的，當工作定義有變動時，Jenkins 服務也會被重新啟動以讓變動生效。</p>
 <h2 id="配置範例">配置範例</h2>
 <p>底下是原作者提供的兩個工作定義範例：</p>
-<figure class="highlight plain"><figcaption><span>.Ruby&#125;</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">jenkins::job &#123; &quot;app1_master&quot;:</span><br><span class="line">    git_repo &#x3D;&gt; &quot;https:&#x2F;&#x2F;github.com&#x2F;user&#x2F;app1&quot;,</span><br><span class="line">    git_branch &#x3D;&gt; &quot;master&quot;,</span><br><span class="line">    command &#x3D;&gt; &quot;.&#x2F;ci.sh&quot;,</span><br><span class="line">    triggers &#x3D;&gt; [&quot;app1_master_integration&quot;]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">jenkins::job &#123; &quot;app1_master_integration&quot;:</span><br><span class="line">    git_repo &#x3D;&gt; &quot;https:&#x2F;&#x2F;github.com&#x2F;user&#x2F;app1&quot;,</span><br><span class="line">    git_branch &#x3D;&gt; &quot;master&quot;,</span><br><span class="line">    command &#x3D;&gt; &quot;.&#x2F;ci.sh integration&quot;,</span><br><span class="line">    poll &#x3D;&gt; false,</span><br><span class="line">    build_schedule &#x3D;&gt; &quot;H H * * *&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight ruby"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">jenkins::job { <span class="string">"app1_master"</span><span class="symbol">:</span></span><br><span class="line">    git_repo =&gt; <span class="string">"https://github.com/user/app1"</span>,</span><br><span class="line">    git_branch =&gt; <span class="string">"master"</span>,</span><br><span class="line">    command =&gt; <span class="string">"./ci.sh"</span>,</span><br><span class="line">    triggers =&gt; [<span class="string">"app1_master_integration"</span>]</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">jenkins::job { <span class="string">"app1_master_integration"</span><span class="symbol">:</span></span><br><span class="line">    git_repo =&gt; <span class="string">"https://github.com/user/app1"</span>,</span><br><span class="line">    git_branch =&gt; <span class="string">"master"</span>,</span><br><span class="line">    command =&gt; <span class="string">"./ci.sh integration"</span>,</span><br><span class="line">    poll =&gt; <span class="literal">false</span>,</span><br><span class="line">    build_schedule =&gt; <span class="string">"H H * * *"</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
 <h2 id="限制">限制</h2>
-<p>雖說是限制，其實是故意這樣設計。由於假設 Jenkins 持續整合系統是隨時可以建構或銷毀，<br>
-因此，設計上就不假設會有長久性的資料放置在上面。也就是說，對於後續要用到的資料或檔案要放到別的服務器。<br>
-例如：將產生的安裝套件上載到 Maven 套件庫。</p>
+<p>雖說是限制，其實是故意這樣設計。由於假設 Jenkins 持續整合系統是隨時可以建構或銷毀，因此，設計上就不假設會有長久性的資料放置在上面。也就是說，對於後續要用到的資料或檔案要放到別的服務器。例如：將產生的安裝套件上載到 Maven 套件庫。</p>
 <h2 id="結語">結語</h2>
 <p>這個方案在寫這篇文章的時候，山姆鍋還沒有開始實際使用，後續會再根據實際使用狀況來調整。</p>
             
@@ -432,8 +422,8 @@ Photo Credit : <a href="https://www.flickrcom/photos/36307913@N00/5171061659/" t
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
                     href="/post/2013/11/build-own-cloud-continuous-integration-system-p2/"
-                    data-tooltip="建構自己的雲端持續整合系統(中)"
-                    aria-label="下一篇: 建構自己的雲端持續整合系統(中)"
+                    data-tooltip="建構自己的雲端持續整合系統 (中)"
+                    aria-label="下一篇: 建構自己的雲端持續整合系統 (中)"
                 >
                     
                         <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
@@ -447,7 +437,7 @@ Photo Credit : <a href="https://www.flickrcom/photos/36307913@N00/5171061659/" t
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Diesen Beitrag teilen"
+                aria-label="Share this post"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -485,7 +475,7 @@ Photo Credit : <a href="https://www.flickrcom/photos/36307913@N00/5171061659/" t
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Kommentieren"
+                        aria-label="Leave a comment"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -494,7 +484,7 @@ Photo Credit : <a href="https://www.flickrcom/photos/36307913@N00/5171061659/" t
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -548,8 +538,8 @@ Photo Credit : <a href="https://www.flickrcom/photos/36307913@N00/5171061659/" t
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
                     href="/post/2013/11/build-own-cloud-continuous-integration-system-p2/"
-                    data-tooltip="建構自己的雲端持續整合系統(中)"
-                    aria-label="下一篇: 建構自己的雲端持續整合系統(中)"
+                    data-tooltip="建構自己的雲端持續整合系統 (中)"
+                    aria-label="下一篇: 建構自己的雲端持續整合系統 (中)"
                 >
                     
                         <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
@@ -563,7 +553,7 @@ Photo Credit : <a href="https://www.flickrcom/photos/36307913@N00/5171061659/" t
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Diesen Beitrag teilen"
+                aria-label="Share this post"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -601,7 +591,7 @@ Photo Credit : <a href="https://www.flickrcom/photos/36307913@N00/5171061659/" t
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Kommentieren"
+                        aria-label="Leave a comment"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -610,7 +600,7 @@ Photo Credit : <a href="https://www.flickrcom/photos/36307913@N00/5171061659/" t
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -670,7 +660,7 @@ Photo Credit : <a href="https://www.flickrcom/photos/36307913@N00/5171061659/" t
             <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="/images/featured_image.jpg" alt="作者的圖片"/>
+            <img id="about-card-picture" src="/images/logo.png" alt="作者的圖片"/>
         
             <h4 id="about-card-name">Sampot (山姆鍋)</h4>
         
@@ -732,10 +722,7 @@ Photo Credit : <a href="https://www.flickrcom/photos/36307913@N00/5171061659/" t
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>本文簡單說明如何設定兩台 MySQL<br>
-server，讓它們彼此互相備份資料(Master-master<br>
-模式)。雖然這樣的設定通常是支援高可用性(high availability)<br>
-平台的一部分，但本文不包含如何完成其他 HA 的工作。設定兩台 MySQL 伺服器互相備份，主要目的就是要確認資料的安全性；同時也提高可用性。</p></div>
+                        <div class="media-content hide-xs font-merryweather"><p>本文簡單說明如何設定兩台 MySQL server，讓它們彼此互相備份資料 (Master-master 模式)。雖然這樣的設定通常是支援高可用性 (high availability) 平台的一部分，但本文不包含如何完成其他 HA 的工作。設定兩台 MySQL 伺服器互相備份，主要目的就是要確認資料的安全性；同時也提高可用性。</p></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>

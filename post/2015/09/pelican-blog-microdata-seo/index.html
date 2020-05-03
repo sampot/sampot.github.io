@@ -17,7 +17,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"featured_image.jpg"},"articleBody":"在使用 Google Search Console 時，發現 Google 無法找出文章的結構化資料，原來是所使用的 Pelican-bootstrap3 主題樣板沒有設定正確的標記，為了讓部落格文章可以被搜尋引擎正確地分析，看來需要修改樣板主題來處理這個問題。\n\n什麼是「結構化資料標記」?\n在一般情況，網頁內容對搜尋引擎來說，只是半結構化的文字片段，並無法進一步分辨網頁包含事件、人物、產品等不同的資料。\n為了讓搜尋引擎這類軟體爬蟲可以更好地處理網頁內容，結構化資料(structured\ndata)便是為了這個目的而生。結構化資料標記可以多種格式加入網頁中，\n主要有：\n\nMicrodata\nRDFa\nJSON-LD\n\n在本文，山姆鍋將用到 Microdata 以及 JSON-LD 兩種格式。\n文章頁面增加結構化標記\n部落格主要的內容就是文章，顯示文章內容的頁面自然是重頭戲。從相關資料可以得知，部落格文章最適合的資料型態(schema)爲\nBlogPosting , 而這種資料型態幾個重要的資料元素有：\n\n標題 (headline): 使用 ‘headline’ 屬性值標註。\n發表日期 (published date): 使用 ‘datePublished’ 屬性值標註。\n特色圖檔 (featured image): 使用 ‘image’ 屬性值標註。\n內文本體 (article body): 使用 articleBody 屬性值標註。\n作者 (author): 使用 Person 資料型態標註。\n\n針對文章，山姆鍋採用 Microdata 格式來標記，該格式使用\nitemscope, itemtype, 以及\nitemprop 元素屬性來標記結構化資料。\n底下是 HTML 片段來自樣板(templates/index.html)。\n標記文章元素\n12345&lt;article itemscope itemtype=\"http://schema.org/Article\"&gt;  # 1        .        .        .&lt;/article&gt;\n在標號 1 使用 itemscope 以及\nitemtype 來標記 &lt;article&gt; HTML\n元素(element)是一篇文章。\n標記文章標題\n123456789&lt;header class=\"page-header\"&gt;    &lt;h1&gt;        &lt;a href=\"&#123;&#123; SITEURL &#125;&#125;/&#123;&#123; article.url &#125;&#125;\"           rel=\"bookmark\"           title=\"Permalink to &#123;&#123; article.title|striptags &#125;&#125;\"&gt;            &lt;span itemprop=\"headline\"&gt;&#123;&#123; article.title &#125;&#125;&lt;/span&gt;  # 2        &lt;/a&gt;    &lt;/h1&gt;&lt;/header&gt;\n標號 2 使用 itempro=&quot;headline&quot;\n定義文章的標題(headline)。\n標記特色圖檔\n使用 itemprop=&quot;image&quot; 來標記特色圖檔。\n123&lt;div class=\"featured-image\"&gt;    &lt;img itemprop=\"image\" class=\"article-image img-responsive\" alt=\"&#123;&#123;article.title&#125;&#125;\"src=\"/media/&#123;&#123;article.image&#125;&#125;\"/&gt;&lt;/div&gt;\n標記文章本體\n使用 itemprop=&quot;articleBody&quot; 來標記文章內文本體(article\nbody)。\n123&lt;div itemprop=\"articleBody\"&gt;    &#123;&#123; article.content &#125;&#125;&lt;/div&gt;\n標記發布日期\nPelican-bootstrap 3 樣板主題，文章的日期是由\n‘templates/includes/article_info.html’\n所呈現。下列是其中文章發表日期標記範例：\n123&lt;span class=\"published\"&gt;    &lt;i class=\"fa fa-calendar\"&gt;&lt;/i&gt;&lt;time itemprop=\"datePublished\" datetime=\"&#123;&#123; article.date.isoformat() &#125;&#125;\"&gt; &#123;&#123; article.locale_date &#125;&#125;&lt;/time&gt;&lt;/span&gt;\n可以看到 itemprop=&quot;datePublished&quot; 標記發表日期元素，並配合\n‘datetime’ 來提供搜尋引擎可理解的日期。\\&lt;time\\&gt;\\\n元素包含的日期格式，可能只適合人類觀看並經過地區化(localization)，所以，才需要另外提供一個公搜尋引擎使用的日期格式。\n標記作者資訊\n作者資訊本身是以另一個資料型態 Person\n來標記個別資料，其中重要的資料屬性有：\n\n名稱: 顯示用的名稱。\n頭像 (image): 作者頭像。\n主要網址 (url): 用來唯一標示這位作者的網址，如個人網站介紹頁面。\n社群網址: Facebook, Twitter 等社群網站個人專屬的網址。\n\n底下 HTML 片段是來自 ‘templates/includes/custom/authroinfo.html’\n這個樣板檔案：\n123456789101112&lt;div class=\"vcard author author_info\" itemprop=\"author\" itemscope itemtype=\"http://schema.org/Person\"&gt;    &lt;div class=\"author_photo pull-left\"&gt;        &lt;img itemprop=\"image\" alt='Sam Kuo (山姆鍋)' src='/images/logo.png' class='avatar avatar-80 photo  img-rounded'/&gt;    &lt;/div&gt;    &lt;div class=\"author-description\"&gt;        &lt;h4&gt;&lt;a class=\"fn url\" target='_blank' itemprop=\"url\" href=\"&#123;&#123; SITEURL &#125;&#125;/about/\" title=\"由 Sam Kuo (山姆鍋) 發表\" rel=\"author\"&gt;&lt;span itemprop=\"name\"&gt;Sam Kuo (山姆鍋)&lt;/span&gt;&lt;/a&gt;&lt;br/&gt;&lt;small&gt;-- 關注自由軟體發展，探索資訊科技應用 --&lt;/small&gt;&lt;/h4&gt;        &lt;a itemprop=\"sameAs\" href=\"https://github.com/sampot\" target='_blank' class=\"btn btn-default btn-xs\" role=\"button\"&gt;&lt;span class=\"fa fa-github-square\"&gt;&lt;/span&gt; GitHub&lt;/a&gt;        &lt;a itemprop=\"sameAs\" href=\"https://twitter.com/sampotkuo\" target='_blank' class=\"btn btn-default btn-xs\" role=\"button\"&gt;&lt;span class=\"fa fa-twitter-square\"&gt;&lt;/span&gt; Twitter&lt;/a&gt;        &lt;a itemprop=\"sameAs\" href=\"https://tw.linkedin.com/in/sampot\" target='_blank' class=\"btn btn-default btn-xs\" role=\"button\"&gt;&lt;span class=\"fa fa-linkedin-square\"&gt;&lt;/span&gt; LinkedIn&lt;/a&gt;    &lt;/div&gt;&lt;/div&gt;\n其中， itemprop=&quot;author&quot; 標記這個 &lt;div&gt;\n元素包含文章作者的資訊; itemscope itemtype=&quot;http://schema.org/Person&quot; 則同時標記它使用\nPerson 這個資料型態。 針對 Person 資料型態，個別的屬性標記分別為：\n\nitemprop=&quot;image&quot; : 標記作者頭像。\n`itemprop=“name” : 標記作者名稱。\n`itemprop=“url” : 標記作者主要個人資料網址。\nitemprop=&quot;sameAs&quot;: 標記作者其他個人資料網址。\n\n首頁增加網站結構化標記\n首頁是放置關於整個網站的結構化資料最適當的網頁，針對網站資料，山姆鍋選擇使用\nJSON-LD 格式來標記。 按照 Google\n的文件\n設定了下面片段在首頁的樣板(index.html)中\n123456789101112&lt;script type=\"application/ld+json\"&gt;&#123;    \"@context\": \"http://schema.org\",    \"@type\": \"WebSite\",    \"url\": \"https://samkuo.me/\",    \"potentialAction\": &#123;        \"@type\": \"SearchAction\",        \"target\": \"http://samkuo.me/search.html?q=&#123;search_term_string&#125;\",        \"query-input\": \"required name=search_term_string\"    &#125;&#125;&lt;/script&gt;\n第 5 行，需要提供網站的正式網址(canonical\nURL)，必須與首頁 HTML 標頭中的中繼資料 \\&lt;link rel=&quot;canonical' href=&quot;https://samkuo.me/&quot; /&gt; 設定相同。 第 8 跟第 9\n行，目的在設定所謂 Sitelinks Search box\n，讓用戶可以直接在搜尋結果進行站內搜尋。此部落格使用 Tipue search 作為\n站內搜尋引擎，不知道是否可行，不管怎樣，都是同樣設定。\n{search\\_term\\_string} 是個置換符，代表搜尋的字詞; 與第 9\n行的 search_term_string 必須相符。\n使用工具檢查\n為了確認設定正確，山姆鍋利用 Google 提供的\n結構化資料測試工具\n, 從下面截圖可以看到結果正確。\n\n結語\n山姆鍋不知道寫沒有人看的文章有何樂趣，所以讓潛在讀者更容易發現部落格文章，應該是值得做的投資。山姆鍋不是\n搜尋引擎最佳化( SEO(Search Engine Optimization){.interpreted-text\nrole=“abbr”})的專家，本文只是針對「我是山姆鍋」這個部落格所做的嘗試。\n參考資料\n_`Microdata`: http://schema.org/docs/gs.html#microdata_how\n_`RDFa`: http://www.w3.org/TR/rdfa-lite/\n_`JSON-LD`: http://www.w3.org/TR/json-ld/\n_`Sitelinks Search box`:\nhttps://developers.google.com/structured-data/slsb-overview\n_`BlogPosting`: http://schema.org/BlogPosting\n","dateCreated":"2015-09-10T08:18:00+08:00","dateModified":"2018-08-29T20:15:40+08:00","datePublished":"2015-09-10T08:18:00+08:00","description":"在使用 Google Search Console 時，發現 Google 無法找出文章的結構化資料，原來是所使用的 Pelican-bootstrap3 主題樣板沒有設定正確的標記，為了讓部落格文章可以被搜尋引擎正確地分析，看來需要修改樣板主題來處理這個問題。","headline":"給部落格來點 SEO","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2015/09/pelican-blog-microdata-seo/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"featured_image.jpg","logo":{"@type":"ImageObject","url":"featured_image.jpg"}},"url":"https://samkuo.me/post/2015/09/pelican-blog-microdata-seo/","keywords":"SEO, Microdata, JSON-LD, RDFa"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"在使用 Google Search Console 時，發現 Google 無法找出文章的結構化資料，原來是所使用的 Pelican-bootstrap3 主題樣板沒有設定正確的標記，為了讓部落格文章可以被搜尋引擎正確地分析，看來需要修改樣板主題來處理這個問題。\n\n什麼是「結構化資料標記」?\n在一般情況，網頁內容對搜尋引擎來說，只是半結構化的文字片段，並無法進一步分辨網頁包含事件、人物、產品等不同的資料。\n為了讓搜尋引擎這類軟體爬蟲可以更好地處理網頁內容，結構化資料(structured\ndata)便是為了這個目的而生。結構化資料標記可以多種格式加入網頁中，\n主要有：\n\nMicrodata\nRDFa\nJSON-LD\n\n在本文，山姆鍋將用到 Microdata 以及 JSON-LD 兩種格式。\n文章頁面增加結構化標記\n部落格主要的內容就是文章，顯示文章內容的頁面自然是重頭戲。從相關資料可以得知，部落格文章最適合的資料型態(schema)爲\nBlogPosting , 而這種資料型態幾個重要的資料元素有：\n\n標題 (headline): 使用 ‘headline’ 屬性值標註。\n發表日期 (published date): 使用 ‘datePublished’ 屬性值標註。\n特色圖檔 (featured image): 使用 ‘image’ 屬性值標註。\n內文本體 (article body): 使用 articleBody 屬性值標註。\n作者 (author): 使用 Person 資料型態標註。\n\n針對文章，山姆鍋採用 Microdata 格式來標記，該格式使用\nitemscope, itemtype, 以及\nitemprop 元素屬性來標記結構化資料。\n底下是 HTML 片段來自樣板(templates/index.html)。\n標記文章元素\n12345&lt;article itemscope itemtype=\"http://schema.org/Article\"&gt;  # 1        .        .        .&lt;/article&gt;\n在標號 1 使用 itemscope 以及\nitemtype 來標記 &lt;article&gt; HTML\n元素(element)是一篇文章。\n標記文章標題\n123456789&lt;header class=\"page-header\"&gt;    &lt;h1&gt;        &lt;a href=\"&#123;&#123; SITEURL &#125;&#125;/&#123;&#123; article.url &#125;&#125;\"           rel=\"bookmark\"           title=\"Permalink to &#123;&#123; article.title|striptags &#125;&#125;\"&gt;            &lt;span itemprop=\"headline\"&gt;&#123;&#123; article.title &#125;&#125;&lt;/span&gt;  # 2        &lt;/a&gt;    &lt;/h1&gt;&lt;/header&gt;\n標號 2 使用 itempro=&quot;headline&quot;\n定義文章的標題(headline)。\n標記特色圖檔\n使用 itemprop=&quot;image&quot; 來標記特色圖檔。\n123&lt;div class=\"featured-image\"&gt;    &lt;img itemprop=\"image\" class=\"article-image img-responsive\" alt=\"&#123;&#123;article.title&#125;&#125;\"src=\"/media/&#123;&#123;article.image&#125;&#125;\"/&gt;&lt;/div&gt;\n標記文章本體\n使用 itemprop=&quot;articleBody&quot; 來標記文章內文本體(article\nbody)。\n123&lt;div itemprop=\"articleBody\"&gt;    &#123;&#123; article.content &#125;&#125;&lt;/div&gt;\n標記發布日期\nPelican-bootstrap 3 樣板主題，文章的日期是由\n‘templates/includes/article_info.html’\n所呈現。下列是其中文章發表日期標記範例：\n123&lt;span class=\"published\"&gt;    &lt;i class=\"fa fa-calendar\"&gt;&lt;/i&gt;&lt;time itemprop=\"datePublished\" datetime=\"&#123;&#123; article.date.isoformat() &#125;&#125;\"&gt; &#123;&#123; article.locale_date &#125;&#125;&lt;/time&gt;&lt;/span&gt;\n可以看到 itemprop=&quot;datePublished&quot; 標記發表日期元素，並配合\n‘datetime’ 來提供搜尋引擎可理解的日期。\\&lt;time\\&gt;\\\n元素包含的日期格式，可能只適合人類觀看並經過地區化(localization)，所以，才需要另外提供一個公搜尋引擎使用的日期格式。\n標記作者資訊\n作者資訊本身是以另一個資料型態 Person\n來標記個別資料，其中重要的資料屬性有：\n\n名稱: 顯示用的名稱。\n頭像 (image): 作者頭像。\n主要網址 (url): 用來唯一標示這位作者的網址，如個人網站介紹頁面。\n社群網址: Facebook, Twitter 等社群網站個人專屬的網址。\n\n底下 HTML 片段是來自 ‘templates/includes/custom/authroinfo.html’\n這個樣板檔案：\n123456789101112&lt;div class=\"vcard author author_info\" itemprop=\"author\" itemscope itemtype=\"http://schema.org/Person\"&gt;    &lt;div class=\"author_photo pull-left\"&gt;        &lt;img itemprop=\"image\" alt='Sam Kuo (山姆鍋)' src='/images/logo.png' class='avatar avatar-80 photo  img-rounded'/&gt;    &lt;/div&gt;    &lt;div class=\"author-description\"&gt;        &lt;h4&gt;&lt;a class=\"fn url\" target='_blank' itemprop=\"url\" href=\"&#123;&#123; SITEURL &#125;&#125;/about/\" title=\"由 Sam Kuo (山姆鍋) 發表\" rel=\"author\"&gt;&lt;span itemprop=\"name\"&gt;Sam Kuo (山姆鍋)&lt;/span&gt;&lt;/a&gt;&lt;br/&gt;&lt;small&gt;-- 關注自由軟體發展，探索資訊科技應用 --&lt;/small&gt;&lt;/h4&gt;        &lt;a itemprop=\"sameAs\" href=\"https://github.com/sampot\" target='_blank' class=\"btn btn-default btn-xs\" role=\"button\"&gt;&lt;span class=\"fa fa-github-square\"&gt;&lt;/span&gt; GitHub&lt;/a&gt;        &lt;a itemprop=\"sameAs\" href=\"https://twitter.com/sampotkuo\" target='_blank' class=\"btn btn-default btn-xs\" role=\"button\"&gt;&lt;span class=\"fa fa-twitter-square\"&gt;&lt;/span&gt; Twitter&lt;/a&gt;        &lt;a itemprop=\"sameAs\" href=\"https://tw.linkedin.com/in/sampot\" target='_blank' class=\"btn btn-default btn-xs\" role=\"button\"&gt;&lt;span class=\"fa fa-linkedin-square\"&gt;&lt;/span&gt; LinkedIn&lt;/a&gt;    &lt;/div&gt;&lt;/div&gt;\n其中， itemprop=&quot;author&quot; 標記這個 &lt;div&gt;\n元素包含文章作者的資訊; itemscope itemtype=&quot;http://schema.org/Person&quot; 則同時標記它使用\nPerson 這個資料型態。 針對 Person 資料型態，個別的屬性標記分別為：\n\nitemprop=&quot;image&quot; : 標記作者頭像。\n`itemprop=“name” : 標記作者名稱。\n`itemprop=“url” : 標記作者主要個人資料網址。\nitemprop=&quot;sameAs&quot;: 標記作者其他個人資料網址。\n\n首頁增加網站結構化標記\n首頁是放置關於整個網站的結構化資料最適當的網頁，針對網站資料，山姆鍋選擇使用\nJSON-LD 格式來標記。 按照 Google\n的文件\n設定了下面片段在首頁的樣板(index.html)中\n123456789101112&lt;script type=\"application/ld+json\"&gt;&#123;    \"@context\": \"http://schema.org\",    \"@type\": \"WebSite\",    \"url\": \"https://samkuo.me/\",    \"potentialAction\": &#123;        \"@type\": \"SearchAction\",        \"target\": \"http://samkuo.me/search.html?q=&#123;search_term_string&#125;\",        \"query-input\": \"required name=search_term_string\"    &#125;&#125;&lt;/script&gt;\n第 5 行，需要提供網站的正式網址(canonical\nURL)，必須與首頁 HTML 標頭中的中繼資料 \\&lt;link rel=&quot;canonical' href=&quot;https://samkuo.me/&quot; /&gt; 設定相同。 第 8 跟第 9\n行，目的在設定所謂 Sitelinks Search box\n，讓用戶可以直接在搜尋結果進行站內搜尋。此部落格使用 Tipue search 作為\n站內搜尋引擎，不知道是否可行，不管怎樣，都是同樣設定。\n{search\\_term\\_string} 是個置換符，代表搜尋的字詞; 與第 9\n行的 search_term_string 必須相符。\n使用工具檢查\n為了確認設定正確，山姆鍋利用 Google 提供的\n結構化資料測試工具\n, 從下面截圖可以看到結果正確。\n\n結語\n山姆鍋不知道寫沒有人看的文章有何樂趣，所以讓潛在讀者更容易發現部落格文章，應該是值得做的投資。山姆鍋不是\n搜尋引擎最佳化( SEO(Search Engine Optimization){.interpreted-text\nrole=“abbr”})的專家，本文只是針對「我是山姆鍋」這個部落格所做的嘗試。\n參考資料\n_`Microdata`: http://schema.org/docs/gs.html#microdata_how\n_`RDFa`: http://www.w3.org/TR/rdfa-lite/\n_`JSON-LD`: http://www.w3.org/TR/json-ld/\n_`Sitelinks Search box`:\nhttps://developers.google.com/structured-data/slsb-overview\n_`BlogPosting`: http://schema.org/BlogPosting\n","dateCreated":"2015-09-10T08:18:00+08:00","dateModified":"2018-08-29T20:15:40+08:00","datePublished":"2015-09-10T08:18:00+08:00","description":"在使用 Google Search Console 時，發現 Google 無法找出文章的結構化資料，原來是所使用的 Pelican-bootstrap3 主題樣板沒有設定正確的標記，為了讓部落格文章可以被搜尋引擎正確地分析，看來需要修改樣板主題來處理這個問題。","headline":"給部落格來點 SEO","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2015/09/pelican-blog-microdata-seo/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2015/09/pelican-blog-microdata-seo/","keywords":"SEO, Microdata, JSON-LD, RDFa"}</script>
     <meta name="description" content="在使用 Google Search Console 時，發現 Google 無法找出文章的結構化資料，原來是所使用的 Pelican-bootstrap3 主題樣板沒有設定正確的標記，為了讓部落格文章可以被搜尋引擎正確地分析，看來需要修改樣板主題來處理這個問題。">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="給部落格來點 SEO">
@@ -41,9 +41,7 @@
     
         
     
-    
-        <meta property="og:image" content="https://samkuo.me/images/featured_image.jpg"/>
-    
+    <meta property="og:image" content="https://samkuo.me/images/featured_image.jpg"/>
     
     
     
@@ -117,7 +115,7 @@
                     href="/#about"
                     aria-label="閱讀有關作者的更多信息"
                 >
-                    <img class="sidebar-profile-picture" src="/images/featured_image.jpg" alt="作者的圖片"/>
+                    <img class="sidebar-profile-picture" src="/images/logo.png" alt="作者的圖片"/>
                 </a>
                 <h4 class="sidebar-profile-name">Sampot (山姆鍋)</h4>
                 
@@ -290,10 +288,10 @@
                                 target="_blank"
                             
                             rel="noopener"
-                            title="Email"
+                            title="聯絡"
                         >
                         <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Email</span>
+                        <span class="sidebar-button-desc">聯絡</span>
                     </a>
             </li>
             
@@ -526,7 +524,7 @@ role=“abbr”})的專家，本文只是針對「我是山姆鍋」這個部落
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Diesen Beitrag teilen"
+                aria-label="Share this post"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -564,7 +562,7 @@ role=“abbr”})的專家，本文只是針對「我是山姆鍋」這個部落
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Kommentieren"
+                        aria-label="Leave a comment"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -573,7 +571,7 @@ role=“abbr”})的專家，本文只是針對「我是山姆鍋」這個部落
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -642,7 +640,7 @@ role=“abbr”})的專家，本文只是針對「我是山姆鍋」這個部落
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Diesen Beitrag teilen"
+                aria-label="Share this post"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -680,7 +678,7 @@ role=“abbr”})的專家，本文只是針對「我是山姆鍋」這個部落
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Kommentieren"
+                        aria-label="Leave a comment"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -689,7 +687,7 @@ role=“abbr”})的專家，本文只是針對「我是山姆鍋」這個部落
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -749,7 +747,7 @@ role=“abbr”})的專家，本文只是針對「我是山姆鍋」這個部落
             <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="/images/featured_image.jpg" alt="作者的圖片"/>
+            <img id="about-card-picture" src="/images/logo.png" alt="作者的圖片"/>
         
             <h4 id="about-card-name">Sampot (山姆鍋)</h4>
         
@@ -811,10 +809,7 @@ role=“abbr”})的專家，本文只是針對「我是山姆鍋」這個部落
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>本文簡單說明如何設定兩台 MySQL<br>
-server，讓它們彼此互相備份資料(Master-master<br>
-模式)。雖然這樣的設定通常是支援高可用性(high availability)<br>
-平台的一部分，但本文不包含如何完成其他 HA 的工作。設定兩台 MySQL 伺服器互相備份，主要目的就是要確認資料的安全性；同時也提高可用性。</p></div>
+                        <div class="media-content hide-xs font-merryweather"><p>本文簡單說明如何設定兩台 MySQL server，讓它們彼此互相備份資料 (Master-master 模式)。雖然這樣的設定通常是支援高可用性 (high availability) 平台的一部分，但本文不包含如何完成其他 HA 的工作。設定兩台 MySQL 伺服器互相備份，主要目的就是要確認資料的安全性；同時也提高可用性。</p></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>

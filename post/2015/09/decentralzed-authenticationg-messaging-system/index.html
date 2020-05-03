@@ -17,7 +17,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"featured_image.jpg"},"articleBody":"山姆鍋期望雲端存儲與備份服務，可以做到保護使用者的資料安全與隱私。針對要達到這樣目標， 已經說明了其中需要的兩個關鍵技術：「資訊擴散演算法」以及「Convergent Encryption」。 本文山姆鍋說明另外一片重要拼圖：「去中心化身份驗證(decentralized authentication)」。\n\n在描述雲端儲存與備份服務時，山姆鍋提到理想的服務需要有下列三點特性：\n\n不用怕儲存主機被入侵;\n不用擔心服務供應商將儲存資料交給第三方;\n全世界只有您能夠讀取資料內容;\n\n本文與之前文章討論的技術可以完成上述特性。為了確保第 3 點，我們要能夠回答下列問題：\n\n資料存取的請求者的身份。\n資料存取的請求者是否具備需要的權限。\n\n由於假設需求是只有自己能夠讀取資料內容，所以資料擁有者應該是唯一合法的請求者。 既然是擁有者，理應擁有所有權限。所以，本文重點旨在說明如何以一個去中心化方法來驗證使用者身份， 以及如何確保只有擁有者能夠解密資料。\n為什麼需要去中心化的驗證方法？\n這個問題其實反映我們的目的：只有擁有者可以存取資料。基於這個需求， 最安全的做法自然是不存放任何身份驗證資訊在雲端主機。而要做到這點唯有去中心化的架構可以實現。 在說明山姆鍋建議的驗證方法前，先看看目前網路上有哪些常見的身份驗證方法。\n常見的身份驗證方法\n目前網路上常用的使用者身份驗證方法，大略有下列三種方式(資料來源參考 Wikipedia)：\n\n\n\n共享秘鑰的驗證方式:\n這應該是大多數人熟悉的方式，使用者被要求輸入登入名稱以及密碼，如果名稱與密碼組合正確， 則登入成功。為了實現這種方法，服務端需要存放使用者的身份認證資訊，例如：經過雜湊並加料過的密碼 [1]。 這種方法的主要缺點在於集中存放使用者身份驗證資料，一旦被入侵，使用者的個人資料， 以及身份驗證資訊可能都會遭受破解(compromised)。這還是網路服務廠商有提供保護措施的情況，如果沒有，那簡直就可以說是長驅直入！\n\n\n\n\n多因子驗證(Multi-factor authentication)方法:\n通常是第一種方法，再加上一個額外的驗證機制。例如：Google 會以簡訊傳送額外的認證碼， 在登入的第二步驟使用。另一種常見的方式是使用硬體或軟體 Token，用來產生一次性認證碼。 由於使用額外的認證機制，在服務端安全的情況下，使用者身份比第一種方法更不容易被盜用。 這種方法主要是要補強使用者的密碼強度不夠或被盜錄的問題。\n\n\n\n\n公開金鑰驗證方法：\n透過使用憑證(certificate)來證明服務端(server)或者客戶端(client)的身份。 憑證使用公開金鑰密碼，如早期的 DSA , RSA ，以及最近的 Elliptic Curve(以下簡稱 EC ) 演算法。 這種方法的主要缺點在於憑證需要預先經過第三方簽核(signed)，憑證的派送、取消與重發需要完整的基礎設施。\n\n\n\n第一跟第二種方法，使用者身份驗證資訊都存放在服務端，大量的用戶資訊永遠都是駭客的潛在目標。 第三種方法雖然相對安全許多，但是憑證的管理負擔以及發行憑證掌握在少數組織的手中， 只要其中的發行憑證被破解，由那個發行憑證所簽核的憑證都可以被捏造。這是已經有實際發生的案例。\n針對雲端存儲與備份服務，實在沒有必要存放使用者的身份資料在服務端，使用公開金鑰方法又有憑證管理複雜的問題。 有沒有適合雲端存儲服務的身份驗證方法呢？實現這種方法的需求是什麼？\n身份驗證方法需求\n針對雲端存儲服務，基於服務端沒有存放個人資料的需求，需要一種不同的驗證方法。 這種驗證方法最好能夠具有下列特性：\n\n\n\n身份驗證資訊少:\n最好服務端只需要一個代表使用者身份的唯一代碼(unique ID)，這個代碼沒有任何語意資訊。\n實務上，這個代碼可能是由其它代碼衍生(derived)而來，不過只要基本上不能從此代碼反推出來源代碼即可。 這可以透過使用密碼學等級的雜湊函式達成。\n\n\n\n\n易於理解與實現：\n因為去中心化的架構，客戶端需要負擔身份認證的運算工作。因此，這種方法要易於理解並實現才能在不同的客戶端實作。\n\n\n\n\n可匿名：\n這種方法最好可以匿名方式進行，也就是身份驗證不需要使用者揭露個人資訊(personal information)。 這裡的個人資訊是指能夠識別(identify)到單一使用者身份的資料，如：姓名、Email 等等。 但對於像是 IP 位址這種可以間接推測個人身份的資訊則需由其他機制處理。\n\n\n\n\n去中心化：\n任兩個參與者，可以互相驗證彼此身份，不用跟第三方預先註冊。\n\n\n\n清楚身份驗證方法的需求後，來看看如何設計符合的身份驗證方法。\n身份驗證方法設計\n本節有點難以說明，您可以跳過，只須記住這個設計確保：\n\n任何人都可以接受到送出的訊息，但只有合法接收者能夠解開訊息。\n驗證訊息的確是來自發送者，且傳輸過程中沒有遭到任何修改。\n\n目前技術要做去中心化的驗證，基本上跳脫不出公開金鑰密碼學的方法。山姆鍋建議的驗證方法使用以 Elliptic curve 公開金鑰為基礎，相較於 DSA/RSA，Elliptic curve 有下列優點：\n\n同樣密碼強度，EC 的位元長度(bit length)較短，且需要的運算能力較低。\n可以直接使用 EC 的公鑰(public key)當作身份識別碼，或者由它再衍生另一個代碼。熟悉 Bitcoin 運作原理的讀者，應該會覺得跟 Bitcoin 的方法很類似。\n\n要了解本文所提的驗證方式，需要先知道 EC 的一些特性：\n\n\n跟 RSA 一樣，EC 同樣使用金鑰對(key pair)，分別為公鑰(public key)以及私鑰(secret key)。\n\n\n\n任意兩個金鑰對，A 跟 B，可以且只可以由 Ａ的私鑰與 B 的公鑰或者 B 的私鑰與 A 的公鑰[2] ，衍生出相同的金鑰(key)。\n這個特性可以用來簡單完成金鑰交換協定。雖然 EC 比 RSA 的運算需求低，但相對於對稱式加密還是比較慢。 所以，通常還是藉由金鑰交換協定來協商一個金鑰並使用於對稱式加密。\n\n\n\n\nEC 建議使用不同的金鑰對作為簽核(signing)用的以及負責加密(encryption)用途。\n針對不同用途，基於安全性原則使用不同的金鑰對。理論上，一個 EC 金鑰對可以在這兩種用途之間轉換， 雖然目前沒有證據顯示這樣做比較不安全，但一般還是分開比較常見。\n\n\n\n本文所建議的方法是參考 CurveCP 的設計。\n假設 Alice 想要送一段訊息(message)給 Bob，Alice 的長期金鑰對為 (s, p), Bob 的長期金鑰對 為(s’, p’)，且假設 Alice 已經透過某種安全管道得知 Bob 的長期公鑰(long-term public key)。\n\n\nAlice 產生一個臨時加密金鑰對(S, P)，使用臨時私鑰 S 以及 Bob 的長期公鑰 p’ 衍生加密用的金鑰 K2。\n\n\nAlice 使用自己的長期私鑰 s 跟 Bob 的長期公鑰 p’ 衍生加密用金鑰 K1。\n\n\n\nAlice 使用 K1 將要傳送的資料(payload)加密，連同自己的長期公鑰 p 一起組成資料區塊 D1。\n\nD1 的資料組成：\n\n\n\n\n\n\n\n\n\n\nAlice 的長期公鑰\n…\nK1 加密過的\n\n\np\n\npayload\n\n\n\n\n\n\n\n\nAlice 使用 K2 加密 D1，得到另一個加密過的資料區段 D2, 連同臨時公鑰 P 一起傳給 Bob。\n\nAlice 傳出去的資料：\n\n\n\n\n\n\n\n\n\n\n臨時公鑰 P\n…\nD2\n\n\n\n\n\n\n\nBob 根據收到的的臨時公鑰 P 以及自己的長期私鑰 s’，衍生加密用的金鑰 K2。\n\n\nBob 使用金鑰 K2 解密接收到的資料區段 D2。\n\n\nBob 使用從 D2 解密取得的 Alice 長期公鑰 p, 與自己的長期私鑰 s’ 衍生出 K1。\n\n\nBob 使用 K1 解密 D1 取得 Alice 所傳送的資料(payload)，同時驗證此訊息確實來自 Alice。\n\n\n使用臨時金鑰對是為了避免 Alice 的長期公鑰暴露給第三方，長期公鑰一般不視為極機密的資訊， 但避免不必要的傳輸減少被破解的資訊可以提高安全性。 為了簡化起見，山姆鍋將流程中需要傳輸的時間郵戳(timestamp), padding 用的資料都忽略不提， 這些資訊用來處理像是過期訊息等問題。 有了這樣的安全訊息傳遞方式，我們就可以來看看跟雲端資料存儲服務如何整合。\n與雲端資料存儲服務的整合\n為了說明為何去中心化的身份驗證是雲端資料存儲服務重要的關鍵技術，花了不少文字描述。不管如何， 終於要說明這種去中心化身份驗證方法如何應用在雲端資料存儲服務。在 Dropbox 做到資料加密又避免重複儲存的秘密 中，最終安全的保障來自於解密的主鑰 (master key) 的安全，但是目前的雲端服務需要將 master key 儲存在雲端主機中，終究是一個安全隱憂。\n如果雲端儲存服務是按照山姆鍋所建議的方式，使用 Convergent encryption 來加密，整個資料倉庫(repository) 最終只需要保護使用者資料索引區塊。這個區塊在雲端主機隨時是加密狀態， 只有在使用者要存取時才會從服務端下載到客戶端，資料有修改的情況下，由客戶端加密後再回傳雲端主機。 透過本文所描述的身份驗證與 EC，由於加密主鑰只存在客戶端， 可以確保只有擁有者可以存取以及解密資料 [3] 。\n結語\n有了這樣一個去中心化，易於理解與實現的身份驗證方法，除了雲端資料備份，也開啟很多種應用的可能。 本文沒有詳細說明如何在客戶端保護好主要的解密金鑰(master key)，概念上可以使用類似 Bitcoin 腦錢包(brain wallet) 的方法，主要解密金鑰衍生自使用者才知道的密語(pass phrase)，所以，雲端資料安全最終的問題轉變成： 如何保護使用者的密語，這個目前山姆鍋不清楚有沒有更簡單又安全的做法。\n免責聲明：山姆鍋不是資料安全方面專家，不保證所描述方法的任何安全性。歡迎有這方面專長的人提出改進建議。\n參考資料\nNaCL: http://nacl.cr.yp.to/\n\n基於 EC 密碼學的加解密程式庫。\n\nlibsodium: https://github.com/jedisct1/libsodium\n\nLibsodium 是一個現代化的 NaCL 加解密程式庫的實作。\n\nlibnacl: https://libnacl.readthedocs.org/en/latest/\n\n一個 Python 的 NaCL 程式庫綁定，可以使用 Libsodium 程式庫。\n\nCurveCP: http://curvecp.org/\n\n基於 NaCL 的安全資料通訊協定。\n\nBitMessage: https://bitmessage.org/wiki/Main_Page\n\n基於 Elliptic Curve 密碼學，採用點對點(P2P)架構，匿名的訊息傳遞程式。\n\nRSA: https://en.wikipedia.org/wiki/RSA_(cryptosystem)\nDSA: https://en.wikipedia.org/wiki/Digital_Signature_Algorithm\nEC: https://en.wikipedia.org/wiki/Elliptic_curve_cryptography\n\n\n\n指密碼使用密碼學等級(cryptographic)的雜湊函式以及一個亂數(稱為 salt)一起計算出密碼雜湊值(password hash)，驗證時使用相同的演算法與亂數，如果匹配則視為認證成功。 ↩︎\n\n這裡的 “只可以” 純粹是從數學的角度來說。因為數學上幾乎不可能猜測出衍生的金鑰。 ↩︎\n\n其實擁有者可以將解密的能力委派給第三方，因為資料採用 Convergent encryption， 只要有金鑰跟加密過的資料，任何人都可以解密。但前提應該只有在擁有者主動提供解密用的金鑰的條件下。 這個特性是實現檔案共享必要的機制。 ↩︎\n\n\n\n","dateCreated":"2015-09-18T08:45:00+08:00","dateModified":"2020-03-08T10:24:13+08:00","datePublished":"2015-09-18T08:45:00+08:00","description":"山姆鍋期望雲端存儲與備份服務，可以做到保護使用者的資料安全與隱私。針對要達到這樣目標， 已經說明了其中需要的兩個關鍵技術：「資訊擴散演算法」以及「Convergent Encryption」。 本文山姆鍋說明另外一片重要拼圖：「去中心化身份驗證(decentralized authentication)」。","headline":"去中心化身份驗證與訊息傳遞","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2015/09/decentralzed-authenticationg-messaging-system/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"featured_image.jpg","logo":{"@type":"ImageObject","url":"featured_image.jpg"}},"url":"https://samkuo.me/post/2015/09/decentralzed-authenticationg-messaging-system/","keywords":"nacl, encryption, security, authentication, messaging"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"山姆鍋期望雲端存儲與備份服務，可以做到保護使用者的資料安全與隱私。針對要達到這樣目標， 已經說明了其中需要的兩個關鍵技術：「資訊擴散演算法」以及「Convergent Encryption」。 本文山姆鍋說明另外一片重要拼圖：「去中心化身份驗證(decentralized authentication)」。\n\n在描述雲端儲存與備份服務時，山姆鍋提到理想的服務需要有下列三點特性：\n\n不用怕儲存主機被入侵;\n不用擔心服務供應商將儲存資料交給第三方;\n全世界只有您能夠讀取資料內容;\n\n本文與之前文章討論的技術可以完成上述特性。為了確保第 3 點，我們要能夠回答下列問題：\n\n資料存取的請求者的身份。\n資料存取的請求者是否具備需要的權限。\n\n由於假設需求是只有自己能夠讀取資料內容，所以資料擁有者應該是唯一合法的請求者。 既然是擁有者，理應擁有所有權限。所以，本文重點旨在說明如何以一個去中心化方法來驗證使用者身份， 以及如何確保只有擁有者能夠解密資料。\n為什麼需要去中心化的驗證方法？\n這個問題其實反映我們的目的：只有擁有者可以存取資料。基於這個需求， 最安全的做法自然是不存放任何身份驗證資訊在雲端主機。而要做到這點唯有去中心化的架構可以實現。 在說明山姆鍋建議的驗證方法前，先看看目前網路上有哪些常見的身份驗證方法。\n常見的身份驗證方法\n目前網路上常用的使用者身份驗證方法，大略有下列三種方式(資料來源參考 Wikipedia)：\n\n\n\n共享秘鑰的驗證方式:\n這應該是大多數人熟悉的方式，使用者被要求輸入登入名稱以及密碼，如果名稱與密碼組合正確， 則登入成功。為了實現這種方法，服務端需要存放使用者的身份認證資訊，例如：經過雜湊並加料過的密碼 [1]。 這種方法的主要缺點在於集中存放使用者身份驗證資料，一旦被入侵，使用者的個人資料， 以及身份驗證資訊可能都會遭受破解(compromised)。這還是網路服務廠商有提供保護措施的情況，如果沒有，那簡直就可以說是長驅直入！\n\n\n\n\n多因子驗證(Multi-factor authentication)方法:\n通常是第一種方法，再加上一個額外的驗證機制。例如：Google 會以簡訊傳送額外的認證碼， 在登入的第二步驟使用。另一種常見的方式是使用硬體或軟體 Token，用來產生一次性認證碼。 由於使用額外的認證機制，在服務端安全的情況下，使用者身份比第一種方法更不容易被盜用。 這種方法主要是要補強使用者的密碼強度不夠或被盜錄的問題。\n\n\n\n\n公開金鑰驗證方法：\n透過使用憑證(certificate)來證明服務端(server)或者客戶端(client)的身份。 憑證使用公開金鑰密碼，如早期的 DSA , RSA ，以及最近的 Elliptic Curve(以下簡稱 EC ) 演算法。 這種方法的主要缺點在於憑證需要預先經過第三方簽核(signed)，憑證的派送、取消與重發需要完整的基礎設施。\n\n\n\n第一跟第二種方法，使用者身份驗證資訊都存放在服務端，大量的用戶資訊永遠都是駭客的潛在目標。 第三種方法雖然相對安全許多，但是憑證的管理負擔以及發行憑證掌握在少數組織的手中， 只要其中的發行憑證被破解，由那個發行憑證所簽核的憑證都可以被捏造。這是已經有實際發生的案例。\n針對雲端存儲與備份服務，實在沒有必要存放使用者的身份資料在服務端，使用公開金鑰方法又有憑證管理複雜的問題。 有沒有適合雲端存儲服務的身份驗證方法呢？實現這種方法的需求是什麼？\n身份驗證方法需求\n針對雲端存儲服務，基於服務端沒有存放個人資料的需求，需要一種不同的驗證方法。 這種驗證方法最好能夠具有下列特性：\n\n\n\n身份驗證資訊少:\n最好服務端只需要一個代表使用者身份的唯一代碼(unique ID)，這個代碼沒有任何語意資訊。\n實務上，這個代碼可能是由其它代碼衍生(derived)而來，不過只要基本上不能從此代碼反推出來源代碼即可。 這可以透過使用密碼學等級的雜湊函式達成。\n\n\n\n\n易於理解與實現：\n因為去中心化的架構，客戶端需要負擔身份認證的運算工作。因此，這種方法要易於理解並實現才能在不同的客戶端實作。\n\n\n\n\n可匿名：\n這種方法最好可以匿名方式進行，也就是身份驗證不需要使用者揭露個人資訊(personal information)。 這裡的個人資訊是指能夠識別(identify)到單一使用者身份的資料，如：姓名、Email 等等。 但對於像是 IP 位址這種可以間接推測個人身份的資訊則需由其他機制處理。\n\n\n\n\n去中心化：\n任兩個參與者，可以互相驗證彼此身份，不用跟第三方預先註冊。\n\n\n\n清楚身份驗證方法的需求後，來看看如何設計符合的身份驗證方法。\n身份驗證方法設計\n本節有點難以說明，您可以跳過，只須記住這個設計確保：\n\n任何人都可以接受到送出的訊息，但只有合法接收者能夠解開訊息。\n驗證訊息的確是來自發送者，且傳輸過程中沒有遭到任何修改。\n\n目前技術要做去中心化的驗證，基本上跳脫不出公開金鑰密碼學的方法。山姆鍋建議的驗證方法使用以 Elliptic curve 公開金鑰為基礎，相較於 DSA/RSA，Elliptic curve 有下列優點：\n\n同樣密碼強度，EC 的位元長度(bit length)較短，且需要的運算能力較低。\n可以直接使用 EC 的公鑰(public key)當作身份識別碼，或者由它再衍生另一個代碼。熟悉 Bitcoin 運作原理的讀者，應該會覺得跟 Bitcoin 的方法很類似。\n\n要了解本文所提的驗證方式，需要先知道 EC 的一些特性：\n\n\n跟 RSA 一樣，EC 同樣使用金鑰對(key pair)，分別為公鑰(public key)以及私鑰(secret key)。\n\n\n\n任意兩個金鑰對，A 跟 B，可以且只可以由 Ａ的私鑰與 B 的公鑰或者 B 的私鑰與 A 的公鑰[2] ，衍生出相同的金鑰(key)。\n這個特性可以用來簡單完成金鑰交換協定。雖然 EC 比 RSA 的運算需求低，但相對於對稱式加密還是比較慢。 所以，通常還是藉由金鑰交換協定來協商一個金鑰並使用於對稱式加密。\n\n\n\n\nEC 建議使用不同的金鑰對作為簽核(signing)用的以及負責加密(encryption)用途。\n針對不同用途，基於安全性原則使用不同的金鑰對。理論上，一個 EC 金鑰對可以在這兩種用途之間轉換， 雖然目前沒有證據顯示這樣做比較不安全，但一般還是分開比較常見。\n\n\n\n本文所建議的方法是參考 CurveCP 的設計。\n假設 Alice 想要送一段訊息(message)給 Bob，Alice 的長期金鑰對為 (s, p), Bob 的長期金鑰對 為(s’, p’)，且假設 Alice 已經透過某種安全管道得知 Bob 的長期公鑰(long-term public key)。\n\n\nAlice 產生一個臨時加密金鑰對(S, P)，使用臨時私鑰 S 以及 Bob 的長期公鑰 p’ 衍生加密用的金鑰 K2。\n\n\nAlice 使用自己的長期私鑰 s 跟 Bob 的長期公鑰 p’ 衍生加密用金鑰 K1。\n\n\n\nAlice 使用 K1 將要傳送的資料(payload)加密，連同自己的長期公鑰 p 一起組成資料區塊 D1。\n\nD1 的資料組成：\n\n\n\n\n\n\n\n\n\n\nAlice 的長期公鑰\n…\nK1 加密過的\n\n\np\n\npayload\n\n\n\n\n\n\n\n\nAlice 使用 K2 加密 D1，得到另一個加密過的資料區段 D2, 連同臨時公鑰 P 一起傳給 Bob。\n\nAlice 傳出去的資料：\n\n\n\n\n\n\n\n\n\n\n臨時公鑰 P\n…\nD2\n\n\n\n\n\n\n\nBob 根據收到的的臨時公鑰 P 以及自己的長期私鑰 s’，衍生加密用的金鑰 K2。\n\n\nBob 使用金鑰 K2 解密接收到的資料區段 D2。\n\n\nBob 使用從 D2 解密取得的 Alice 長期公鑰 p, 與自己的長期私鑰 s’ 衍生出 K1。\n\n\nBob 使用 K1 解密 D1 取得 Alice 所傳送的資料(payload)，同時驗證此訊息確實來自 Alice。\n\n\n使用臨時金鑰對是為了避免 Alice 的長期公鑰暴露給第三方，長期公鑰一般不視為極機密的資訊， 但避免不必要的傳輸減少被破解的資訊可以提高安全性。 為了簡化起見，山姆鍋將流程中需要傳輸的時間郵戳(timestamp), padding 用的資料都忽略不提， 這些資訊用來處理像是過期訊息等問題。 有了這樣的安全訊息傳遞方式，我們就可以來看看跟雲端資料存儲服務如何整合。\n與雲端資料存儲服務的整合\n為了說明為何去中心化的身份驗證是雲端資料存儲服務重要的關鍵技術，花了不少文字描述。不管如何， 終於要說明這種去中心化身份驗證方法如何應用在雲端資料存儲服務。在 Dropbox 做到資料加密又避免重複儲存的秘密 中，最終安全的保障來自於解密的主鑰 (master key) 的安全，但是目前的雲端服務需要將 master key 儲存在雲端主機中，終究是一個安全隱憂。\n如果雲端儲存服務是按照山姆鍋所建議的方式，使用 Convergent encryption 來加密，整個資料倉庫(repository) 最終只需要保護使用者資料索引區塊。這個區塊在雲端主機隨時是加密狀態， 只有在使用者要存取時才會從服務端下載到客戶端，資料有修改的情況下，由客戶端加密後再回傳雲端主機。 透過本文所描述的身份驗證與 EC，由於加密主鑰只存在客戶端， 可以確保只有擁有者可以存取以及解密資料 [3] 。\n結語\n有了這樣一個去中心化，易於理解與實現的身份驗證方法，除了雲端資料備份，也開啟很多種應用的可能。 本文沒有詳細說明如何在客戶端保護好主要的解密金鑰(master key)，概念上可以使用類似 Bitcoin 腦錢包(brain wallet) 的方法，主要解密金鑰衍生自使用者才知道的密語(pass phrase)，所以，雲端資料安全最終的問題轉變成： 如何保護使用者的密語，這個目前山姆鍋不清楚有沒有更簡單又安全的做法。\n免責聲明：山姆鍋不是資料安全方面專家，不保證所描述方法的任何安全性。歡迎有這方面專長的人提出改進建議。\n參考資料\nNaCL: http://nacl.cr.yp.to/\n\n基於 EC 密碼學的加解密程式庫。\n\nlibsodium: https://github.com/jedisct1/libsodium\n\nLibsodium 是一個現代化的 NaCL 加解密程式庫的實作。\n\nlibnacl: https://libnacl.readthedocs.org/en/latest/\n\n一個 Python 的 NaCL 程式庫綁定，可以使用 Libsodium 程式庫。\n\nCurveCP: http://curvecp.org/\n\n基於 NaCL 的安全資料通訊協定。\n\nBitMessage: https://bitmessage.org/wiki/Main_Page\n\n基於 Elliptic Curve 密碼學，採用點對點(P2P)架構，匿名的訊息傳遞程式。\n\nRSA: https://en.wikipedia.org/wiki/RSA_(cryptosystem)\nDSA: https://en.wikipedia.org/wiki/Digital_Signature_Algorithm\nEC: https://en.wikipedia.org/wiki/Elliptic_curve_cryptography\n\n\n\n指密碼使用密碼學等級(cryptographic)的雜湊函式以及一個亂數(稱為 salt)一起計算出密碼雜湊值(password hash)，驗證時使用相同的演算法與亂數，如果匹配則視為認證成功。 ↩︎\n\n這裡的 “只可以” 純粹是從數學的角度來說。因為數學上幾乎不可能猜測出衍生的金鑰。 ↩︎\n\n其實擁有者可以將解密的能力委派給第三方，因為資料採用 Convergent encryption， 只要有金鑰跟加密過的資料，任何人都可以解密。但前提應該只有在擁有者主動提供解密用的金鑰的條件下。 這個特性是實現檔案共享必要的機制。 ↩︎\n\n\n\n","dateCreated":"2015-09-18T08:45:00+08:00","dateModified":"2020-03-08T10:24:13+08:00","datePublished":"2015-09-18T08:45:00+08:00","description":"山姆鍋期望雲端存儲與備份服務，可以做到保護使用者的資料安全與隱私。針對要達到這樣目標， 已經說明了其中需要的兩個關鍵技術：「資訊擴散演算法」以及「Convergent Encryption」。 本文山姆鍋說明另外一片重要拼圖：「去中心化身份驗證(decentralized authentication)」。","headline":"去中心化身份驗證與訊息傳遞","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2015/09/decentralzed-authenticationg-messaging-system/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2015/09/decentralzed-authenticationg-messaging-system/","keywords":"nacl, encryption, security, authentication, messaging"}</script>
     <meta name="description" content="山姆鍋期望雲端存儲與備份服務，可以做到保護使用者的資料安全與隱私。針對要達到這樣目標， 已經說明了其中需要的兩個關鍵技術：「資訊擴散演算法」以及「Convergent Encryption」。 本文山姆鍋說明另外一片重要拼圖：「去中心化身份驗證(decentralized authentication)」。">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="去中心化身份驗證與訊息傳遞">
@@ -40,9 +40,7 @@
     
         
     
-    
-        <meta property="og:image" content="https://samkuo.me/images/featured_image.jpg"/>
-    
+    <meta property="og:image" content="https://samkuo.me/images/featured_image.jpg"/>
     
     
     
@@ -116,7 +114,7 @@
                     href="/#about"
                     aria-label="閱讀有關作者的更多信息"
                 >
-                    <img class="sidebar-profile-picture" src="/images/featured_image.jpg" alt="作者的圖片"/>
+                    <img class="sidebar-profile-picture" src="/images/logo.png" alt="作者的圖片"/>
                 </a>
                 <h4 class="sidebar-profile-name">Sampot (山姆鍋)</h4>
                 
@@ -289,10 +287,10 @@
                                 target="_blank"
                             
                             rel="noopener"
-                            title="Email"
+                            title="聯絡"
                         >
                         <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Email</span>
+                        <span class="sidebar-button-desc">聯絡</span>
                     </a>
             </li>
             
@@ -640,7 +638,7 @@
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Diesen Beitrag teilen"
+                aria-label="Share this post"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -678,7 +676,7 @@
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Kommentieren"
+                        aria-label="Leave a comment"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -687,7 +685,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -756,7 +754,7 @@
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Diesen Beitrag teilen"
+                aria-label="Share this post"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -794,7 +792,7 @@
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Kommentieren"
+                        aria-label="Leave a comment"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -803,7 +801,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -863,7 +861,7 @@
             <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="/images/featured_image.jpg" alt="作者的圖片"/>
+            <img id="about-card-picture" src="/images/logo.png" alt="作者的圖片"/>
         
             <h4 id="about-card-name">Sampot (山姆鍋)</h4>
         
@@ -925,10 +923,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>本文簡單說明如何設定兩台 MySQL<br>
-server，讓它們彼此互相備份資料(Master-master<br>
-模式)。雖然這樣的設定通常是支援高可用性(high availability)<br>
-平台的一部分，但本文不包含如何完成其他 HA 的工作。設定兩台 MySQL 伺服器互相備份，主要目的就是要確認資料的安全性；同時也提高可用性。</p></div>
+                        <div class="media-content hide-xs font-merryweather"><p>本文簡單說明如何設定兩台 MySQL server，讓它們彼此互相備份資料 (Master-master 模式)。雖然這樣的設定通常是支援高可用性 (high availability) 平台的一部分，但本文不包含如何完成其他 HA 的工作。設定兩台 MySQL 伺服器互相備份，主要目的就是要確認資料的安全性；同時也提高可用性。</p></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>

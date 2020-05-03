@@ -17,16 +17,16 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"featured_image.jpg"},"articleBody":"最近需要使用 BitTorrent 來實驗點對點資料傳輸功能，所以想說來玩玩 libtorrent 這個程式庫(C++)，為了方便實驗，也需要它的 Python 綁定。經過三天的爬文與奮戰，終於在 Windows, OSX 以及 Ubuntu 上成功編譯或安裝，本文山姆鍋就來分享在 Windows 64 位元電腦上編譯的方法之一。\n\n會特別選擇 Windows 環境來說明，主要也是因為在這個平台上編譯是其中最麻煩的，加上又是要給 64 位元架構的電腦執行，更是雪上加霜。雖然說條條道路通羅馬， 但本文所說明的是山姆鍋目前唯一成功的方法，如果您有其它更簡潔的作法，請分享。\n編譯環境\n從程式碼編譯成功與否跟實際編譯時的環境有很大的關聯，底下是山姆鍋使用的環境(實際上是虛擬機)：\n\n\n\n作業系統：Windows X86 64 Bit\n本文使用的是正體中文環境，不過應該沒有差別。\n\n\n\n\nC/C++ 編譯器: VC for Python\n可以在這裡下載：http://www.microsoft.com/en-us/download/details.aspx?id=44266 ，本文假設您使用預設路徑自行安裝完成。\n\n\n\n\nPython 執行環境\n本文使用 2.7.10 64 位元版本，可到此下載並安裝：https://www.python.org/ftp/python/2.7.10/python-2.7.10.amd64.msi ， 本文假設安裝路徑為：‘C:\\Python’。\n\n\n\n\nDependency Walker\n這個工具是為了找出動態連結檔相依性問題，可以在此下載： http://www.dependencywalker.com/ ，不一定需要，但在 Python 發生無法 import 的問題時可以幫助找出問題。\n\n\n\n準備作業\n在正式編譯前，編譯環境需要做些修改： 找到這個檔案，\n%USERPROFILE%\\\\AppData\\\\Local\\\\Programs\\\\Common\\\\Microsoft\\\\Visual C++ for Python\\\\9.0\\\\vcvarsall.bat\\ , 其中 %USERFILE% 是 Windows 使用者個人目錄，如：C:\\\\Users\\\\Sam Kuo。\n將此檔案中的 if &quot;%1&quot; == &quot;&quot; goto x86 改為 if &quot;%1&quot; == &quot;&quot; goto amd64 , 這個目的是讓編譯器預設使用 64 位元模式，如果您之後需要改編譯 32 位元，請自行改回去。\n開啟「命令提示字元(Command Prompt)」視窗，並執行下列指令設定編譯器的環境變數：\n1\"%USERPROFILE%\\AppData\\Local\\Programs\\Common\\Microsoft\\Visual C++ for Python\\9.0\\vcvarsall.bat\"\n底下小節皆假設在同一個命令視窗執行。\n編譯與安裝 Boost\n下載\nlibtorrent 使用到 Boost 這個程式庫， 本文使用的版本是 1.59.0，可到這裡下載： http://sourceforge.net/projects/boost/files/boost/1.59.0/ ，下載到 C 槽並解壓縮後，原始檔的路徑為： ‘c:\\boost_1_59_0’ 。\n將目前目錄更換到 ‘c:\\boost_1_59_0’ ，執行下列指令編譯 Boost 需要的建構工具 b2.exe。\n1bootstrap.bat\n編譯並安裝 Boost\n1b2 --with-system --with-date_time --with-python address-model=64 install\n上述指令會將需要的檔案複製到 C:\\\\Boost 這個目錄，其中會有 include 跟 lib 這兩個子目錄。\nlib 子目錄中有兩個檔案需要改名，將:\n\nboost_python-vc90-mt-1_59.lib 複製並改名為 boost_python.lib\nboost_system-vc90-mt-1_59.lib 複製並改名為 boost_system.lib\n\n沒有改名，在編譯 libtorrent 時會出現找不到程式庫錯誤。\n編譯 libtorrent\n本文使用的版本是 1.0.7，可到此下載：https://github.com/arvidn/libtorrent/releases , 假設下載後解壓縮到目錄: C:\\\\libtorrent-1_0_7 ，\n設定 BOOST_ROOT 環境變數：\n1set BOOST_ROOT=c:\\boost_1_59_0\n更換目前路徑到 ‘C:\\libtorrent-1_0_7\\bindings\\python’ ，執行：\n1c:\\boost_1_59_0\\b2.exe boost=source boost-link=static link=static  release optimization=space address-model=64  \"include=c:\\Boost\\include\\boost-1_59\" \"library-path=c:\\Boost\\lib\"\n請注意，上述指令並沒有換行。\n經過不少時間的編譯，如果沒有出問題，會產生所需的 Python 模組以及 libtorrent 本身的動態連結檔， 分別在：\n\n\n\nPython 模組\n‘C:\\libtorrent-1_0_7\\bindings\\python\\bin\\msvc-9.0\\release\\address-model-64\\boost-source\\link-static\\optimization-space\\libtorrent.pyd’\n\n\n\n\nlibtorrent 程式庫\n‘C:\\libtorrent-1_0_7\\bin\\msvc-9.0\\release\\address-model-64\\boost-link-shared\\boost-source\\optimization-space\\threading-multi\\torrent.dll’\n\n\n\n是的，我知道，路徑就是這麼長！\n設定 libtorrent-python 模組\n\n將 libtorrent 程式庫的 DLL 檔複製到 ‘C:\\Python’\n將 Python 模組, libtorrent.pyd 複製到\n‘C:\\Python\\Lib\\site-packages\\’\n\n如果您在這個階段使用 Python 試圖 import libtorrent，會出現無法 import 的錯誤資訊， 這是因為 libtorrent.pyd 還相依於 Boost 的 system 模組。要解決這個問題，可以將 ‘C:\\Boost\\lib\\boost_system-vc90-mt-1_59.dll’ 複製到 Windows 系統目錄， 或者像山姆鍋一樣複製到 ‘C:\\Python\\’ 目錄中。\n驗證模組安裝完成\n啟動 Python 進入互動模式，輸入：\n12import libtorrentlibtorrent.version\n如果正常 import 並顯示版本號碼，模組應該有安裝成功。如果沒有，請使用 Dependency Walker 查看 libtorrent.pyd 的相依連結是否完整？例如缺少 msvcr90.dll 或 msvcp90.dll 這兩個檔案，則需要安裝 Visual Studio\nRedistributable 2008 套件。\nOS X 跟 Ubuntu?\n這兩個平台按照 Storjtorrent 提供的步驟便能運作，本文就不重複。\n小技巧\n在過程中，山姆鍋學到一些有用的小技巧或知識，在這裏順便提供：\n\n\n\n如何觀看動態連結檔(DLL)或共享物件檔(.so)的相依性？\n熟悉 Linux 系統的會知道有個 ldd 程式可以方便檢視 .so\n相依於哪些其它 .so 檔； 在 OSX 系統，使用 otool -L\n可以達到類似功能；Windows 系統則可以用 Dependency Walker\n來查看。\n\n\n\n\n在 Windows 上如何分辨執行檔(.exe)或動態連結檔(.dll)是 32 還是 64 位元？\n\nVisual Studio 有個 dumpbin.exe 工具程式可以用來分辨，指令用法：\n  1dumpbin /headers &lt;檔案名稱&gt;\n從顯示的訊息，如果有看到 x64 表示是 64 位元， x86 則是 32 位元，如下面片段：\n  12FILE HEADER VALUES        8664 machine (x64)\n\n\n\n\n結語\n雖說山姆鍋最終希望只需要一個 libtorrent.pyd 檔案便能夠使用, 也就是說：libtorrent 跟 Boost 都以靜態連結的方式到那個模組檔中，只可惜還沒有試出來。現階段只做到編譯跟安裝， 編譯出來的程式庫是否功能完全正常，這點還沒有進一步驗證；另外，很明顯 libtorrent 的一些選用的功能是不支援的，例如：OpenSSL encryption。不管怎樣，希望對於也想透過 Python 玩玩 libtorrent 的人有所幫助。\n","dateCreated":"2015-11-19T10:03:00+08:00","dateModified":"2018-08-30T14:57:07+08:00","datePublished":"2015-11-19T10:03:00+08:00","description":"最近需要使用 BitTorrent 來實驗點對點資料傳輸功能，所以想說來玩玩 libtorrent 這個程式庫(C++)，為了方便實驗，也需要它的 Python 綁定。經過三天的爬文與奮戰，終於在 Windows, OSX 以及 Ubuntu 上成功編譯或安裝，本文山姆鍋就來分享在 Windows 64 位元電腦上編譯的方法之一。","headline":"在 Windows 64 位元電腦上編譯 Libtorrent-python","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2015/11/build-libtorrent-python-on-windows-64-bit/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"featured_image.jpg","logo":{"@type":"ImageObject","url":"featured_image.jpg"}},"url":"https://samkuo.me/post/2015/11/build-libtorrent-python-on-windows-64-bit/","keywords":"Python, Libtorrent, BitTorrent, Windows"}</script>
-    <meta name="description" content="最近需要使用 BitTorrent 來實驗點對點資料傳輸功能，所以想說來玩玩 libtorrent 這個程式庫(C++)，為了方便實驗，也需要它的 Python 綁定。經過三天的爬文與奮戰，終於在 Windows, OSX 以及 Ubuntu 上成功編譯或安裝，本文山姆鍋就來分享在 Windows 64 位元電腦上編譯的方法之一。">
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"最近需要使用 BitTorrent 來實驗點對點資料傳輸功能，所以想說來玩玩 libtorrent 這個程式庫 (C++)，為了方便實驗，也需要它的 Python 綁定。經過三天的爬文與奮戰，終於在 Windows, OSX 以及 Ubuntu 上成功編譯或安裝，本文山姆鍋就來分享在 Windows 64 位元電腦上編譯的方法之一。\n\n會特別選擇 Windows 環境來說明，主要也是因為在這個平台上編譯是其中最麻煩的，加上又是要給 64 位元架構的電腦執行，更是雪上加霜。雖然說條條道路通羅馬， 但本文所說明的是山姆鍋目前唯一成功的方法，如果您有其它更簡潔的作法，請分享。\n編譯環境\n從程式碼編譯成功與否跟實際編譯時的環境有很大的關聯，底下是山姆鍋使用的環境 (實際上是虛擬機)：\n\n\n\n作業系統：Windows X86 64 Bit\n 本文使用的是正體中文環境，不過應該沒有差別。\n\n\n\n\nC/C++ 編譯器: VC for Python\n 可以在這裡下載：http://www.microsoft.com/en-us/download/details.aspx?id=44266 ，本文假設您使用預設路徑自行安裝完成。\n\n\n\n\nPython 執行環境\n本文使用 2.7.10 64 位元版本，可到此下載並安裝，本文假設安裝路徑為：C:\\\\Python\\。\n\n\n\n\nDependency Walker\n 這個工具是為了找出動態連結檔相依性問題，可以在此下載 ，不一定需要，但在 Python 發生無法 import 的問題時可以幫助找出問題。\n\n\n\n準備作業\n在正式編譯前，編譯環境需要做些修改： 找到這個檔案，\n%USERPROFILE%\\\\AppData\\\\Local\\\\Programs\\\\Common\\\\Microsoft\\\\Visual C++ for Python\\\\9.0\\\\vcvarsall.bat\\ , 其中 % USERFILE% 是 Windows 使用者個人目錄，如：C:\\\\Users\\\\Sam Kuo。\n將此檔案中的 if \"%1\" == \"\" goto x86 改為 if \"%1\" == \"\" goto amd64 , 這個目的是讓編譯器預設使用 64 位元模式，如果您之後需要改編譯 32 位元，請自行改回去。\n開啟「命令提示字元 (Command Prompt)」視窗，並執行下列指令設定編譯器的環境變數：\n1\"%USERPROFILE%\\AppData\\Local\\Programs\\Common\\Microsoft\\Visual C++ for Python\\9.0\\vcvarsall.bat\"\n底下小節皆假設在同一個命令視窗執行。\n編譯與安裝 Boost\n下載\nlibtorrent 使用到 Boost 這個程式庫， 本文使用的版本是 1.59.0，可到這裡下載，下載到 C 槽並解壓縮後，原始檔的路徑為： c:\\\\boost_1_59_0 。\n將目前目錄更換到 c:\\\\boost_1_59_0\\ ，執行下列指令編譯 Boost 需要的建構工具 b2.exe。\n1bootstrap.bat\n編譯並安裝 Boost\n1b2 --with-system --with-date_time --with-python address-model=64 install\n上述指令會將需要的檔案複製到 C:\\\\Boost 這個目錄，其中會有 include 跟 lib 這兩個子目錄。\nlib 子目錄中有兩個檔案需要改名，將:\n\nboost_python-vc90-mt-1_59.lib 複製並改名為 boost_python.lib\nboost_system-vc90-mt-1_59.lib 複製並改名為 boost_system.lib\n\n沒有改名，在編譯 libtorrent 時會出現找不到程式庫錯誤。\n編譯 libtorrent\n本文使用的版本是 1.0.7，可到此下載 , 假設下載後解壓縮到目錄: C:\\\\libtorrent-1_0_7 ，\n設定 BOOST_ROOT 環境變數：\n1set BOOST_ROOT=c:\\boost_1_59_0\n更換目前路徑到 C:\\\\libtorrent-1_0_7\\\\bindings\\\\python ，執行：\n1c:\\boost_1_59_0\\b2.exe boost=source boost-link=static link=static  release optimization=space address-model=64  \"include=c:\\Boost\\include\\boost-1_59\" \"library-path=c:\\Boost\\lib\"\n請注意，上述指令並沒有換行。\n經過不少時間的編譯，如果沒有出問題，會產生所需的 Python 模組以及 libtorrent 本身的動態連結檔， 分別在：\n\n\n\nPython 模組\n‘C:\\libtorrent-1_0_7\\bindings\\python\\bin\\msvc-9.0\\release\\address-model-64\\boost-source\\link-static\\optimization-space\\libtorrent.pyd’\n\n\n\n\nlibtorrent 程式庫\n‘C:\\libtorrent-1_0_7\\bin\\msvc-9.0\\release\\address-model-64\\boost-link-shared\\boost-source\\optimization-space\\threading-multi\\torrent.dll’\n\n\n\n是的，我知道，路徑就是這麼長！\n設定 libtorrent-python 模組\n\n將 libtorrent 程式庫的 DLL 檔複製到 ‘C:\\Python’\n將 Python 模組，libtorrent.pyd 複製到\n‘C:\\Python\\Lib\\site-packages\\’\n\n如果您在這個階段使用 Python 試圖 import libtorrent，會出現無法 import 的錯誤資訊， 這是因為 libtorrent.pyd 還相依於 Boost 的 system 模組。要解決這個問題，可以將 ‘C:\\Boost\\lib\\boost_system-vc90-mt-1_59.dll’ 複製到 Windows 系統目錄， 或者像山姆鍋一樣複製到 ‘C:\\Python\\’ 目錄中。\n驗證模組安裝完成\n啟動 Python 進入互動模式，輸入：\n12import libtorrentlibtorrent.version\n如果正常 import 並顯示版本號碼，模組應該有安裝成功。如果沒有，請使用 Dependency Walker 查看 libtorrent.pyd 的相依連結是否完整？例如缺少 msvcr90.dll 或 msvcp90.dll 這兩個檔案，則需要安裝 Visual Studio\nRedistributable 2008 套件。\nOS X 跟 Ubuntu?\n這兩個平台按照 Storjtorrent 提供的步驟便能運作，本文就不重複。\n小技巧\n在過程中，山姆鍋學到一些有用的小技巧或知識，在這裏順便提供：\n\n\n\n如何觀看動態連結檔 (DLL) 或共享物件檔 (.so) 的相依性？\n熟悉 Linux 系統的會知道有個 ldd 程式可以方便檢視 .so\n相依於哪些其它 .so 檔； 在 OSX 系統，使用 otool -L\n可以達到類似功能；Windows 系統則可以用 Dependency Walker\n來查看。\n\n\n\n\n在 Windows 上如何分辨執行檔 (.exe) 或動態連結檔 (.dll) 是 32 還是 64 位元？\nVisual Studio 有個 dumpbin.exe 工具程式可以用來分辨，指令用法：\n\n  1dumpbin /headers &lt;檔案名稱&gt;\n從顯示的訊息，如果有看到 x64 表示是 64 位元， x86 則是 32 位元，如下面片段：\n  12FILE HEADER VALUES        8664 machine (x64)\n\n\n結語\n雖說山姆鍋最終希望只需要一個 libtorrent.pyd 檔案便能夠使用，也就是說：libtorrent 跟 Boost 都以靜態連結的方式到那個模組檔中，只可惜還沒有試出來。現階段只做到編譯跟安裝， 編譯出來的程式庫是否功能完全正常，這點還沒有進一步驗證；另外，很明顯 libtorrent 的一些選用的功能是不支援的，例如：OpenSSL encryption。不管怎樣，希望對於也想透過 Python 玩玩 libtorrent 的人有所幫助。\n","dateCreated":"2015-11-19T10:03:00+08:00","dateModified":"2020-05-04T06:43:31+08:00","datePublished":"2015-11-19T10:03:00+08:00","description":"最近需要使用 BitTorrent 來實驗點對點資料傳輸功能，所以想說來玩玩 libtorrent 這個程式庫 (C++)，為了方便實驗，也需要它的 Python 綁定。經過三天的爬文與奮戰，終於在 Windows, OSX 以及 Ubuntu 上成功編譯或安裝，本文山姆鍋就來分享在 Windows 64 位元電腦上編譯的方法之一。","headline":"在 Windows 64 位元電腦上編譯 Libtorrent-python","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2015/11/build-libtorrent-python-on-windows-64-bit/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2015/11/build-libtorrent-python-on-windows-64-bit/","keywords":"Python, Libtorrent, BitTorrent, Windows"}</script>
+    <meta name="description" content="最近需要使用 BitTorrent 來實驗點對點資料傳輸功能，所以想說來玩玩 libtorrent 這個程式庫 (C++)，為了方便實驗，也需要它的 Python 綁定。經過三天的爬文與奮戰，終於在 Windows, OSX 以及 Ubuntu 上成功編譯或安裝，本文山姆鍋就來分享在 Windows 64 位元電腦上編譯的方法之一。">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="在 Windows 64 位元電腦上編譯 Libtorrent-python">
 <meta property="og:url" content="https://samkuo.me/post/2015/11/build-libtorrent-python-on-windows-64-bit/">
 <meta property="og:site_name" content="我是山姆鍋">
-<meta property="og:description" content="最近需要使用 BitTorrent 來實驗點對點資料傳輸功能，所以想說來玩玩 libtorrent 這個程式庫(C++)，為了方便實驗，也需要它的 Python 綁定。經過三天的爬文與奮戰，終於在 Windows, OSX 以及 Ubuntu 上成功編譯或安裝，本文山姆鍋就來分享在 Windows 64 位元電腦上編譯的方法之一。">
+<meta property="og:description" content="最近需要使用 BitTorrent 來實驗點對點資料傳輸功能，所以想說來玩玩 libtorrent 這個程式庫 (C++)，為了方便實驗，也需要它的 Python 綁定。經過三天的爬文與奮戰，終於在 Windows, OSX 以及 Ubuntu 上成功編譯或安裝，本文山姆鍋就來分享在 Windows 64 位元電腦上編譯的方法之一。">
 <meta property="og:locale" content="zh_TW">
 <meta property="article:published_time" content="2015-11-19T02:03:00.000Z">
-<meta property="article:modified_time" content="2018-08-30T06:57:07.099Z">
+<meta property="article:modified_time" content="2020-05-03T22:43:31.314Z">
 <meta property="article:author" content="Sampot (山姆鍋)">
 <meta property="article:tag" content="Python">
 <meta property="article:tag" content="Libtorrent">
@@ -39,9 +39,7 @@
     
         
     
-    
-        <meta property="og:image" content="https://samkuo.me/images/featured_image.jpg"/>
-    
+    <meta property="og:image" content="https://samkuo.me/images/featured_image.jpg"/>
     
     
     
@@ -115,7 +113,7 @@
                     href="/#about"
                     aria-label="閱讀有關作者的更多信息"
                 >
-                    <img class="sidebar-profile-picture" src="/images/featured_image.jpg" alt="作者的圖片"/>
+                    <img class="sidebar-profile-picture" src="/images/logo.png" alt="作者的圖片"/>
                 </a>
                 <h4 class="sidebar-profile-name">Sampot (山姆鍋)</h4>
                 
@@ -288,10 +286,10 @@
                                 target="_blank"
                             
                             rel="noopener"
-                            title="Email"
+                            title="聯絡"
                         >
                         <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Email</span>
+                        <span class="sidebar-button-desc">聯絡</span>
                     </a>
             </li>
             
@@ -369,51 +367,51 @@
     
     <div class="post-content markdown">
         <div class="main-content-wrap">
-            <p>最近需要使用 BitTorrent 來實驗點對點資料傳輸功能，所以想說來玩玩 libtorrent 這個程式庫(C++)，為了方便實驗，也需要它的 Python 綁定。經過三天的爬文與奮戰，終於在 Windows, OSX 以及 Ubuntu 上成功編譯或安裝，本文山姆鍋就來分享在 Windows 64 位元電腦上編譯的方法之一。</p>
+            <p>最近需要使用 BitTorrent 來實驗點對點資料傳輸功能，所以想說來玩玩 libtorrent 這個程式庫 (C++)，為了方便實驗，也需要它的 Python 綁定。經過三天的爬文與奮戰，終於在 Windows, OSX 以及 Ubuntu 上成功編譯或安裝，本文山姆鍋就來分享在 Windows 64 位元電腦上編譯的方法之一。</p>
 <a id="more"></a>
 <p>會特別選擇 Windows 環境來說明，主要也是因為在這個平台上編譯是其中最麻煩的，加上又是要給 64 位元架構的電腦執行，更是雪上加霜。雖然說條條道路通羅馬， 但本文所說明的是山姆鍋目前唯一成功的方法，如果您有其它更簡潔的作法，請分享。</p>
 <h2 id="編譯環境">編譯環境</h2>
-<p>從程式碼編譯成功與否跟實際編譯時的環境有很大的關聯，底下是山姆鍋使用的環境(實際上是虛擬機)：</p>
+<p>從程式碼編譯成功與否跟實際編譯時的環境有很大的關聯，底下是山姆鍋使用的環境 (實際上是虛擬機)：</p>
 <ul>
 <li>
 <dl>
 <dt>作業系統：Windows X86 64 Bit</dt>
-<dd>本文使用的是正體中文環境，不過應該沒有差別。</dd>
+<dd> 本文使用的是正體中文環境，不過應該沒有差別。</dd>
 </dl>
 </li>
 <li>
 <dl>
 <dt>C/C++ 編譯器: VC for Python</dt>
-<dd>可以在這裡下載：<a href="http://www.microsoft.com/en-us/download/details.aspx?id=44266" target="_blank" rel="noopener">http://www.microsoft.com/en-us/download/details.aspx?id=44266</a> ，本文假設您使用預設路徑自行安裝完成。</dd>
+<dd> 可以在這裡下載：<a href="http://www.microsoft.com/en-us/download/details.aspx?id=44266" target="_blank" rel="noopener">http://www.microsoft.com/en-us/download/details.aspx?id=44266</a> ，本文假設您使用預設路徑自行安裝完成。</dd>
 </dl>
 </li>
 <li>
 <dl>
 <dt>Python 執行環境</dt>
-<dd>本文使用 2.7.10 64 位元版本，可到此下載並安裝：<a href="https://www.python.org/ftp/python/2.7.10/python-2.7.10.amd64.msi" target="_blank" rel="noopener">https://www.python.org/ftp/python/2.7.10/python-2.7.10.amd64.msi</a> ， 本文假設安裝路徑為：‘C:\Python’。</dd>
+<dd>本文使用 2.7.10 64 位元版本，可到此<a href="https://www.python.org/ftp/python/2.7.10/python-2.7.10.amd64.msi" target="_blank" rel="noopener">下載</a>並安裝，本文假設安裝路徑為：<code>C:\\Python\</code>。</dd>
 </dl>
 </li>
 <li>
 <dl>
 <dt>Dependency Walker</dt>
-<dd>這個工具是為了找出動態連結檔相依性問題，可以在此下載： <a href="http://www.dependencywalker.com/" target="_blank" rel="noopener">http://www.dependencywalker.com/</a> ，不一定需要，但在 Python 發生無法 import 的問題時可以幫助找出問題。</dd>
+<dd> 這個工具是為了找出動態連結檔相依性問題，可以在此<a href="http://www.dependencywalker.com" target="_blank" rel="noopener">下載</a> ，不一定需要，但在 Python 發生無法 import 的問題時可以幫助找出問題。</dd>
 </dl>
 </li>
 </ul>
 <h2 id="準備作業">準備作業</h2>
 <p>在正式編譯前，編譯環境需要做些修改： 找到這個檔案，</p>
-<p><code>%USERPROFILE%\\AppData\\Local\\Programs\\Common\\Microsoft\\Visual C++ for Python\\9.0\\vcvarsall.bat\</code> , 其中 %USERFILE% 是 Windows 使用者個人目錄，如：<code>C:\\Users\\Sam Kuo</code>。</p>
-<p>將此檔案中的 <code>if &quot;%1&quot; == &quot;&quot; goto x86</code> 改為 <code>if &quot;%1&quot; == &quot;&quot; goto amd64</code> , 這個目的是讓編譯器預設使用 64 位元模式，如果您之後需要改編譯 32 位元，請自行改回去。</p>
-<p>開啟「命令提示字元(Command Prompt)」視窗，並執行下列指令設定編譯器的環境變數：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"%USERPROFILE%\AppData\Local\Programs\Common\Microsoft\Visual C++ for Python\9.0\vcvarsall.bat"</span></span><br></pre></td></tr></table></figure>
+<p><code>%USERPROFILE%\\AppData\\Local\\Programs\\Common\\Microsoft\\Visual C++ for Python\\9.0\\vcvarsall.bat\</code> , 其中 % USERFILE% 是 Windows 使用者個人目錄，如：<code>C:\\Users\\Sam Kuo</code>。</p>
+<p>將此檔案中的 <code>if "%1" == "" goto x86</code> 改為 <code>if "%1" == "" goto amd64</code> , 這個目的是讓編譯器預設使用 64 位元模式，如果您之後需要改編譯 32 位元，請自行改回去。</p>
+<p>開啟「命令提示字元 (Command Prompt)」視窗，並執行下列指令設定編譯器的環境變數：</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"%USERPROFILE%\AppData\Local\Programs\Common\Microsoft\Visual C++ for Python\9.0\vcvarsall.bat"</span></span><br></pre></td></tr></tbody></table></figure>
 <p>底下小節皆假設在同一個命令視窗執行。</p>
 <h2 id="編譯與安裝-Boost">編譯與安裝 Boost</h2>
 <h3 id="下載">下載</h3>
-<p>libtorrent 使用到 <a href="http://www.boost.org/" target="_blank" rel="noopener">Boost</a> 這個程式庫， 本文使用的版本是 1.59.0，可到這裡下載： <a href="http://sourceforge.net/projects/boost/files/boost/1.59.0/" target="_blank" rel="noopener">http://sourceforge.net/projects/boost/files/boost/1.59.0/</a> ，下載到 C 槽並解壓縮後，原始檔的路徑為： ‘c:\boost_1_59_0’ 。</p>
-<p>將目前目錄更換到 ‘c:\boost_1_59_0’ ，執行下列指令編譯 Boost 需要的建構工具 b2.exe。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bootstrap.bat</span><br></pre></td></tr></table></figure>
+<p>libtorrent 使用到 <a href="http://www.boost.org/" target="_blank" rel="noopener">Boost</a> 這個程式庫， 本文使用的版本是 1.59.0，可到這裡<a href="http://sourceforge.net/projects/boost/files/boost/1.59.0" target="_blank" rel="noopener">下載</a>，下載到 C 槽並解壓縮後，原始檔的路徑為： <code>c:\\boost_1_59_0</code> 。</p>
+<p>將目前目錄更換到 <code>c:\\boost_1_59_0\</code> ，執行下列指令編譯 Boost 需要的建構工具 b2.exe。</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bootstrap.bat</span><br></pre></td></tr></tbody></table></figure>
 <p>編譯並安裝 Boost</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">b2 --with-system --with-date_time --with-python address-model=64 install</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">b2 --with-system --with-date_time --with-python address-model=64 install</span><br></pre></td></tr></tbody></table></figure>
 <p>上述指令會將需要的檔案複製到 <code>C:\\Boost</code> 這個目錄，其中會有 <code>include</code> 跟 <code>lib</code> 這兩個子目錄。</p>
 <p><code>lib</code> 子目錄中有兩個檔案需要改名，將:</p>
 <ol>
@@ -422,11 +420,11 @@
 </ol>
 <p>沒有改名，在編譯 libtorrent 時會出現找不到程式庫錯誤。</p>
 <h2 id="編譯-libtorrent">編譯 libtorrent</h2>
-<p>本文使用的版本是 1.0.7，可到此下載：<a href="https://github.com/arvidn/libtorrent/releases" target="_blank" rel="noopener">https://github.com/arvidn/libtorrent/releases</a> , 假設下載後解壓縮到目錄: <code>C:\\libtorrent-1_0_7</code> ，</p>
+<p>本文使用的版本是 1.0.7，可到此<a href="https://github.com/arvidn/libtorrent/releases" target="_blank" rel="noopener">下載</a> , 假設下載後解壓縮到目錄: <code>C:\\libtorrent-1_0_7</code> ，</p>
 <p>設定 <code>BOOST_ROOT</code> 環境變數：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">set</span> BOOST_ROOT=c:\boost_1_59_0</span><br></pre></td></tr></table></figure>
-<p>更換目前路徑到 ‘C:\libtorrent-1_0_7\bindings\python’ ，執行：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">c:\boost_1_59_0\b2.exe boost=<span class="built_in">source</span> boost-link=static link=static  release optimization=space address-model=64  <span class="string">"include=c:\Boost\include\boost-1_59"</span> <span class="string">"library-path=c:\Boost\lib"</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">set</span> BOOST_ROOT=c:\boost_1_59_0</span><br></pre></td></tr></tbody></table></figure>
+<p>更換目前路徑到 <code>C:\\libtorrent-1_0_7\\bindings\\python</code> ，執行：</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">c:\boost_1_59_0\b2.exe boost=<span class="built_in">source</span> boost-link=static link=static  release optimization=space address-model=64  <span class="string">"include=c:\Boost\include\boost-1_59"</span> <span class="string">"library-path=c:\Boost\lib"</span></span><br></pre></td></tr></tbody></table></figure>
 <p>請注意，上述指令並沒有換行。</p>
 <p>經過不少時間的編譯，如果沒有出問題，會產生所需的 Python 模組以及 libtorrent 本身的動態連結檔， 分別在：</p>
 <ul>
@@ -447,13 +445,13 @@
 <h2 id="設定-libtorrent-python-模組">設定 libtorrent-python 模組</h2>
 <ol>
 <li>將 libtorrent 程式庫的 DLL 檔複製到 ‘C:\Python’</li>
-<li>將 Python 模組, libtorrent.pyd 複製到<br>
+<li>將 Python 模組，libtorrent.pyd 複製到<br>
 ‘C:\Python\Lib\site-packages\’</li>
 </ol>
 <p>如果您在這個階段使用 Python 試圖 import libtorrent，會出現無法 import 的錯誤資訊， 這是因為 libtorrent.pyd 還相依於 Boost 的 system 模組。要解決這個問題，可以將 ‘C:\Boost\lib\boost_system-vc90-mt-1_59.dll’ 複製到 Windows 系統目錄， 或者像山姆鍋一樣複製到 ‘C:\Python\’ 目錄中。</p>
 <h3 id="驗證模組安裝完成">驗證模組安裝完成</h3>
 <p>啟動 Python 進入互動模式，輸入：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> libtorrent</span><br><span class="line">libtorrent.version</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> libtorrent</span><br><span class="line">libtorrent.version</span><br></pre></td></tr></tbody></table></figure>
 <p>如果正常 import 並顯示版本號碼，模組應該有安裝成功。如果沒有，請使用 Dependency Walker 查看 <code>libtorrent.pyd</code> 的相依連結是否完整？例如缺少 <code>msvcr90.dll</code> 或 <code>msvcp90.dll</code> 這兩個檔案，則需要安裝 Visual Studio<br>
 Redistributable 2008 套件。</p>
 <h2 id="OS-X-跟-Ubuntu">OS X 跟 Ubuntu?</h2>
@@ -463,7 +461,7 @@ Redistributable 2008 套件。</p>
 <ul>
 <li>
 <dl>
-<dt>如何觀看動態連結檔(DLL)或共享物件檔(.so)的相依性？</dt>
+<dt>如何觀看動態連結檔 (DLL) 或共享物件檔 (.so) 的相依性？</dt>
 <dd>熟悉 Linux 系統的會知道有個 ldd 程式可以方便檢視 .so<br>
 相依於哪些其它 .so 檔； 在 OSX 系統，使用 <code>otool -L</code><br>
 可以達到類似功能；Windows 系統則可以用 Dependency Walker<br>
@@ -472,18 +470,16 @@ Redistributable 2008 套件。</p>
 </li>
 <li>
 <dl>
-<dt>在 Windows 上如何分辨執行檔(.exe)或動態連結檔(.dll)是 32 還是 64 位元？</dt>
-<dd>
-<p>Visual Studio 有個 dumpbin.exe 工具程式可以用來分辨，指令用法：</p>
-  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dumpbin /headers &lt;檔案名稱&gt;</span><br></pre></td></tr></table></figure>
-<p>從顯示的訊息，如果有看到 <code>x64</code> 表示是 64 位元， <code>x86</code> 則是 32 位元，如下面片段：</p>
-  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">FILE HEADER VALUES</span><br><span class="line">        8664 machine (x64)</span><br></pre></td></tr></table></figure>
-</dd>
+<dt>在 Windows 上如何分辨執行檔 (.exe) 或動態連結檔 (.dll) 是 32 還是 64 位元？</dt>
+<dd>Visual Studio 有個 dumpbin.exe 工具程式可以用來分辨，指令用法：</dd>
 </dl>
+  <figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dumpbin /headers &lt;檔案名稱&gt;</span><br></pre></td></tr></tbody></table></figure>
+<p>從顯示的訊息，如果有看到 <code>x64</code> 表示是 64 位元， <code>x86</code> 則是 32 位元，如下面片段：</p>
+  <figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">FILE HEADER VALUES</span><br><span class="line">        8664 machine (x64)</span><br></pre></td></tr></tbody></table></figure>
 </li>
 </ul>
 <h2 id="結語">結語</h2>
-<p>雖說山姆鍋最終希望只需要一個 <code>libtorrent.pyd</code> 檔案便能夠使用, 也就是說：libtorrent 跟 Boost 都以靜態連結的方式到那個模組檔中，只可惜還沒有試出來。現階段只做到編譯跟安裝， 編譯出來的程式庫是否功能完全正常，這點還沒有進一步驗證；另外，很明顯 libtorrent 的一些選用的功能是不支援的，例如：OpenSSL encryption。不管怎樣，希望對於也想透過 Python 玩玩 libtorrent 的人有所幫助。</p>
+<p>雖說山姆鍋最終希望只需要一個 <code>libtorrent.pyd</code> 檔案便能夠使用，也就是說：libtorrent 跟 Boost 都以靜態連結的方式到那個模組檔中，只可惜還沒有試出來。現階段只做到編譯跟安裝， 編譯出來的程式庫是否功能完全正常，這點還沒有進一步驗證；另外，很明顯 libtorrent 的一些選用的功能是不支援的，例如：OpenSSL encryption。不管怎樣，希望對於也想透過 Python 玩玩 libtorrent 的人有所幫助。</p>
 
             
 
@@ -538,7 +534,7 @@ Redistributable 2008 套件。</p>
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Diesen Beitrag teilen"
+                aria-label="Share this post"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -576,7 +572,7 @@ Redistributable 2008 套件。</p>
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Kommentieren"
+                        aria-label="Leave a comment"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -585,7 +581,7 @@ Redistributable 2008 套件。</p>
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -654,7 +650,7 @@ Redistributable 2008 套件。</p>
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Diesen Beitrag teilen"
+                aria-label="Share this post"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -692,7 +688,7 @@ Redistributable 2008 套件。</p>
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Kommentieren"
+                        aria-label="Leave a comment"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -701,7 +697,7 @@ Redistributable 2008 套件。</p>
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -761,7 +757,7 @@ Redistributable 2008 套件。</p>
             <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="/images/featured_image.jpg" alt="作者的圖片"/>
+            <img id="about-card-picture" src="/images/logo.png" alt="作者的圖片"/>
         
             <h4 id="about-card-name">Sampot (山姆鍋)</h4>
         
@@ -823,10 +819,7 @@ Redistributable 2008 套件。</p>
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>本文簡單說明如何設定兩台 MySQL<br>
-server，讓它們彼此互相備份資料(Master-master<br>
-模式)。雖然這樣的設定通常是支援高可用性(high availability)<br>
-平台的一部分，但本文不包含如何完成其他 HA 的工作。設定兩台 MySQL 伺服器互相備份，主要目的就是要確認資料的安全性；同時也提高可用性。</p></div>
+                        <div class="media-content hide-xs font-merryweather"><p>本文簡單說明如何設定兩台 MySQL server，讓它們彼此互相備份資料 (Master-master 模式)。雖然這樣的設定通常是支援高可用性 (high availability) 平台的一部分，但本文不包含如何完成其他 HA 的工作。設定兩台 MySQL 伺服器互相備份，主要目的就是要確認資料的安全性；同時也提高可用性。</p></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>
