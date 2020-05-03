@@ -1,0 +1,80 @@
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import, print_function, unicode_literals
+
+import msgpack
+import struct
+from gevent.event import Event
+from ava.util.clock import clock
+
+
+class LmdbQueue(object):
+    """ Persistent queue backed by LMDB for single consumer.
+    """
+    def __init__(self, db_env, prefix=b'\x00'):
+        self.db_env = db_env
+        self.prefix = prefix
+        self.available = Event()
+        self.begin_key = prefix + b'\x00'
+        self.end_key = prefix + b'\xff'
+        self.key_fmt = b'!%dsBQ' % len(prefix)
+        self.key_size = struct.calcsize(self.key_fmt)
+
+    def get(self, block=True, timeout=None, txn=None):
+        while True:
+            with self.db_env.begin(write=True) as txn:
+                with txn.cursor() as cur:
+                    if cur.set_range(self.begin_key) \
+                            and cur.key() < self.end_key:
+                        ret = msgpack.unpackb(cur.value())
+                        cur.delete()
+                        return ret
+
+            self.available.clear()
+            if block:
+                if timeout is None:
+                    self.available.wait()
+                else:
+                    self.available.wait(timeout)
+            else:
+                return None
+
+    def get_nowait(self, txn=None):
+        return self.get(block=False, txn=txn)
+
+    def put(self, item, txn=None):
+        key = struct.pack(self.key_fmt,
+                          self.prefix,
+                          ord(b'T'),
+                          clock.tick())
+        if txn is None:
+            with self.db_env.begin(write=True) as txn:
+                txn.put(key, msgpack.packb(item))
+                self.available.set()
+        else:
+            txn.put(key, msgpack.packb(item))
+            self.available.set()
+
+    def put_multi(self, items, txn=None):
+        """ Puts multiple items into the queue.
+
+        :param items:
+        :param txn:
+        """
+        if txn is None:
+            with self.db_env.begin(write=True) as txn:
+                for item in items:
+                    key = struct.pack(self.key_fmt,
+                                      self.prefix,
+                                      ord(b'T'),
+                                      clock.tick())
+                    txn.put(key, msgpack.packb(item))
+                    self.available.set()
+        else:
+            for item in items:
+                key = struct.pack(self.key_fmt,
+                                  self.prefix,
+                                  ord(b'T'),
+                                  clock.tick())
+                txn.put(key, msgpack.packb(item))
+                self.available.set()
+

@@ -1,0 +1,1199 @@
+
+<!DOCTYPE html>
+<html lang="zh-tw">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="我是山姆鍋">
+    <title>利用 SoftEther 以及 QNAP NAS 架設 L2TP/IPSec VPN 服務器(下) - 我是山姆鍋</title>
+    <meta name="author" content="Sampot (山姆鍋)">
+    
+    
+        <link rel="icon" href="https://samkuo.me/images/favicon.png">
+    
+    
+        
+            <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
+        
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"在上一篇文章中，山姆鍋說明如何在 QNAP NAS 裝置上安裝 SoftEther\nVPN 軟體來架設 VPN 服務器。 雖然需要一些額外套件來進行編譯才能安裝，但不排斥編譯的人來說應該也不至於太難。不過講到設定，那最好使用 SoftEther 提供的工具，本文就來說明如何使用 SoftEther VPN Server Manager for Windows 來設定您的 VPN 服務器。\n\n安裝 SoftEther VPN Server Manager for Windows\n首先到 SoftEther 的\n下載網址\n，下載適合您的 Windows 系統的工具。\n\n執行下載的程式，按照步驟完成安裝。\n建立與 VPN 服務器的連線設定\n假設您的 VPN 服務器已經啟動，執行 SoftEther Server Manager for\nWindows 後，您應該會看到下列畫面：\n\n選擇&quot;New Setting&quot;後，出現新增服務器連線設定的視窗：\n\n\n\n\n選擇一個名稱, 例如:\n\n:   \\'Local VPN\\'\n\n\n\n\n設定 \\'Host Name\\':\n\n:   VPN服務器的IP位址。\n\n\n\n\n設定Port Number:\n\n:   預設是使用 443(HTTPS\n    port)，但QNAP已經使用443做其他用途，所以，這裡山姆鍋使用的是992。\n\n    Note: 第一次連線時，SoftEther會讓您設定新的管理者密碼。\n\n連線到 VPN 服務器\n設定好 VPN 服務器連線設定後，出現下方畫面：\n\n選擇 “Connect” 來連到 VPN 服務器進行管理，下圖是主畫面：\n\n因為山姆鍋已經有建立兩個 Virtual Hub，您的列表應該是空的。\n建立新的 Virtual Hub\n從主畫面選擇 “Create a Virtual Hub”：\n\n\n\n\n設定\\&quot;Virtual Hub Name\\&quot;：\n\n:   這是您的專屬VPN, 所以取個別人不易猜測的名稱。\n\n\n選擇&quot;OK&quot;建立。\n\n建立 Virtual Hub 連線帳戶\n從主畫面，點選您要管理的 “Virtual Hub&quot;後，選擇&quot;Manage Virtual\nHub”。如此，會進到 Virtual Hub 的管理界面，如下圖：\n\n從 Virtual Hub 管理界面，選擇&quot;Manage Users&quot; --&gt;\n再選’New’按鈕，出現新增用戶視窗：\n\n\n\n\nUser Name:\n\n:   輸入登入用的用戶名稱。\n\n\n\n\nFull Name:\n\n:   用戶的全名，只是輔助性資料。\n\n\n\n\nAuth Type:\n\n:   認證方式，選擇\\'Password Authentication\\'。\n\n\n\n\nPassword 跟 Confirm Password:\n\n:   輸入認證用的密碼。\n\n啟用 L2TP/IPSec 服務\n\n從主畫面，選擇 “IPSec/L2TP Setting”\n\n\n\n\n\n選用 \\&quot;Enable L2TP Server Function (L2TP over IPSec)\\&quot;\n\n:   設定這個選項，讓SoftEther啟用L2TP服務。\n\n\n\n\n選擇 \\&quot;Default Virtual Hub\\&quot;\n\n:   這個欄位的用途是在VPN客戶端提供的用戶名稱沒有包含Virtual\n    hub名稱時，預設使用的Virtual Hub。\n    SoftEther服務器可以同時支援多個Virtual\n    Hub，如果用戶名稱以這種形式\n    \\'[tester\\@your-private-hub\\'表示](mailto:tester@your-private-hub'表示)，\\'@\\'後面就是Virtual\n    hub的名稱。\n\n\n\n\n設定 \\&quot;IPSec Pre-Shared Key\\&quot;\n\n:   這個是連線時，客戶端與服務端認證需要的。如果您要讓朋友使用您的VPN服務器，則這個也需要提供給他們。\n\n設定 NAT Port forwarding\n通常家用網路環境會有一個 NAT 裝置，可能是 ADSL 的 router 或者是頻寬分享器。不管如何，要讓客戶端可以連到您的 VPN 服務器，您需要在 router 上設定 port\nforwarding。底下是需要設定轉到 VPN 服務器的 port：\n\n500/UDP\n4500/UDP\n1701/UDP\n\n使用 Local bridge 跟實體網路串接\n雖然到這裡已經可以使用 VPN 客戶端來連到 VPN 服務器，但您會發現卻無法存取網路，這是因為每個\nVirtual Hub\n就相當於一個獨立網段，彼此並沒有關聯。為了讓 VPN 連線可以存取網路，SoftEther 有幾個不同做法，這裡山姆鍋使用 Local\nbridge 的方式來將 Virtual\nHub 與實體網路串接，如此可以讓 VPN 客戶端以 VPN 服務器當作閘道器(gateway)來存取網際網路。\n\n在管理主畫面，選擇 Local Bridge Setting。\n\n\n\n在 “Virtual Hub” 欄位，選擇您建立的 Virtual Hub 名稱。\n“LAN adapter” 欄位，選擇要串接的網卡。\n這裡山姆鍋使用第二張網卡’eth1’，這樣讓 VPN 客戶端依然可以 VPN 服務器本身。\n如果您只有一張網卡，那就選擇那張。\n\n客戶端設定\n底下是設定 VPN 客戶端需要使用的資訊：\n\n\n\n主機名稱:\n\n:   VPN服務器位址，如有使用NAT則是NAT的外部位址。\n\n\n\n\n用戶名稱：\n\n:   &lt;tester@your-private-vpn&gt;。需要使用全名，也就是要包含\\'\\@your-private-vpn\\'這部分。\n    當然，\\'your-private-vpn\\'是您設定的Virtual Hub名稱。\n\n\n\n\n登入密碼：\n\n:   認證密碼。\n\n\n\n\nPre-Shared Key:\n\n:   設定L2TP 服務時設定的Pre-Shared Key。\n\n結語\n經過這番折騰後，希望您已經有一個可以使用的專屬 VPN 服務了。\n本文介紹的設定是要讓您個人使用，可不要隨便開帳號給別人。\n","dateCreated":"2013-11-25T15:24:00+08:00","dateModified":"2018-08-22T19:36:37+08:00","datePublished":"2013-11-25T15:24:00+08:00","description":"在上一篇文章中，山姆鍋說明如何在 QNAP NAS 裝置上安裝 SoftEther\nVPN 軟體來架設 VPN 服務器。 雖然需要一些額外套件來進行編譯才能安裝，但不排斥編譯的人來說應該也不至於太難。不過講到設定，那最好使用 SoftEther 提供的工具，本文就來說明如何使用 SoftEther VPN Server Manager for Windows 來設定您的 VPN 服務器。","headline":"利用 SoftEther 以及 QNAP NAS 架設 L2TP/IPSec VPN 服務器(下)","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/11/setup-home-vpn-server-with-softether-qnap-nas-p2/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2013/11/setup-home-vpn-server-with-softether-qnap-nas-p2/","keywords":"Security, VPN, VLAN, SoftEther"}</script>
+    <meta name="description" content="在上一篇文章中，山姆鍋說明如何在 QNAP NAS 裝置上安裝 SoftEther VPN 軟體來架設 VPN 服務器。 雖然需要一些額外套件來進行編譯才能安裝，但不排斥編譯的人來說應該也不至於太難。不過講到設定，那最好使用 SoftEther 提供的工具，本文就來說明如何使用 SoftEther VPN Server Manager for Windows 來設定您的 VPN 服務器。">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="利用 SoftEther 以及 QNAP NAS 架設 L2TP&#x2F;IPSec VPN 服務器(下)">
+<meta property="og:url" content="https://samkuo.me/post/2013/11/setup-home-vpn-server-with-softether-qnap-nas-p2/">
+<meta property="og:site_name" content="我是山姆鍋">
+<meta property="og:description" content="在上一篇文章中，山姆鍋說明如何在 QNAP NAS 裝置上安裝 SoftEther VPN 軟體來架設 VPN 服務器。 雖然需要一些額外套件來進行編譯才能安裝，但不排斥編譯的人來說應該也不至於太難。不過講到設定，那最好使用 SoftEther 提供的工具，本文就來說明如何使用 SoftEther VPN Server Manager for Windows 來設定您的 VPN 服務器。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://samkuo.me/media/2013/11/softether-manager-download.png">
+<meta property="og:image" content="https://samkuo.me/media/2013/11/softether-manager-screen1.png">
+<meta property="og:image" content="https://samkuo.me/media/2013/11/softether-manager-screen2.png">
+<meta property="og:image" content="https://samkuo.me/media/2013/11/softether-manager-screen3.png">
+<meta property="og:image" content="https://samkuo.me/media/2013/11/softether-manager-screen4.png">
+<meta property="og:image" content="https://samkuo.me/media/2013/11/softether-manager-screen9.png">
+<meta property="og:image" content="https://samkuo.me/media/2013/11/softether-manager-screen5.png">
+<meta property="og:image" content="https://samkuo.me/media/2013/11/softether-manager-screen6.png">
+<meta property="og:image" content="https://samkuo.me/media/2013/11/softether-manager-screen10.png">
+<meta property="og:image" content="https://samkuo.me/media/2013/11/softether-manager-screen8.png">
+<meta property="article:published_time" content="2013-11-25T07:24:00.000Z">
+<meta property="article:modified_time" content="2018-08-22T11:36:37.224Z">
+<meta property="article:author" content="Sampot (山姆鍋)">
+<meta property="article:tag" content="Security">
+<meta property="article:tag" content="VPN">
+<meta property="article:tag" content="VLAN">
+<meta property="article:tag" content="SoftEther">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://samkuo.me/media/2013/11/softether-manager-download.png">
+<meta name="twitter:creator" content="@sampotkuo">
+<meta property="fb:app_id" content="109832189371155">
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://samkuo.me/images/logo.png"/>
+    
+    
+    
+    
+    <!--STYLES-->
+    
+<link rel="stylesheet" href="/assets/css/all.css">
+
+    
+<link rel="stylesheet" href="/assets/css/jquery.fancybox.css">
+
+    
+<link rel="stylesheet" href="/assets/css/thumbs.css">
+
+    
+<link rel="stylesheet" href="/assets/css/tranquilpeak.css">
+
+    <!--STYLES END-->
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-41152700-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-41152700-1');
+    </script>
+
+
+    
+
+    
+        
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+<header id="header" data-behavior="4">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a
+            class="header-title-link"
+            href="/"
+            aria-label=""
+        >
+            我是山姆鍋
+        </a>
+    </div>
+    
+        
+            <a
+                class="header-right-icon open-algolia-search"
+                href="#search"
+                aria-label="打開鏈接: /#search"
+            >
+        
+        
+            <i class="fa fa-search fa-lg"></i>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="4">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a
+                    href="/#about"
+                    aria-label="閱讀有關作者的更多信息"
+                >
+                    <img class="sidebar-profile-picture" src="/images/logo.png" alt="作者的圖片"/>
+                </a>
+                <h4 class="sidebar-profile-name">Sampot (山姆鍋)</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>個人部落格， 記錄與分享一些軟體開發與運營相關資訊， 偶爾也會碎念一下</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/"
+                            
+                            rel="noopener"
+                            title="首頁"
+                        >
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">首頁</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-categories"
+                            
+                            rel="noopener"
+                            title="分類"
+                        >
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">分類</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-tags"
+                            
+                            rel="noopener"
+                            title="標籤"
+                        >
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">標籤</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-archives"
+                            
+                            rel="noopener"
+                            title="所有文章"
+                        >
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">所有文章</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link open-algolia-search"
+                            href="#search"
+                            
+                            rel="noopener"
+                            title="搜尋"
+                        >
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">搜尋</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/about/"
+                            
+                            rel="noopener"
+                            title="關於"
+                        >
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">關於</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://github.com/sampot"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="GitHub"
+                        >
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://twitter.com/sampotkuo"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Twitter"
+                        >
+                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Twitter</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://facebook.com/sampotkuo"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Facebook"
+                        >
+                        <i class="sidebar-button-icon fab fa-facebook" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Facebook</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://tw.linkedin.com/in/sampot"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="LinkedIn"
+                        >
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://developers.tw/@山姆鍋"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Email"
+                        >
+                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Email</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/sitemap/"
+                            
+                            rel="noopener"
+                            title="網站導覽"
+                        >
+                        <i class="sidebar-button-icon fa fa-sitemap" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">網站導覽</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/atom.xml"
+                            
+                            rel="noopener"
+                            title="Atom"
+                        >
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Atom</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="4"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            利用 SoftEther 以及 QNAP NAS 架設 L2TP/IPSec VPN 服務器(下)
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2013-11-25T15:24:00+08:00">
+	
+		    11月 25, 2013
+    	
+    </time>
+    
+        <span>分類 </span>
+        
+    <a class="category-link" href="/category/service-operations/">Service Operations</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>在上一篇文章中，山姆鍋說明如何在 QNAP NAS 裝置上安裝 SoftEther<br>
+VPN 軟體來架設 VPN 服務器。 雖然需要一些額外套件來進行編譯才能安裝，但不排斥編譯的人來說應該也不至於太難。不過講到設定，那最好使用 SoftEther 提供的工具，本文就來說明如何使用 SoftEther VPN Server Manager for Windows 來設定您的 VPN 服務器。</p>
+<a id="more"></a>
+<h2 id="安裝-SoftEther-VPN-Server-Manager-for-Windows">安裝 SoftEther VPN Server Manager for Windows</h2>
+<p>首先到 SoftEther 的<br>
+<a href="http://www.softether-download.com/cn.aspx?product=softether" target="_blank" rel="noopener">下載網址</a><br>
+，下載適合您的 Windows 系統的工具。</p>
+<p><img src="/media/2013/11/softether-manager-download.png" alt="softether-manager-download"></p>
+<p>執行下載的程式，按照步驟完成安裝。</p>
+<h2 id="建立與-VPN-服務器的連線設定">建立與 VPN 服務器的連線設定</h2>
+<p>假設您的 VPN 服務器已經啟動，執行 SoftEther Server Manager for<br>
+Windows 後，您應該會看到下列畫面：</p>
+<p><img src="/media/2013/11/softether-manager-screen1.png" alt="softether-manager-screen1"></p>
+<p>選擇&quot;New Setting&quot;後，出現新增服務器連線設定的視窗：</p>
+<p><img src="/media/2013/11/softether-manager-screen2.png" alt="softether-manager-screen2"></p>
+<ol>
+<li></li>
+</ol>
+<pre><code>選擇一個名稱, 例如:
+
+:   \'Local VPN\'
+</code></pre>
+<ol start="2">
+<li></li>
+</ol>
+<pre><code>設定 \'Host Name\':
+
+:   VPN服務器的IP位址。
+</code></pre>
+<ol start="3">
+<li></li>
+</ol>
+<pre><code>設定Port Number:
+
+:   預設是使用 443(HTTPS
+    port)，但QNAP已經使用443做其他用途，所以，這裡山姆鍋使用的是992。
+
+    Note: 第一次連線時，SoftEther會讓您設定新的管理者密碼。
+</code></pre>
+<h2 id="連線到-VPN-服務器">連線到 VPN 服務器</h2>
+<p>設定好 VPN 服務器連線設定後，出現下方畫面：</p>
+<p><img src="/media/2013/11/softether-manager-screen3.png" alt="softether-manager-screen3"></p>
+<p>選擇 “Connect” 來連到 VPN 服務器進行管理，下圖是主畫面：</p>
+<p><img src="/media/2013/11/softether-manager-screen4.png" alt="softether-manager-screen4"></p>
+<p>因為山姆鍋已經有建立兩個 Virtual Hub，您的列表應該是空的。</p>
+<h2 id="建立新的-Virtual-Hub">建立新的 Virtual Hub</h2>
+<p>從主畫面選擇 “Create a Virtual Hub”：</p>
+<p><img src="/media/2013/11/softether-manager-screen9.png" alt="softether-manager-screen9"></p>
+<ol>
+<li></li>
+</ol>
+<pre><code>設定\&quot;Virtual Hub Name\&quot;：
+
+:   這是您的專屬VPN, 所以取個別人不易猜測的名稱。
+</code></pre>
+<ol start="2">
+<li>選擇&quot;OK&quot;建立。</li>
+</ol>
+<h2 id="建立-Virtual-Hub-連線帳戶">建立 Virtual Hub 連線帳戶</h2>
+<p>從主畫面，點選您要管理的 “Virtual Hub&quot;後，選擇&quot;Manage Virtual<br>
+Hub”。如此，會進到 Virtual Hub 的管理界面，如下圖：</p>
+<p><img src="/media/2013/11/softether-manager-screen5.png" alt="softether-manager-screen5"></p>
+<p>從 Virtual Hub 管理界面，選擇&quot;Manage Users&quot; --&gt;<br>
+再選’New’按鈕，出現新增用戶視窗：</p>
+<p><img src="/media/2013/11/softether-manager-screen6.png" alt="softether-manager-screen6"></p>
+<ol>
+<li></li>
+</ol>
+<pre><code>User Name:
+
+:   輸入登入用的用戶名稱。
+</code></pre>
+<ol start="2">
+<li></li>
+</ol>
+<pre><code>Full Name:
+
+:   用戶的全名，只是輔助性資料。
+</code></pre>
+<ol start="3">
+<li></li>
+</ol>
+<pre><code>Auth Type:
+
+:   認證方式，選擇\'Password Authentication\'。
+</code></pre>
+<ol start="4">
+<li></li>
+</ol>
+<pre><code>Password 跟 Confirm Password:
+
+:   輸入認證用的密碼。
+</code></pre>
+<h2 id="啟用-L2TP-IPSec-服務">啟用 L2TP/IPSec 服務</h2>
+<ol>
+<li>從主畫面，選擇 “IPSec/L2TP Setting”</li>
+</ol>
+<p><img src="/media/2013/11/softether-manager-screen10.png" alt="softether-manager-screen10"></p>
+<ol start="2">
+<li></li>
+</ol>
+<pre><code>選用 \&quot;Enable L2TP Server Function (L2TP over IPSec)\&quot;
+
+:   設定這個選項，讓SoftEther啟用L2TP服務。
+</code></pre>
+<ol start="3">
+<li></li>
+</ol>
+<pre><code>選擇 \&quot;Default Virtual Hub\&quot;
+
+:   這個欄位的用途是在VPN客戶端提供的用戶名稱沒有包含Virtual
+    hub名稱時，預設使用的Virtual Hub。
+    SoftEther服務器可以同時支援多個Virtual
+    Hub，如果用戶名稱以這種形式
+    \'[tester\@your-private-hub\'表示](mailto:tester@your-private-hub'表示)，\'@\'後面就是Virtual
+    hub的名稱。
+</code></pre>
+<ol start="4">
+<li></li>
+</ol>
+<pre><code>設定 \&quot;IPSec Pre-Shared Key\&quot;
+
+:   這個是連線時，客戶端與服務端認證需要的。如果您要讓朋友使用您的VPN服務器，則這個也需要提供給他們。
+</code></pre>
+<h2 id="設定-NAT-Port-forwarding">設定 NAT Port forwarding</h2>
+<p>通常家用網路環境會有一個 NAT 裝置，可能是 ADSL 的 router 或者是頻寬分享器。不管如何，要讓客戶端可以連到您的 VPN 服務器，您需要在 router 上設定 port<br>
+forwarding。底下是需要設定轉到 VPN 服務器的 port：</p>
+<ol>
+<li>500/UDP</li>
+<li>4500/UDP</li>
+<li>1701/UDP</li>
+</ol>
+<h2 id="使用-Local-bridge-跟實體網路串接">使用 Local bridge 跟實體網路串接</h2>
+<p>雖然到這裡已經可以使用 VPN 客戶端來連到 VPN 服務器，但您會發現卻無法存取網路，這是因為每個<br>
+Virtual Hub<br>
+就相當於一個獨立網段，彼此並沒有關聯。為了讓 VPN 連線可以存取網路，SoftEther 有幾個不同做法，這裡山姆鍋使用 Local<br>
+bridge 的方式來將 Virtual<br>
+Hub 與實體網路串接，如此可以讓 VPN 客戶端以 VPN 服務器當作閘道器(gateway)來存取網際網路。</p>
+<ol>
+<li>在管理主畫面，選擇 Local Bridge Setting。</li>
+</ol>
+<p><img src="/media/2013/11/softether-manager-screen8.png" alt="softether-manager-screen8"></p>
+<ol start="2">
+<li>在 “Virtual Hub” 欄位，選擇您建立的 Virtual Hub 名稱。</li>
+<li>“LAN adapter” 欄位，選擇要串接的網卡。<br>
+這裡山姆鍋使用第二張網卡’eth1’，這樣讓 VPN 客戶端依然可以 VPN 服務器本身。<br>
+如果您只有一張網卡，那就選擇那張。</li>
+</ol>
+<h2 id="客戶端設定">客戶端設定</h2>
+<p>底下是設定 VPN 客戶端需要使用的資訊：</p>
+<ol>
+<li></li>
+</ol>
+<pre><code>主機名稱:
+
+:   VPN服務器位址，如有使用NAT則是NAT的外部位址。
+</code></pre>
+<ol start="2">
+<li></li>
+</ol>
+<pre><code>用戶名稱：
+
+:   &lt;tester@your-private-vpn&gt;。需要使用全名，也就是要包含\'\@your-private-vpn\'這部分。
+    當然，\'your-private-vpn\'是您設定的Virtual Hub名稱。
+</code></pre>
+<ol start="3">
+<li></li>
+</ol>
+<pre><code>登入密碼：
+
+:   認證密碼。
+</code></pre>
+<ol start="4">
+<li></li>
+</ol>
+<pre><code>Pre-Shared Key:
+
+:   設定L2TP 服務時設定的Pre-Shared Key。
+</code></pre>
+<h2 id="結語">結語</h2>
+<p>經過這番折騰後，希望您已經有一個可以使用的專屬 VPN 服務了。<br>
+本文介紹的設定是要讓您個人使用，可不要隨便開帳號給別人。</p>
+
+            
+
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">標籤</span><br/>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tag/security/" rel="tag">Security</a> <a class="tag tag--primary tag--small t-link" href="/tag/softether/" rel="tag">SoftEther</a> <a class="tag tag--primary tag--small t-link" href="/tag/vlan/" rel="tag">VLAN</a> <a class="tag tag--primary tag--small t-link" href="/tag/vpn/" rel="tag">VPN</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/post/2015/08/first-blog-post/"
+                    data-tooltip="改用 Pelican 寫部落格文章"
+                    aria-label="上一篇: 改用 Pelican 寫部落格文章"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/post/2013/11/setup-home-vpn-server-with-softether-qnap-nas/"
+                    data-tooltip="利用 SoftEther 以及 QNAP NAS 架設 L2TP/IPSec VPN 服務器(上)"
+                    aria-label="下一篇: 利用 SoftEther 以及 QNAP NAS 架設 L2TP/IPSec VPN 服務器(上)"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://samkuo.me/post/2013/11/setup-home-vpn-server-with-softether-qnap-nas-p2/"
+                    title="分享到 Facebook"
+                    aria-label="分享到 Facebook"
+                >
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://twitter.com/intent/tweet?text=https://samkuo.me/post/2013/11/setup-home-vpn-server-with-softether-qnap-nas-p2/"
+                    title="分享到 Twitter"
+                    aria-label="分享到 Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#disqus_thread"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript" target="_blank" rel="noopener">comments powered by Disqus.</a></noscript>
+</div>
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2020 Sampot (山姆鍋). All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/post/2015/08/first-blog-post/"
+                    data-tooltip="改用 Pelican 寫部落格文章"
+                    aria-label="上一篇: 改用 Pelican 寫部落格文章"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/post/2013/11/setup-home-vpn-server-with-softether-qnap-nas/"
+                    data-tooltip="利用 SoftEther 以及 QNAP NAS 架設 L2TP/IPSec VPN 服務器(上)"
+                    aria-label="下一篇: 利用 SoftEther 以及 QNAP NAS 架設 L2TP/IPSec VPN 服務器(上)"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://samkuo.me/post/2013/11/setup-home-vpn-server-with-softether-qnap-nas-p2/"
+                    title="分享到 Facebook"
+                    aria-label="分享到 Facebook"
+                >
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://twitter.com/intent/tweet?text=https://samkuo.me/post/2013/11/setup-home-vpn-server-with-softether-qnap-nas-p2/"
+                    title="分享到 Twitter"
+                    aria-label="分享到 Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#disqus_thread"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://www.facebook.com/sharer/sharer.php?u=https://samkuo.me/post/2013/11/setup-home-vpn-server-with-softether-qnap-nas-p2/"
+                        aria-label="分享到 Facebook"
+                    >
+                        <i class="fab fa-facebook" aria-hidden="true"></i><span>分享到 Facebook</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://twitter.com/intent/tweet?text=https://samkuo.me/post/2013/11/setup-home-vpn-server-with-softether-qnap-nas-p2/"
+                        aria-label="分享到 Twitter"
+                    >
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>分享到 Twitter</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/images/logo.png" alt="作者的圖片"/>
+        
+            <h4 id="about-card-name">Sampot (山姆鍋)</h4>
+        
+            <div id="about-card-bio"><p>個人部落格， 記錄與分享一些軟體開發與運營相關資訊， 偶爾也會碎念一下</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>IT 自由工作者</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                台灣/台北
+            </div>
+        
+    </div>
+</div>
+
+        
+            <div id="algolia-search-modal" class="modal-container">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="close-button"><i class="fa fa-times"></i></span>
+            <a href="https://algolia.com" target="_blank" rel="noopener" class="searchby-algolia text-color-light link-unstyled">
+                <span class="searchby-algolia-text text-color-light text-small">by</span>
+                <img class="searchby-algolia-logo" src="/assets/images/logo-algolia-nebula-blue-full.svg">
+            </a>
+            <i class="search-icon fa fa-search"></i>
+            <form id="algolia-search-form">
+                <input type="text" id="algolia-search-input" name="search"
+                    class="form-control input--large search-input" placeholder="Search "
+                    />
+            </form>
+        </div>
+        <div class="modal-body">
+            <div class="no-result text-color-light text-center">沒有找到文章</div>
+            <div class="results">
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2012/03/set-up-mysql-master-master-replication/"
+                            aria-label=": 設定 MySQL Master-Master 複製"
+                        >
+                            <h3 class="media-heading">設定 MySQL Master-Master 複製</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2012年3月3日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>本文簡單說明如何設定兩台 MySQL<br>
+server，讓它們彼此互相備份資料(Master-master<br>
+模式)。雖然這樣的設定通常是支援高可用性(high availability)<br>
+平台的一部分，但本文不包含如何完成其他 HA 的工作。設定兩台 MySQL 伺服器互相備份，主要目的就是要確認資料的安全性；同時也提高可用性。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2012/04/use-pacemaker-two-node-ha-cluster/"
+                            aria-label=": 使用Pacemaker 建構雙節點叢集系統"
+                        >
+                            <h3 class="media-heading">使用Pacemaker 建構雙節點叢集系統</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2012年4月6日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>想要達到系統高可用性(high availability)的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2012/04/build-cluster-filesystem-with-glusterfs-ubuntu/"
+                            aria-label=": 使用 GlusterFS 在 Ubuntu 上建構雙節點叢集檔案系統"
+                        >
+                            <h3 class="media-heading">使用 GlusterFS 在 Ubuntu 上建構雙節點叢集檔案系統</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2012年4月23日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案(圖檔, CSS 等等)可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點(single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2012/04/scale-wordpress-with-hyperdb/"
+                            aria-label=": 使用 HyperDB 加強 WordPress 網站的資料庫擴充性"
+                        >
+                            <h3 class="media-heading">使用 HyperDB 加強 WordPress 網站的資料庫擴充性</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2012年4月23日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>對於流量高的 Wordpress 網站來說，資料庫往往是第一個出現的瓶頸。針對資料庫擴充性的問題，本文介紹 HyperDB 這個解決方案。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2012/04/create-lnmp-environment-with-nginx/"
+                            aria-label=": 在 Linode 上使用 Nginx 架設 LNMP 環境"
+                        >
+                            <h3 class="media-heading">在 Linode 上使用 Nginx 架設 LNMP 環境</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2012年4月30日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>Apache HTTPd 是很好的網站伺服器，但是對於 CPU 跟記憶體的要求較高，對於架設在 VPS 上面網站來說， 需要一個更輕量級的解決方案。越來越多人選擇使用 Nginx 架設網站，主要考量便是它的快速、穩定以及輕量的特性。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2012/05/support-sending-mail-php-linux-vps-exim/"
+                            aria-label=": Linux VPS PHP 網站可以發送信件"
+                        >
+                            <h3 class="media-heading">Linux VPS PHP 網站可以發送信件</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2012年5月8日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>PHP 架站軟體通常需要用到寄信功能，例如：通知站長有新的迴響需要審核。使用虛擬主機來架站的讀者一定會納悶：<br>
+不管是 WordPress，Drupal 或者其他 PHP<br>
+架站軟體不是都不用另外設定就可以寄信？為什麼需要特地提到這件事情。<br>
+話說山姆鍋的主機採用的是 Linode VPS，很多事情都需要自己來，唉！<br>
+如果您的網站主機跟山姆鍋一樣是 VPS 或者專屬伺服器，那這篇文章也許對您有幫助。<br>
+由於不是要做為公司的郵件伺服器，山姆鍋希望除了讓 PHP 架站軟體送信外，不再作其它用途。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2013/04/start-up/"
+                            aria-label=": 影化身科技有限公司成立"
+                        >
+                            <h3 class="media-heading">影化身科技有限公司成立</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2013年4月24日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>2013 年 4 月 24 日，影化身科技有限公司登記成立，致力於提供雲端服務平台。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2013/05/shi-yong-octopresszuo-wei-bo-ke-ping-tai/"
+                            aria-label=": 使用 Octopress 作為部落格平台"
+                        >
+                            <h3 class="media-heading">使用 Octopress 作為部落格平台</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2013年5月23日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>由於沒有需要太多動態功能，所以，嘗試使用靜態部落格平台 Octopress 來寫文章。「艾米部落」<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup> 一路從 Joomla, Drupal, WordPress 到現在的 Octopress，也算是換了不少平台。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2013/05/use-static-site-generator-for-company-site/"
+                            aria-label=": 使用靜態網頁產生器來管理公司網站"
+                        >
+                            <h3 class="media-heading">使用靜態網頁產生器來管理公司網站</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2013年5月28日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>對於不需要動態功能的網站而言，使用像是 Drupal、WordPress 之類的架站軟體，感覺有點大材小用。對於可以接受不使用「所見即所得」編輯器的人，靜態網站產生器應該是個可以接受的方案。 雖說是靜態網站，缺少很多功能，但像是公司或者行銷網站往往也不需要這些。況且， 靜態網站有諸多動態網站所沒有的功能，如：</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2013/05/exchange-name-card-with-eavatar-me/"
+                            aria-label=": 如何利用「我．影化身」服務交換名片"
+                        >
+                            <h3 class="media-heading">如何利用「我．影化身」服務交換名片</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2013年5月29日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>今天從 MR JAMIE 上讀到一篇文章：「從今天開始，請 email 你的名片給我吧！」這讓我想到，與其使用 Email，使用「我．影化身」來代替，不是也很適當？</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+            </div>
+        </div>
+        <div class="modal-footer">
+            <p class="results-count text-medium"
+                data-message-zero="沒有找到文章"
+                data-message-one="找到 1 篇文章"
+                data-message-other="找到 {n} 篇文章">
+                找到 122 篇文章
+            </p>
+        </div>
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+
+<script src="/assets/js/jquery.js"></script>
+
+
+<script src="/assets/js/jquery.fancybox.js"></script>
+
+
+<script src="/assets/js/thumbs.js"></script>
+
+
+<script src="/assets/js/tranquilpeak.js"></script>
+
+<!--SCRIPTS END-->
+
+
+    
+        <script>
+          var disqus_config = function() {
+            this.page.url = 'https://samkuo.me/post/2013/11/setup-home-vpn-server-with-softether-qnap-nas-p2/';
+              
+            this.page.identifier = 'post/2013/11/setup-home-vpn-server-with-softether-qnap-nas-p2/';
+              
+          };
+          (function() {
+            var d = document, s = d.createElement('script');
+            var disqus_shortname = 'sampotkuo';
+            s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+          })();
+        </script>
+    
+
+
+
+    
+<script src="/assets/js/moment-with-locales.js"></script>
+
+    
+<script src="/assets/js/algoliasearch.js"></script>
+
+    <script>
+      var algoliaClient = algoliasearch('OIWK4CBFS4', 'f676051199368fe5f161c9012b7edaf6');
+      var algoliaIndex = algoliaClient.initIndex('MyBlogIndex');
+    </script>
+
+
+    </body>
+</html>

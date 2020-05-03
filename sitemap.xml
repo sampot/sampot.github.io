@@ -1,0 +1,970 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  
+  <url>
+    <loc>https://samkuo.me/post/2020/05/wsl-switch-to-docker-ce-in-linux/</loc>
+    
+    <lastmod>2020-05-03T02:15:58.323Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2020/05/hexo-browsersync-fix/</loc>
+    
+    <lastmod>2020-05-02T02:45:32.549Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2020/04/dev-env-docker-wsl2-k3d-vs-code/</loc>
+    
+    <lastmod>2020-04-30T02:56:36.143Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2020/04/multipass-k3s-kubernetes-dev-env/</loc>
+    
+    <lastmod>2020-04-06T04:30:48.336Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/about/</loc>
+    
+    <lastmod>2020-03-24T13:22:41.522Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2020/03/why-sotfware-architecture-is-necessary-by-story/</loc>
+    
+    <lastmod>2020-03-23T09:32:35.458Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2020/03/install-nodebb-digitalocean-production/</loc>
+    
+    <lastmod>2020-03-23T02:37:15.282Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2020/03/morden-web-forum-nodebb/</loc>
+    
+    <lastmod>2020-03-20T06:33:10.464Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2015/10/persistent-message-queues-with-lmdb/</loc>
+    
+    <lastmod>2020-03-08T02:40:41.715Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2015/09/generate-qrcode-for-pyside/</loc>
+    
+    <lastmod>2020-03-08T02:35:59.050Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2015/09/hybrid-logical-clock-for-python/</loc>
+    
+    <lastmod>2020-03-08T02:31:28.600Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2015/08/first-blog-post/</loc>
+    
+    <lastmod>2020-03-08T02:26:26.953Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2015/09/django_live_functional_test_selenium/</loc>
+    
+    <lastmod>2020-03-08T02:25:05.746Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/11/devops-lab-1-jenkins-ci/</loc>
+    
+    <lastmod>2020-03-08T02:24:28.399Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2015/09/decentralzed-authenticationg-messaging-system/</loc>
+    
+    <lastmod>2020-03-08T02:24:13.179Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/10/cross-datacenter-nosql-cassandra-database/</loc>
+    
+    <lastmod>2020-03-08T02:23:32.550Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/11/build-own-cloud-continuous-integration-system-p2/</loc>
+    
+    <lastmod>2020-03-08T02:22:33.632Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/06/blog-with-prose-github-octopress-travis-ci/</loc>
+    
+    <lastmod>2020-03-08T02:21:54.108Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2015/09/architecture-requirements-of-highly-scalable-task-execution/</loc>
+    
+    <lastmod>2020-03-08T02:21:37.127Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2015/09/architecture-design-of-highly-scalable-task-execution/</loc>
+    
+    <lastmod>2020-03-08T02:20:42.492Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/10/amazon-s3-as-maven-repository-with-gradle/</loc>
+    
+    <lastmod>2020-03-08T02:13:55.590Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/10/eclipse-dark-theme/</loc>
+    
+    <lastmod>2020-03-08T02:12:59.197Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/09/remote-backup-disaster-recovery/</loc>
+    
+    <lastmod>2020-03-08T02:11:27.347Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/10/jenkins-continuous-integration-server-cloudbees-build-services/</loc>
+    
+    <lastmod>2020-03-08T02:10:19.451Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/10/cloud-project-management-system-infrastructure/</loc>
+    
+    <lastmod>2020-03-08T02:08:48.108Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/06/cloud-version-control-system/</loc>
+    
+    <lastmod>2020-03-08T02:06:51.735Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/10/google-docs-document-management-system/</loc>
+    
+    <lastmod>2020-03-08T02:05:40.765Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/09/enterprise-email-system/</loc>
+    
+    <lastmod>2020-03-08T02:04:55.741Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/10/install-oracle-jdk-on-ubuntu-with-puppet/</loc>
+    
+    <lastmod>2020-03-08T02:04:08.122Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/10/real-time-web-with-vert-dot-x/</loc>
+    
+    <lastmod>2020-03-08T02:03:14.361Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/10/run-java-process-as-daemon-or-service-on-linux-windows/</loc>
+    
+    <lastmod>2020-03-08T01:59:07.118Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/10/paas-for-java-applications/</loc>
+    
+    <lastmod>2020-03-08T01:53:48.732Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/10/maven-repository-amazon-s3/</loc>
+    
+    <lastmod>2020-03-08T01:52:50.339Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/10/infrastructure-as-a-service-for-micro-enterprise/</loc>
+    
+    <lastmod>2020-03-08T01:49:39.905Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/06/identity-access-management-system-enterprise/</loc>
+    
+    <lastmod>2020-03-08T01:49:14.048Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/10/cloud-customer-service-system/</loc>
+    
+    <lastmod>2020-03-08T01:46:45.807Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/10/setup-consistent-dev-test-environments-with-vagrant/</loc>
+    
+    <lastmod>2020-03-08T01:45:55.606Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2020/03/why-i-work-for-startups/</loc>
+    
+    <lastmod>2020-03-05T08:50:32.477Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2018/08/use-hexo-for-blog/</loc>
+    
+    <lastmod>2020-03-05T02:46:32.018Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2015/11/buildbot-continuous-integration-for-python/</loc>
+    
+    <lastmod>2020-03-05T02:45:28.650Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/recruiting/</loc>
+    
+    <lastmod>2020-03-05T01:55:35.640Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/sitemap/</loc>
+    
+    <lastmod>2020-03-05T01:23:20.375Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/contact/</loc>
+    
+    <lastmod>2020-03-02T11:56:47.844Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2015/11/jquery-mobile-and-backbone-framework/</loc>
+    
+    <lastmod>2020-03-02T10:20:45.802Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2015/12/http-live-streaming-on-osx-camera-with-python/</loc>
+    
+    <lastmod>2020-03-02T10:17:11.787Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2015/09/how-dropbox-encrypt-data-with-convergent-encryption/</loc>
+    
+    <lastmod>2019-11-29T10:01:24.292Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/06/octopress-tag-cloud-aside/</loc>
+    
+    <lastmod>2018-08-31T06:11:55.030Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/11/devops-lab-oracle-jdk-enhanced/</loc>
+    
+    <lastmod>2018-08-30T06:57:07.100Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2015/11/build-libtorrent-python-on-windows-64-bit/</loc>
+    
+    <lastmod>2018-08-30T06:57:07.099Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/changelogs/</loc>
+    
+    <lastmod>2018-08-30T02:31:51.028Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2016/03/new-development-team/</loc>
+    
+    <lastmod>2018-08-29T15:50:46.112Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/404</loc>
+    
+    <lastmod>2018-08-29T15:44:49.683Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2015/09/python-system-tray-icon-with-pyside/</loc>
+    
+    <lastmod>2018-08-29T15:29:57.240Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2015/09/python-with-erasure-code/</loc>
+    
+    <lastmod>2018-08-29T15:10:13.461Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2016/04/shippable-ci-docker-compose/</loc>
+    
+    <lastmod>2018-08-29T12:19:36.961Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2015/10/eavatar-circleci-continuous-integration/</loc>
+    
+    <lastmod>2018-08-29T12:19:08.058Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/11/setup-home-vpn-server-with-softether-qnap-nas/</loc>
+    
+    <lastmod>2018-08-29T12:17:01.290Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2015/09/tipue-static-search-offline/</loc>
+    
+    <lastmod>2018-08-29T12:16:38.565Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2012/03/set-up-mysql-master-master-replication/</loc>
+    
+    <lastmod>2018-08-29T12:16:20.234Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2015/09/tiny-docker-image-with-ubuntu-bash/</loc>
+    
+    <lastmod>2018-08-29T12:16:20.234Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2015/10/pkg_resources_plugin_framework/</loc>
+    
+    <lastmod>2018-08-29T12:16:20.233Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2015/10/how-to-find-ip-addresses-with-python/</loc>
+    
+    <lastmod>2018-08-29T12:16:03.548Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2015/10/eavatar-a-versatile-agent-for-task-automation/</loc>
+    
+    <lastmod>2018-08-29T12:16:03.504Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2015/09/insert-default-image-pelican-post/</loc>
+    
+    <lastmod>2018-08-29T12:16:03.504Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2015/09/experiment-with-python-sandbox/</loc>
+    
+    <lastmod>2018-08-29T12:16:03.503Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2015/09/python-rsync-hash-split/</loc>
+    
+    <lastmod>2018-08-29T12:16:03.503Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2015/09/pelican-blog-microdata-seo/</loc>
+    
+    <lastmod>2018-08-29T12:15:40.341Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/11/vagrant-with-digital-ocean-provider/</loc>
+    
+    <lastmod>2018-08-29T12:07:19.869Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2015/11/using-circleci-with-docker/</loc>
+    
+    <lastmod>2018-08-29T12:07:10.101Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2016/04/docker-golang-awesome/</loc>
+    
+    <lastmod>2018-08-29T11:38:00.751Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2016/04/containerized-app-continuous-delivery/</loc>
+    
+    <lastmod>2018-08-29T11:30:29.158Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/10/build-robust-and-effective-web-sites-for-micro-enterprises/</loc>
+    
+    <lastmod>2018-08-29T11:13:09.374Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/11/build-own-cloud-continuous-integration-system/</loc>
+    
+    <lastmod>2018-08-29T11:13:01.466Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/11/build-own-cloud-continuous-integration-system-p3/</loc>
+    
+    <lastmod>2018-08-29T11:12:53.947Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2015/09/add-custom-jinja2-filter-to-pelican/</loc>
+    
+    <lastmod>2018-08-29T11:12:01.645Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/search/</loc>
+    
+    <lastmod>2018-08-29T10:38:05.815Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2012/05/support-sending-mail-php-linux-vps-exim/</loc>
+    
+    <lastmod>2018-08-28T17:00:58.990Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2015/11/web-scraping-with-beautifulsoup/</loc>
+    
+    <lastmod>2018-08-28T16:48:39.765Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2015/09/use-pyinstaller-to-package-pyside-desktop-app/</loc>
+    
+    <lastmod>2018-08-28T16:20:26.192Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2012/04/scale-wordpress-with-hyperdb/</loc>
+    
+    <lastmod>2018-08-28T16:20:19.052Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/06/use-cloudfront-speed-up-eavatar-home/</loc>
+    
+    <lastmod>2018-08-28T02:45:35.688Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/06/online-ide-cloud9/</loc>
+    
+    <lastmod>2018-08-28T02:45:16.121Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/08/distribute-mobile-app/</loc>
+    
+    <lastmod>2018-08-28T02:44:49.425Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2015/09/interview-test-engineers/</loc>
+    
+    <lastmod>2018-08-28T02:42:32.246Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2015/10/what-if-i-have-shadow-clones/</loc>
+    
+    <lastmod>2018-08-25T13:53:14.289Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2015/09/wan-discovery-mainline-dht-bittorrent/</loc>
+    
+    <lastmod>2018-08-25T13:49:57.519Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/04/start-up/</loc>
+    
+    <lastmod>2018-08-25T13:37:52.945Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2015/10/design-a-simple-actor-framework-with-python/</loc>
+    
+    <lastmod>2018-08-25T13:29:46.324Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2012/04/create-lnmp-environment-with-nginx/</loc>
+    
+    <lastmod>2018-08-25T12:33:18.028Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2012/04/build-cluster-filesystem-with-glusterfs-ubuntu/</loc>
+    
+    <lastmod>2018-08-25T06:57:16.297Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2015/09/why-time-uuid/</loc>
+    
+    <lastmod>2018-08-25T06:35:16.654Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2015/09/why-use-database-as-queue/</loc>
+    
+    <lastmod>2018-08-25T06:33:18.185Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/search</loc>
+    
+    <lastmod>2018-08-25T04:19:46.191Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/series/</loc>
+    
+    <lastmod>2018-08-24T13:02:50.140Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2015/09/python-aes-256-and-sha-256-examples/</loc>
+    
+    <lastmod>2018-08-24T13:01:04.634Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/10/continuous-integration-deployment-delivery/</loc>
+    
+    <lastmod>2018-08-23T07:46:06.427Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/06/howto-heroku-ssl-endpoint/</loc>
+    
+    <lastmod>2018-08-23T05:00:52.080Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/10/how-to-install-oracle-jdk-on-ubuntu-12-04/</loc>
+    
+    <lastmod>2018-08-23T05:00:47.219Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/06/how-the-name-eavatar-come-to-being/</loc>
+    
+    <lastmod>2018-08-23T05:00:35.904Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/07/how-eavatar-protect-your-data/</loc>
+    
+    <lastmod>2018-08-23T05:00:30.440Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/05/exchange-name-card-with-eavatar-me/</loc>
+    
+    <lastmod>2018-08-23T04:59:54.654Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/06/change-octopress-blog-dir/</loc>
+    
+    <lastmod>2018-08-23T04:55:41.489Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/05/migrated-to-octopress/</loc>
+    
+    <lastmod>2018-08-23T04:30:42.202Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/06/flask-framework/</loc>
+    
+    <lastmod>2018-08-22T15:54:17.155Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/06/octopress-categorized-articles/</loc>
+    
+    <lastmod>2018-08-22T15:32:38.463Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/06/octopress-ping-search-engines/</loc>
+    
+    <lastmod>2018-08-22T15:29:59.165Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/06/octopress-reduce-http-requests-withl-asset-pipeline/</loc>
+    
+    <lastmod>2018-08-22T15:27:07.107Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/06/octopress-related-posts-plugin/</loc>
+    
+    <lastmod>2018-08-22T15:27:00.977Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/05/payment-service-providers-know-what-you-buy/</loc>
+    
+    <lastmod>2018-08-22T12:11:28.434Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/11/principles-continuous-delivery/</loc>
+    
+    <lastmod>2018-08-22T11:57:53.442Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/06/protect-your-privacy-with-disposable-email/</loc>
+    
+    <lastmod>2018-08-22T11:56:33.563Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/06/purchase-rapidssl-certificate-from-cheapssls/</loc>
+    
+    <lastmod>2018-08-22T11:55:31.235Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/11/setup-home-vpn-server-with-softether-qnap-nas-p2/</loc>
+    
+    <lastmod>2018-08-22T11:36:37.224Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/06/spam-mail-so-annoying/</loc>
+    
+    <lastmod>2018-08-22T11:04:11.974Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/11/strategies-small-team-and-big-systems/</loc>
+    
+    <lastmod>2018-08-22T11:01:33.068Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/11/the-baby-step-of-vm-provisioning-in-the-cloud/</loc>
+    
+    <lastmod>2018-08-22T10:59:51.832Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/11/vagrant-mcollective/</loc>
+    
+    <lastmod>2018-08-22T10:58:32.502Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2015/10/thoughts-about-p2p-media-streaming-mobile-network/</loc>
+    
+    <lastmod>2018-08-22T04:51:58.647Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/10/use-asciidoc-for-documentation/</loc>
+    
+    <lastmod>2018-08-19T14:04:48.408Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/10/java-build-tools/</loc>
+    
+    <lastmod>2018-08-19T14:03:09.700Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/06/speed-up-amazon-s3-static-website-gzip/</loc>
+    
+    <lastmod>2018-08-19T13:45:49.533Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/06/taiwan-bloggers-who-use-octopress/</loc>
+    
+    <lastmod>2018-08-19T13:43:27.706Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2012/04/use-pacemaker-two-node-ha-cluster/</loc>
+    
+    <lastmod>2018-08-19T13:39:15.269Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/06/use-post-url-internal-link-octopress/</loc>
+    
+    <lastmod>2018-08-19T04:25:24.739Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2015/09/why-developers-should-have-a-blog/</loc>
+    
+    <lastmod>2018-08-19T03:39:54.874Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/05/use-static-site-generator-for-company-site/</loc>
+    
+    <lastmod>2018-08-19T03:26:27.333Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/06/what-is-eavatar-or-web-agent/</loc>
+    
+    <lastmod>2018-08-18T02:40:37.693Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/offline/</loc>
+    
+    <lastmod>2018-08-17T15:43:12.910Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/google45600e2c4169dd1a</loc>
+    
+    <lastmod>2018-08-17T15:16:23.191Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/notes/</loc>
+    
+    <lastmod>2018-08-17T05:13:23.044Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/11/why-static-web-sites/</loc>
+    
+    <lastmod>2018-08-17T04:05:38.436Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/apps/</loc>
+    
+    <lastmod>2018-08-17T03:09:49.666Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/10/modular-apps-with-vertx/</loc>
+    
+    <lastmod>2018-08-16T03:11:31.393Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/all-tags/</loc>
+    
+    <lastmod>2018-08-13T15:15:06.162Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/all-archives/</loc>
+    
+    <lastmod>2018-08-13T15:14:03.519Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/all-categories/</loc>
+    
+    <lastmod>2018-08-13T15:13:02.560Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/06/infrastructure-software-shop-with-cloud-services/</loc>
+    
+    <lastmod>2013-10-25T03:16:00.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/05/shi-yong-octopresszuo-wei-bo-ke-ping-tai/</loc>
+    
+    <lastmod>2013-06-12T08:34:00.000Z</lastmod>
+    
+  </url>
+  
+</urlset>

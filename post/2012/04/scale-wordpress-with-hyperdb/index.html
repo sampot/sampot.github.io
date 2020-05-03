@@ -1,0 +1,1032 @@
+
+<!DOCTYPE html>
+<html lang="zh-tw">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="我是山姆鍋">
+    <title>使用 HyperDB 加強 WordPress 網站的資料庫擴充性 - 我是山姆鍋</title>
+    <meta name="author" content="Sampot (山姆鍋)">
+    
+    
+        <link rel="icon" href="https://samkuo.me/images/favicon.png">
+    
+    
+        
+            <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
+        
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"對於流量高的 Wordpress 網站來說，資料庫往往是第一個出現的瓶頸。針對資料庫擴充性的問題，本文介紹 HyperDB 這個解決方案。\n\nHyperDB 設計來取代內建的$wpdb 物件，因此，對於現有程式來說，無須修改就能夠享受它帶來的好處。\nHyperDB 支援多個資料庫服務器，可以將唯讀的請求導到 MySQL\n從屬(slave)伺服器以提高查詢效能；\n當某一台資料庫伺服器沒有回應，它也能夠偵測出來，並將請求導到其他還有作用的伺服器，以達到錯誤轉移的效果。\n前提假設\n\n假設有兩台 MySQL 伺服器，已經按照 設定 MySQL Master-Master\n複製\n方式設定。\n這兩台 MySQL 伺服器各自內部的連線網址分別為: node1.local 跟\nnode2.local。\n\n安裝方式\n複製 db.php\n將 HyperDB 的 zip 檔解開到某個目錄, 將其中的 db.php 複製到\nwp-content 目錄中。\n建立 db-config\n在跟 wp-config.php 同一層的目錄，建立名為\ndb-config.php 的檔案，底下為其內容：\n.php&#125;123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475767778798081828384858687888990919293949596979899100101102103104105106107108109110111112113114115116117118119120121122123124125126127128129130131132133134135136137138139140141142143144145146147148149150151152153154155156157158159160161162163164165166167168169170171172173174175176177178179180181182183184185186187188189190191192193194195196197198199200201202203204205206207208209210211212213214215&lt;?php&#x2F;** Variable settings **&#x2F;&#x2F;*** save_queries (bool)* This is useful for debugging. Queries are saved in $wpdb-&gt;;queries. It is not* a constant because you might want to use it momentarily.* Default: false*&#x2F;$wpdb-&gt;;save_queries &#x3D; false;&#x2F;*** persistent (bool)* This determines whether to use mysql_connect or mysql_pconnect. The effects* of this setting may vary and should be carefully tested.* Default: false*&#x2F;$wpdb-&gt;persistent &#x3D; false;&#x2F;*** max_connections (int)* This is the number of mysql connections to keep open. Increase if you expect* to reuse a lot of connections to different servers. This is ignored if you* enable persistent connections.* Default: 10*&#x2F;$wpdb-&gt;max_connections &#x3D; 10;&#x2F;*** check_tcp_responsiveness* Enables checking TCP responsiveness by fsockopen prior to mysql_connect or* mysql_pconnect. This was added because PHP&#39;s mysql functions do not provide* a variable timeout setting. Disabling it may improve average performance by* a very tiny margin but lose protection against connections failing slowly.* Default: true*&#x2F;$wpdb-&gt;check_tcp_responsiveness &#x3D; true;&#x2F;** Configuration Functions **&#x2F;&#x2F;*** $wpdb-&gt;add_database( $database );** $database is an associative array with these parameters:* host          (required) Hostname with optional :port. Default port is 3306.* user          (required) MySQL user name.* password      (required) MySQL user password.* name          (required) MySQL database name.* read          (optional) Whether server is readable. Default is 1 (readable).*                                                 Also used to assign preference. See &quot;Network topology&quot;.* write         (optional) Whether server is writable. Default is 1 (writable).*                          Also used to assign preference in multi-master mode.* dataset       (optional) Name of dataset. Default is &#39;global&#39;.* timeout       (optional) Seconds to wait for TCP responsiveness. Default is 0.2* lag_threshold (optional) The minimum lag on a slave in seconds before we consider it lagged.*                                                      Set null to disable. When not set, the value of $wpdb-&gt;default_lag_threshold is used.*&#x2F;&#x2F;** Masters and slaves** A database definition can include &#39;read&#39; and &#39;write&#39; parameters. These* operate as boolean switches but they are typically specified as integers.* They allow or disallow use of the database for reading or writing.** A master database might be configured to allow reading and writing:*   &#39;write&#39; &#x3D;&gt; 1,*   &#39;read&#39;  &#x3D;&gt; 1,* while a slave would be allowed only to read:*   &#39;write&#39; &#x3D;&gt; 0,*   &#39;read&#39;  &#x3D;&gt; 1,** It might be advantageous to disallow reading from the master, such as when* there are many slaves available and the master is very busy with writes.*   &#39;write&#39; &#x3D;&gt; 1,*   &#39;read&#39;  &#x3D;&gt; 0,* HyperDB tracks the tables that it has written since instantiation and sending* subsequent read queries to the same server that received the write query.* Thus a master set up this way will still receive read queries, but only* subsequent to writes.*&#x2F;&#x2F;*** Slaves lag awareness** HyperDB accommodates slave lag by making decisions, based on the defined lag* threshold. If the lag threshold is not set, it will ignore the slave lag.* Otherwise, it will try to find a non-lagged slave, before connecting to a lagged one.** A slave is considered lagged, if it&#39;s replication lag is bigger than the lag threshold* you have defined in $wpdb-&gt;$default_lag_threshold or in the per-database settings, using* add_database(). You can also rewrite the lag threshold, by returning* $server[&#39;lag_threshold&#39;] variable with the &#39;dataset&#39; group callbacks.** HyperDB does not check the lag on the slaves. You have to define two callbacks* callbacks to do that:** $wpdb-&gt;add_callback( $callback, &#39;get_lag_cache&#39; );** and** $wpdb-&gt;add_callback( $callback, &#39;get_lag&#39; );** The first one is called, before connecting to a slave and should return* the replication lag in seconds or false, if unknown, based on $wpdb-&gt;lag_cache_key.** The second callback is called after a connection to a slave is established.* It should return it&#39;s replication lag or false, if unknown,* based on the connection in $wpdb-&gt;dbhs[ $wpdb-&gt;dbhname ].*&#x2F;&#x2F;** Sample Configuration 1: Using the Default Server **&#x2F;&#x2F;** NOTE: THIS IS ACTIVE BY DEFAULT. COMMENT IT OUT. **&#x2F;&#x2F;*** This is the most basic way to add a server to HyperDB using only the* required parameters: host, user, password, name.* This adds the DB defined in wp-config.php as a read&#x2F;write server for* the &#39;global&#39; dataset. (Every table is in &#39;global&#39; by default.)*&#x2F;$wpdb-&gt;add_database(array(&#39;host&#39;     &#x3D;&gt; DB_HOST,     &#x2F;&#x2F; If port is other than 3306, use host:port.&#39;user&#39;     &#x3D;&gt; DB_USER,&#39;password&#39; &#x3D;&gt; DB_PASSWORD,&#39;name&#39;     &#x3D;&gt; DB_NAME,));&#x2F;*** This adds the same server again, only this time it is configured as a slave.* The last three parameters are set to the defaults but are shown for clarity.*&#x2F;$wpdb-&gt;add_database(array(&#39;host&#39;     &#x3D;&gt; &#39;node1.local&#39;,     &#x2F;&#x2F; If port is other than 3306, use host:port.&#39;user&#39;     &#x3D;&gt; DB_USER,&#39;password&#39; &#x3D;&gt; DB_PASSWORD,&#39;name&#39;     &#x3D;&gt; DB_NAME,&#39;write&#39;    &#x3D;&gt; 0,&#39;read&#39;     &#x3D;&gt; 1,&#39;dataset&#39;  &#x3D;&gt; &#39;global&#39;,&#39;timeout&#39;  &#x3D;&gt; 0.2,));$wpdb-&gt;add_database(array(&#39;host&#39;     &#x3D;&gt; &#39;node2.local&#39;,     &#x2F;&#x2F; If port is other than 3306, use host:port.&#39;user&#39;     &#x3D;&gt; DB_USER,&#39;password&#39; &#x3D;&gt; DB_PASSWORD,&#39;name&#39;     &#x3D;&gt; DB_NAME,&#39;write&#39;    &#x3D;&gt; 0,&#39;read&#39;     &#x3D;&gt; 1,&#39;dataset&#39;  &#x3D;&gt; &#39;global&#39;,&#39;timeout&#39;  &#x3D;&gt; 0.2,));&#x2F;*** Sample replication lag detection configuration.** We use mk-heartbeat (http:&#x2F;&#x2F;www.maatkit.org&#x2F;doc&#x2F;mk-heartbeat.html)* to detect replication lag.** This implementation requires the database user* to have read access to the heartbeat table.** The cache uses shared memory for portability.* Can be modified to work with Memcached, APC and etc.*&#x2F;&#x2F;*$wpdb-&gt;lag_cache_ttl &#x3D; 30;$wpdb-&gt;shmem_key &#x3D; ftok( __FILE__, &quot;Y&quot; );$wpdb-&gt;shmem_size &#x3D; 128 * 1024;$wpdb-&gt;add_callback( &#39;get_lag_cache&#39;, &#39;get_lag_cache&#39; );$wpdb-&gt;add_callback( &#39;get_lag&#39;,       &#39;get_lag&#39; );function get_lag_cache( $wpdb ) &#123;    $segment &#x3D; shm_attach( $wpdb-&gt;shmem_key, $wpdb-&gt;shmem_size, 0600 );    $lag_data &#x3D; @shm_get_var( $segment, 0 );    shm_detach( $segment );    if ( !is_array( $lag_data ) || !is_array( $lag_data[ $wpdb-&gt;lag_cache_key ] ) )        return false;    if ( $wpdb-&gt;lag_cache_ttl &lt; time() - $lag_data[ $wpdb-&gt;lag_cache_key ][ &#39;timestamp&#39; ] )        return false;    return $lag_data[ $wpdb-&gt;lag_cache_key ][ &#39;lag&#39; ];&#125;function get_lag( $wpdb ) &#123;    $dbh &#x3D; $wpdb-&gt;dbhs[ $wpdb-&gt;dbhname ];    if ( !mysql_select_db( &#39;heartbeat&#39;, $dbh ) )        return false;    $result &#x3D; mysql_query( &quot;SELECT UNIX_TIMESTAMP() - UNIX_TIMESTAMP(ts) AS lag FROM heartbeat LIMIT 1&quot;, $dbh );    if ( !$result || false &#x3D;&#x3D;&#x3D; $row &#x3D; mysql_fetch_assoc( $result ) )        return false;    &#x2F;&#x2F; Cache the result in shared memory with timestamp    $sem_id &#x3D; sem_get( $wpdb-&gt;shmem_key, 1, 0600, 1 ) ;    sem_acquire( $sem_id );    $segment &#x3D; shm_attach( $wpdb-&gt;shmem_key, $wpdb-&gt;shmem_size, 0600 );    $lag_data &#x3D; @shm_get_var( $segment, 0 );    if ( !is_array( $lag_data ) )        $lag_data &#x3D; array();    $lag_data[ $wpdb-&gt;lag_cache_key ] &#x3D; array( &#39;timestamp&#39; &#x3D;&gt; time(), &#39;lag&#39; &#x3D;&gt; $row[ &#39;lag&#39; ] );    shm_put_var( $segment, 0, $lag_data );    shm_detach( $segment );    sem_release( $sem_id );    return $row[ &#39;lag&#39; ];&#125;*&#x2F;&#x2F;&#x2F; The ending PHP tag is omitted. This is actually safer than including it.\n重點在其中的$wpdb-&gt;add_database 敘述，第一個敘述將 Wordpress 現有的資料庫連線作為預設，\n只有這個的話，行為跟沒有安裝 HyperDB 應該一樣。後兩個敘述，就是把 node1.local\n跟 node2.local 這兩個資料庫加入成為唯讀的連線設定。\n修改 wp-config.php\n修改 wp-config.php 檔案，在最後加上下列敘述:\n.php&#125;1require_once(ABSPATH . &#39;db-config.php&#39;);\n","dateCreated":"2012-04-23T12:27:00+08:00","dateModified":"2018-08-29T00:20:19+08:00","datePublished":"2012-04-23T12:27:00+08:00","description":"對於流量高的 Wordpress 網站來說，資料庫往往是第一個出現的瓶頸。針對資料庫擴充性的問題，本文介紹 HyperDB 這個解決方案。","headline":"使用 HyperDB 加強 WordPress 網站的資料庫擴充性","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2012/04/scale-wordpress-with-hyperdb/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2012/04/scale-wordpress-with-hyperdb/","keywords":"WordPress, HyperDB"}</script>
+    <meta name="description" content="對於流量高的 Wordpress 網站來說，資料庫往往是第一個出現的瓶頸。針對資料庫擴充性的問題，本文介紹 HyperDB 這個解決方案。">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="使用 HyperDB 加強 WordPress 網站的資料庫擴充性">
+<meta property="og:url" content="https://samkuo.me/post/2012/04/scale-wordpress-with-hyperdb/">
+<meta property="og:site_name" content="我是山姆鍋">
+<meta property="og:description" content="對於流量高的 Wordpress 網站來說，資料庫往往是第一個出現的瓶頸。針對資料庫擴充性的問題，本文介紹 HyperDB 這個解決方案。">
+<meta property="og:locale" content="zh_TW">
+<meta property="article:published_time" content="2012-04-23T04:27:00.000Z">
+<meta property="article:modified_time" content="2018-08-28T16:20:19.052Z">
+<meta property="article:author" content="Sampot (山姆鍋)">
+<meta property="article:tag" content="WordPress">
+<meta property="article:tag" content="HyperDB">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:creator" content="@sampotkuo">
+<meta property="fb:app_id" content="109832189371155">
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://samkuo.me/images/logo.png"/>
+    
+    
+    
+    
+    <!--STYLES-->
+    
+<link rel="stylesheet" href="/assets/css/all.css">
+
+    
+<link rel="stylesheet" href="/assets/css/jquery.fancybox.css">
+
+    
+<link rel="stylesheet" href="/assets/css/thumbs.css">
+
+    
+<link rel="stylesheet" href="/assets/css/tranquilpeak.css">
+
+    <!--STYLES END-->
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-41152700-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-41152700-1');
+    </script>
+
+
+    
+
+    
+        
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+<header id="header" data-behavior="4">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a
+            class="header-title-link"
+            href="/"
+            aria-label=""
+        >
+            我是山姆鍋
+        </a>
+    </div>
+    
+        
+            <a
+                class="header-right-icon open-algolia-search"
+                href="#search"
+                aria-label="打開鏈接: /#search"
+            >
+        
+        
+            <i class="fa fa-search fa-lg"></i>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="4">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a
+                    href="/#about"
+                    aria-label="閱讀有關作者的更多信息"
+                >
+                    <img class="sidebar-profile-picture" src="/images/logo.png" alt="作者的圖片"/>
+                </a>
+                <h4 class="sidebar-profile-name">Sampot (山姆鍋)</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>個人部落格， 記錄與分享一些軟體開發與運營相關資訊， 偶爾也會碎念一下</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/"
+                            
+                            rel="noopener"
+                            title="首頁"
+                        >
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">首頁</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-categories"
+                            
+                            rel="noopener"
+                            title="分類"
+                        >
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">分類</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-tags"
+                            
+                            rel="noopener"
+                            title="標籤"
+                        >
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">標籤</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-archives"
+                            
+                            rel="noopener"
+                            title="所有文章"
+                        >
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">所有文章</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link open-algolia-search"
+                            href="#search"
+                            
+                            rel="noopener"
+                            title="搜尋"
+                        >
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">搜尋</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/about/"
+                            
+                            rel="noopener"
+                            title="關於"
+                        >
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">關於</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://github.com/sampot"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="GitHub"
+                        >
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://twitter.com/sampotkuo"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Twitter"
+                        >
+                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Twitter</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://facebook.com/sampotkuo"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Facebook"
+                        >
+                        <i class="sidebar-button-icon fab fa-facebook" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Facebook</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://tw.linkedin.com/in/sampot"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="LinkedIn"
+                        >
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://developers.tw/@山姆鍋"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Email"
+                        >
+                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Email</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/sitemap/"
+                            
+                            rel="noopener"
+                            title="網站導覽"
+                        >
+                        <i class="sidebar-button-icon fa fa-sitemap" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">網站導覽</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/atom.xml"
+                            
+                            rel="noopener"
+                            title="Atom"
+                        >
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Atom</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="4"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            使用 HyperDB 加強 WordPress 網站的資料庫擴充性
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2012-04-23T12:27:00+08:00">
+	
+		    4月 23, 2012
+    	
+    </time>
+    
+        <span>分類 </span>
+        
+    <a class="category-link" href="/category/service-operations/">Service Operations</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>對於流量高的 Wordpress 網站來說，資料庫往往是第一個出現的瓶頸。針對資料庫擴充性的問題，本文介紹 HyperDB 這個解決方案。</p>
+<a id="more"></a>
+<p>HyperDB 設計來取代內建的$wpdb 物件，因此，對於現有程式來說，無須修改就能夠享受它帶來的好處。<br>
+HyperDB 支援多個資料庫服務器，可以將唯讀的請求導到 MySQL<br>
+從屬(slave)伺服器以提高查詢效能；<br>
+當某一台資料庫伺服器沒有回應，它也能夠偵測出來，並將請求導到其他還有作用的伺服器，以達到錯誤轉移的效果。</p>
+<h2 id="前提假設">前提假設</h2>
+<ul>
+<li>假設有兩台 MySQL 伺服器，已經按照 <a href="/post/2012/03/set-up-mysql-master-master-replication/">設定 MySQL Master-Master<br>
+複製</a><br>
+方式設定。</li>
+<li>這兩台 MySQL 伺服器各自內部的連線網址分別為: node1.local 跟<br>
+node2.local。</li>
+</ul>
+<h2 id="安裝方式">安裝方式</h2>
+<h3 id="複製-db-php">複製 db.php</h3>
+<p>將 HyperDB 的 zip 檔解開到某個目錄, 將其中的 db.php 複製到<br>
+wp-content 目錄中。</p>
+<h3 id="建立-db-config">建立 db-config</h3>
+<p>在跟 wp-config.php 同一層的目錄，建立名為<br>
+db-config.php 的檔案，底下為其內容：</p>
+<figure class="highlight plain"><figcaption><span>.php&#125;</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">&#x2F;** Variable settings **&#x2F;</span><br><span class="line">&#x2F;**</span><br><span class="line">* save_queries (bool)</span><br><span class="line">* This is useful for debugging. Queries are saved in $wpdb-&gt;;queries. It is not</span><br><span class="line">* a constant because you might want to use it momentarily.</span><br><span class="line">* Default: false</span><br><span class="line">*&#x2F;</span><br><span class="line">$wpdb-&gt;;save_queries &#x3D; false;</span><br><span class="line"></span><br><span class="line">&#x2F;**</span><br><span class="line">* persistent (bool)</span><br><span class="line">* This determines whether to use mysql_connect or mysql_pconnect. The effects</span><br><span class="line">* of this setting may vary and should be carefully tested.</span><br><span class="line">* Default: false</span><br><span class="line">*&#x2F;</span><br><span class="line">$wpdb-&gt;persistent &#x3D; false;</span><br><span class="line"></span><br><span class="line">&#x2F;**</span><br><span class="line">* max_connections (int)</span><br><span class="line">* This is the number of mysql connections to keep open. Increase if you expect</span><br><span class="line">* to reuse a lot of connections to different servers. This is ignored if you</span><br><span class="line">* enable persistent connections.</span><br><span class="line">* Default: 10</span><br><span class="line">*&#x2F;</span><br><span class="line">$wpdb-&gt;max_connections &#x3D; 10;</span><br><span class="line"></span><br><span class="line">&#x2F;**</span><br><span class="line">* check_tcp_responsiveness</span><br><span class="line">* Enables checking TCP responsiveness by fsockopen prior to mysql_connect or</span><br><span class="line">* mysql_pconnect. This was added because PHP&#39;s mysql functions do not provide</span><br><span class="line">* a variable timeout setting. Disabling it may improve average performance by</span><br><span class="line">* a very tiny margin but lose protection against connections failing slowly.</span><br><span class="line">* Default: true</span><br><span class="line">*&#x2F;</span><br><span class="line">$wpdb-&gt;check_tcp_responsiveness &#x3D; true;</span><br><span class="line"></span><br><span class="line">&#x2F;** Configuration Functions **&#x2F;</span><br><span class="line"></span><br><span class="line">&#x2F;**</span><br><span class="line">* $wpdb-&gt;add_database( $database );</span><br><span class="line">*</span><br><span class="line">* $database is an associative array with these parameters:</span><br><span class="line">* host          (required) Hostname with optional :port. Default port is 3306.</span><br><span class="line">* user          (required) MySQL user name.</span><br><span class="line">* password      (required) MySQL user password.</span><br><span class="line">* name          (required) MySQL database name.</span><br><span class="line">* read          (optional) Whether server is readable. Default is 1 (readable).</span><br><span class="line">*                                                 Also used to assign preference. See &quot;Network topology&quot;.</span><br><span class="line">* write         (optional) Whether server is writable. Default is 1 (writable).</span><br><span class="line">*                          Also used to assign preference in multi-master mode.</span><br><span class="line">* dataset       (optional) Name of dataset. Default is &#39;global&#39;.</span><br><span class="line">* timeout       (optional) Seconds to wait for TCP responsiveness. Default is 0.2</span><br><span class="line">* lag_threshold (optional) The minimum lag on a slave in seconds before we consider it lagged.</span><br><span class="line">*                                                      Set null to disable. When not set, the value of $wpdb-&gt;default_lag_threshold is used.</span><br><span class="line">*&#x2F;</span><br><span class="line"></span><br><span class="line">&#x2F;** Masters and slaves</span><br><span class="line">*</span><br><span class="line">* A database definition can include &#39;read&#39; and &#39;write&#39; parameters. These</span><br><span class="line">* operate as boolean switches but they are typically specified as integers.</span><br><span class="line">* They allow or disallow use of the database for reading or writing.</span><br><span class="line">*</span><br><span class="line">* A master database might be configured to allow reading and writing:</span><br><span class="line">*   &#39;write&#39; &#x3D;&gt; 1,</span><br><span class="line">*   &#39;read&#39;  &#x3D;&gt; 1,</span><br><span class="line">* while a slave would be allowed only to read:</span><br><span class="line">*   &#39;write&#39; &#x3D;&gt; 0,</span><br><span class="line">*   &#39;read&#39;  &#x3D;&gt; 1,</span><br><span class="line">*</span><br><span class="line">* It might be advantageous to disallow reading from the master, such as when</span><br><span class="line">* there are many slaves available and the master is very busy with writes.</span><br><span class="line">*   &#39;write&#39; &#x3D;&gt; 1,</span><br><span class="line">*   &#39;read&#39;  &#x3D;&gt; 0,</span><br><span class="line">* HyperDB tracks the tables that it has written since instantiation and sending</span><br><span class="line">* subsequent read queries to the same server that received the write query.</span><br><span class="line">* Thus a master set up this way will still receive read queries, but only</span><br><span class="line">* subsequent to writes.</span><br><span class="line">*&#x2F;</span><br><span class="line"></span><br><span class="line">&#x2F;**</span><br><span class="line">* Slaves lag awareness</span><br><span class="line">*</span><br><span class="line">* HyperDB accommodates slave lag by making decisions, based on the defined lag</span><br><span class="line">* threshold. If the lag threshold is not set, it will ignore the slave lag.</span><br><span class="line">* Otherwise, it will try to find a non-lagged slave, before connecting to a lagged one.</span><br><span class="line">*</span><br><span class="line">* A slave is considered lagged, if it&#39;s replication lag is bigger than the lag threshold</span><br><span class="line">* you have defined in $wpdb-&gt;$default_lag_threshold or in the per-database settings, using</span><br><span class="line">* add_database(). You can also rewrite the lag threshold, by returning</span><br><span class="line">* $server[&#39;lag_threshold&#39;] variable with the &#39;dataset&#39; group callbacks.</span><br><span class="line">*</span><br><span class="line">* HyperDB does not check the lag on the slaves. You have to define two callbacks</span><br><span class="line">* callbacks to do that:</span><br><span class="line">*</span><br><span class="line">* $wpdb-&gt;add_callback( $callback, &#39;get_lag_cache&#39; );</span><br><span class="line">*</span><br><span class="line">* and</span><br><span class="line">*</span><br><span class="line">* $wpdb-&gt;add_callback( $callback, &#39;get_lag&#39; );</span><br><span class="line">*</span><br><span class="line">* The first one is called, before connecting to a slave and should return</span><br><span class="line">* the replication lag in seconds or false, if unknown, based on $wpdb-&gt;lag_cache_key.</span><br><span class="line">*</span><br><span class="line">* The second callback is called after a connection to a slave is established.</span><br><span class="line">* It should return it&#39;s replication lag or false, if unknown,</span><br><span class="line">* based on the connection in $wpdb-&gt;dbhs[ $wpdb-&gt;dbhname ].</span><br><span class="line">*&#x2F;</span><br><span class="line"></span><br><span class="line">&#x2F;** Sample Configuration 1: Using the Default Server **&#x2F;</span><br><span class="line">&#x2F;** NOTE: THIS IS ACTIVE BY DEFAULT. COMMENT IT OUT. **&#x2F;</span><br><span class="line"></span><br><span class="line">&#x2F;**</span><br><span class="line">* This is the most basic way to add a server to HyperDB using only the</span><br><span class="line">* required parameters: host, user, password, name.</span><br><span class="line">* This adds the DB defined in wp-config.php as a read&#x2F;write server for</span><br><span class="line">* the &#39;global&#39; dataset. (Every table is in &#39;global&#39; by default.)</span><br><span class="line">*&#x2F;</span><br><span class="line">$wpdb-&gt;add_database(array(</span><br><span class="line">&#39;host&#39;     &#x3D;&gt; DB_HOST,     &#x2F;&#x2F; If port is other than 3306, use host:port.</span><br><span class="line">&#39;user&#39;     &#x3D;&gt; DB_USER,</span><br><span class="line">&#39;password&#39; &#x3D;&gt; DB_PASSWORD,</span><br><span class="line">&#39;name&#39;     &#x3D;&gt; DB_NAME,</span><br><span class="line">));</span><br><span class="line"></span><br><span class="line">&#x2F;**</span><br><span class="line">* This adds the same server again, only this time it is configured as a slave.</span><br><span class="line">* The last three parameters are set to the defaults but are shown for clarity.</span><br><span class="line">*&#x2F;</span><br><span class="line">$wpdb-&gt;add_database(array(</span><br><span class="line">&#39;host&#39;     &#x3D;&gt; &#39;node1.local&#39;,     &#x2F;&#x2F; If port is other than 3306, use host:port.</span><br><span class="line">&#39;user&#39;     &#x3D;&gt; DB_USER,</span><br><span class="line">&#39;password&#39; &#x3D;&gt; DB_PASSWORD,</span><br><span class="line">&#39;name&#39;     &#x3D;&gt; DB_NAME,</span><br><span class="line">&#39;write&#39;    &#x3D;&gt; 0,</span><br><span class="line">&#39;read&#39;     &#x3D;&gt; 1,</span><br><span class="line">&#39;dataset&#39;  &#x3D;&gt; &#39;global&#39;,</span><br><span class="line">&#39;timeout&#39;  &#x3D;&gt; 0.2,</span><br><span class="line">));</span><br><span class="line"></span><br><span class="line">$wpdb-&gt;add_database(array(</span><br><span class="line">&#39;host&#39;     &#x3D;&gt; &#39;node2.local&#39;,     &#x2F;&#x2F; If port is other than 3306, use host:port.</span><br><span class="line">&#39;user&#39;     &#x3D;&gt; DB_USER,</span><br><span class="line">&#39;password&#39; &#x3D;&gt; DB_PASSWORD,</span><br><span class="line">&#39;name&#39;     &#x3D;&gt; DB_NAME,</span><br><span class="line">&#39;write&#39;    &#x3D;&gt; 0,</span><br><span class="line">&#39;read&#39;     &#x3D;&gt; 1,</span><br><span class="line">&#39;dataset&#39;  &#x3D;&gt; &#39;global&#39;,</span><br><span class="line">&#39;timeout&#39;  &#x3D;&gt; 0.2,</span><br><span class="line">));</span><br><span class="line"></span><br><span class="line">&#x2F;**</span><br><span class="line">* Sample replication lag detection configuration.</span><br><span class="line">*</span><br><span class="line">* We use mk-heartbeat (http:&#x2F;&#x2F;www.maatkit.org&#x2F;doc&#x2F;mk-heartbeat.html)</span><br><span class="line">* to detect replication lag.</span><br><span class="line">*</span><br><span class="line">* This implementation requires the database user</span><br><span class="line">* to have read access to the heartbeat table.</span><br><span class="line">*</span><br><span class="line">* The cache uses shared memory for portability.</span><br><span class="line">* Can be modified to work with Memcached, APC and etc.</span><br><span class="line">*&#x2F;</span><br><span class="line"></span><br><span class="line">&#x2F;*</span><br><span class="line"></span><br><span class="line">$wpdb-&gt;lag_cache_ttl &#x3D; 30;</span><br><span class="line">$wpdb-&gt;shmem_key &#x3D; ftok( __FILE__, &quot;Y&quot; );</span><br><span class="line">$wpdb-&gt;shmem_size &#x3D; 128 * 1024;</span><br><span class="line"></span><br><span class="line">$wpdb-&gt;add_callback( &#39;get_lag_cache&#39;, &#39;get_lag_cache&#39; );</span><br><span class="line">$wpdb-&gt;add_callback( &#39;get_lag&#39;,       &#39;get_lag&#39; );</span><br><span class="line"></span><br><span class="line">function get_lag_cache( $wpdb ) &#123;</span><br><span class="line">    $segment &#x3D; shm_attach( $wpdb-&gt;shmem_key, $wpdb-&gt;shmem_size, 0600 );</span><br><span class="line">    $lag_data &#x3D; @shm_get_var( $segment, 0 );</span><br><span class="line">    shm_detach( $segment );</span><br><span class="line"></span><br><span class="line">    if ( !is_array( $lag_data ) || !is_array( $lag_data[ $wpdb-&gt;lag_cache_key ] ) )</span><br><span class="line">        return false;</span><br><span class="line"></span><br><span class="line">    if ( $wpdb-&gt;lag_cache_ttl &lt; time() - $lag_data[ $wpdb-&gt;lag_cache_key ][ &#39;timestamp&#39; ] )</span><br><span class="line">        return false;</span><br><span class="line"></span><br><span class="line">    return $lag_data[ $wpdb-&gt;lag_cache_key ][ &#39;lag&#39; ];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">function get_lag( $wpdb ) &#123;</span><br><span class="line">    $dbh &#x3D; $wpdb-&gt;dbhs[ $wpdb-&gt;dbhname ];</span><br><span class="line"></span><br><span class="line">    if ( !mysql_select_db( &#39;heartbeat&#39;, $dbh ) )</span><br><span class="line">        return false;</span><br><span class="line">    $result &#x3D; mysql_query( &quot;SELECT UNIX_TIMESTAMP() - UNIX_TIMESTAMP(ts) AS lag FROM heartbeat LIMIT 1&quot;, $dbh );</span><br><span class="line">    if ( !$result || false &#x3D;&#x3D;&#x3D; $row &#x3D; mysql_fetch_assoc( $result ) )</span><br><span class="line">        return false;</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F; Cache the result in shared memory with timestamp</span><br><span class="line">    $sem_id &#x3D; sem_get( $wpdb-&gt;shmem_key, 1, 0600, 1 ) ;</span><br><span class="line">    sem_acquire( $sem_id );</span><br><span class="line">    $segment &#x3D; shm_attach( $wpdb-&gt;shmem_key, $wpdb-&gt;shmem_size, 0600 );</span><br><span class="line">    $lag_data &#x3D; @shm_get_var( $segment, 0 );</span><br><span class="line"></span><br><span class="line">    if ( !is_array( $lag_data ) )</span><br><span class="line">        $lag_data &#x3D; array();</span><br><span class="line"></span><br><span class="line">    $lag_data[ $wpdb-&gt;lag_cache_key ] &#x3D; array( &#39;timestamp&#39; &#x3D;&gt; time(), &#39;lag&#39; &#x3D;&gt; $row[ &#39;lag&#39; ] );</span><br><span class="line">    shm_put_var( $segment, 0, $lag_data );</span><br><span class="line">    shm_detach( $segment );</span><br><span class="line">    sem_release( $sem_id );</span><br><span class="line"></span><br><span class="line">    return $row[ &#39;lag&#39; ];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">*&#x2F;</span><br><span class="line">&#x2F;&#x2F; The ending PHP tag is omitted. This is actually safer than including it.</span><br></pre></td></tr></table></figure>
+<p>重點在其中的$wpdb-&gt;add_database 敘述，第一個敘述將 Wordpress 現有的資料庫連線作為預設，<br>
+只有這個的話，行為跟沒有安裝 HyperDB 應該一樣。後兩個敘述，就是把 node1.local<br>
+跟 node2.local 這兩個資料庫加入成為唯讀的連線設定。</p>
+<h3 id="修改-wp-config-php">修改 wp-config.php</h3>
+<p>修改 wp-config.php 檔案，在最後加上下列敘述:</p>
+<figure class="highlight plain"><figcaption><span>.php&#125;</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">require_once(ABSPATH . &#39;db-config.php&#39;);</span><br></pre></td></tr></table></figure>
+
+            
+
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">標籤</span><br/>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tag/hyperdb/" rel="tag">HyperDB</a> <a class="tag tag--primary tag--small t-link" href="/tag/wordpress/" rel="tag">WordPress</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/post/2012/04/create-lnmp-environment-with-nginx/"
+                    data-tooltip="在 Linode 上使用 Nginx 架設 LNMP 環境"
+                    aria-label="上一篇: 在 Linode 上使用 Nginx 架設 LNMP 環境"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/post/2012/04/build-cluster-filesystem-with-glusterfs-ubuntu/"
+                    data-tooltip="使用 GlusterFS 在 Ubuntu 上建構雙節點叢集檔案系統"
+                    aria-label="下一篇: 使用 GlusterFS 在 Ubuntu 上建構雙節點叢集檔案系統"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://samkuo.me/post/2012/04/scale-wordpress-with-hyperdb/"
+                    title="分享到 Facebook"
+                    aria-label="分享到 Facebook"
+                >
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://twitter.com/intent/tweet?text=https://samkuo.me/post/2012/04/scale-wordpress-with-hyperdb/"
+                    title="分享到 Twitter"
+                    aria-label="分享到 Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#disqus_thread"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript" target="_blank" rel="noopener">comments powered by Disqus.</a></noscript>
+</div>
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2020 Sampot (山姆鍋). All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/post/2012/04/create-lnmp-environment-with-nginx/"
+                    data-tooltip="在 Linode 上使用 Nginx 架設 LNMP 環境"
+                    aria-label="上一篇: 在 Linode 上使用 Nginx 架設 LNMP 環境"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/post/2012/04/build-cluster-filesystem-with-glusterfs-ubuntu/"
+                    data-tooltip="使用 GlusterFS 在 Ubuntu 上建構雙節點叢集檔案系統"
+                    aria-label="下一篇: 使用 GlusterFS 在 Ubuntu 上建構雙節點叢集檔案系統"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://samkuo.me/post/2012/04/scale-wordpress-with-hyperdb/"
+                    title="分享到 Facebook"
+                    aria-label="分享到 Facebook"
+                >
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://twitter.com/intent/tweet?text=https://samkuo.me/post/2012/04/scale-wordpress-with-hyperdb/"
+                    title="分享到 Twitter"
+                    aria-label="分享到 Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#disqus_thread"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://www.facebook.com/sharer/sharer.php?u=https://samkuo.me/post/2012/04/scale-wordpress-with-hyperdb/"
+                        aria-label="分享到 Facebook"
+                    >
+                        <i class="fab fa-facebook" aria-hidden="true"></i><span>分享到 Facebook</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://twitter.com/intent/tweet?text=https://samkuo.me/post/2012/04/scale-wordpress-with-hyperdb/"
+                        aria-label="分享到 Twitter"
+                    >
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>分享到 Twitter</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/images/logo.png" alt="作者的圖片"/>
+        
+            <h4 id="about-card-name">Sampot (山姆鍋)</h4>
+        
+            <div id="about-card-bio"><p>個人部落格， 記錄與分享一些軟體開發與運營相關資訊， 偶爾也會碎念一下</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>IT 自由工作者</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                台灣/台北
+            </div>
+        
+    </div>
+</div>
+
+        
+            <div id="algolia-search-modal" class="modal-container">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="close-button"><i class="fa fa-times"></i></span>
+            <a href="https://algolia.com" target="_blank" rel="noopener" class="searchby-algolia text-color-light link-unstyled">
+                <span class="searchby-algolia-text text-color-light text-small">by</span>
+                <img class="searchby-algolia-logo" src="/assets/images/logo-algolia-nebula-blue-full.svg">
+            </a>
+            <i class="search-icon fa fa-search"></i>
+            <form id="algolia-search-form">
+                <input type="text" id="algolia-search-input" name="search"
+                    class="form-control input--large search-input" placeholder="Search "
+                    />
+            </form>
+        </div>
+        <div class="modal-body">
+            <div class="no-result text-color-light text-center">沒有找到文章</div>
+            <div class="results">
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2012/03/set-up-mysql-master-master-replication/"
+                            aria-label=": 設定 MySQL Master-Master 複製"
+                        >
+                            <h3 class="media-heading">設定 MySQL Master-Master 複製</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2012年3月3日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>本文簡單說明如何設定兩台 MySQL<br>
+server，讓它們彼此互相備份資料(Master-master<br>
+模式)。雖然這樣的設定通常是支援高可用性(high availability)<br>
+平台的一部分，但本文不包含如何完成其他 HA 的工作。設定兩台 MySQL 伺服器互相備份，主要目的就是要確認資料的安全性；同時也提高可用性。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2012/04/use-pacemaker-two-node-ha-cluster/"
+                            aria-label=": 使用Pacemaker 建構雙節點叢集系統"
+                        >
+                            <h3 class="media-heading">使用Pacemaker 建構雙節點叢集系統</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2012年4月6日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>想要達到系統高可用性(high availability)的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2012/04/build-cluster-filesystem-with-glusterfs-ubuntu/"
+                            aria-label=": 使用 GlusterFS 在 Ubuntu 上建構雙節點叢集檔案系統"
+                        >
+                            <h3 class="media-heading">使用 GlusterFS 在 Ubuntu 上建構雙節點叢集檔案系統</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2012年4月23日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案(圖檔, CSS 等等)可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點(single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2012/04/scale-wordpress-with-hyperdb/"
+                            aria-label=": 使用 HyperDB 加強 WordPress 網站的資料庫擴充性"
+                        >
+                            <h3 class="media-heading">使用 HyperDB 加強 WordPress 網站的資料庫擴充性</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2012年4月23日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>對於流量高的 Wordpress 網站來說，資料庫往往是第一個出現的瓶頸。針對資料庫擴充性的問題，本文介紹 HyperDB 這個解決方案。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2012/04/create-lnmp-environment-with-nginx/"
+                            aria-label=": 在 Linode 上使用 Nginx 架設 LNMP 環境"
+                        >
+                            <h3 class="media-heading">在 Linode 上使用 Nginx 架設 LNMP 環境</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2012年4月30日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>Apache HTTPd 是很好的網站伺服器，但是對於 CPU 跟記憶體的要求較高，對於架設在 VPS 上面網站來說， 需要一個更輕量級的解決方案。越來越多人選擇使用 Nginx 架設網站，主要考量便是它的快速、穩定以及輕量的特性。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2012/05/support-sending-mail-php-linux-vps-exim/"
+                            aria-label=": Linux VPS PHP 網站可以發送信件"
+                        >
+                            <h3 class="media-heading">Linux VPS PHP 網站可以發送信件</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2012年5月8日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>PHP 架站軟體通常需要用到寄信功能，例如：通知站長有新的迴響需要審核。使用虛擬主機來架站的讀者一定會納悶：<br>
+不管是 WordPress，Drupal 或者其他 PHP<br>
+架站軟體不是都不用另外設定就可以寄信？為什麼需要特地提到這件事情。<br>
+話說山姆鍋的主機採用的是 Linode VPS，很多事情都需要自己來，唉！<br>
+如果您的網站主機跟山姆鍋一樣是 VPS 或者專屬伺服器，那這篇文章也許對您有幫助。<br>
+由於不是要做為公司的郵件伺服器，山姆鍋希望除了讓 PHP 架站軟體送信外，不再作其它用途。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2013/04/start-up/"
+                            aria-label=": 影化身科技有限公司成立"
+                        >
+                            <h3 class="media-heading">影化身科技有限公司成立</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2013年4月24日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>2013 年 4 月 24 日，影化身科技有限公司登記成立，致力於提供雲端服務平台。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2013/05/shi-yong-octopresszuo-wei-bo-ke-ping-tai/"
+                            aria-label=": 使用 Octopress 作為部落格平台"
+                        >
+                            <h3 class="media-heading">使用 Octopress 作為部落格平台</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2013年5月23日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>由於沒有需要太多動態功能，所以，嘗試使用靜態部落格平台 Octopress 來寫文章。「艾米部落」<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup> 一路從 Joomla, Drupal, WordPress 到現在的 Octopress，也算是換了不少平台。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2013/05/use-static-site-generator-for-company-site/"
+                            aria-label=": 使用靜態網頁產生器來管理公司網站"
+                        >
+                            <h3 class="media-heading">使用靜態網頁產生器來管理公司網站</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2013年5月28日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>對於不需要動態功能的網站而言，使用像是 Drupal、WordPress 之類的架站軟體，感覺有點大材小用。對於可以接受不使用「所見即所得」編輯器的人，靜態網站產生器應該是個可以接受的方案。 雖說是靜態網站，缺少很多功能，但像是公司或者行銷網站往往也不需要這些。況且， 靜態網站有諸多動態網站所沒有的功能，如：</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2013/05/exchange-name-card-with-eavatar-me/"
+                            aria-label=": 如何利用「我．影化身」服務交換名片"
+                        >
+                            <h3 class="media-heading">如何利用「我．影化身」服務交換名片</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2013年5月29日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>今天從 MR JAMIE 上讀到一篇文章：「從今天開始，請 email 你的名片給我吧！」這讓我想到，與其使用 Email，使用「我．影化身」來代替，不是也很適當？</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+            </div>
+        </div>
+        <div class="modal-footer">
+            <p class="results-count text-medium"
+                data-message-zero="沒有找到文章"
+                data-message-one="找到 1 篇文章"
+                data-message-other="找到 {n} 篇文章">
+                找到 122 篇文章
+            </p>
+        </div>
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+
+<script src="/assets/js/jquery.js"></script>
+
+
+<script src="/assets/js/jquery.fancybox.js"></script>
+
+
+<script src="/assets/js/thumbs.js"></script>
+
+
+<script src="/assets/js/tranquilpeak.js"></script>
+
+<!--SCRIPTS END-->
+
+
+    
+        <script>
+          var disqus_config = function() {
+            this.page.url = 'https://samkuo.me/post/2012/04/scale-wordpress-with-hyperdb/';
+              
+            this.page.identifier = 'post/2012/04/scale-wordpress-with-hyperdb/';
+              
+          };
+          (function() {
+            var d = document, s = d.createElement('script');
+            var disqus_shortname = 'sampotkuo';
+            s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+          })();
+        </script>
+    
+
+
+
+    
+<script src="/assets/js/moment-with-locales.js"></script>
+
+    
+<script src="/assets/js/algoliasearch.js"></script>
+
+    <script>
+      var algoliaClient = algoliasearch('OIWK4CBFS4', 'f676051199368fe5f161c9012b7edaf6');
+      var algoliaIndex = algoliaClient.initIndex('MyBlogIndex');
+    </script>
+
+
+    </body>
+</html>

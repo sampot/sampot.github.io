@@ -1,0 +1,122 @@
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import, print_function
+
+import os
+import time
+import urllib2
+import av
+import threading
+from Queue import Queue
+
+OUTPUT_FOLDER = os.path.abspath('./webroot/live')
+
+interrupted = False
+
+
+class SegmentSubmitter(threading.Thread):
+
+    def __init__(self):
+        super(SegmentSubmitter, self).__init__()
+        self.queue = Queue()
+        self.setDaemon(True)
+
+    def put_item(self, item):
+        self.queue.put_nowait(item)
+
+    def run(self):
+        print("Submitter started.")
+        while True:
+            item = self.queue.get()
+            if len(item) == 0:
+                break
+
+            print("Submitting %s" % item[0])
+            url = 'http://127.0.0.1:8080/publish/%s/%f' % item
+            try:
+                content = urllib2.urlopen(url=url).read()
+            except urllib2.URLError:
+                pass
+
+
+def gen_segment(filename, source, bit_rate=1000000, vcodec='h264',
+                pix_fmt='yuv420p', frame_rate=20, duration=2):
+    global interrupted
+
+    out_filename = os.path.join(OUTPUT_FOLDER, filename)
+    output = av.open(out_filename, 'w')
+
+    outs = output.add_stream(vcodec, str(frame_rate))
+    outs.bit_rate = bit_rate
+    outs.pix_fmt = pix_fmt
+    outs.width = 640
+    outs.height = 480
+    secs_per_frame = 1.0 / frame_rate
+    frame_count = 0
+    segment_start_time = time.time()
+
+    while True:
+        start_time = time.time()
+        packet = source.next()
+
+        for frame in packet.decode():
+            frame.pts = None
+            out_packet = outs.encode(frame)
+            frame_count += 1
+            if out_packet:
+                output.mux(out_packet)
+
+        if (time.time() - segment_start_time) > duration:
+            break
+
+        time_to_wait = start_time + secs_per_frame - time.time()
+        if time_to_wait > 0:
+            try:
+                time.sleep(time_to_wait)
+            except KeyboardInterrupt:
+                interrupted = True
+                break
+
+    while True:
+        out_packet = outs.encode()
+        if out_packet:
+            frame_count += 1
+            output.mux(out_packet)
+        else:
+            break
+
+    output.close()
+
+    segment_duration = time.time() - segment_start_time
+    return segment_duration, frame_count
+
+
+def publish(source):
+    global interrupted
+
+    num_segments = 0
+    submitter = SegmentSubmitter()
+    submitter.start()
+
+    stream = next(s for s in source.streams if s.type == 'video')
+    it = source.demux(stream)
+
+    while not interrupted:
+        filename = 'seg-%d.ts' % num_segments
+        print("Generating segment: %s" % filename)
+        num_segments += 1
+        duration, frame_count = gen_segment(filename, it)
+        print("Segment generated: (%s, %f, %d)" %
+              (filename, duration, frame_count))
+        submitter.put_item((filename, duration))
+
+
+def main():
+    source = av.open(format='avfoundation', file='0')
+    #source = av.open(file='movie.mp4', 'r')
+
+    print("Number of streams in source: %d" % len(source.streams))
+
+    publish(source)
+
+if __name__ == '__main__':
+    main()

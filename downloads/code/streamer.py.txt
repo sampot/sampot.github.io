@@ -1,0 +1,79 @@
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import, print_function
+
+import os
+from collections import deque
+
+from gevent import monkey; monkey.patch_all()
+from bottle import route, run, static_file, request, response, hook
+
+WEBROOT = os.path.abspath('./webroot')
+
+LIVE_MEDIA_FOLDER = os.path.join(WEBROOT, 'live')
+
+ROLLING_WINDOW = 10
+playlist = deque(maxlen=ROLLING_WINDOW)
+
+published_segments = 0
+
+
+@hook('after_request')
+def no_cache():
+    response.set_header('Cache-Control', 'no-cache, no-store, must-revalidate')
+    response.set_header('Pragma', 'no-cache')
+    response.set_header('Expires', '0')
+
+
+@route('/stream.m3u8')
+def live_stream_meta():
+    global playlist
+    global published_segments
+
+    print("Serve playlist")
+    response.content_type = 'application/x-mpegURL'
+
+    result = list()
+    result.append('#EXTM3U\n')
+    result.append('#EXT-X-VERSION:3\n')
+    # result.append('#EXT-X-PLAYLIST-TYPE:EVENT\n')
+    result.append('#EXT-X-TARGETDURATION:3\n')
+
+    if len(playlist) == 0:
+        result.append('#EXT-X-MEDIA-SEQUENCE:0\n')
+    else:
+        sequence = playlist[0][2]
+        result.append('#EXT-X-MEDIA-SEQUENCE:%d\n' % sequence)
+
+    for name, duration, sequence in playlist:
+        result.append('#EXTINF:%s,\n' % duration)
+        result.append('/live/%s\n' % name)
+    # result.append('#EXT-X-ENDLIST')
+    print(result)
+    return result
+
+
+@route('/live/<filename>')
+def live_stream_data(filename):
+    print("Serve stream data:", filename)
+    response.content_type = 'video/mp2t'
+    in_file = os.path.join(LIVE_MEDIA_FOLDER, filename)
+    with open(in_file) as f:
+        return f.read()
+
+
+@route('/publish/<filename:path>/<duration>')
+def publish(filename, duration):
+    global playlist
+    global published_segments
+    playlist.append((filename, duration, published_segments))
+    print("Published segment:(%s, %s)" % (filename, duration))
+    published_segments += 1
+
+
+
+def main():
+    run(host='0.0.0.0', port=8080, server='gevent')
+
+
+if __name__ == '__main__':
+    main()
