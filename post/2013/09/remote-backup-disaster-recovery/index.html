@@ -19,7 +19,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"大部份人應該都知道，重要資料要定期備份，不然往往一個硬碟損毀或者其他原因導致資料再也救不回來，那種鬱悶有時會讓人想跳樓。本文山姆鍋介紹一個利用 QNAP NAS 以及 Symform 雲端備份服務來達到資料異地備援的目的。本文屬於 「善用雲端服務，微型企業的自強之道」系列的文章之一。\n\n為什麼需要異地備援？\n不管對於個人或者公司，一定有些重要資料不想或者不能遺失。針對這些資料通常會（定期）進行備份，但有些人往往會忽略災難性事件所帶來的資料損失。什麼是災難性事件？像是火災、地震等天災人禍導致一棟建築甚至一個區域毀滅的事件，如果備份跟原始資料都在同一個區域，對於這類災難性事件並沒有太大的防護。所以，需要將資料備份到遠端不同的地點去。\n異地備源的選擇\n除了自行在遠端資料中心建置備份方案外，現在很多公司都知道可以利用雲端儲存/備份服務來降低異地備援的門檻，像是 Amazon S3, Amazon Glacier, Dropbox 都是不錯的方案。雖然這些雲端服務大都有提供免費的額度，但對於山姆鍋這種需要備份大量資料的人，每個月的費用也是不小的開銷。\n有沒有免費/便宜的支援大量資料備份的雲端服務？山姆鍋發現了一個這樣的服務，前提是您本身已經有使用本地備援方案，像是 NAS。因為性價比不錯，山姆鍋早先就有使用 QNAP NAS 作為本地資料備份的設備，在最近一次的韌體更新中，發現它整合了 symform這個雲端備份服務。\n運作原理\nQNAP NAS 作為本地備份裝置實在沒有太多可以挑剔，加上對 symform 的整合，基本上是不二選擇。為什麼 symform 這麼特別？因為它允許您用您多出來的儲存空間來交換遠端備份的容量，比例是 2:1。也就是說，您可以使用 2GB 的本地備份空間來免費交換 1GB 遠端備份容量。\n您可以指定 QNAP NAS 中特定的目錄要同步到 symform 雲端儲存空間，這樣只要該目錄有新增或刪除的檔案就會反映到雲端空間去。symform 並不是一個像 Dropbox 一樣可以讓您在不同裝置方便同步檔案的方案，基本上，它只提供備份功能。也就是說，主要用途在您不小心刪除檔案，而本地備份也已經不在的情況下。這樣的話，使用到的機會不是很低？當然，這只是個保險，畢竟天災人禍不應該常常發生，不過一旦發生卻可能會讓公司就此一蹶不振！\n復原本地備份裝置\n如果本地備份裝置故障，需要使用新的裝置來還原。基本做法是：\n\n取得新的 QNAP NAS 裝置。\n讓此裝置支援 symform 服務。\n設定 symform 服務時，選擇要回復整個裝置。\n等待目錄同步完成。\n\n復原刪除的檔案\n要復原刪除的檔案，只要從 QNAP NAS 進行即可。在文章的開頭就說了，這是資料異地備援方案，可不是本地備份。\n小結\n因為方便且價格合理，現在大部份的公司都有使用 NAS 來作為備份裝置，但如果資料都放在同一個區域卻讓人無法放心。所以，謹慎的公司會採用異地備源來避免天災人禍所導致的資料損失。本文山姆鍋介紹 QNAP NAS 與 symform 雲端備份服務整合，作為一個廉價的資料異地備援方案。完整的異地備源當然不止包含資料的部分，但是資料卻是其他備援重要的基礎。\n","dateCreated":"2013-09-09T10:41:00+08:00","dateModified":"2020-03-08T10:11:27+08:00","datePublished":"2013-09-09T10:41:00+08:00","description":"大部份人應該都知道，重要資料要定期備份，不然往往一個硬碟損毀或者其他原因導致資料再也救不回來，那種鬱悶有時會讓人想跳樓。本文山姆鍋介紹一個利用 QNAP NAS 以及 Symform 雲端備份服務來達到資料異地備援的目的。本文屬於 「善用雲端服務，微型企業的自強之道」系列的文章之一。","headline":"微型企業之雲端資料備援服務 - Symform","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/09/remote-backup-disaster-recovery/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2013/09/remote-backup-disaster-recovery/","keywords":"Backup, Disaster recovery, Symform"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"/images/logo32.png"},"articleBody":"大部份人應該都知道，重要資料要定期備份，不然往往一個硬碟損毀或者其他原因導致資料再也救不回來，那種鬱悶有時會讓人想跳樓。本文山姆鍋介紹一個利用 QNAP NAS 以及 Symform 雲端備份服務來達到資料異地備援的目的。本文屬於 「善用雲端服務，微型企業的自強之道」系列的文章之一。\n\n為什麼需要異地備援？\n不管對於個人或者公司，一定有些重要資料不想或者不能遺失。針對這些資料通常會（定期）進行備份，但有些人往往會忽略災難性事件所帶來的資料損失。什麼是災難性事件？像是火災、地震等天災人禍導致一棟建築甚至一個區域毀滅的事件，如果備份跟原始資料都在同一個區域，對於這類災難性事件並沒有太大的防護。所以，需要將資料備份到遠端不同的地點去。\n異地備源的選擇\n除了自行在遠端資料中心建置備份方案外，現在很多公司都知道可以利用雲端儲存/備份服務來降低異地備援的門檻，像是 Amazon S3, Amazon Glacier, Dropbox 都是不錯的方案。雖然這些雲端服務大都有提供免費的額度，但對於山姆鍋這種需要備份大量資料的人，每個月的費用也是不小的開銷。\n有沒有免費/便宜的支援大量資料備份的雲端服務？山姆鍋發現了一個這樣的服務，前提是您本身已經有使用本地備援方案，像是 NAS。因為性價比不錯，山姆鍋早先就有使用 QNAP NAS 作為本地資料備份的設備，在最近一次的韌體更新中，發現它整合了 symform這個雲端備份服務。\n運作原理\nQNAP NAS 作為本地備份裝置實在沒有太多可以挑剔，加上對 symform 的整合，基本上是不二選擇。為什麼 symform 這麼特別？因為它允許您用您多出來的儲存空間來交換遠端備份的容量，比例是 2:1。也就是說，您可以使用 2GB 的本地備份空間來免費交換 1GB 遠端備份容量。\n您可以指定 QNAP NAS 中特定的目錄要同步到 symform 雲端儲存空間，這樣只要該目錄有新增或刪除的檔案就會反映到雲端空間去。symform 並不是一個像 Dropbox 一樣可以讓您在不同裝置方便同步檔案的方案，基本上，它只提供備份功能。也就是說，主要用途在您不小心刪除檔案，而本地備份也已經不在的情況下。這樣的話，使用到的機會不是很低？當然，這只是個保險，畢竟天災人禍不應該常常發生，不過一旦發生卻可能會讓公司就此一蹶不振！\n復原本地備份裝置\n如果本地備份裝置故障，需要使用新的裝置來還原。基本做法是：\n\n取得新的 QNAP NAS 裝置。\n讓此裝置支援 symform 服務。\n設定 symform 服務時，選擇要回復整個裝置。\n等待目錄同步完成。\n\n復原刪除的檔案\n要復原刪除的檔案，只要從 QNAP NAS 進行即可。在文章的開頭就說了，這是資料異地備援方案，可不是本地備份。\n小結\n因為方便且價格合理，現在大部份的公司都有使用 NAS 來作為備份裝置，但如果資料都放在同一個區域卻讓人無法放心。所以，謹慎的公司會採用異地備源來避免天災人禍所導致的資料損失。本文山姆鍋介紹 QNAP NAS 與 symform 雲端備份服務整合，作為一個廉價的資料異地備援方案。完整的異地備源當然不止包含資料的部分，但是資料卻是其他備援重要的基礎。\n","dateCreated":"2013-09-09T10:41:00+08:00","dateModified":"2020-03-08T10:11:27+08:00","datePublished":"2013-09-09T10:41:00+08:00","description":"大部份人應該都知道，重要資料要定期備份，不然往往一個硬碟損毀或者其他原因導致資料再也救不回來，那種鬱悶有時會讓人想跳樓。本文山姆鍋介紹一個利用 QNAP NAS 以及 Symform 雲端備份服務來達到資料異地備援的目的。本文屬於 「善用雲端服務，微型企業的自強之道」系列的文章之一。","headline":"微型企業之雲端資料備援服務 - Symform","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/09/remote-backup-disaster-recovery/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"/images/logo32.png","logo":{"@type":"ImageObject","url":"/images/logo32.png"}},"url":"https://samkuo.me/post/2013/09/remote-backup-disaster-recovery/","keywords":"Backup, Disaster recovery, Symform"}</script>
     <meta name="description" content="山姆鍋在使用，作為災難還原一環的資料異地備援。">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="微型企業之雲端資料備援服務 - Symform">
@@ -43,23 +43,14 @@
         
     
     
-        <meta property="og:image" content="https://samkuo.me/images/logo.png"/>
+        <meta property="og:image" content="https://www.gravatar.com/avatar/2b44878cb27d093ac9c72a495ea642cf?s=640"/>
     
     
     
     
     <!--STYLES-->
     
-<link rel="stylesheet" href="/assets/css/all.css">
-
-    
-<link rel="stylesheet" href="/assets/css/jquery.fancybox.css">
-
-    
-<link rel="stylesheet" href="/assets/css/thumbs.css">
-
-    
-<link rel="stylesheet" href="/assets/css/tranquilpeak.css">
+<link rel="stylesheet" href="/assets/css/style-qlm634aeqqh4pedhidwvikqi59e0o7qckfid1geequyx9cyxw5rqjplgvt1t.min.css">
 
     <!--STYLES END-->
     
@@ -93,6 +84,7 @@
             href="/"
             aria-label=""
         >
+        <img class="header-avatar-picture" src="/images/logo32.png" alt="作者的圖片" />
             我是山姆鍋
         </a>
     </div>
@@ -114,8 +106,6 @@
             <!-- Define author's picture -->
 
 
-
-        
     
 
 <nav id="sidebar" data-behavior="4">
@@ -126,7 +116,7 @@
                     href="/#about"
                     aria-label="閱讀有關作者的更多信息"
                 >
-                    <img class="sidebar-profile-picture" src="/images/logo.png" alt="作者的圖片"/>
+                    <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/2b44878cb27d093ac9c72a495ea642cf?s=110" alt="作者的圖片"/>
                 </a>
                 <h4 class="sidebar-profile-name">Sampot (山姆鍋)</h4>
                 
@@ -456,7 +446,7 @@
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Share this post"
+                aria-label="Diesen Beitrag teilen"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -494,7 +484,7 @@
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Leave a comment"
+                        aria-label="Kommentieren"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -503,7 +493,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -572,7 +562,7 @@
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Share this post"
+                aria-label="Diesen Beitrag teilen"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -610,7 +600,7 @@
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Leave a comment"
+                        aria-label="Kommentieren"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -619,7 +609,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -670,8 +660,6 @@
 
 
     
-        
-    
 
 <div id="about">
     <div id="about-card">
@@ -679,7 +667,7 @@
             <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="/images/logo.png" alt="作者的圖片"/>
+            <img id="about-card-picture" src="https://www.gravatar.com/avatar/2b44878cb27d093ac9c72a495ea642cf?s=110" alt="作者的圖片"/>
         
             <h4 id="about-card-name">Sampot (山姆鍋)</h4>
         
@@ -980,16 +968,7 @@ server，讓它們彼此互相備份資料(Master-master<br>
 <div id="cover" style="background-image:url('/images/cover.jpg');"></div>
         <!--SCRIPTS-->
 
-<script src="/assets/js/jquery.js"></script>
-
-
-<script src="/assets/js/jquery.fancybox.js"></script>
-
-
-<script src="/assets/js/thumbs.js"></script>
-
-
-<script src="/assets/js/tranquilpeak.js"></script>
+<script src="/assets/js/script-kkzt2vzfxsb5bych7gew3tzpzddvyjfn0sutkf3vixujdxhpjr4ifnekp3si.min.js"></script>
 
 <!--SCRIPTS END-->
 

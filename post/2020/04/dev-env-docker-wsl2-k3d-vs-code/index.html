@@ -17,7 +17,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"\n前言\n山姆鍋主要的開發機是 15 吋的 MacBook Pro, 但為了工作方便攜帶也買了一台 Surface Pro。當初為了能夠在這台 Surface Pro 執行 Docker Desktop, 還特地選了 Windows 10 Professtional 版本(支援 Hyper-V 虛擬技術)，但 Surface Pro 記憶體只有 4GB, 導致就算 Docker Desktop 跑起來了，也沒有多少資源可以用於開發用途，只能用來進行遠端運維工作。最近發現 Docker Desktop Edge 版本支援 WSL 2 作為後端，除了執行效能提高，記憶體也可以跟其它程式共用，因此興起重新折騰這台 Surface Pro 的念頭。\n本文旨在說明山姆鍋的本機工作環境的主要組成跟各個元件的用途，並非如何安裝的步驟說明。\n目標\n由於工作大多是 Web 應用相關，也習慣採用容器化持續部署方式，山姆鍋希望也以容器化開發環境來使用工作機。 此工作環境需要滿足下列目標：\n\n必須足夠輕量化: 山姆鍋的 Surface Pro CPU 不夠強，記憶體也只有 4GB，因此採用的方案需要可以在此限制下執行。\n支援 Kubernetes: Kubernetes 是 Web 應用的部署環境，需要能夠直接在此工作環境運行。\n接近 MacBook Pro 上的開發模式：由於已經習慣 MacBook 的開發環境，自然希望兩者越接近越好。\n\n基本環境\n本文所提的容器化開發環境，需要工作機已經安裝好支援 WSL 2 的 Windows 系統。 山姆鍋採用的是 Windows 10 Pro 測試人員計畫特別版本。雖然 WSL 2 也有採用虛擬化技術，但 WSL 2 所運行的輕量虛擬機跟 Windows 系統進行效能優化以及高度整合，在效能以及操作便利性上不是直接使用 Hyper-V、Virtualbox 等虛擬機可以比擬。\nWSL 2 相關的安裝說明可以參考 WSL 2 的安裝指示。\n容器化開發環境\n容器化開發環境是以容器來作為開發、建置與發行的主要技術，特別適用於 Web 應用的開發。這個容器化開發環境主要由下面元件組成：\nUbuntu 18.04 WSL 發行版\n從 Windows Store 上安裝 Ubuntu 18.04 的發行版本。 WSL 2 也支援其它 Linux 發行版本，但 Ubuntu 使用較廣泛也是山姆鍋比較熟悉的系統。這個 WSL 2 環境負責運行容器以及作為主要命令列工作環境。\nDocker Desktop Edge\n是整個容器化開發的主要技術核心，提供容器的建置與運行。藉由 WSL 2 的支援讓 Linux 容器可以在 Windows 系統上接近原生的效能執行。由於 Ubuntu 18.04 WSL 不支援 Systemd, 所以如果一啟動就需要的服務也是以容器方式執行，例如：使用容器執行私有的 registry 服務來存放容器映像檔。\n相關連結：Docker Desktop WSL 2 Backend\n\nVisual Studio Code\n除非需要開發行動應用程式，不然 VS Code 就是山姆鍋預設的整合開發環境。VS Code 的 Remote development 套件讓 VS Code 可以使用容器方式來管理開發環境，如此開發者不用再為了不同專案安裝不同版本的程式語言跟環境。\nVS Code 是在 Windows 環境中安裝，需要確定 VS Code 執行檔在 PATH 環境變數中。\nRemote - Containers 擴充套件\n新加入一個專案，工程師往往需要安裝不同工具、套件才能真正開始編譯跟建置程式碼，如果可以讓這樣的準備工作自動化就能夠有效減低進入門檻。VS Code 的 Remote - Containers 套件提供使用容器來作為開發環境，所需要的工具、語言套件都在容器內提供，開發者工作環境不用再安裝各種不同版本的工具與執行環境。由於以描述檔方式紀錄開發環境如何組成與建置，這些描述檔隨同專案程式碼發佈，使用 VS Code 開啟時便會自動建置所需的開發用容器。雖然使用容器作為開發環境可以避免污染工作主機，但缺點是需要花費額外建置容器時間。\n相關參考：Developing inside a Container\nRemote - WSL 擴充套件\n此 VS Code 擴充套件讓開發者可以使用 WSL Linux 發行版本作為完整的開發環境。有了此擴充套件，當從 WSL 環境中執行 code 指令時，會啟動 Windows 版的 VS Code, 而 VS Code 會自動連到 WSL，並使用當下目錄作為工作空間(workspace)，開啟 VS Code terminal 也是執行 WSL 預設的 shell。\n相關參考：Developing in WSL\n下圖是 VS Code 連結到 WSL 的截圖：\n\nK3S\n由 Rancher 所開發的輕量化 Kubernetes 叢集發行版本，在 運用 Multipass 與 K3S 建立 Kubernetes 測試環境 一文中，山姆鍋有對 K3S 的簡短介紹。 相對於官方的 Kubernetes 發行版，K3S 對於記憶體的需求低，主要(master)節點只需要 512MB 記憶體便可以正常運行，因此山姆鍋選擇 K3S 作為開發環境中的 Kubernetes 部署用途。\n\nK3D\n在開發環境，每個專案的 Kubernetes 部署環境組態往往不同，需要個別分開。為了能夠快速建置跟管理各個專案的 K8S 叢集，需要採用 K3D 這個命令列工具。 K3D 將 K3S 叢集部署在一個 Docker 容器中執行，可以同時管理跟執行不同專案的 K3S 環境。\n\nK3D 命令列工具需要在 Windows 以及 WSL 環境中都安裝。理想上，K3D 只需要在 WSL 環境安裝即可，但從 WSL 中執行創建(create) K3S 叢集時後遇到 Permission denied 的錯誤導致無法成功(同樣指令從 Windows 命令列可以正常)。同樣地，在 WSL 中執行 k3d get-kubeconfig 取得的 kubeconfig 設定檔，在執行 kubectl 指令時會出現 certificate signed by unknown authority的錯誤。 k3d 在 WSL 的其它操作都可以正常使用，所以在創建 K3S 叢集跟產生 kubeconfig 檔案時，需要使用 Windows 版的 K3D 命令列工具。 由於 WSL 命令列可以直接啟動 Windows 程式，所以在 WSL 環境中，將 k3d 指令換成 k3d.exe 就可以。\n\nWindows Terminal\nWindows 內建支援的終端機模擬器很陽春，通常會換用其它模擬器，如 wsltty, Windows Terminal, ConEmu, Hyper 等等。 山姆鍋在建置此工作環境時，試過 wsltty 跟 Windows Terminal, 選用 Windows Terminal 主要是因為同時可以支援 「命令列提示字元」、Power Shell 以及 WSL。雖然希望主要都在 Linux 環境下操作命令，但還是不時需要開啟 Windows 命令列來執行一些指令。\n有了好的終端機模擬器，自然跟 MacBook Pro 上一樣選用 Zsh + Oh My Zsh 來作為命令列操作介面。下圖是 Windows Terminal 截圖，畫面顯示的是 Ubuntu 的 Zsh 命令令操作介面，cmd 分頁則是 Windows 的 「命令提示字元」。\n\n\n注意：從 Windows Store 上面安裝的 Windows Terminal Preview 版本會有無法輸入中文的問題，這裡的 Windows Terminal 是透過 Scoop 安裝。\n\n\n2020/4/30 Edit: 後來重新從 Windows Store 安裝 Windows Terminal Preview 又可以正常顯示與輸入中文。建議優先使用 Windows Store 的版本。\n\n為何不直接裝 Ubuntu?\n雖然有在 Surface Pro 上直接安裝 Ubuntu 系統的想法，但其實還是蠻需要這台 Surface Pro 可以執行一些 Windows 應用，所以折衷採用 Windows Subsystem for Linux(WSL)。 WSL 是微軟讓 Windows 系統可以不用虛擬機直接執行原生 Linux 程式的技術，WSL 1 雖然可以稱職地執行 Ubuntu 多數的命令列程式，對於運維是綽綽有餘，但由於 I/O 效能太差，拿來開發明顯效率不佳。 WSL 2 採用輕量虛擬化技術重新設計架構，直接在 WSL 中執行 Linux 核心(WSL 1 只是轉換系統呼叫到 Windows 核心)來達到與現有 Linux 更高的相容度(如 Docker 已經可以原生在 WSL 2 中執行)，更重要的是 WSL2 預計只需要 Windows 10 Home 版本就可以支援。雖然聽起來很美好，但是 WSL2 還沒正式發行，需要參加 Windows Insider 計畫才能取得；Docker Desktop 也需要 Edge 版本才有支援 WSL 2。由於不是主要工作環境，拿來試試新技術也無妨啦！\n小結\n當初山姆鍋在推行全端容器化開發時遇到的主要問題是多數的工程師的 Windows 系統都不具備 Hyper-V 虛擬機功能，也就是無法直接執行 Docker Desktop。使用 VirtualBox 效能不佳且耗用系統資源，在前端工程師的推廣上遭遇失敗。隨著技術的演進，山姆鍋又看到一線曙光，也希望 Docker Desktop for WSL2 的正式推出可以讓容器化技術更加地普及。","dateCreated":"2020-04-22T11:32:25+08:00","dateModified":"2020-04-30T10:56:36+08:00","datePublished":"2020-04-22T11:32:25+08:00","description":"Surface Pro 跑得動 Docker + Kubernetes? 採用輕量化虛擬技術加上特別的 K8S 發行套件，答案應該是可行的。本文山姆鍋告訴您可以採用哪些組件來達成。","headline":"Docker Desktop for WSL2 容器化開發環境","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2020/04/dev-env-docker-wsl2-k3d-vs-code/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2020/04/dev-env-docker-wsl2-k3d-vs-code/","keywords":"Docker, WSL2, K3S, K3D, Kubernetes, Container, 容器"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"/images/logo32.png"},"articleBody":"\n前言\n山姆鍋主要的開發機是 15 吋的 MacBook Pro, 但為了工作方便攜帶也買了一台 Surface Pro。當初為了能夠在這台 Surface Pro 執行 Docker Desktop, 還特地選了 Windows 10 Professtional 版本(支援 Hyper-V 虛擬技術)，但 Surface Pro 記憶體只有 4GB, 導致就算 Docker Desktop 跑起來了，也沒有多少資源可以用於開發用途，只能用來進行遠端運維工作。最近發現 Docker Desktop Edge 版本支援 WSL 2 作為後端，除了執行效能提高，記憶體也可以跟其它程式共用，因此興起重新折騰這台 Surface Pro 的念頭。\n本文旨在說明山姆鍋的本機工作環境的主要組成跟各個元件的用途，並非如何安裝的步驟說明。\n目標\n由於工作大多是 Web 應用相關，也習慣採用容器化持續部署方式，山姆鍋希望也以容器化開發環境來使用工作機。 此工作環境需要滿足下列目標：\n\n必須足夠輕量化: 山姆鍋的 Surface Pro CPU 不夠強，記憶體也只有 4GB，因此採用的方案需要可以在此限制下執行。\n支援 Kubernetes: Kubernetes 是 Web 應用的部署環境，需要能夠直接在此工作環境運行。\n接近 MacBook Pro 上的開發模式：由於已經習慣 MacBook 的開發環境，自然希望兩者越接近越好。\n\n基本環境\n本文所提的容器化開發環境，需要工作機已經安裝好支援 WSL 2 的 Windows 系統。 山姆鍋採用的是 Windows 10 Pro 測試人員計畫特別版本。雖然 WSL 2 也有採用虛擬化技術，但 WSL 2 所運行的輕量虛擬機跟 Windows 系統進行效能優化以及高度整合，在效能以及操作便利性上不是直接使用 Hyper-V、Virtualbox 等虛擬機可以比擬。\nWSL 2 相關的安裝說明可以參考 WSL 2 的安裝指示。\n容器化開發環境\n容器化開發環境是以容器來作為開發、建置與發行的主要技術，特別適用於 Web 應用的開發。這個容器化開發環境主要由下面元件組成：\nUbuntu 18.04 WSL 發行版\n從 Windows Store 上安裝 Ubuntu 18.04 的發行版本。 WSL 2 也支援其它 Linux 發行版本，但 Ubuntu 使用較廣泛也是山姆鍋比較熟悉的系統。這個 WSL 2 環境負責運行容器以及作為主要命令列工作環境。\nDocker Desktop Edge\n是整個容器化開發的主要技術核心，提供容器的建置與運行。藉由 WSL 2 的支援讓 Linux 容器可以在 Windows 系統上接近原生的效能執行。由於 Ubuntu 18.04 WSL 不支援 Systemd, 所以如果一啟動就需要的服務也是以容器方式執行，例如：使用容器執行私有的 registry 服務來存放容器映像檔。\n相關連結：Docker Desktop WSL 2 Backend\n\nVisual Studio Code\n除非需要開發行動應用程式，不然 VS Code 就是山姆鍋預設的整合開發環境。VS Code 的 Remote development 套件讓 VS Code 可以使用容器方式來管理開發環境，如此開發者不用再為了不同專案安裝不同版本的程式語言跟環境。\nVS Code 是在 Windows 環境中安裝，需要確定 VS Code 執行檔在 PATH 環境變數中。\nRemote - Containers 擴充套件\n新加入一個專案，工程師往往需要安裝不同工具、套件才能真正開始編譯跟建置程式碼，如果可以讓這樣的準備工作自動化就能夠有效減低進入門檻。VS Code 的 Remote - Containers 套件提供使用容器來作為開發環境，所需要的工具、語言套件都在容器內提供，開發者工作環境不用再安裝各種不同版本的工具與執行環境。由於以描述檔方式紀錄開發環境如何組成與建置，這些描述檔隨同專案程式碼發佈，使用 VS Code 開啟時便會自動建置所需的開發用容器。雖然使用容器作為開發環境可以避免污染工作主機，但缺點是需要花費額外建置容器時間。\n相關參考：Developing inside a Container\nRemote - WSL 擴充套件\n此 VS Code 擴充套件讓開發者可以使用 WSL Linux 發行版本作為完整的開發環境。有了此擴充套件，當從 WSL 環境中執行 code 指令時，會啟動 Windows 版的 VS Code, 而 VS Code 會自動連到 WSL，並使用當下目錄作為工作空間(workspace)，開啟 VS Code terminal 也是執行 WSL 預設的 shell。\n相關參考：Developing in WSL\n下圖是 VS Code 連結到 WSL 的截圖：\n\nK3S\n由 Rancher 所開發的輕量化 Kubernetes 叢集發行版本，在 運用 Multipass 與 K3S 建立 Kubernetes 測試環境 一文中，山姆鍋有對 K3S 的簡短介紹。 相對於官方的 Kubernetes 發行版，K3S 對於記憶體的需求低，主要(master)節點只需要 512MB 記憶體便可以正常運行，因此山姆鍋選擇 K3S 作為開發環境中的 Kubernetes 部署用途。\n\nK3D\n在開發環境，每個專案的 Kubernetes 部署環境組態往往不同，需要個別分開。為了能夠快速建置跟管理各個專案的 K8S 叢集，需要採用 K3D 這個命令列工具。 K3D 將 K3S 叢集部署在一個 Docker 容器中執行，可以同時管理跟執行不同專案的 K3S 環境。\n\nK3D 命令列工具需要在 Windows 以及 WSL 環境中都安裝。理想上，K3D 只需要在 WSL 環境安裝即可，但從 WSL 中執行創建(create) K3S 叢集時後遇到 Permission denied 的錯誤導致無法成功(同樣指令從 Windows 命令列可以正常)。同樣地，在 WSL 中執行 k3d get-kubeconfig 取得的 kubeconfig 設定檔，在執行 kubectl 指令時會出現 certificate signed by unknown authority的錯誤。 k3d 在 WSL 的其它操作都可以正常使用，所以在創建 K3S 叢集跟產生 kubeconfig 檔案時，需要使用 Windows 版的 K3D 命令列工具。 由於 WSL 命令列可以直接啟動 Windows 程式，所以在 WSL 環境中，將 k3d 指令換成 k3d.exe 就可以。\n\nWindows Terminal\nWindows 內建支援的終端機模擬器很陽春，通常會換用其它模擬器，如 wsltty, Windows Terminal, ConEmu, Hyper 等等。 山姆鍋在建置此工作環境時，試過 wsltty 跟 Windows Terminal, 選用 Windows Terminal 主要是因為同時可以支援 「命令列提示字元」、Power Shell 以及 WSL。雖然希望主要都在 Linux 環境下操作命令，但還是不時需要開啟 Windows 命令列來執行一些指令。\n有了好的終端機模擬器，自然跟 MacBook Pro 上一樣選用 Zsh + Oh My Zsh 來作為命令列操作介面。下圖是 Windows Terminal 截圖，畫面顯示的是 Ubuntu 的 Zsh 命令令操作介面，cmd 分頁則是 Windows 的 「命令提示字元」。\n\n\n注意：從 Windows Store 上面安裝的 Windows Terminal Preview 版本會有無法輸入中文的問題，這裡的 Windows Terminal 是透過 Scoop 安裝。\n\n\n2020/4/30 Edit: 後來重新從 Windows Store 安裝 Windows Terminal Preview 又可以正常顯示與輸入中文。建議優先使用 Windows Store 的版本。\n\n為何不直接裝 Ubuntu?\n雖然有在 Surface Pro 上直接安裝 Ubuntu 系統的想法，但其實還是蠻需要這台 Surface Pro 可以執行一些 Windows 應用，所以折衷採用 Windows Subsystem for Linux(WSL)。 WSL 是微軟讓 Windows 系統可以不用虛擬機直接執行原生 Linux 程式的技術，WSL 1 雖然可以稱職地執行 Ubuntu 多數的命令列程式，對於運維是綽綽有餘，但由於 I/O 效能太差，拿來開發明顯效率不佳。 WSL 2 採用輕量虛擬化技術重新設計架構，直接在 WSL 中執行 Linux 核心(WSL 1 只是轉換系統呼叫到 Windows 核心)來達到與現有 Linux 更高的相容度(如 Docker 已經可以原生在 WSL 2 中執行)，更重要的是 WSL2 預計只需要 Windows 10 Home 版本就可以支援。雖然聽起來很美好，但是 WSL2 還沒正式發行，需要參加 Windows Insider 計畫才能取得；Docker Desktop 也需要 Edge 版本才有支援 WSL 2。由於不是主要工作環境，拿來試試新技術也無妨啦！\n小結\n當初山姆鍋在推行全端容器化開發時遇到的主要問題是多數的工程師的 Windows 系統都不具備 Hyper-V 虛擬機功能，也就是無法直接執行 Docker Desktop。使用 VirtualBox 效能不佳且耗用系統資源，在前端工程師的推廣上遭遇失敗。隨著技術的演進，山姆鍋又看到一線曙光，也希望 Docker Desktop for WSL2 的正式推出可以讓容器化技術更加地普及。","dateCreated":"2020-04-22T11:32:25+08:00","dateModified":"2020-04-30T10:56:36+08:00","datePublished":"2020-04-22T11:32:25+08:00","description":"Surface Pro 跑得動 Docker + Kubernetes? 採用輕量化虛擬技術加上特別的 K8S 發行套件，答案應該是可行的。本文山姆鍋告訴您可以採用哪些組件來達成。","headline":"Docker Desktop for WSL2 容器化開發環境","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2020/04/dev-env-docker-wsl2-k3d-vs-code/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"/images/logo32.png","logo":{"@type":"ImageObject","url":"/images/logo32.png"}},"url":"https://samkuo.me/post/2020/04/dev-env-docker-wsl2-k3d-vs-code/","keywords":"Docker, WSL2, K3S, K3D, Kubernetes, Container, 容器"}</script>
     <meta name="description" content="Surface Pro 跑得動 Docker + Kubernetes? 採用輕量化虛擬技術加上特別的 K8S 發行套件，答案應該是可行的。本文山姆鍋告訴您可以採用哪些組件來達成。">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="Docker Desktop for WSL2 容器化開發環境">
@@ -48,23 +48,14 @@
         
     
     
-        <meta property="og:image" content="https://samkuo.me/images/logo.png"/>
+        <meta property="og:image" content="https://www.gravatar.com/avatar/2b44878cb27d093ac9c72a495ea642cf?s=640"/>
     
     
     
     
     <!--STYLES-->
     
-<link rel="stylesheet" href="/assets/css/all.css">
-
-    
-<link rel="stylesheet" href="/assets/css/jquery.fancybox.css">
-
-    
-<link rel="stylesheet" href="/assets/css/thumbs.css">
-
-    
-<link rel="stylesheet" href="/assets/css/tranquilpeak.css">
+<link rel="stylesheet" href="/assets/css/style-qlm634aeqqh4pedhidwvikqi59e0o7qckfid1geequyx9cyxw5rqjplgvt1t.min.css">
 
     <!--STYLES END-->
     
@@ -98,6 +89,7 @@
             href="/"
             aria-label=""
         >
+        <img class="header-avatar-picture" src="/images/logo32.png" alt="作者的圖片" />
             我是山姆鍋
         </a>
     </div>
@@ -119,8 +111,6 @@
             <!-- Define author's picture -->
 
 
-
-        
     
 
 <nav id="sidebar" data-behavior="4">
@@ -131,7 +121,7 @@
                     href="/#about"
                     aria-label="閱讀有關作者的更多信息"
                 >
-                    <img class="sidebar-profile-picture" src="/images/logo.png" alt="作者的圖片"/>
+                    <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/2b44878cb27d093ac9c72a495ea642cf?s=110" alt="作者的圖片"/>
                 </a>
                 <h4 class="sidebar-profile-name">Sampot (山姆鍋)</h4>
                 
@@ -487,7 +477,7 @@
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Share this post"
+                aria-label="Diesen Beitrag teilen"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -525,7 +515,7 @@
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Leave a comment"
+                        aria-label="Kommentieren"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -534,7 +524,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -603,7 +593,7 @@
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Share this post"
+                aria-label="Diesen Beitrag teilen"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -641,7 +631,7 @@
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Leave a comment"
+                        aria-label="Kommentieren"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -650,7 +640,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -701,8 +691,6 @@
 
 
     
-        
-    
 
 <div id="about">
     <div id="about-card">
@@ -710,7 +698,7 @@
             <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="/images/logo.png" alt="作者的圖片"/>
+            <img id="about-card-picture" src="https://www.gravatar.com/avatar/2b44878cb27d093ac9c72a495ea642cf?s=110" alt="作者的圖片"/>
         
             <h4 id="about-card-name">Sampot (山姆鍋)</h4>
         
@@ -1011,16 +999,7 @@ server，讓它們彼此互相備份資料(Master-master<br>
 <div id="cover" style="background-image:url('/images/cover.jpg');"></div>
         <!--SCRIPTS-->
 
-<script src="/assets/js/jquery.js"></script>
-
-
-<script src="/assets/js/jquery.fancybox.js"></script>
-
-
-<script src="/assets/js/thumbs.js"></script>
-
-
-<script src="/assets/js/tranquilpeak.js"></script>
+<script src="/assets/js/script-kkzt2vzfxsb5bych7gew3tzpzddvyjfn0sutkf3vixujdxhpjr4ifnekp3si.min.js"></script>
 
 <!--SCRIPTS END-->
 

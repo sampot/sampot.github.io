@@ -17,7 +17,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"很早之前在寫 QR Code 解碼器的時候就接觸過「糾刪碼」(erasure code)這種技術， 因為 QR Code 有使用到 Reed–Solomon error correction 。雖然知道是數學的運算結果，但至今還是對它的功用感到很神奇！背後的編碼理論已經超過山姆鍋的理解範圍，但撇除背後的數學理論，身為工程師要如何理解糾刪碼，以及作何應用呢？\n\n糾刪碼(erasure code)簡介\n網路上介紹糾刪碼的文章總喜歡講解背後的數學原理，真要了解背後的數學理論才能知道如何應用的話，那只會讓人想打退堂鼓。 所以，山姆鍋在這裏只說明抽象概念 [1]。 簡單地說，糾刪碼是一種演算法，可以將 K 個相同大小的資料區塊(data block)，轉成 (K + M) 個編碼後的區塊，接收者可以從這 (K + M) 個區塊中， 任選 K 個區塊，便足以還原編碼前的 K 個資料區塊。也就是說，它允許最多 M 個資料區塊在傳輸或讀取過程中遺失或錯誤！ 進一步的介紹可以參考這篇：Dummies Guide to Erasure Coding\n糾刪碼的應用情境\n糾刪碼的幾種應用範例：\n\n像 QR Code 這種二維條碼，通常會運用糾刪碼來更正條碼透過光學鏡頭讀取所產生的變形錯誤。\n衛星通訊單向傳輸，由於接收方無法要求重送，使用糾刪碼在有封包遺失的情況下自動更正。\n資料儲存應用中，用來遮蔽(mask)儲存媒體故障造成的讀取錯誤。\n\n為什麼糾刪碼很酷?\n最近糾刪碼會再度引起關注，跟雲端儲存服務(cloud storage service)的崛起有很大的關係。背後的理由很簡單： 為了資料可靠性(reliability)與可用性(availability)，雲端儲存服務通常會儲存同組資料多個備份(通常是 3 份)在不同的裝置，機架，甚至不同的資料中心。 在這樣的組態下，服務允許最多 2 個資料來源發生故障而不遺失資料。在這樣的組態下， 其空間冗餘率是 200%。透過糾刪碼，在(6 + 4)的組態下，除了允許最多任意 4 個資料來源不可用外，其空間冗餘率只有 4/6 ~= 67%，節省的空間比例相當明顯 。\n允許 4 個資料來源不可得是怎樣的概念，對於資料可用性有什麼影響？假設一個資料來源任一時間點可用性為 90%，也就是不可用機率為 10% = 0.1。 對於資料中心的儲存裝置，這個假設可能有點低，但對於點對點的儲存服務，如 Symform，可能就有點高，這也是為何他們會要求參與者保證基本上線時間。 運用基本的機率公式，單一個資料來源不可用的機率既然是 0.1，2 個資料來源 同時 不可用的機率卻變成 0.1 x 0.1 = 0.01，以此類推。 當可以接受 4 個資料來源不可用時，資料不可用的機率只剩下 0.0001，也就是有 99.99%的可用性 [2]，這已經是Ａ級資料中心的要求等級。當然整體資料可用性有許多因素決定，例如：對外網路可用性如果只有 95%，最終資料可用性最高就不會超過 95%。\n既然糾刪碼這麼厲害，為什麼沒有廣泛地被應用在儲存方案中？山姆鍋想得到的原因：\n\n計算糾刪碼很耗 CPU 運算能力。\n當存儲媒體數量不大時， 現有 RAID 技術便足以應付。\n專利問題：除了少數演算法專利已經過期外，其餘都尚有專利存在。\n\n但隨著雲端儲存的流行，其背後龐大的存儲裝置數量驚人，透過糾刪碼技術能夠節省的裝置數量提供很大的經濟誘因。\n現有 Python 糾刪碼程式庫\n想要應用糾刪碼，除非您有非常深厚的編碼學基礎，不然使用別人開發好的程式庫在所難免。底下是幾個山姆鍋所知，可以透過 Python 使用的開源程式庫：\n\n\n\nPyECLib\n底層使用 C 實作; BSD\n授權。支援多種的原生(native)糾刪碼實作，但是相依套件顯然不支援\nWindows，在 Unix-like 的環境編譯也很困難。\n\n\n\n\nzfec\n底層使用 C 實作; GPL 授權。如果 GPL對您不是問題的話，可以考慮。\n\n\n\n\npy_ecc\n純 Python 實現; 不確定授權模式，應該類似 BSD。\n除非只是為了驗證概念，不然使用純 Python 實作無法實際應用。\n\n\n\n假如上述的程式庫，不合乎您的需要的話，請繼續看下一節。\n自行包裝糾刪碼程式庫\n山姆鍋發現一個在 GitHub 上的 Longhair 專案有提供所需的程式碼。 使用 C++ 開發，但提供 C 語言呼叫介面，New BSD 授權，剛好符合需要。 唯一的問題：它不支援 Python 支援！\n還好 Python 的特性之一便是容易整合原生(native)程式庫，這讓我興起自行整合的想法。因為不想學習 Python 完整的 C 擴充介面 [3]，於是山姆鍋選擇 Cython 來進行包裝工作。\n完成的相關程式碼在 GitHub 上。\n測試程式碼\n底下的測試碼示範如何使用 fec_encode 編碼，以及 fec_decode 解碼：\n123456789101112131415161718192021222324252627def test_fec_encode(self):    block_size = 8192    k = 10    m = 4    data = os.urandom(k * block_size)    parity = bytearray(m * block_size)    assert fec_encode(k, m, block_size, data, parity) == 0def test_fec_decode_without_sufficient_blocks(self):    block_size = 8192    k = 10    m = 4    data = os.urandom(k * block_size)    parity = bytearray(m * block_size)    assert parity == b'\\x00' * (m * block_size)    assert fec_encode(k, m, block_size, data, parity) == 0    blocks = []    for row in range(k-1):        offset = row * block_size        block_data = data[offset:offset + block_size]        blocks.append((row, block_data))    blocks.append((k, bytearray(parity[:block_size])))    assert fec_decode(k, m, block_size, blocks) == 0    offset = (k-1) * block_size    assert blocks[(k-1)][1] == data[offset:offset + block_size]\n解碼測試案例故意將最後一個(索引值 k-1)原始資料區塊，換成第一個同位檢查資料區塊來驗證解碼正確。\n結語\n數學對山姆鍋而言，通常是要敬而遠之的東西，但是糾刪碼實在很酷，讓我還是想寫寫關於它的應用。試想：將資料加密後，再使用糾刪碼切成 (K + M) 份， 分散到網路上 (K + M) 台主機。理論上，不僅沒有一台主機有完整資訊可以還原資料外，還可以容忍其中 M 台主機離線或故障。最重要的是： 只有自己擁有最終解碼所需的金鑰(secret key)，這才是雲端存儲的終極之道啊！關於雲端資料加密的作法，以後有機會再介紹。\n參考資料\nCython: http://cython.org/\nLonghair: https://github.com/catid/longhair\nSymform: http://www.symform.com/\nDummies Guide to Erasure Coding:\nhttp://smahesh.com/blog/2012/07/01/dummies-guide-to-erasure-coding/\n\n\n\n其實是山姆鍋也不了解背後艱深的數學原理。 ↩︎\n\n也就是俗稱 4 個 9 的可用性。 ↩︎\n\n如果您了解 Python 的 C 擴充介面，記得跟社群分享。 ↩︎\n\n\n\n","dateCreated":"2015-09-11T08:40:00+08:00","dateModified":"2018-08-29T23:10:13+08:00","datePublished":"2015-09-11T08:40:00+08:00","description":"很早之前在寫 QR Code 解碼器的時候就接觸過「糾刪碼」(erasure code)這種技術， 因為 QR Code 有使用到 Reed–Solomon error correction 。雖然知道是數學的運算結果，但至今還是對它的功用感到很神奇！背後的編碼理論已經超過山姆鍋的理解範圍，但撇除背後的數學理論，身為工程師要如何理解糾刪碼，以及作何應用呢？","headline":"很酷的糾刪碼(erasure code)技術","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2015/09/python-with-erasure-code/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2015/09/python-with-erasure-code/","keywords":"Python, Erasure code, RAID"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"/images/logo32.png"},"articleBody":"很早之前在寫 QR Code 解碼器的時候就接觸過「糾刪碼」(erasure code)這種技術， 因為 QR Code 有使用到 Reed–Solomon error correction 。雖然知道是數學的運算結果，但至今還是對它的功用感到很神奇！背後的編碼理論已經超過山姆鍋的理解範圍，但撇除背後的數學理論，身為工程師要如何理解糾刪碼，以及作何應用呢？\n\n糾刪碼(erasure code)簡介\n網路上介紹糾刪碼的文章總喜歡講解背後的數學原理，真要了解背後的數學理論才能知道如何應用的話，那只會讓人想打退堂鼓。 所以，山姆鍋在這裏只說明抽象概念 [1]。 簡單地說，糾刪碼是一種演算法，可以將 K 個相同大小的資料區塊(data block)，轉成 (K + M) 個編碼後的區塊，接收者可以從這 (K + M) 個區塊中， 任選 K 個區塊，便足以還原編碼前的 K 個資料區塊。也就是說，它允許最多 M 個資料區塊在傳輸或讀取過程中遺失或錯誤！ 進一步的介紹可以參考這篇：Dummies Guide to Erasure Coding\n糾刪碼的應用情境\n糾刪碼的幾種應用範例：\n\n像 QR Code 這種二維條碼，通常會運用糾刪碼來更正條碼透過光學鏡頭讀取所產生的變形錯誤。\n衛星通訊單向傳輸，由於接收方無法要求重送，使用糾刪碼在有封包遺失的情況下自動更正。\n資料儲存應用中，用來遮蔽(mask)儲存媒體故障造成的讀取錯誤。\n\n為什麼糾刪碼很酷?\n最近糾刪碼會再度引起關注，跟雲端儲存服務(cloud storage service)的崛起有很大的關係。背後的理由很簡單： 為了資料可靠性(reliability)與可用性(availability)，雲端儲存服務通常會儲存同組資料多個備份(通常是 3 份)在不同的裝置，機架，甚至不同的資料中心。 在這樣的組態下，服務允許最多 2 個資料來源發生故障而不遺失資料。在這樣的組態下， 其空間冗餘率是 200%。透過糾刪碼，在(6 + 4)的組態下，除了允許最多任意 4 個資料來源不可用外，其空間冗餘率只有 4/6 ~= 67%，節省的空間比例相當明顯 。\n允許 4 個資料來源不可得是怎樣的概念，對於資料可用性有什麼影響？假設一個資料來源任一時間點可用性為 90%，也就是不可用機率為 10% = 0.1。 對於資料中心的儲存裝置，這個假設可能有點低，但對於點對點的儲存服務，如 Symform，可能就有點高，這也是為何他們會要求參與者保證基本上線時間。 運用基本的機率公式，單一個資料來源不可用的機率既然是 0.1，2 個資料來源 同時 不可用的機率卻變成 0.1 x 0.1 = 0.01，以此類推。 當可以接受 4 個資料來源不可用時，資料不可用的機率只剩下 0.0001，也就是有 99.99%的可用性 [2]，這已經是Ａ級資料中心的要求等級。當然整體資料可用性有許多因素決定，例如：對外網路可用性如果只有 95%，最終資料可用性最高就不會超過 95%。\n既然糾刪碼這麼厲害，為什麼沒有廣泛地被應用在儲存方案中？山姆鍋想得到的原因：\n\n計算糾刪碼很耗 CPU 運算能力。\n當存儲媒體數量不大時， 現有 RAID 技術便足以應付。\n專利問題：除了少數演算法專利已經過期外，其餘都尚有專利存在。\n\n但隨著雲端儲存的流行，其背後龐大的存儲裝置數量驚人，透過糾刪碼技術能夠節省的裝置數量提供很大的經濟誘因。\n現有 Python 糾刪碼程式庫\n想要應用糾刪碼，除非您有非常深厚的編碼學基礎，不然使用別人開發好的程式庫在所難免。底下是幾個山姆鍋所知，可以透過 Python 使用的開源程式庫：\n\n\n\nPyECLib\n底層使用 C 實作; BSD\n授權。支援多種的原生(native)糾刪碼實作，但是相依套件顯然不支援\nWindows，在 Unix-like 的環境編譯也很困難。\n\n\n\n\nzfec\n底層使用 C 實作; GPL 授權。如果 GPL對您不是問題的話，可以考慮。\n\n\n\n\npy_ecc\n純 Python 實現; 不確定授權模式，應該類似 BSD。\n除非只是為了驗證概念，不然使用純 Python 實作無法實際應用。\n\n\n\n假如上述的程式庫，不合乎您的需要的話，請繼續看下一節。\n自行包裝糾刪碼程式庫\n山姆鍋發現一個在 GitHub 上的 Longhair 專案有提供所需的程式碼。 使用 C++ 開發，但提供 C 語言呼叫介面，New BSD 授權，剛好符合需要。 唯一的問題：它不支援 Python 支援！\n還好 Python 的特性之一便是容易整合原生(native)程式庫，這讓我興起自行整合的想法。因為不想學習 Python 完整的 C 擴充介面 [3]，於是山姆鍋選擇 Cython 來進行包裝工作。\n完成的相關程式碼在 GitHub 上。\n測試程式碼\n底下的測試碼示範如何使用 fec_encode 編碼，以及 fec_decode 解碼：\n123456789101112131415161718192021222324252627def test_fec_encode(self):    block_size = 8192    k = 10    m = 4    data = os.urandom(k * block_size)    parity = bytearray(m * block_size)    assert fec_encode(k, m, block_size, data, parity) == 0def test_fec_decode_without_sufficient_blocks(self):    block_size = 8192    k = 10    m = 4    data = os.urandom(k * block_size)    parity = bytearray(m * block_size)    assert parity == b'\\x00' * (m * block_size)    assert fec_encode(k, m, block_size, data, parity) == 0    blocks = []    for row in range(k-1):        offset = row * block_size        block_data = data[offset:offset + block_size]        blocks.append((row, block_data))    blocks.append((k, bytearray(parity[:block_size])))    assert fec_decode(k, m, block_size, blocks) == 0    offset = (k-1) * block_size    assert blocks[(k-1)][1] == data[offset:offset + block_size]\n解碼測試案例故意將最後一個(索引值 k-1)原始資料區塊，換成第一個同位檢查資料區塊來驗證解碼正確。\n結語\n數學對山姆鍋而言，通常是要敬而遠之的東西，但是糾刪碼實在很酷，讓我還是想寫寫關於它的應用。試想：將資料加密後，再使用糾刪碼切成 (K + M) 份， 分散到網路上 (K + M) 台主機。理論上，不僅沒有一台主機有完整資訊可以還原資料外，還可以容忍其中 M 台主機離線或故障。最重要的是： 只有自己擁有最終解碼所需的金鑰(secret key)，這才是雲端存儲的終極之道啊！關於雲端資料加密的作法，以後有機會再介紹。\n參考資料\nCython: http://cython.org/\nLonghair: https://github.com/catid/longhair\nSymform: http://www.symform.com/\nDummies Guide to Erasure Coding:\nhttp://smahesh.com/blog/2012/07/01/dummies-guide-to-erasure-coding/\n\n\n\n其實是山姆鍋也不了解背後艱深的數學原理。 ↩︎\n\n也就是俗稱 4 個 9 的可用性。 ↩︎\n\n如果您了解 Python 的 C 擴充介面，記得跟社群分享。 ↩︎\n\n\n\n","dateCreated":"2015-09-11T08:40:00+08:00","dateModified":"2018-08-29T23:10:13+08:00","datePublished":"2015-09-11T08:40:00+08:00","description":"很早之前在寫 QR Code 解碼器的時候就接觸過「糾刪碼」(erasure code)這種技術， 因為 QR Code 有使用到 Reed–Solomon error correction 。雖然知道是數學的運算結果，但至今還是對它的功用感到很神奇！背後的編碼理論已經超過山姆鍋的理解範圍，但撇除背後的數學理論，身為工程師要如何理解糾刪碼，以及作何應用呢？","headline":"很酷的糾刪碼(erasure code)技術","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2015/09/python-with-erasure-code/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"/images/logo32.png","logo":{"@type":"ImageObject","url":"/images/logo32.png"}},"url":"https://samkuo.me/post/2015/09/python-with-erasure-code/","keywords":"Python, Erasure code, RAID"}</script>
     <meta name="description" content="很早之前在寫 QR Code 解碼器的時候就接觸過「糾刪碼」(erasure code)這種技術， 因為 QR Code 有使用到 Reed–Solomon error correction 。雖然知道是數學的運算結果，但至今還是對它的功用感到很神奇！背後的編碼理論已經超過山姆鍋的理解範圍，但撇除背後的數學理論，身為工程師要如何理解糾刪碼，以及作何應用呢？">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="很酷的糾刪碼(erasure code)技術">
@@ -39,23 +39,14 @@
         
     
     
-        <meta property="og:image" content="https://samkuo.me/images/logo.png"/>
+        <meta property="og:image" content="https://www.gravatar.com/avatar/2b44878cb27d093ac9c72a495ea642cf?s=640"/>
     
     
     
     
     <!--STYLES-->
     
-<link rel="stylesheet" href="/assets/css/all.css">
-
-    
-<link rel="stylesheet" href="/assets/css/jquery.fancybox.css">
-
-    
-<link rel="stylesheet" href="/assets/css/thumbs.css">
-
-    
-<link rel="stylesheet" href="/assets/css/tranquilpeak.css">
+<link rel="stylesheet" href="/assets/css/style-qlm634aeqqh4pedhidwvikqi59e0o7qckfid1geequyx9cyxw5rqjplgvt1t.min.css">
 
     <!--STYLES END-->
     
@@ -89,6 +80,7 @@
             href="/"
             aria-label=""
         >
+        <img class="header-avatar-picture" src="/images/logo32.png" alt="作者的圖片" />
             我是山姆鍋
         </a>
     </div>
@@ -110,8 +102,6 @@
             <!-- Define author's picture -->
 
 
-
-        
     
 
 <nav id="sidebar" data-behavior="4">
@@ -122,7 +112,7 @@
                     href="/#about"
                     aria-label="閱讀有關作者的更多信息"
                 >
-                    <img class="sidebar-profile-picture" src="/images/logo.png" alt="作者的圖片"/>
+                    <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/2b44878cb27d093ac9c72a495ea642cf?s=110" alt="作者的圖片"/>
                 </a>
                 <h4 class="sidebar-profile-name">Sampot (山姆鍋)</h4>
                 
@@ -504,7 +494,7 @@ Windows，在 Unix-like 的環境編譯也很困難。</dd>
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Share this post"
+                aria-label="Diesen Beitrag teilen"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -542,7 +532,7 @@ Windows，在 Unix-like 的環境編譯也很困難。</dd>
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Leave a comment"
+                        aria-label="Kommentieren"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -551,7 +541,7 @@ Windows，在 Unix-like 的環境編譯也很困難。</dd>
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -620,7 +610,7 @@ Windows，在 Unix-like 的環境編譯也很困難。</dd>
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Share this post"
+                aria-label="Diesen Beitrag teilen"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -658,7 +648,7 @@ Windows，在 Unix-like 的環境編譯也很困難。</dd>
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Leave a comment"
+                        aria-label="Kommentieren"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -667,7 +657,7 @@ Windows，在 Unix-like 的環境編譯也很困難。</dd>
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -718,8 +708,6 @@ Windows，在 Unix-like 的環境編譯也很困難。</dd>
 
 
     
-        
-    
 
 <div id="about">
     <div id="about-card">
@@ -727,7 +715,7 @@ Windows，在 Unix-like 的環境編譯也很困難。</dd>
             <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="/images/logo.png" alt="作者的圖片"/>
+            <img id="about-card-picture" src="https://www.gravatar.com/avatar/2b44878cb27d093ac9c72a495ea642cf?s=110" alt="作者的圖片"/>
         
             <h4 id="about-card-name">Sampot (山姆鍋)</h4>
         
@@ -1028,16 +1016,7 @@ server，讓它們彼此互相備份資料(Master-master<br>
 <div id="cover" style="background-image:url('/images/cover.jpg');"></div>
         <!--SCRIPTS-->
 
-<script src="/assets/js/jquery.js"></script>
-
-
-<script src="/assets/js/jquery.fancybox.js"></script>
-
-
-<script src="/assets/js/thumbs.js"></script>
-
-
-<script src="/assets/js/tranquilpeak.js"></script>
+<script src="/assets/js/script-kkzt2vzfxsb5bych7gew3tzpzddvyjfn0sutkf3vixujdxhpjr4ifnekp3si.min.js"></script>
 
 <!--SCRIPTS END-->
 

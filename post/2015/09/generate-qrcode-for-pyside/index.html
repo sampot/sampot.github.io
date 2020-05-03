@@ -17,7 +17,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"從現在來看，QR Code 的使用算是很普遍，例如用來產生網頁文章的超連結、Bitcoin 的位址等等。不管目的是什麼，產生 QR Code 已經是常有的需求。 本文山姆鍋分享如何使用 Python 的 qrcode 套件來產生 PySide 可以顯示的 QR Code 圖檔。\n\n使用的程式庫\n本文範例將使用到下列程式庫及其版本編號：\n\nqrcode - 版本：5.1\nPySide - 版本：1.2.2\nPillow - 版本：2.9.0\n\n相依性需求\nPySide 需要在執行的電腦上安裝 QT 4\n的圖形介面程式庫，相關安裝方式可以參考 PySide\n文件。\n產收 QR Code 圖檔\nqrcode 是一個給 Python 程式用來產生 QR Code\n的程式庫套件，最簡單地使用方法，只需要如下面範例：\n12import qrcodeimg = qrcode.make('Some data here')\nqrcode 會自動根據資料量來決定產生的 QR Code\n版本以及其他參數。如果要多一點的控制，下面的例子，也足夠應用：\n1234567891011import qrcodeqr = qrcode.QRCode(    version=1,    error_correction=qrcode.constants.ERROR_CORRECT_L,    box_size=10,    border=4,)qr.add_data('Some data')qr.make(fit=True)img = qr.make_image()\n只要安裝好 qrcode 以及其相依套件 Pillow，產生 QR Code\n可說相對簡單許多。 如果想要在 PySide\n的圖形介面顯示，則需要額外的步驟。 雖然 Pillow\n支援多種圖檔輸出格式，可以輸出圖檔然後再由 PySide\n讀取後顯示。但這種作法顯然有點多此一舉，且影響效能；\n最好是將圖檔資料直接交由 PySide 來輸出。由於 PySide 不了解\nPillow 的內部格式，所以，需要將 Pillow 的圖檔資料轉換成\nPySide 可以理解的格式。\n基於這個需求，山姆鍋寫了兩個公用函式，作為產生以及轉換圖檔的用途。\n123456789101112131415161718192021222324252627282930313233343536373839404142434445# -*- coding: utf-8 -*-from __future__ import absolute_import, print_function, unicode_literalsimport qrcodefrom PySide.QtGui import *def generate_qrcode_pilimage(data, version=2, box_size=4, border=2):    \"\"\" Generates a QR Code in PIL image.    :param data:    :param version:    :param box_size:    :param border:    :return:    \"\"\"    qr = qrcode.QRCode(        version=version,        error_correction=qrcode.constants.ERROR_CORRECT_M,        box_size=box_size,        border=border,    )    qr.add_data(data)    qr.make(fit=True)    img = qr.make_image()    return imgdef generate_qrcode_qpixmap(data, version=2, box_size=4, border=2):    \"\"\" Generates a QR Code in QPixmap format.    :param data: the data to be encoded.    :param version:    :param box_size:    :param border:    :return: the QPixmap    \"\"\"    img = generate_qrcode_pilimage(data, version, box_size, border)    img_data = img.convert(\"RGBA\").tostring('raw', 'RGBA')  # 1    image = QImage(img_data, img.size[0], img.size[1], QImage.Format_ARGB32)    pix = QPixmap.fromImage(image) # 2    return pix\n上方程式片段共定義兩個函式， generate_qrcode_pilimage 以及 generate_qrcode_qpixmap 。 generate_qrcode_pilimage\n函式根據 要編碼的資料產生 QR Code 對應的 Pillow\n圖檔資料； generate_qrcode_qpixmap 則是利用它來將 Pillow\n圖檔資料轉換成 PySide 可以顯示 的 QPixmap 物件。 標號 1\n的敘述在將 PIL image 轉換成 PySide (其實是 QT4) 可以理解的格式; 標號\n2 將圖檔資料轉成 QPixmap 物件，可透過 QLabel 顯示圖檔。\n顯示 QR Code 圖檔\n例如下列程式片段， 使用上述的函式在對話框中來顯示一個 URL 的 QR Code：\n123456789101112131415161718# -*- coding: utf-8 -*-from __future__ import absolute_import, print_function, unicode_literalsfrom PySide.QtCore import *from PySide.QtGui import *from ava.util import qrcode_genclass QRCodeLink(QDialog):    \"\"\" Displays a URL in QR Code image.    \"\"\"    def __init__(self, url, parent=None):        super(QRCodeLink, self).__init__(parent)        self.url = url        image_lbl = QLabel()        image_lbl.setPixmap(qrcode_gen.generate_qrcode_qpixmap(self.url))\n結語\n山姆鍋大多數寫過的程式，需要使用 QR Code\n的場合都只是用來顯示簡單的資料，如 URL 網址、秘鑰 (secret\nkey)等。雖然可以要求使用者抄寫下來， 但透過 QR Code\n來傳遞到其他裝置可說是友善許多。山姆鍋多年前還用 J2ME 寫過自己的 QR Code\n掃描程式，不過這是題外話了！\n參考資料\nqrcode: https://github.com/lincolnloop/python-qrcode\nPillow: https://python-pillow.github.io/\nPySide: https://pypi.python.org/pypi/PySide/1.2.2\n","dateCreated":"2015-09-07T08:06:00+08:00","dateModified":"2020-03-08T10:35:59+08:00","datePublished":"2015-09-07T08:06:00+08:00","description":"從現在來看，QR Code 的使用算是很普遍，例如用來產生網頁文章的超連結、Bitcoin 的位址等等。不管目的是什麼，產生 QR Code 已經是常有的需求。 本文山姆鍋分享如何使用 Python 的 qrcode 套件來產生 PySide 可以顯示的 QR Code 圖檔。","headline":"如何在 PySide 顯示 QR Code","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2015/09/generate-qrcode-for-pyside/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2015/09/generate-qrcode-for-pyside/","keywords":"Python, QR Code, PySide, Pillow"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"/images/logo32.png"},"articleBody":"從現在來看，QR Code 的使用算是很普遍，例如用來產生網頁文章的超連結、Bitcoin 的位址等等。不管目的是什麼，產生 QR Code 已經是常有的需求。 本文山姆鍋分享如何使用 Python 的 qrcode 套件來產生 PySide 可以顯示的 QR Code 圖檔。\n\n使用的程式庫\n本文範例將使用到下列程式庫及其版本編號：\n\nqrcode - 版本：5.1\nPySide - 版本：1.2.2\nPillow - 版本：2.9.0\n\n相依性需求\nPySide 需要在執行的電腦上安裝 QT 4\n的圖形介面程式庫，相關安裝方式可以參考 PySide\n文件。\n產收 QR Code 圖檔\nqrcode 是一個給 Python 程式用來產生 QR Code\n的程式庫套件，最簡單地使用方法，只需要如下面範例：\n12import qrcodeimg = qrcode.make('Some data here')\nqrcode 會自動根據資料量來決定產生的 QR Code\n版本以及其他參數。如果要多一點的控制，下面的例子，也足夠應用：\n1234567891011import qrcodeqr = qrcode.QRCode(    version=1,    error_correction=qrcode.constants.ERROR_CORRECT_L,    box_size=10,    border=4,)qr.add_data('Some data')qr.make(fit=True)img = qr.make_image()\n只要安裝好 qrcode 以及其相依套件 Pillow，產生 QR Code\n可說相對簡單許多。 如果想要在 PySide\n的圖形介面顯示，則需要額外的步驟。 雖然 Pillow\n支援多種圖檔輸出格式，可以輸出圖檔然後再由 PySide\n讀取後顯示。但這種作法顯然有點多此一舉，且影響效能；\n最好是將圖檔資料直接交由 PySide 來輸出。由於 PySide 不了解\nPillow 的內部格式，所以，需要將 Pillow 的圖檔資料轉換成\nPySide 可以理解的格式。\n基於這個需求，山姆鍋寫了兩個公用函式，作為產生以及轉換圖檔的用途。\n123456789101112131415161718192021222324252627282930313233343536373839404142434445# -*- coding: utf-8 -*-from __future__ import absolute_import, print_function, unicode_literalsimport qrcodefrom PySide.QtGui import *def generate_qrcode_pilimage(data, version=2, box_size=4, border=2):    \"\"\" Generates a QR Code in PIL image.    :param data:    :param version:    :param box_size:    :param border:    :return:    \"\"\"    qr = qrcode.QRCode(        version=version,        error_correction=qrcode.constants.ERROR_CORRECT_M,        box_size=box_size,        border=border,    )    qr.add_data(data)    qr.make(fit=True)    img = qr.make_image()    return imgdef generate_qrcode_qpixmap(data, version=2, box_size=4, border=2):    \"\"\" Generates a QR Code in QPixmap format.    :param data: the data to be encoded.    :param version:    :param box_size:    :param border:    :return: the QPixmap    \"\"\"    img = generate_qrcode_pilimage(data, version, box_size, border)    img_data = img.convert(\"RGBA\").tostring('raw', 'RGBA')  # 1    image = QImage(img_data, img.size[0], img.size[1], QImage.Format_ARGB32)    pix = QPixmap.fromImage(image) # 2    return pix\n上方程式片段共定義兩個函式， generate_qrcode_pilimage 以及 generate_qrcode_qpixmap 。 generate_qrcode_pilimage\n函式根據 要編碼的資料產生 QR Code 對應的 Pillow\n圖檔資料； generate_qrcode_qpixmap 則是利用它來將 Pillow\n圖檔資料轉換成 PySide 可以顯示 的 QPixmap 物件。 標號 1\n的敘述在將 PIL image 轉換成 PySide (其實是 QT4) 可以理解的格式; 標號\n2 將圖檔資料轉成 QPixmap 物件，可透過 QLabel 顯示圖檔。\n顯示 QR Code 圖檔\n例如下列程式片段， 使用上述的函式在對話框中來顯示一個 URL 的 QR Code：\n123456789101112131415161718# -*- coding: utf-8 -*-from __future__ import absolute_import, print_function, unicode_literalsfrom PySide.QtCore import *from PySide.QtGui import *from ava.util import qrcode_genclass QRCodeLink(QDialog):    \"\"\" Displays a URL in QR Code image.    \"\"\"    def __init__(self, url, parent=None):        super(QRCodeLink, self).__init__(parent)        self.url = url        image_lbl = QLabel()        image_lbl.setPixmap(qrcode_gen.generate_qrcode_qpixmap(self.url))\n結語\n山姆鍋大多數寫過的程式，需要使用 QR Code\n的場合都只是用來顯示簡單的資料，如 URL 網址、秘鑰 (secret\nkey)等。雖然可以要求使用者抄寫下來， 但透過 QR Code\n來傳遞到其他裝置可說是友善許多。山姆鍋多年前還用 J2ME 寫過自己的 QR Code\n掃描程式，不過這是題外話了！\n參考資料\nqrcode: https://github.com/lincolnloop/python-qrcode\nPillow: https://python-pillow.github.io/\nPySide: https://pypi.python.org/pypi/PySide/1.2.2\n","dateCreated":"2015-09-07T08:06:00+08:00","dateModified":"2020-03-08T10:35:59+08:00","datePublished":"2015-09-07T08:06:00+08:00","description":"從現在來看，QR Code 的使用算是很普遍，例如用來產生網頁文章的超連結、Bitcoin 的位址等等。不管目的是什麼，產生 QR Code 已經是常有的需求。 本文山姆鍋分享如何使用 Python 的 qrcode 套件來產生 PySide 可以顯示的 QR Code 圖檔。","headline":"如何在 PySide 顯示 QR Code","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2015/09/generate-qrcode-for-pyside/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"/images/logo32.png","logo":{"@type":"ImageObject","url":"/images/logo32.png"}},"url":"https://samkuo.me/post/2015/09/generate-qrcode-for-pyside/","keywords":"Python, QR Code, PySide, Pillow"}</script>
     <meta name="description" content="從現在來看，QR Code 的使用算是很普遍，例如用來產生網頁文章的超連結、Bitcoin 的位址等等。不管目的是什麼，產生 QR Code 已經是常有的需求。 本文山姆鍋分享如何使用 Python 的 qrcode 套件來產生 PySide 可以顯示的 QR Code 圖檔。">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="如何在 PySide 顯示 QR Code">
@@ -40,23 +40,14 @@
         
     
     
-        <meta property="og:image" content="https://samkuo.me/images/logo.png"/>
+        <meta property="og:image" content="https://www.gravatar.com/avatar/2b44878cb27d093ac9c72a495ea642cf?s=640"/>
     
     
     
     
     <!--STYLES-->
     
-<link rel="stylesheet" href="/assets/css/all.css">
-
-    
-<link rel="stylesheet" href="/assets/css/jquery.fancybox.css">
-
-    
-<link rel="stylesheet" href="/assets/css/thumbs.css">
-
-    
-<link rel="stylesheet" href="/assets/css/tranquilpeak.css">
+<link rel="stylesheet" href="/assets/css/style-qlm634aeqqh4pedhidwvikqi59e0o7qckfid1geequyx9cyxw5rqjplgvt1t.min.css">
 
     <!--STYLES END-->
     
@@ -90,6 +81,7 @@
             href="/"
             aria-label=""
         >
+        <img class="header-avatar-picture" src="/images/logo32.png" alt="作者的圖片" />
             我是山姆鍋
         </a>
     </div>
@@ -111,8 +103,6 @@
             <!-- Define author's picture -->
 
 
-
-        
     
 
 <nav id="sidebar" data-behavior="4">
@@ -123,7 +113,7 @@
                     href="/#about"
                     aria-label="閱讀有關作者的更多信息"
                 >
-                    <img class="sidebar-profile-picture" src="/images/logo.png" alt="作者的圖片"/>
+                    <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/2b44878cb27d093ac9c72a495ea642cf?s=110" alt="作者的圖片"/>
                 </a>
                 <h4 class="sidebar-profile-name">Sampot (山姆鍋)</h4>
                 
@@ -480,7 +470,7 @@ key)等。雖然可以要求使用者抄寫下來， 但透過 QR Code<br>
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Share this post"
+                aria-label="Diesen Beitrag teilen"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -518,7 +508,7 @@ key)等。雖然可以要求使用者抄寫下來， 但透過 QR Code<br>
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Leave a comment"
+                        aria-label="Kommentieren"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -527,7 +517,7 @@ key)等。雖然可以要求使用者抄寫下來， 但透過 QR Code<br>
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -596,7 +586,7 @@ key)等。雖然可以要求使用者抄寫下來， 但透過 QR Code<br>
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Share this post"
+                aria-label="Diesen Beitrag teilen"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -634,7 +624,7 @@ key)等。雖然可以要求使用者抄寫下來， 但透過 QR Code<br>
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Leave a comment"
+                        aria-label="Kommentieren"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -643,7 +633,7 @@ key)等。雖然可以要求使用者抄寫下來， 但透過 QR Code<br>
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -694,8 +684,6 @@ key)等。雖然可以要求使用者抄寫下來， 但透過 QR Code<br>
 
 
     
-        
-    
 
 <div id="about">
     <div id="about-card">
@@ -703,7 +691,7 @@ key)等。雖然可以要求使用者抄寫下來， 但透過 QR Code<br>
             <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="/images/logo.png" alt="作者的圖片"/>
+            <img id="about-card-picture" src="https://www.gravatar.com/avatar/2b44878cb27d093ac9c72a495ea642cf?s=110" alt="作者的圖片"/>
         
             <h4 id="about-card-name">Sampot (山姆鍋)</h4>
         
@@ -1004,16 +992,7 @@ server，讓它們彼此互相備份資料(Master-master<br>
 <div id="cover" style="background-image:url('/images/cover.jpg');"></div>
         <!--SCRIPTS-->
 
-<script src="/assets/js/jquery.js"></script>
-
-
-<script src="/assets/js/jquery.fancybox.js"></script>
-
-
-<script src="/assets/js/thumbs.js"></script>
-
-
-<script src="/assets/js/tranquilpeak.js"></script>
+<script src="/assets/js/script-kkzt2vzfxsb5bych7gew3tzpzddvyjfn0sutkf3vixujdxhpjr4ifnekp3si.min.js"></script>
 
 <!--SCRIPTS END-->
 

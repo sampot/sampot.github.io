@@ -17,7 +17,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"\n\n自從山姆鍋決定採用容器化技術作為應用部署的方案後，很多的細節需要設計跟決定，為了避免太專注細節， 決定先設計出計畫採用的持續軟體交付流程。由於每個團隊的使用的工具跟系統可能差異很大， 為了讓本文可以適用其他團隊，先以抽象流程來描述然後才說明山姆鍋採用的方案。\n此流程在完成軟體持續整合、部署與交付所需要的支援。為了減低人為的錯誤以及強化軟體品質，軟體部署的流程需加以自動化且在其中加入自動功能測試的步驟。\n流程概觀\n整個流程故意以抽象的概念表示，並沒有提到具體使用的工具或系統，因為這些跟個別團隊有關。底下是流程步驟的簡短說明：\n\n開發人員提交程式碼到「源始碼儲存庫」後，「源始碼儲存庫」會透過 webhook 通知「持續整合系統(CI)」有新的程式碼。\n「持續整合系統」會啟動並排程軟體建置任務來完成取出源始碼、編譯、單元測試、包裝與整合測試。\n「持續整合系統」將應用容器發佈到「容器映像儲存庫」。\n「持續整合系統」通知「部署機器人」有新的應用容器發佈。\n「部署機器人」會將發佈的應用容器自動部署到 「QA 環境」，容器映像是由部署環境直接由「容器映像儲存庫」下載到主機節點。\n\n有個系統沒有呈現在圖中，但卻扮演至關重要的角色：「群組訊息系統」，之所以沒有呈現出來是擔心圖形過於複雜，因為基本上，其它系統或工具都會跟它有互動。當「開發人員」將程式碼提交到「源始碼儲存庫」時，「源始碼儲存庫」便會通知相關群組此訊息，而「持續整合系統」在建置過程如有任何錯誤也會將此事件回報給相關群組成員，如果沒有問題則會通知容器發佈的消息。「自動部署機器人」會從「群組訊息系統」監聽容器發佈的消息，一旦有容器發佈會立刻自動將該容器部署到「QA 環境」。\n幾個特別注意的事項：\n\n目前部署到「生產環境」須由維運人員指示「自動部署機器人」來執行，但部署的動作仍舊是自動完成。\n容器映像的標籤(tag)\n需要能夠讓開發人員很容易回推當初建置該映像(image)所使用的程式碼版本跟分支。\n根據部署環境的複雜度而定，「自動部署機器人」的功能也可以整合到「持續整合系統」中。\n\n了解了流程抽象概念後，後續小節說明具體使用的工具或系統。\n群組訊息系統\n這個系統是讓開發團隊內不同的群組(groups) 可以即時的訊息溝通，而群組的成員並不限制只有人， 自動系統也會參與。因為需要整合自動化系統，使得常見的即時訊息服務，如 Line, QQ, Skype 等， 無法勝任這個角色。因此，有特別針對這個需要提供的雲端服務，目前主要的：Slack, HipChat, Gitter， 按照跟其它系統的整合支援度排序。\n許多人會選擇 Slack，但因為有整合的考量，本團隊選擇使用同樣由 Atlassian 公司提供的 HipChat 服務。 群組訊息系統可以說是團隊的神經系統，讓團隊可以更快有效地彼此同步訊息，這對於像本團隊一樣， 成員分散在不同地區與工作時間的團隊尤其重要。另外，我們也改用此系統做 Scrum 的 standup 會議， 當然實際形式上有所不同。\n源始碼管理系統\n以目前發展的態勢以及雲端服務的多寡來判斷，Git 作為源始碼管理系統的首選應該是大勢底定。 使用 Git 的主要原因：\n\n有成熟的雲端託管服務商(GitHub, BitBucket, etc)。\n快速方便的源始碼分支(branch)與合併(merge)功能。\n可以離線提交(commit)，避免一次性提交一大段難以理解的源始碼。\n除了中央源始碼儲存庫外，開發者的本機也是源始碼的完整備份。\n\n源始碼託管服務/源始碼儲存庫\n主要的雲端源始碼託管服務有: GitHub, BitBucket，因為整體考量，本團隊採用 BitBucket 作為源始碼託管服務供應商。 不管採用哪種源始碼管理系統，交付流程都需要有一個中央源始碼儲存庫來存放平台所有源始碼，自動建置系統會從此儲存庫取出並建置要部署的軟體元件。使用源始碼託管服務還有個好處，就是可以很好地支援 Pull request，讓 code review 的流程更順暢。\n容器映像儲存庫(Image Repository)\n當採用以容器化(containerized)方式來發行軟體元件時，便需要一個容器映像儲存庫。此儲存庫， 顧名思義是用來存放打包好的應用程式或者服務模組。本團隊後端的服務或應用皆是以容器來包裝跟交付， 即使是前端開發人員，為了整合測試需要仍舊要對容器技術有基本的了解。目前雲端的容器映像儲存庫， 除了 Google Cloud Platform 跟 AWS 有提供外，另外兩個考慮的就是：\n\nDocker Hub\nQuay.io\n\n本團隊目前採用的是 Docker Hub，原因無他，只是比較習慣而已。但未來如果需要更好的團隊權限控管與 HipChat 更好的整合，會考慮轉換為 Quay.io。\n自動建置系統/持續整合系統\n自動建置系統會在開發者提交源始碼後，自動 check out 源始碼並編譯、測試並產生二元檔案或者映像檔。軟體的部署只能使用由建置系統所產生的二元檔案或者映像檔，不能直接連上服務器進行修改動作。每個應用/元件/模組在自動建置階段需按照順序完成下列階段才算成功：\n\n\n\n單元測試(unit test)\n元件需具備足夠的單元測試以確保功能正確並且避免 regression\n的發生。每個語言的單元測試方法或框架也許不同，但基本概念是一樣的。\n\n\n\n\n元件包裝(packaging)\n經過單元測試後，元件需要包裝成可以發佈的二進位形式，以傳統 Java\n應用為例，這可以是一個 Jar 或者 War\n檔。以本團隊的作法，後端服務都是以 Docker\n容器形式包裝。行動應用則是根據支援的平台有所不同，如 Android 的\napk 檔，iOS 的 ipa 檔。Webapp 則是以 tgz 格式發佈。\n\n\n\n\n整合測試(integration test)\n針對後端元件，整合測試需要在本地採用 docker-compose\n部署一個測試環境後執行相關的自動測試。\n針對行動應用，這個階段需將應用發佈到「裝置測試系統」來以實際裝置執行自動測試。\n\n\n\n\n元件發佈(release)\n經過單元與整合測試後的元件，已經可以發佈。注意這裡「發佈」是指將包裝後的元件推送至「容器映像儲存庫」\n，並不表示發佈給終端用戶。\n\n\n\n\n元件部署(deployment)\n針對後端元件，「部署」代表將包裝好的元件上載到應用部署環境後設定並啟用。這裡的部署環境可能是開發或者\nQA 環境。部署的方式是自動建置系統會向 “Operations” 這個\nHipChat\n聊天室發佈元件已經發佈的消息，然後部署機器人會接續後續部署工作。也就是說，部署的工作並不是整個在自動建置系統內完成。\n針對行動應用，「部署」意味著行動應用可以讓 QA\n人員下載、安裝到手機或者平板來進行測試。針對這點，也有雲端服務來提供行動應用發佈以方便 QA 人員下載跟安裝。\n\n\n\n自動部署機器人(DevOps Bot)\n由於本團隊採用 Kubernetes 作為應用部署平台，現有的「持續整合系統」對它的整合度不高， 加上考量到生產環境要支援人工審核部署的步驟，才有了這樣的設計。對於一般常見的部署環境， 自動部署也可以在「持續整合環境」中完成，不少服務也針對部署有特別的支援。 本團隊的「自動部署機器人」，英文叫 Sammy，中文叫「蝦米」，會監聽某個 HipChat 特定地聊天室(Operations)的訊息，「持續整合系統」在應用容器發佈成功後在此聊天室發佈訊息， Sammy 收到該訊息後便會自動進行部署。\n在 「QA 環境」測試過沒問題的版本，會由管理人員下指令給 Sammy 來部署到「生產環境」。 使用機器人有另一個好處：由於不是透過 Webhook 來取得通知，Sammy 可以部署在防火牆後，實際上 Sammy 同樣以容器形式被部署在應用平台中。除了第一次啟動(bootstrap)需要手動外， Sammy 也可以用來部署自己新的版本。\n應用部署平台(Deployment Platform)\n這個平台主要是針對後端服務跟網站，容器化的應用元件在生產與 QA 環境的需要跟開發階段在本機以及自動建置環境不同。 應用部署平台提供應用的高可用性、擴充性以及其它非功能面的需求。目前團隊是採用 Kubernetes 來管理應用部署平台。\n在此部署平台可以同時有多個部署環境(environments)，至少會有 QA 跟生產(Production) 兩個環境。\n\nQA 環境：是用來驗證開發中的應用功能正確也用來驗證一些非功能需求。\n生產環境：應用的正式執行環境，支援應用的可用性、動態擴充、服務發現與負載均衡等。\n\n目前 「QA 環境」與「生產環境」共用同一組基礎設施(infrastructure)，這樣做的幾個理由：\n\n管理彈性，主機節點可以在不同環境間挪用或共用。\n確保環境之間的相似性，不用因應不同環境有不同的部署方式。\n\n平台基礎設施(infrastructure)\n「應用部署平台」提供應用的部署環境，但畢竟它是由軟體組成，最終還是需要伺服器來執行。 透過 Kubernetes 應用部署平台理論上可以採用不同的雲端基礎設施服務，但本團隊實際使用的是 AWS。 經過評估後，以 CoreOS 提供的虛擬機映像為基礎，實現 Kubernetes 需要的環境。 採用 CoreOS 的理由：\n\n需要方便可以在本地測試：需要的話，開發跟運營人員可以在本機複製一個叢集(cluster)環境來測試。\n有較多的文件跟支援：使用 Google Cloud Platform 的支援度最廣，但本團隊使用的是 AWS 。\n可以跨不同的基礎設施：實務上可能不會用到，但不被綁住在特定供應商總是一件好事。\n\n山姆鍋希望基礎設施可以類似 AWS CloudFormation 一樣可以自動建立，但又不想被綁定在 CloudFormation。 評估過 Ansible, SaltStack 這類組態管理工具後，發現 Terraform 比較適合這個工作，目前正在研究中。\n小結\n本文所提的流程是山姆鍋所屬團隊所採用，但仍在建置中的方案，目前主要是「自動部署機器人」跟「應用部署平台」 有技術上的瓶頸。要特別說明的是：本文假設採用微服務架構(Microservices)， 每個應用容器都是可以獨立部署的單元，不管該容器是用來部署一個應用、微服務或者批次工作(batch job)。","dateCreated":"2016-04-18T15:45:00+08:00","dateModified":"2018-08-29T19:30:29+08:00","datePublished":"2016-04-18T15:45:00+08:00","description":"自從山姆鍋決定採用容器化技術作為應用部署的方案後，很多的細節需要設計跟決定，為了避免太專注細節， 決定先設計出計畫採用的持續軟體交付流程。由於每個團隊的使用的工具跟系統可能差異很大， 為了讓本文可以適用其他團隊，先以抽象流程來描述然後才說明山姆鍋採用的方案。","headline":"容器化應用持續交付","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2016/04/containerized-app-continuous-delivery/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2016/04/containerized-app-continuous-delivery/","keywords":"Continuous integration, Continuous delivery, Continuous deployment, container"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"/images/logo32.png"},"articleBody":"\n\n自從山姆鍋決定採用容器化技術作為應用部署的方案後，很多的細節需要設計跟決定，為了避免太專注細節， 決定先設計出計畫採用的持續軟體交付流程。由於每個團隊的使用的工具跟系統可能差異很大， 為了讓本文可以適用其他團隊，先以抽象流程來描述然後才說明山姆鍋採用的方案。\n此流程在完成軟體持續整合、部署與交付所需要的支援。為了減低人為的錯誤以及強化軟體品質，軟體部署的流程需加以自動化且在其中加入自動功能測試的步驟。\n流程概觀\n整個流程故意以抽象的概念表示，並沒有提到具體使用的工具或系統，因為這些跟個別團隊有關。底下是流程步驟的簡短說明：\n\n開發人員提交程式碼到「源始碼儲存庫」後，「源始碼儲存庫」會透過 webhook 通知「持續整合系統(CI)」有新的程式碼。\n「持續整合系統」會啟動並排程軟體建置任務來完成取出源始碼、編譯、單元測試、包裝與整合測試。\n「持續整合系統」將應用容器發佈到「容器映像儲存庫」。\n「持續整合系統」通知「部署機器人」有新的應用容器發佈。\n「部署機器人」會將發佈的應用容器自動部署到 「QA 環境」，容器映像是由部署環境直接由「容器映像儲存庫」下載到主機節點。\n\n有個系統沒有呈現在圖中，但卻扮演至關重要的角色：「群組訊息系統」，之所以沒有呈現出來是擔心圖形過於複雜，因為基本上，其它系統或工具都會跟它有互動。當「開發人員」將程式碼提交到「源始碼儲存庫」時，「源始碼儲存庫」便會通知相關群組此訊息，而「持續整合系統」在建置過程如有任何錯誤也會將此事件回報給相關群組成員，如果沒有問題則會通知容器發佈的消息。「自動部署機器人」會從「群組訊息系統」監聽容器發佈的消息，一旦有容器發佈會立刻自動將該容器部署到「QA 環境」。\n幾個特別注意的事項：\n\n目前部署到「生產環境」須由維運人員指示「自動部署機器人」來執行，但部署的動作仍舊是自動完成。\n容器映像的標籤(tag)\n需要能夠讓開發人員很容易回推當初建置該映像(image)所使用的程式碼版本跟分支。\n根據部署環境的複雜度而定，「自動部署機器人」的功能也可以整合到「持續整合系統」中。\n\n了解了流程抽象概念後，後續小節說明具體使用的工具或系統。\n群組訊息系統\n這個系統是讓開發團隊內不同的群組(groups) 可以即時的訊息溝通，而群組的成員並不限制只有人， 自動系統也會參與。因為需要整合自動化系統，使得常見的即時訊息服務，如 Line, QQ, Skype 等， 無法勝任這個角色。因此，有特別針對這個需要提供的雲端服務，目前主要的：Slack, HipChat, Gitter， 按照跟其它系統的整合支援度排序。\n許多人會選擇 Slack，但因為有整合的考量，本團隊選擇使用同樣由 Atlassian 公司提供的 HipChat 服務。 群組訊息系統可以說是團隊的神經系統，讓團隊可以更快有效地彼此同步訊息，這對於像本團隊一樣， 成員分散在不同地區與工作時間的團隊尤其重要。另外，我們也改用此系統做 Scrum 的 standup 會議， 當然實際形式上有所不同。\n源始碼管理系統\n以目前發展的態勢以及雲端服務的多寡來判斷，Git 作為源始碼管理系統的首選應該是大勢底定。 使用 Git 的主要原因：\n\n有成熟的雲端託管服務商(GitHub, BitBucket, etc)。\n快速方便的源始碼分支(branch)與合併(merge)功能。\n可以離線提交(commit)，避免一次性提交一大段難以理解的源始碼。\n除了中央源始碼儲存庫外，開發者的本機也是源始碼的完整備份。\n\n源始碼託管服務/源始碼儲存庫\n主要的雲端源始碼託管服務有: GitHub, BitBucket，因為整體考量，本團隊採用 BitBucket 作為源始碼託管服務供應商。 不管採用哪種源始碼管理系統，交付流程都需要有一個中央源始碼儲存庫來存放平台所有源始碼，自動建置系統會從此儲存庫取出並建置要部署的軟體元件。使用源始碼託管服務還有個好處，就是可以很好地支援 Pull request，讓 code review 的流程更順暢。\n容器映像儲存庫(Image Repository)\n當採用以容器化(containerized)方式來發行軟體元件時，便需要一個容器映像儲存庫。此儲存庫， 顧名思義是用來存放打包好的應用程式或者服務模組。本團隊後端的服務或應用皆是以容器來包裝跟交付， 即使是前端開發人員，為了整合測試需要仍舊要對容器技術有基本的了解。目前雲端的容器映像儲存庫， 除了 Google Cloud Platform 跟 AWS 有提供外，另外兩個考慮的就是：\n\nDocker Hub\nQuay.io\n\n本團隊目前採用的是 Docker Hub，原因無他，只是比較習慣而已。但未來如果需要更好的團隊權限控管與 HipChat 更好的整合，會考慮轉換為 Quay.io。\n自動建置系統/持續整合系統\n自動建置系統會在開發者提交源始碼後，自動 check out 源始碼並編譯、測試並產生二元檔案或者映像檔。軟體的部署只能使用由建置系統所產生的二元檔案或者映像檔，不能直接連上服務器進行修改動作。每個應用/元件/模組在自動建置階段需按照順序完成下列階段才算成功：\n\n\n\n單元測試(unit test)\n元件需具備足夠的單元測試以確保功能正確並且避免 regression\n的發生。每個語言的單元測試方法或框架也許不同，但基本概念是一樣的。\n\n\n\n\n元件包裝(packaging)\n經過單元測試後，元件需要包裝成可以發佈的二進位形式，以傳統 Java\n應用為例，這可以是一個 Jar 或者 War\n檔。以本團隊的作法，後端服務都是以 Docker\n容器形式包裝。行動應用則是根據支援的平台有所不同，如 Android 的\napk 檔，iOS 的 ipa 檔。Webapp 則是以 tgz 格式發佈。\n\n\n\n\n整合測試(integration test)\n針對後端元件，整合測試需要在本地採用 docker-compose\n部署一個測試環境後執行相關的自動測試。\n針對行動應用，這個階段需將應用發佈到「裝置測試系統」來以實際裝置執行自動測試。\n\n\n\n\n元件發佈(release)\n經過單元與整合測試後的元件，已經可以發佈。注意這裡「發佈」是指將包裝後的元件推送至「容器映像儲存庫」\n，並不表示發佈給終端用戶。\n\n\n\n\n元件部署(deployment)\n針對後端元件，「部署」代表將包裝好的元件上載到應用部署環境後設定並啟用。這裡的部署環境可能是開發或者\nQA 環境。部署的方式是自動建置系統會向 “Operations” 這個\nHipChat\n聊天室發佈元件已經發佈的消息，然後部署機器人會接續後續部署工作。也就是說，部署的工作並不是整個在自動建置系統內完成。\n針對行動應用，「部署」意味著行動應用可以讓 QA\n人員下載、安裝到手機或者平板來進行測試。針對這點，也有雲端服務來提供行動應用發佈以方便 QA 人員下載跟安裝。\n\n\n\n自動部署機器人(DevOps Bot)\n由於本團隊採用 Kubernetes 作為應用部署平台，現有的「持續整合系統」對它的整合度不高， 加上考量到生產環境要支援人工審核部署的步驟，才有了這樣的設計。對於一般常見的部署環境， 自動部署也可以在「持續整合環境」中完成，不少服務也針對部署有特別的支援。 本團隊的「自動部署機器人」，英文叫 Sammy，中文叫「蝦米」，會監聽某個 HipChat 特定地聊天室(Operations)的訊息，「持續整合系統」在應用容器發佈成功後在此聊天室發佈訊息， Sammy 收到該訊息後便會自動進行部署。\n在 「QA 環境」測試過沒問題的版本，會由管理人員下指令給 Sammy 來部署到「生產環境」。 使用機器人有另一個好處：由於不是透過 Webhook 來取得通知，Sammy 可以部署在防火牆後，實際上 Sammy 同樣以容器形式被部署在應用平台中。除了第一次啟動(bootstrap)需要手動外， Sammy 也可以用來部署自己新的版本。\n應用部署平台(Deployment Platform)\n這個平台主要是針對後端服務跟網站，容器化的應用元件在生產與 QA 環境的需要跟開發階段在本機以及自動建置環境不同。 應用部署平台提供應用的高可用性、擴充性以及其它非功能面的需求。目前團隊是採用 Kubernetes 來管理應用部署平台。\n在此部署平台可以同時有多個部署環境(environments)，至少會有 QA 跟生產(Production) 兩個環境。\n\nQA 環境：是用來驗證開發中的應用功能正確也用來驗證一些非功能需求。\n生產環境：應用的正式執行環境，支援應用的可用性、動態擴充、服務發現與負載均衡等。\n\n目前 「QA 環境」與「生產環境」共用同一組基礎設施(infrastructure)，這樣做的幾個理由：\n\n管理彈性，主機節點可以在不同環境間挪用或共用。\n確保環境之間的相似性，不用因應不同環境有不同的部署方式。\n\n平台基礎設施(infrastructure)\n「應用部署平台」提供應用的部署環境，但畢竟它是由軟體組成，最終還是需要伺服器來執行。 透過 Kubernetes 應用部署平台理論上可以採用不同的雲端基礎設施服務，但本團隊實際使用的是 AWS。 經過評估後，以 CoreOS 提供的虛擬機映像為基礎，實現 Kubernetes 需要的環境。 採用 CoreOS 的理由：\n\n需要方便可以在本地測試：需要的話，開發跟運營人員可以在本機複製一個叢集(cluster)環境來測試。\n有較多的文件跟支援：使用 Google Cloud Platform 的支援度最廣，但本團隊使用的是 AWS 。\n可以跨不同的基礎設施：實務上可能不會用到，但不被綁住在特定供應商總是一件好事。\n\n山姆鍋希望基礎設施可以類似 AWS CloudFormation 一樣可以自動建立，但又不想被綁定在 CloudFormation。 評估過 Ansible, SaltStack 這類組態管理工具後，發現 Terraform 比較適合這個工作，目前正在研究中。\n小結\n本文所提的流程是山姆鍋所屬團隊所採用，但仍在建置中的方案，目前主要是「自動部署機器人」跟「應用部署平台」 有技術上的瓶頸。要特別說明的是：本文假設採用微服務架構(Microservices)， 每個應用容器都是可以獨立部署的單元，不管該容器是用來部署一個應用、微服務或者批次工作(batch job)。","dateCreated":"2016-04-18T15:45:00+08:00","dateModified":"2018-08-29T19:30:29+08:00","datePublished":"2016-04-18T15:45:00+08:00","description":"自從山姆鍋決定採用容器化技術作為應用部署的方案後，很多的細節需要設計跟決定，為了避免太專注細節， 決定先設計出計畫採用的持續軟體交付流程。由於每個團隊的使用的工具跟系統可能差異很大， 為了讓本文可以適用其他團隊，先以抽象流程來描述然後才說明山姆鍋採用的方案。","headline":"容器化應用持續交付","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2016/04/containerized-app-continuous-delivery/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"/images/logo32.png","logo":{"@type":"ImageObject","url":"/images/logo32.png"}},"url":"https://samkuo.me/post/2016/04/containerized-app-continuous-delivery/","keywords":"Continuous integration, Continuous delivery, Continuous deployment, container"}</script>
     <meta name="description" content="自從山姆鍋決定採用容器化技術作為應用部署的方案後，很多的細節需要設計跟決定，為了避免太專注細節， 決定先設計出計畫採用的持續軟體交付流程。由於每個團隊的使用的工具跟系統可能差異很大， 為了讓本文可以適用其他團隊，先以抽象流程來描述然後才說明山姆鍋採用的方案。">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="容器化應用持續交付">
@@ -42,23 +42,14 @@
         
     
     
-        <meta property="og:image" content="https://samkuo.me/images/logo.png"/>
+        <meta property="og:image" content="https://www.gravatar.com/avatar/2b44878cb27d093ac9c72a495ea642cf?s=640"/>
     
     
     
     
     <!--STYLES-->
     
-<link rel="stylesheet" href="/assets/css/all.css">
-
-    
-<link rel="stylesheet" href="/assets/css/jquery.fancybox.css">
-
-    
-<link rel="stylesheet" href="/assets/css/thumbs.css">
-
-    
-<link rel="stylesheet" href="/assets/css/tranquilpeak.css">
+<link rel="stylesheet" href="/assets/css/style-qlm634aeqqh4pedhidwvikqi59e0o7qckfid1geequyx9cyxw5rqjplgvt1t.min.css">
 
     <!--STYLES END-->
     
@@ -92,6 +83,7 @@
             href="/"
             aria-label=""
         >
+        <img class="header-avatar-picture" src="/images/logo32.png" alt="作者的圖片" />
             我是山姆鍋
         </a>
     </div>
@@ -113,8 +105,6 @@
             <!-- Define author's picture -->
 
 
-
-        
     
 
 <nav id="sidebar" data-behavior="4">
@@ -125,7 +115,7 @@
                     href="/#about"
                     aria-label="閱讀有關作者的更多信息"
                 >
-                    <img class="sidebar-profile-picture" src="/images/logo.png" alt="作者的圖片"/>
+                    <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/2b44878cb27d093ac9c72a495ea642cf?s=110" alt="作者的圖片"/>
                 </a>
                 <h4 class="sidebar-profile-name">Sampot (山姆鍋)</h4>
                 
@@ -546,7 +536,7 @@ HipChat<br>
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Share this post"
+                aria-label="Diesen Beitrag teilen"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -584,7 +574,7 @@ HipChat<br>
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Leave a comment"
+                        aria-label="Kommentieren"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -593,7 +583,7 @@ HipChat<br>
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -662,7 +652,7 @@ HipChat<br>
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Share this post"
+                aria-label="Diesen Beitrag teilen"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -700,7 +690,7 @@ HipChat<br>
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Leave a comment"
+                        aria-label="Kommentieren"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -709,7 +699,7 @@ HipChat<br>
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -760,8 +750,6 @@ HipChat<br>
 
 
     
-        
-    
 
 <div id="about">
     <div id="about-card">
@@ -769,7 +757,7 @@ HipChat<br>
             <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="/images/logo.png" alt="作者的圖片"/>
+            <img id="about-card-picture" src="https://www.gravatar.com/avatar/2b44878cb27d093ac9c72a495ea642cf?s=110" alt="作者的圖片"/>
         
             <h4 id="about-card-name">Sampot (山姆鍋)</h4>
         
@@ -1070,16 +1058,7 @@ server，讓它們彼此互相備份資料(Master-master<br>
 <div id="cover" style="background-image:url('/images/cover.jpg');"></div>
         <!--SCRIPTS-->
 
-<script src="/assets/js/jquery.js"></script>
-
-
-<script src="/assets/js/jquery.fancybox.js"></script>
-
-
-<script src="/assets/js/thumbs.js"></script>
-
-
-<script src="/assets/js/tranquilpeak.js"></script>
+<script src="/assets/js/script-kkzt2vzfxsb5bych7gew3tzpzddvyjfn0sutkf3vixujdxhpjr4ifnekp3si.min.js"></script>
 
 <!--SCRIPTS END-->
 

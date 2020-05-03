@@ -19,7 +19,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"由於 Ubuntu 發行版本已經不再內建 Oracle/Sun JDK，對現在的 Java 平台開發者而言，要在 Ubuntu 系統上安裝 Java 環境變得有點麻煩。所幸網路上有志人士提供了輔助的方法，本文山姆鍋就來分享一下如何在 Ubuntu 系統上，安裝 Oracle JDK 7。\n\n為什麼要安裝 Oracle JDK?\n雖然 Ubuntu 跟其他 Linux 發行套件都有支援 OpenJDK，但是大部份公司或開發者還是採用 Oracle JDK/JRE 來作為開發與部署環境。有些 Java 開發的軟體也宣稱只支援 Oracle JRE，因此，採用 Oracle JDK/JRE 是比較保險的做法。\n安裝環境\n\n作業系統: Ubuntu 12.04 LTS x86_64\n\n安裝步驟\n新增 WebUpd8 的 PPA\n12$ sudo apt-get install python-software-properties$ sudo add-apt-repository ppa:webupd8team/java\n第一個指令目的在安裝’add-apt-repository’命令，因為他並沒有預先安裝好。\n更新套件列表\n更新套件列表的目的是讓 apt-get 可以找到由 ppa:webupd8team/java 提供的套件。\n1$ sudo apt-get update\n安裝 Oracle JDK\n1$ sudo apt-get install oracle-java7-installer\n如果要安裝 JDK 6 或 8，只要換成 ‘oracle-java6-installer’ 或’oracle-java8-installer’即可。\n小結\n透過 PPA 安裝套件可以方便以後的更新，免得每次都要從 Oracle 官網下載安裝。\n","dateCreated":"2013-10-01T13:44:00+08:00","dateModified":"2018-08-23T13:00:47+08:00","datePublished":"2013-10-01T13:44:00+08:00","description":"由於 Ubuntu 發行版本已經不再內建 Oracle/Sun JDK，對現在的 Java 平台開發者而言，要在 Ubuntu 系統上安裝 Java 環境變得有點麻煩。所幸網路上有志人士提供了輔助的方法，本文山姆鍋就來分享一下如何在 Ubuntu 系統上，安裝 Oracle JDK 7。","headline":"在Ubuntu系統上，使用Deb套件安裝Oracle JDK","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/10/how-to-install-oracle-jdk-on-ubuntu-12-04/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2013/10/how-to-install-oracle-jdk-on-ubuntu-12-04/","keywords":"Ubuntu, Java"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"/images/logo32.png"},"articleBody":"由於 Ubuntu 發行版本已經不再內建 Oracle/Sun JDK，對現在的 Java 平台開發者而言，要在 Ubuntu 系統上安裝 Java 環境變得有點麻煩。所幸網路上有志人士提供了輔助的方法，本文山姆鍋就來分享一下如何在 Ubuntu 系統上，安裝 Oracle JDK 7。\n\n為什麼要安裝 Oracle JDK?\n雖然 Ubuntu 跟其他 Linux 發行套件都有支援 OpenJDK，但是大部份公司或開發者還是採用 Oracle JDK/JRE 來作為開發與部署環境。有些 Java 開發的軟體也宣稱只支援 Oracle JRE，因此，採用 Oracle JDK/JRE 是比較保險的做法。\n安裝環境\n\n作業系統: Ubuntu 12.04 LTS x86_64\n\n安裝步驟\n新增 WebUpd8 的 PPA\n12$ sudo apt-get install python-software-properties$ sudo add-apt-repository ppa:webupd8team/java\n第一個指令目的在安裝’add-apt-repository’命令，因為他並沒有預先安裝好。\n更新套件列表\n更新套件列表的目的是讓 apt-get 可以找到由 ppa:webupd8team/java 提供的套件。\n1$ sudo apt-get update\n安裝 Oracle JDK\n1$ sudo apt-get install oracle-java7-installer\n如果要安裝 JDK 6 或 8，只要換成 ‘oracle-java6-installer’ 或’oracle-java8-installer’即可。\n小結\n透過 PPA 安裝套件可以方便以後的更新，免得每次都要從 Oracle 官網下載安裝。\n","dateCreated":"2013-10-01T13:44:00+08:00","dateModified":"2018-08-23T13:00:47+08:00","datePublished":"2013-10-01T13:44:00+08:00","description":"由於 Ubuntu 發行版本已經不再內建 Oracle/Sun JDK，對現在的 Java 平台開發者而言，要在 Ubuntu 系統上安裝 Java 環境變得有點麻煩。所幸網路上有志人士提供了輔助的方法，本文山姆鍋就來分享一下如何在 Ubuntu 系統上，安裝 Oracle JDK 7。","headline":"在Ubuntu系統上，使用Deb套件安裝Oracle JDK","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/10/how-to-install-oracle-jdk-on-ubuntu-12-04/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"/images/logo32.png","logo":{"@type":"ImageObject","url":"/images/logo32.png"}},"url":"https://samkuo.me/post/2013/10/how-to-install-oracle-jdk-on-ubuntu-12-04/","keywords":"Ubuntu, Java"}</script>
     <meta name="description" content="在Ubuntu系統上，使用deb套件手動安裝Oracle JDK 7。">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="在Ubuntu系統上，使用Deb套件安裝Oracle JDK">
@@ -44,23 +44,14 @@
         
     
     
-        <meta property="og:image" content="https://samkuo.me/images/logo.png"/>
+        <meta property="og:image" content="https://www.gravatar.com/avatar/2b44878cb27d093ac9c72a495ea642cf?s=640"/>
     
     
     
     
     <!--STYLES-->
     
-<link rel="stylesheet" href="/assets/css/all.css">
-
-    
-<link rel="stylesheet" href="/assets/css/jquery.fancybox.css">
-
-    
-<link rel="stylesheet" href="/assets/css/thumbs.css">
-
-    
-<link rel="stylesheet" href="/assets/css/tranquilpeak.css">
+<link rel="stylesheet" href="/assets/css/style-qlm634aeqqh4pedhidwvikqi59e0o7qckfid1geequyx9cyxw5rqjplgvt1t.min.css">
 
     <!--STYLES END-->
     
@@ -94,6 +85,7 @@
             href="/"
             aria-label=""
         >
+        <img class="header-avatar-picture" src="/images/logo32.png" alt="作者的圖片" />
             我是山姆鍋
         </a>
     </div>
@@ -115,8 +107,6 @@
             <!-- Define author's picture -->
 
 
-
-        
     
 
 <nav id="sidebar" data-behavior="4">
@@ -127,7 +117,7 @@
                     href="/#about"
                     aria-label="閱讀有關作者的更多信息"
                 >
-                    <img class="sidebar-profile-picture" src="/images/logo.png" alt="作者的圖片"/>
+                    <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/2b44878cb27d093ac9c72a495ea642cf?s=110" alt="作者的圖片"/>
                 </a>
                 <h4 class="sidebar-profile-name">Sampot (山姆鍋)</h4>
                 
@@ -455,7 +445,7 @@
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Share this post"
+                aria-label="Diesen Beitrag teilen"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -493,7 +483,7 @@
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Leave a comment"
+                        aria-label="Kommentieren"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -502,7 +492,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -571,7 +561,7 @@
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Share this post"
+                aria-label="Diesen Beitrag teilen"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -609,7 +599,7 @@
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Leave a comment"
+                        aria-label="Kommentieren"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -618,7 +608,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -669,8 +659,6 @@
 
 
     
-        
-    
 
 <div id="about">
     <div id="about-card">
@@ -678,7 +666,7 @@
             <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="/images/logo.png" alt="作者的圖片"/>
+            <img id="about-card-picture" src="https://www.gravatar.com/avatar/2b44878cb27d093ac9c72a495ea642cf?s=110" alt="作者的圖片"/>
         
             <h4 id="about-card-name">Sampot (山姆鍋)</h4>
         
@@ -979,16 +967,7 @@ server，讓它們彼此互相備份資料(Master-master<br>
 <div id="cover" style="background-image:url('/images/cover.jpg');"></div>
         <!--SCRIPTS-->
 
-<script src="/assets/js/jquery.js"></script>
-
-
-<script src="/assets/js/jquery.fancybox.js"></script>
-
-
-<script src="/assets/js/thumbs.js"></script>
-
-
-<script src="/assets/js/tranquilpeak.js"></script>
+<script src="/assets/js/script-kkzt2vzfxsb5bych7gew3tzpzddvyjfn0sutkf3vixujdxhpjr4ifnekp3si.min.js"></script>
 
 <!--SCRIPTS END-->
 

@@ -19,7 +19,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"對於軟體開發者來說，選擇建構工具(build tool)是個重要的決定，對於 Java 開發者來說，擁有更多選擇的情況下更是如此。雖然山姆鍋目前最熟悉的建構工具是 Maven，但是還是來看看在 Java 建構工具這個領域，有哪些變化。\n\nAnt\nAnt是比較早先流行的建構工具，山姆鍋只有一些零星使用的經驗。基本上，採用類似 Makefile 的描述與建構邏輯，提供相當大的彈性。作為基本的建構工具，Ant 已經足夠。但對於大型專案來說，需要的不只單單能夠建構就可以，例如：很難想像沒有自動相依套件管理，在大型專案中如何有效進行程式庫的發佈。\nIvy\nIvy 基於 Ant 為基礎，主要特點是加入相依管理(dependency management)，支援 Maven 套件庫。發現這個工具的時候，山姆鍋已經使用 Maven 且是基於 Ant，所以從來沒用過。\nMaven\nMaven 可以說是目前 Java 領域，建構工具事實上的標準(de facto)。跟 Ant 相比，主要特點有:\n\n相依套件管理(dependency management)。\n約定優於配置(Convention-over-configuration)。\n可以插件擴充功能，但需要的功能往往已經有第三方提供。\n提供專案的物件模型，作為了解專案基本資訊的主要來源。\n\n越來越多人不滿於 Maven 的嚴格限制，以及使用 XML 作為建構描述檔的肥大，有不少有名的專案改採用其它建構工具，例如：Hibernate 換到 Gradle。\nGradle\nGradle 使用 Groovy 語言，提供領域特定語言(Domain-Specific Language)的建構工具。採取任務(task)導向的描述方式，但 Gradle 的任務類似 Ant 的目標(target)。任務間可以有相依性，進而可以完成複雜的建構工作。\n\n支援 Maven 套件庫。\n支援相依套件管理(dependency management)。\n使用 Groovy 客制話建構工作。\n可以重用現存 Ant 開發的程式庫。\n\n基本上是一套相當彈性且針對大部份 Maven 的使用者需要的功能都有直接的支援。對於覺得 Maven 的“約定優於配置”綁手綁腳的人來說，這是個不錯的選擇。\nBuildr\nBuildr 這個工具最有趣的地方在於它是基於 Ruby 的 Rake 來發展，但是卻是面向 Java 的開發。跟 Gradle 一樣，可以讓您使用腳本語言(Ruby)來彈性設定建構方案。另一個值得一提的是：如果您已經有安裝 Ruby 環境，那麼安裝 Buildr 就很簡單，只要一個指令就可完成。\n1gem install buildr\n除了使用 Ruby 作為領域特定語言以及較少人使用外，功能上其實跟 Gradle 相近。\n小結\n針對開發工作，山姆鍋還是會先以 Maven 來進行，但是會逐漸實驗 Gradle 跟 Buildr 來取代。\n","dateCreated":"2013-10-03T09:57:00+08:00","dateModified":"2018-08-19T22:03:09+08:00","datePublished":"2013-10-03T09:57:00+08:00","description":"對於軟體開發者來說，選擇建構工具(build tool)是個重要的決定，對於 Java 開發者來說，擁有更多選擇的情況下更是如此。雖然山姆鍋目前最熟悉的建構工具是 Maven，但是還是來看看在 Java 建構工具這個領域，有哪些變化。","headline":"選擇 Java 軟體建構工具","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/10/java-build-tools/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2013/10/java-build-tools/","keywords":"Gradle, Maven, Development, Continuous integration"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"/images/logo32.png"},"articleBody":"對於軟體開發者來說，選擇建構工具(build tool)是個重要的決定，對於 Java 開發者來說，擁有更多選擇的情況下更是如此。雖然山姆鍋目前最熟悉的建構工具是 Maven，但是還是來看看在 Java 建構工具這個領域，有哪些變化。\n\nAnt\nAnt是比較早先流行的建構工具，山姆鍋只有一些零星使用的經驗。基本上，採用類似 Makefile 的描述與建構邏輯，提供相當大的彈性。作為基本的建構工具，Ant 已經足夠。但對於大型專案來說，需要的不只單單能夠建構就可以，例如：很難想像沒有自動相依套件管理，在大型專案中如何有效進行程式庫的發佈。\nIvy\nIvy 基於 Ant 為基礎，主要特點是加入相依管理(dependency management)，支援 Maven 套件庫。發現這個工具的時候，山姆鍋已經使用 Maven 且是基於 Ant，所以從來沒用過。\nMaven\nMaven 可以說是目前 Java 領域，建構工具事實上的標準(de facto)。跟 Ant 相比，主要特點有:\n\n相依套件管理(dependency management)。\n約定優於配置(Convention-over-configuration)。\n可以插件擴充功能，但需要的功能往往已經有第三方提供。\n提供專案的物件模型，作為了解專案基本資訊的主要來源。\n\n越來越多人不滿於 Maven 的嚴格限制，以及使用 XML 作為建構描述檔的肥大，有不少有名的專案改採用其它建構工具，例如：Hibernate 換到 Gradle。\nGradle\nGradle 使用 Groovy 語言，提供領域特定語言(Domain-Specific Language)的建構工具。採取任務(task)導向的描述方式，但 Gradle 的任務類似 Ant 的目標(target)。任務間可以有相依性，進而可以完成複雜的建構工作。\n\n支援 Maven 套件庫。\n支援相依套件管理(dependency management)。\n使用 Groovy 客制話建構工作。\n可以重用現存 Ant 開發的程式庫。\n\n基本上是一套相當彈性且針對大部份 Maven 的使用者需要的功能都有直接的支援。對於覺得 Maven 的“約定優於配置”綁手綁腳的人來說，這是個不錯的選擇。\nBuildr\nBuildr 這個工具最有趣的地方在於它是基於 Ruby 的 Rake 來發展，但是卻是面向 Java 的開發。跟 Gradle 一樣，可以讓您使用腳本語言(Ruby)來彈性設定建構方案。另一個值得一提的是：如果您已經有安裝 Ruby 環境，那麼安裝 Buildr 就很簡單，只要一個指令就可完成。\n1gem install buildr\n除了使用 Ruby 作為領域特定語言以及較少人使用外，功能上其實跟 Gradle 相近。\n小結\n針對開發工作，山姆鍋還是會先以 Maven 來進行，但是會逐漸實驗 Gradle 跟 Buildr 來取代。\n","dateCreated":"2013-10-03T09:57:00+08:00","dateModified":"2018-08-19T22:03:09+08:00","datePublished":"2013-10-03T09:57:00+08:00","description":"對於軟體開發者來說，選擇建構工具(build tool)是個重要的決定，對於 Java 開發者來說，擁有更多選擇的情況下更是如此。雖然山姆鍋目前最熟悉的建構工具是 Maven，但是還是來看看在 Java 建構工具這個領域，有哪些變化。","headline":"選擇 Java 軟體建構工具","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/10/java-build-tools/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"/images/logo32.png","logo":{"@type":"ImageObject","url":"/images/logo32.png"}},"url":"https://samkuo.me/post/2013/10/java-build-tools/","keywords":"Gradle, Maven, Development, Continuous integration"}</script>
     <meta name="description" content="幾個常見用在開發 Java 軟體的建構工具(build tools)。">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="選擇 Java 軟體建構工具">
@@ -44,23 +44,14 @@
         
     
     
-        <meta property="og:image" content="https://samkuo.me/images/logo.png"/>
+        <meta property="og:image" content="https://www.gravatar.com/avatar/2b44878cb27d093ac9c72a495ea642cf?s=640"/>
     
     
     
     
     <!--STYLES-->
     
-<link rel="stylesheet" href="/assets/css/all.css">
-
-    
-<link rel="stylesheet" href="/assets/css/jquery.fancybox.css">
-
-    
-<link rel="stylesheet" href="/assets/css/thumbs.css">
-
-    
-<link rel="stylesheet" href="/assets/css/tranquilpeak.css">
+<link rel="stylesheet" href="/assets/css/style-qlm634aeqqh4pedhidwvikqi59e0o7qckfid1geequyx9cyxw5rqjplgvt1t.min.css">
 
     <!--STYLES END-->
     
@@ -94,6 +85,7 @@
             href="/"
             aria-label=""
         >
+        <img class="header-avatar-picture" src="/images/logo32.png" alt="作者的圖片" />
             我是山姆鍋
         </a>
     </div>
@@ -115,8 +107,6 @@
             <!-- Define author's picture -->
 
 
-
-        
     
 
 <nav id="sidebar" data-behavior="4">
@@ -127,7 +117,7 @@
                     href="/#about"
                     aria-label="閱讀有關作者的更多信息"
                 >
-                    <img class="sidebar-profile-picture" src="/images/logo.png" alt="作者的圖片"/>
+                    <img class="sidebar-profile-picture" src="https://www.gravatar.com/avatar/2b44878cb27d093ac9c72a495ea642cf?s=110" alt="作者的圖片"/>
                 </a>
                 <h4 class="sidebar-profile-name">Sampot (山姆鍋)</h4>
                 
@@ -465,7 +455,7 @@
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Share this post"
+                aria-label="Diesen Beitrag teilen"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -503,7 +493,7 @@
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Leave a comment"
+                        aria-label="Kommentieren"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -512,7 +502,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -581,7 +571,7 @@
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Share this post"
+                aria-label="Diesen Beitrag teilen"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -619,7 +609,7 @@
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Leave a comment"
+                        aria-label="Kommentieren"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -628,7 +618,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -679,8 +669,6 @@
 
 
     
-        
-    
 
 <div id="about">
     <div id="about-card">
@@ -688,7 +676,7 @@
             <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="/images/logo.png" alt="作者的圖片"/>
+            <img id="about-card-picture" src="https://www.gravatar.com/avatar/2b44878cb27d093ac9c72a495ea642cf?s=110" alt="作者的圖片"/>
         
             <h4 id="about-card-name">Sampot (山姆鍋)</h4>
         
@@ -989,16 +977,7 @@ server，讓它們彼此互相備份資料(Master-master<br>
 <div id="cover" style="background-image:url('/images/cover.jpg');"></div>
         <!--SCRIPTS-->
 
-<script src="/assets/js/jquery.js"></script>
-
-
-<script src="/assets/js/jquery.fancybox.js"></script>
-
-
-<script src="/assets/js/thumbs.js"></script>
-
-
-<script src="/assets/js/tranquilpeak.js"></script>
+<script src="/assets/js/script-kkzt2vzfxsb5bych7gew3tzpzddvyjfn0sutkf3vixujdxhpjr4ifnekp3si.min.js"></script>
 
 <!--SCRIPTS END-->
 
