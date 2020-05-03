@@ -17,7 +17,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"在 上篇文章 中， 山姆鍋描述了一個高可擴展的任務執行(task execution)架構的需求。針對同一組需求，不同的人會有不同架構設計，沒有所謂標準答案。 這應該跟架構通常描述的是比較抽象的概念有關。本文山姆鍋提供自己的設計，供有興趣的人參考。\n\n進一步了解需求\n在上一篇文章中有一個需求沒有加入：服務的任一個節點都可以接受客戶端的請求，節點彼此在功能上是完全相同(identical)。 之所以沒有加入是不想限制其他人的架構設計。從日後系統維運與架構的單純性來講，加入這個需求是有幫助的， 但是實現這個需求卻不是一般系統架構所能達成。要實現整體需求，我們可以採用「網格運算」的方法。\n必須再次強調的一點：不是因為上篇文章的需求&quot;自然知道&quot;可以使用網格作為架構。 而是因為山姆鍋已經知道「網格運算」的概念，所以知道可以運用來解決問題。 還有就是：是不是一定要用網格來實現？答案當然不是。\n網格運算(Grid Computing)\n網格運算藉由將底層的運算資源抽象化來讓上層的應用可以使用而不用考慮資源存取方法的差異。 網格還可以粗略分為「運算網格(compute grid)」以及「資料網格(data grid)」兩個層面， 分別負責網格中運算以及資料存取的需求。本文說明的任務執行服務屬於「運算網格」。\n有看過星際迷航記的人，應該記得其中有所謂博格人(Borg)這個種族，博格人藉由「同化(Assimilate)」其他種族來強化自己。 最有名的那句台詞：「我們是博格人，你即將要被同化，反抗無用(We are the Borg, you will be assimilated. Resistance is futile. )」。 網格作為一個運算資源的集合體(collective)，就像博格人一樣，藉由同化(透過抽象化、虛擬技術、整合等等)其他主機， 來讓集合體的運算資源可以持續擴大。下一節說明網格如何同化其他節點。\n\n網格成員(Grid Membership)\n由於系統要支援為數不小的節點數量(理論上，無數量限制），要求單一節點維護所有其他的節點的資訊是不實際的。 幸運的是，就任務執行這個服務，我們也不需要。由於需求是將代理人盡可能的隨機分散到不同節點去， 所以，每個節點只需要維持部分的其它節點列表，不過這些節點須代表從整個集合體中的隨機抽樣 [1]。 當節點被要求派生(spawn)新的代理人時，它便可以從這個隨機抽樣中，隨機選一個來指派代理人。 由於節點需要維護的其他節點的最大數量是固定的，例如：64 個。所以， 這個維護的負擔不會因為整個集合體加大而持續增加。這個特性是實現大型網路架構的關鍵之一。\n從整個集合體的觀點，成員節點是動態的。節點不時地加入跟離開，因此，節點所維護的其他節點列表也不是靜態的。 要維持一個代表集合體的少數隨機抽樣，最簡單的方法就是透過 Gossip 通訊協定來定時交換彼此的節點資訊 [2]。 透過這樣的機制，集合體會趨近於一個 隨機圖(Random graph)。關於成員協定，有許多種建議的文件， 山姆鍋建議您看看 Cyclon 。\n驗證需求\n了解網格運算應用在任務執行應用上的優勢後，再來便是說明非功能需求如何被滿足。\n\n\n負載均衡(load distribution):\n\n每一個節點都可以接受派生代理人的要求，每個新派生出來的代理人會被隨機指派到不同的節點。 長遠來看，達到盡可能善用系統資源的目的。\n\n\n\n高可用性(highly available):\n\n每個代理人都有一個監管人(supervisor)負責監管，當代理人逾時或發生故障， 監管人可以根據任務特性來決定是否重新派生代理人或者忽略。最頂層的監管人，也就是客戶端， 需最終負責決定代理人故障如何處理。客戶端本身的可用性不在此服務的範圍內。\n\n\n\n高可擴展性(highly scalable)：\n\n採用網格架構，節點可以不斷地新增或刪除(自動或手動)，可以根據需求來調整。針對任務執行這個應用服務，理論上可無限擴展。\n\n\n\n容忍網路分割(network partition)：\n\n由於節點功能上完全相同，就算是只有少數節點仍舊可以提供服務。 但是單一網路分割的節點數量會限制服務的處理能力(throughput)跟容量(capacity)。\n\n\n\n支援跨資料中心(cross data centers):\n\n節點透過 Gossip 交換節點資訊的過程，在符合隨機性的要求下，可以選擇跟自己緊鄰(proximity)的節點。 這樣做可以避免跨資料中心的傳輸負擔(overhead)，但當在本地資料中心沒有足夠節點的情況下， 仍舊可以將代理人指派到不同的資料中心。 上面的敘述故意忽略網路架構中的防火牆、VPN 等設備。實務上，跨網段或資料中心，實際資料還是有可能會通過這些設備。\n\n\n\n代理人間可以位置無關(location transparency)方式溝通:\n\n代理人的「參考(reference)」封裝與該代理人溝通所需的資訊， 代理人間的溝通已經被抽象化變得跟所在的節點無關。但明確地使用訊息傳遞方式，應用仍舊不能忽略網路本身具備延遲性、訊息遺失等問題。簡單地說：服務並沒有要試圖隱藏網路的存在。\n\n\n\n已知限制\n\n使用 Gossip\n協定，節點故障到被偵測出來是有時間差的。所以，對於需要即時完成的任務，應用需要運用逾時(timeout)的技巧來處理。\n\n結語\n您也許會納悶山姆鍋為什麼不用比較傳統，比較多人使用的架構方式？理由很簡單：實務上常用的方法，山姆鍋大部份都使用過了。 就是因為實務上比較少用，所以就來紙上談兵一下。不過，實務上比較少用，不代表說是不實際的做法，這是兩回事。\n參考資料\n\nRandom graph: https://en.wikipedia.org/wiki/Random_graph\n\n\n隨機圖。\n\n\nCyclon: http://gossple2.irisa.fr/~akermarr/cyclon.jnsm.pdf\n\n\n一種非結構化 P2P 網路的成員協定。\n\n\n\n\n\n正確名稱是：Partial view。 ↩︎\n\n是的，神奇的 Gossip 協定又再次出現了。 ↩︎\n\n\n\n","dateCreated":"2015-09-25T12:50:00+08:00","dateModified":"2020-03-08T10:20:42+08:00","datePublished":"2015-09-25T12:50:00+08:00","description":"在 上篇文章 中， 山姆鍋描述了一個高可擴展的任務執行(task execution)架構的需求。針對同一組需求，不同的人會有不同架構設計，沒有所謂標準答案。 這應該跟架構通常描述的是比較抽象的概念有關。本文山姆鍋提供自己的設計，供有興趣的人參考。","headline":"高可擴展的任務執行架構設計","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2015/09/architecture-design-of-highly-scalable-task-execution/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2015/09/architecture-design-of-highly-scalable-task-execution/","keywords":"Grid, Agent"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"featured_image.jpg"},"articleBody":"在 上篇文章 中， 山姆鍋描述了一個高可擴展的任務執行(task execution)架構的需求。針對同一組需求，不同的人會有不同架構設計，沒有所謂標準答案。 這應該跟架構通常描述的是比較抽象的概念有關。本文山姆鍋提供自己的設計，供有興趣的人參考。\n\n進一步了解需求\n在上一篇文章中有一個需求沒有加入：服務的任一個節點都可以接受客戶端的請求，節點彼此在功能上是完全相同(identical)。 之所以沒有加入是不想限制其他人的架構設計。從日後系統維運與架構的單純性來講，加入這個需求是有幫助的， 但是實現這個需求卻不是一般系統架構所能達成。要實現整體需求，我們可以採用「網格運算」的方法。\n必須再次強調的一點：不是因為上篇文章的需求&quot;自然知道&quot;可以使用網格作為架構。 而是因為山姆鍋已經知道「網格運算」的概念，所以知道可以運用來解決問題。 還有就是：是不是一定要用網格來實現？答案當然不是。\n網格運算(Grid Computing)\n網格運算藉由將底層的運算資源抽象化來讓上層的應用可以使用而不用考慮資源存取方法的差異。 網格還可以粗略分為「運算網格(compute grid)」以及「資料網格(data grid)」兩個層面， 分別負責網格中運算以及資料存取的需求。本文說明的任務執行服務屬於「運算網格」。\n有看過星際迷航記的人，應該記得其中有所謂博格人(Borg)這個種族，博格人藉由「同化(Assimilate)」其他種族來強化自己。 最有名的那句台詞：「我們是博格人，你即將要被同化，反抗無用(We are the Borg, you will be assimilated. Resistance is futile. )」。 網格作為一個運算資源的集合體(collective)，就像博格人一樣，藉由同化(透過抽象化、虛擬技術、整合等等)其他主機， 來讓集合體的運算資源可以持續擴大。下一節說明網格如何同化其他節點。\n\n網格成員(Grid Membership)\n由於系統要支援為數不小的節點數量(理論上，無數量限制），要求單一節點維護所有其他的節點的資訊是不實際的。 幸運的是，就任務執行這個服務，我們也不需要。由於需求是將代理人盡可能的隨機分散到不同節點去， 所以，每個節點只需要維持部分的其它節點列表，不過這些節點須代表從整個集合體中的隨機抽樣 [1]。 當節點被要求派生(spawn)新的代理人時，它便可以從這個隨機抽樣中，隨機選一個來指派代理人。 由於節點需要維護的其他節點的最大數量是固定的，例如：64 個。所以， 這個維護的負擔不會因為整個集合體加大而持續增加。這個特性是實現大型網路架構的關鍵之一。\n從整個集合體的觀點，成員節點是動態的。節點不時地加入跟離開，因此，節點所維護的其他節點列表也不是靜態的。 要維持一個代表集合體的少數隨機抽樣，最簡單的方法就是透過 Gossip 通訊協定來定時交換彼此的節點資訊 [2]。 透過這樣的機制，集合體會趨近於一個 隨機圖(Random graph)。關於成員協定，有許多種建議的文件， 山姆鍋建議您看看 Cyclon 。\n驗證需求\n了解網格運算應用在任務執行應用上的優勢後，再來便是說明非功能需求如何被滿足。\n\n\n負載均衡(load distribution):\n\n每一個節點都可以接受派生代理人的要求，每個新派生出來的代理人會被隨機指派到不同的節點。 長遠來看，達到盡可能善用系統資源的目的。\n\n\n\n高可用性(highly available):\n\n每個代理人都有一個監管人(supervisor)負責監管，當代理人逾時或發生故障， 監管人可以根據任務特性來決定是否重新派生代理人或者忽略。最頂層的監管人，也就是客戶端， 需最終負責決定代理人故障如何處理。客戶端本身的可用性不在此服務的範圍內。\n\n\n\n高可擴展性(highly scalable)：\n\n採用網格架構，節點可以不斷地新增或刪除(自動或手動)，可以根據需求來調整。針對任務執行這個應用服務，理論上可無限擴展。\n\n\n\n容忍網路分割(network partition)：\n\n由於節點功能上完全相同，就算是只有少數節點仍舊可以提供服務。 但是單一網路分割的節點數量會限制服務的處理能力(throughput)跟容量(capacity)。\n\n\n\n支援跨資料中心(cross data centers):\n\n節點透過 Gossip 交換節點資訊的過程，在符合隨機性的要求下，可以選擇跟自己緊鄰(proximity)的節點。 這樣做可以避免跨資料中心的傳輸負擔(overhead)，但當在本地資料中心沒有足夠節點的情況下， 仍舊可以將代理人指派到不同的資料中心。 上面的敘述故意忽略網路架構中的防火牆、VPN 等設備。實務上，跨網段或資料中心，實際資料還是有可能會通過這些設備。\n\n\n\n代理人間可以位置無關(location transparency)方式溝通:\n\n代理人的「參考(reference)」封裝與該代理人溝通所需的資訊， 代理人間的溝通已經被抽象化變得跟所在的節點無關。但明確地使用訊息傳遞方式，應用仍舊不能忽略網路本身具備延遲性、訊息遺失等問題。簡單地說：服務並沒有要試圖隱藏網路的存在。\n\n\n\n已知限制\n\n使用 Gossip\n協定，節點故障到被偵測出來是有時間差的。所以，對於需要即時完成的任務，應用需要運用逾時(timeout)的技巧來處理。\n\n結語\n您也許會納悶山姆鍋為什麼不用比較傳統，比較多人使用的架構方式？理由很簡單：實務上常用的方法，山姆鍋大部份都使用過了。 就是因為實務上比較少用，所以就來紙上談兵一下。不過，實務上比較少用，不代表說是不實際的做法，這是兩回事。\n參考資料\n\nRandom graph: https://en.wikipedia.org/wiki/Random_graph\n\n\n隨機圖。\n\n\nCyclon: http://gossple2.irisa.fr/~akermarr/cyclon.jnsm.pdf\n\n\n一種非結構化 P2P 網路的成員協定。\n\n\n\n\n\n正確名稱是：Partial view。 ↩︎\n\n是的，神奇的 Gossip 協定又再次出現了。 ↩︎\n\n\n\n","dateCreated":"2015-09-25T12:50:00+08:00","dateModified":"2020-03-08T10:20:42+08:00","datePublished":"2015-09-25T12:50:00+08:00","description":"在 上篇文章 中， 山姆鍋描述了一個高可擴展的任務執行(task execution)架構的需求。針對同一組需求，不同的人會有不同架構設計，沒有所謂標準答案。 這應該跟架構通常描述的是比較抽象的概念有關。本文山姆鍋提供自己的設計，供有興趣的人參考。","headline":"高可擴展的任務執行架構設計","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2015/09/architecture-design-of-highly-scalable-task-execution/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"featured_image.jpg","logo":{"@type":"ImageObject","url":"featured_image.jpg"}},"url":"https://samkuo.me/post/2015/09/architecture-design-of-highly-scalable-task-execution/","keywords":"Grid, Agent"}</script>
     <meta name="description" content="在 上篇文章 中， 山姆鍋描述了一個高可擴展的任務執行(task execution)架構的需求。針對同一組需求，不同的人會有不同架構設計，沒有所謂標準答案。 這應該跟架構通常描述的是比較抽象的概念有關。本文山姆鍋提供自己的設計，供有興趣的人參考。">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="高可擴展的任務執行架構設計">
@@ -40,7 +40,7 @@
         
     
     
-        <meta property="og:image" content="https://samkuo.me/images/logo.png"/>
+        <meta property="og:image" content="https://samkuo.me/images/featured_image.jpg"/>
     
     
     
@@ -115,7 +115,7 @@
                     href="/#about"
                     aria-label="閱讀有關作者的更多信息"
                 >
-                    <img class="sidebar-profile-picture" src="/images/logo.png" alt="作者的圖片"/>
+                    <img class="sidebar-profile-picture" src="/images/featured_image.jpg" alt="作者的圖片"/>
                 </a>
                 <h4 class="sidebar-profile-name">Sampot (山姆鍋)</h4>
                 
@@ -505,7 +505,7 @@
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Diesen Beitrag teilen"
+                aria-label="Share this post"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -543,7 +543,7 @@
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Kommentieren"
+                        aria-label="Leave a comment"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -552,7 +552,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -621,7 +621,7 @@
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Diesen Beitrag teilen"
+                aria-label="Share this post"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -659,7 +659,7 @@
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Kommentieren"
+                        aria-label="Leave a comment"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -668,7 +668,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -728,7 +728,7 @@
             <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="/images/logo.png" alt="作者的圖片"/>
+            <img id="about-card-picture" src="/images/featured_image.jpg" alt="作者的圖片"/>
         
             <h4 id="about-card-name">Sampot (山姆鍋)</h4>
         

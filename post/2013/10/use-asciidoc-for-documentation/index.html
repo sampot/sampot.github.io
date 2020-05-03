@@ -19,7 +19,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"作為軟體開發人員，山姆鍋跟大多數人一樣不太喜歡寫文件，但文件(尤其是 API 等技術文件)其實就跟原始碼一樣需要即時的更新與維護。「影化身科技」的網站已經採用 Markdown 這種輕量級文件格式且所有內容都跟程式碼一樣進行版本控制，對於技術文件，自然希望採取相同的流程。本文說明山姆鍋選擇 AsciiDoc 作為文件格式的主要原因。\n\n問題\n在軟體開發過程中，不管是專案內部使用的需求規格、架構設計、還是外部使用手冊，或多或少都需要產出一些相關文件。文件的撰寫工具往往會限制文件生產的流程，而軟體開發文件因為常常需要配合目前軟體版本的變動，需要即時的更新來保持它的利用價值。\n需求\n作為軟體相關文件，底下是山姆鍋評估的重點：\n1. 可以多人共同協作\n文件格式或工具必須可以讓多人同時撰寫，使用電子郵件把文件寄來寄去這種方式不算是可行的作法。多人協作需要可以方便知道「誰」、「何時」、「做了哪些修改」，因此也就引申出版本控制的需求。\n2. 支援版本控制\n文件格式要能夠進行版本控制，除了可以支援多人共同協作，還可以利用持續整合工具來持續發佈最新版本以供除錯或審閱。\n3. 支援多種輸出格式\n文件就跟軟體一樣，要送達到最終的使用者手中才有價值。而為了達到這個目的，文件必須能夠以多種格式存在來讓使用者以最方便的方式讀取。\n現有做法\n底下是幾種常用來作為文件撰寫的工具：\n1. 使用文書處理軟體\n像是 MS Word、OO Writer 這類的文書處理器軟體，是撰寫文件的自然選擇。但使用文書處理軟體有幾個缺點：\n\n大部份使用私有格式，導致支援的編寫工具不足。\n難以進行自動轉換來輸出多種格式。\n「所見即所得」的編輯方式會讓寫手分心處理樣式而不是更重要的內容。\n不方便進行版本控制，無法有效協作撰寫。\n\n2. 使用 Wiki 編輯軟體\n過去山姆鍋也使用過像是 Confluence 這種 Wiki 軟體來作為文件撰寫工具，由於使用簡單的文字格式，編寫上相對簡單，藉由插件也可以支援多種格式的輸出。但使用 Wiki 軟體主要的缺點有：\n\n很難讓文件與軟體一起進行發佈。\n難以進行自動轉換來輸出多種格式。\n\n3. 使用 DocBook 工具\n使用DocBook作為文件原始格式並配合相關工具，可以說符合大部份需要。 DocBook 是一種 XML 文件格式規範，適合用來作為書籍、文件的撰寫格式，透過 XSL 樣式可以轉換成 HTML, PDF 等多種格式。由於是文字檔案，進行版本控制也是輕而易舉。雖然符合需要，但最大缺點就是 XML 語法過於繁瑣。\n方案\n在尋找比 DocBook 更簡單的方案的過程中，山姆鍋發現了AsciiDoc這個輕量級文件格式。它的目的基本上就是作為 DocBook 的簡易替代格式，使用流程上跟 DocBook 一樣。事實上，AsciiDoc 可以轉換成 DocBook 格式，因此可以運用 DocBook 現有工具。\nAsciiDoc 是一種文字格式，採用與 Wiki 編寫類似的語法。對大部份的需求，AsciiDoc 都採用比 DocBook 簡單的語法來達成，對於 AsciiDoc 沒有支援的 DocBook 特性，也可以透過 AsciiDoc 的 Passthrough 機制來達成。Passthrough 機制簡單地說是讓您可以將 DocBook 的片段直接寫在 AsciiDoc 文件中，而這些片段會出現在最終產出的 DocBook 文件。\n小結\n從精實生產(lean production)的觀點，要盡可能將生產過程中的一切步驟自動化，作為開發流程的一環，文件的產出自然也不能例外。使用 AsciiDoc 這種文字型的文件格式讓文件就跟原始程式碼一樣，可以經過後製來得到最終格式化後的產物，從而讓開發者/撰寫者可以專注在產出內容上。\n","dateCreated":"2013-10-22T09:12:00+08:00","dateModified":"2018-08-19T22:04:48+08:00","datePublished":"2013-10-22T09:12:00+08:00","description":"作為軟體開發人員，山姆鍋跟大多數人一樣不太喜歡寫文件，但文件(尤其是 API 等技術文件)其實就跟原始碼一樣需要即時的更新與維護。「影化身科技」的網站已經採用 Markdown 這種輕量級文件格式且所有內容都跟程式碼一樣進行版本控制，對於技術文件，自然希望採取相同的流程。本文說明山姆鍋選擇 AsciiDoc 作為文件格式的主要原因。","headline":"運用AsciiDoc作為文件撰寫格式","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/10/use-asciidoc-for-documentation/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2013/10/use-asciidoc-for-documentation/","keywords":"AsciiDoc, DocBook, Markdown, reStructuredText"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"featured_image.jpg"},"articleBody":"作為軟體開發人員，山姆鍋跟大多數人一樣不太喜歡寫文件，但文件(尤其是 API 等技術文件)其實就跟原始碼一樣需要即時的更新與維護。「影化身科技」的網站已經採用 Markdown 這種輕量級文件格式且所有內容都跟程式碼一樣進行版本控制，對於技術文件，自然希望採取相同的流程。本文說明山姆鍋選擇 AsciiDoc 作為文件格式的主要原因。\n\n問題\n在軟體開發過程中，不管是專案內部使用的需求規格、架構設計、還是外部使用手冊，或多或少都需要產出一些相關文件。文件的撰寫工具往往會限制文件生產的流程，而軟體開發文件因為常常需要配合目前軟體版本的變動，需要即時的更新來保持它的利用價值。\n需求\n作為軟體相關文件，底下是山姆鍋評估的重點：\n1. 可以多人共同協作\n文件格式或工具必須可以讓多人同時撰寫，使用電子郵件把文件寄來寄去這種方式不算是可行的作法。多人協作需要可以方便知道「誰」、「何時」、「做了哪些修改」，因此也就引申出版本控制的需求。\n2. 支援版本控制\n文件格式要能夠進行版本控制，除了可以支援多人共同協作，還可以利用持續整合工具來持續發佈最新版本以供除錯或審閱。\n3. 支援多種輸出格式\n文件就跟軟體一樣，要送達到最終的使用者手中才有價值。而為了達到這個目的，文件必須能夠以多種格式存在來讓使用者以最方便的方式讀取。\n現有做法\n底下是幾種常用來作為文件撰寫的工具：\n1. 使用文書處理軟體\n像是 MS Word、OO Writer 這類的文書處理器軟體，是撰寫文件的自然選擇。但使用文書處理軟體有幾個缺點：\n\n大部份使用私有格式，導致支援的編寫工具不足。\n難以進行自動轉換來輸出多種格式。\n「所見即所得」的編輯方式會讓寫手分心處理樣式而不是更重要的內容。\n不方便進行版本控制，無法有效協作撰寫。\n\n2. 使用 Wiki 編輯軟體\n過去山姆鍋也使用過像是 Confluence 這種 Wiki 軟體來作為文件撰寫工具，由於使用簡單的文字格式，編寫上相對簡單，藉由插件也可以支援多種格式的輸出。但使用 Wiki 軟體主要的缺點有：\n\n很難讓文件與軟體一起進行發佈。\n難以進行自動轉換來輸出多種格式。\n\n3. 使用 DocBook 工具\n使用DocBook作為文件原始格式並配合相關工具，可以說符合大部份需要。 DocBook 是一種 XML 文件格式規範，適合用來作為書籍、文件的撰寫格式，透過 XSL 樣式可以轉換成 HTML, PDF 等多種格式。由於是文字檔案，進行版本控制也是輕而易舉。雖然符合需要，但最大缺點就是 XML 語法過於繁瑣。\n方案\n在尋找比 DocBook 更簡單的方案的過程中，山姆鍋發現了AsciiDoc這個輕量級文件格式。它的目的基本上就是作為 DocBook 的簡易替代格式，使用流程上跟 DocBook 一樣。事實上，AsciiDoc 可以轉換成 DocBook 格式，因此可以運用 DocBook 現有工具。\nAsciiDoc 是一種文字格式，採用與 Wiki 編寫類似的語法。對大部份的需求，AsciiDoc 都採用比 DocBook 簡單的語法來達成，對於 AsciiDoc 沒有支援的 DocBook 特性，也可以透過 AsciiDoc 的 Passthrough 機制來達成。Passthrough 機制簡單地說是讓您可以將 DocBook 的片段直接寫在 AsciiDoc 文件中，而這些片段會出現在最終產出的 DocBook 文件。\n小結\n從精實生產(lean production)的觀點，要盡可能將生產過程中的一切步驟自動化，作為開發流程的一環，文件的產出自然也不能例外。使用 AsciiDoc 這種文字型的文件格式讓文件就跟原始程式碼一樣，可以經過後製來得到最終格式化後的產物，從而讓開發者/撰寫者可以專注在產出內容上。\n","dateCreated":"2013-10-22T09:12:00+08:00","dateModified":"2018-08-19T22:04:48+08:00","datePublished":"2013-10-22T09:12:00+08:00","description":"作為軟體開發人員，山姆鍋跟大多數人一樣不太喜歡寫文件，但文件(尤其是 API 等技術文件)其實就跟原始碼一樣需要即時的更新與維護。「影化身科技」的網站已經採用 Markdown 這種輕量級文件格式且所有內容都跟程式碼一樣進行版本控制，對於技術文件，自然希望採取相同的流程。本文說明山姆鍋選擇 AsciiDoc 作為文件格式的主要原因。","headline":"運用AsciiDoc作為文件撰寫格式","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/10/use-asciidoc-for-documentation/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"featured_image.jpg","logo":{"@type":"ImageObject","url":"featured_image.jpg"}},"url":"https://samkuo.me/post/2013/10/use-asciidoc-for-documentation/","keywords":"AsciiDoc, DocBook, Markdown, reStructuredText"}</script>
     <meta name="description" content="使用AsciiDoc作為技術文件、文章或其他網頁內容的格式。">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="運用AsciiDoc作為文件撰寫格式">
@@ -43,7 +43,7 @@
         
     
     
-        <meta property="og:image" content="https://samkuo.me/images/logo.png"/>
+        <meta property="og:image" content="https://samkuo.me/images/featured_image.jpg"/>
     
     
     
@@ -118,7 +118,7 @@
                     href="/#about"
                     aria-label="閱讀有關作者的更多信息"
                 >
-                    <img class="sidebar-profile-picture" src="/images/logo.png" alt="作者的圖片"/>
+                    <img class="sidebar-profile-picture" src="/images/featured_image.jpg" alt="作者的圖片"/>
                 </a>
                 <h4 class="sidebar-profile-name">Sampot (山姆鍋)</h4>
                 
@@ -461,7 +461,7 @@
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Diesen Beitrag teilen"
+                aria-label="Share this post"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -499,7 +499,7 @@
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Kommentieren"
+                        aria-label="Leave a comment"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -508,7 +508,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -577,7 +577,7 @@
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Diesen Beitrag teilen"
+                aria-label="Share this post"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -615,7 +615,7 @@
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Kommentieren"
+                        aria-label="Leave a comment"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -624,7 +624,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -684,7 +684,7 @@
             <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="/images/logo.png" alt="作者的圖片"/>
+            <img id="about-card-picture" src="/images/featured_image.jpg" alt="作者的圖片"/>
         
             <h4 id="about-card-name">Sampot (山姆鍋)</h4>
         

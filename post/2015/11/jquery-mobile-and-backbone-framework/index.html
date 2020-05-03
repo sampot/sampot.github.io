@@ -17,7 +17,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"山姆鍋對 JavaScript 大多數框架都不算熟悉，但因為《我.影化身》專案需要提供 Web 介面， 不得已也要選擇符合自己需要的框架來運用一下。幸好，我的目標只是一個相對簡單的使用者介面， 讓這個過程縮短不少時間，最後決定使用 JQuery Mobile + Backbone 這樣的框架組合。\n\n為什麼選擇使用 Web 用戶介面?\n《我.影化身》專案有桌面環境用戶介面的需求，也嘗試過使用 Qt\n這種跨平台的程式庫。 但山姆鍋對於產生的發行包因為這樣就要多將近\n20MB 的大小一直覺得耿耿於懷，雖然這只是個人偏好問題，\n還是希望有一個較輕量的跨平台用戶介面。\n另外一個做法就是使用各個平台的特有程式庫來開發 UI，對於 Python\n程式，這表示：\n\n在 Windows 使用 PyWin32\n在 OS X 使用 PyObjC\n在 Linux 使用 PyGObject\n\n理論上是可行，但要同時使用不同 API 在不同平台開發 UI, 只要 UI\n稍微複雜點，\n開發的困難度就會需要每個平台一個專職工程師了。《我.影化身》的確有使用上述\n程式庫來整合桌面環境的訊息通知機制以及選單，但要開發完整\nUI，即使像是《我.影化身》這種設定不需要複雜 UI\n的程式，難度還是太高了。其它如 Toga, PyGUI 等等特殊的跨平台 UI\n程式庫都因為缺乏專案所需的功能而無法採用。\n不管原因為何，最後決定使用 Web 技術來提供跨平台 UI,\n似乎也是很合理的方案。\n為什麼選擇 JQuery Mobile + Backbone?\n由於專業上需要，一直以來山姆鍋都有持續在關注 JavaScript 應用框架的發展，\n也常常對於如雨後春筍般出現的新框架感到無所適從，所以之前都僅止於了解，並沒有太多實際運用的經驗。\n如今要選擇專案所使用的框架，自然要先說說專案的需求：\n\n\n\n提供一個類似應用程式(App)的用戶介面\n\n:   因為這個專案就是個應用程式。\n\n\n\n\n不用太多 HTML5, CSS3 設計\n\n:   作為工程師，山姆鍋對於設計的美感真的不在行。\n\n\n\n\n使用現有的用戶介面元件\n\n:   希望開發的方式可以使用元件概念撰寫，也就是有明確的 Button, List,\n    Table 這樣的概念。\n\n\n\n\n同時支援桌面、平板以及手機裝置\n\n:   沒有太多時間使用不同的框架。\n\n應該也有其它方案符合需求，像是 Sencha Touch 等，但個人偏好 JQuery\nMobile。 作為 UI 框架, JQuery Mobile\n基本功能完整，但要開發應用總還是希望程式要有更好的結構，\n這就需要考慮採用其它應用框架來輔助，目前跟 JQuery Mobile\n搭配最好的看來是 Backbone。\n雖然網路上有許多關於 JQuery Mobile + Backbone 的教學文章，JQuery Mobile\n官網甚至有提供示範案例，但這些例子大多假設專案需求龐大，硬是要使用\nRequireJS 來提供模組化開發機制。 對於《我.影化身》這樣的專案來說，使用\nRequireJS 總有點太過了[1] 。 雖然網路上也找得到關於只使用 JQuery Mobile\n\nBackbone 的範例，但事情如果順利的話， 就不會有這篇文章了！\n\n問題出在哪?\n老實說，山姆鍋對 JavaScript 相關框架真的不熟，只是一邊開發一邊學習。\n對於網路找到的 JQuery Mobile + Backbone\n範例為何不能正常運作也沒有時間深入了解，\n也許是單純版本問題，或者只是山姆鍋眼睛脫窗哪裏沒有設定好！不管怎樣，本來認為一件簡單的事情，\n卡了一段時間後終於試出來一個可以運作的組合。\n除了 JQuery，JQM\n本身並不依賴其它程式庫，雖說是完整的框架，但因為它缺少其它 MV*\n應用框架的功能， 讓它其實更像 Twitter Bootstrap 這種 UI\n框架。為了開發完整的應用，通常還是搭配 Backbone 這樣的應用框架。\n但因為 JQM 有自己的頁面路由(page\nrouting)的機制，所以需要設定讓它不處理這部分功能，而由 Backbone\n全權處理。JQM 相關的設定在 /js/jqm-config.js 這個檔案：\n12345678910111213// JQM config$(document).on(\"mobileinit\", function () &#123;    $.mobile.ajaxEnabled = false;    $.mobile.linkBindingEnabled = false;    $.mobile.hashListeningEnabled = false;    $.mobile.pushStateEnabled = false;    $.mobile.defaultPageTransition = \"fade\";    $.mobile.autoInitializePage = false;    $(\"div[data-role='page']\").on(\"pagehide\", function (event, ui) &#123;        $(event.currentTarget).remove();    &#125;);&#125;);\n\n\n\n\\'mobileinit\\' 事件\n\n:   在 JQM 完成初始化前會呼叫此事件，所以在此設定 JQM。\n\n\n\n\najaxEnabled, linkBindingEnabled, pushStateEnabled 都設為 false\n\n:   分別讓 JQM 不使用 Ajax 方式動態載入頁面, 不處理超連結點選事件,\n    以及瀏覽器的導航歷史管理(navigation history)，這些都會干擾\n    Backbone 的運作。\n\n\n\n\nhashListeningEnabled 設為 false\n\n:   告訴 JQM 不要處理瀏覽器 URL hash 更動事件。 URL\n    hash就是瀏覽器網址中 \\'\\#\\' 那個部分，\n    這個部分按照規範是不會傳給後端伺服器，只能在網頁中存取。JQM 跟\n    Backbone 就是利用這個 hash 來決定要使用的頁面。\n\n\n\n\n由於 JQM 不再負責頁面導航管理，需要由我們自己完成舊的頁面資料從 DOM 中移除的工作\n\n:   `pagehide` 事件處理便是用來完成這個工作。\n\n有了這樣的設定，基本上就可以使用 Backbone\n來處理前端頁面導航以及其它功能。\n其它注意事項\n有幾個在實際開發中遇到的問題：\n\n\n\n動態產生 JQM 頁面內容時，可能會發現網頁呈現不太正常\n\n:   這點在專案樣板中沒有實例。這是因為 JQM\n    沒有機會套用樣式到新增的網頁元素，需要特別通知 JQM:\n\n    1$(this.el).trigger(\"create\");\n\n    如果您有其它更好的方式，請不吝指教。\n\n\n\n\n新版本的更換頁面方式\n\n:   新版本的 JQM 管理頁面的方式有更動，改為下列方式：\n\n    1$(\":mobile-pagecontainer\").pagecontainer( \"change\", $(page.el), &#123; changeHash: false&#125;);\n\n    網路上找到的文章大多使用舊的方法，也就是：\n\n    1$.mobile.changePage($(page.el), &#123;changeHash:false&#125;);\n\n\n\n\njqm-config.js 的引入順序\n\n:   `/js/jqm-config.js` 是用來設定 JQM, 它必須在 JQuery\n    之後， JQM 之前在網頁中引入，如:\n\n123&lt;script src=\"/js/jquery.min.js\"&gt;&lt;/script&gt;&lt;script src=\"/js/jqm-config.js\"&gt;&lt;/script&gt;&lt;script src=\"/js/jquery.mobile.min.js\"&gt;&lt;/script&gt;\nJQM + Backbone 專案樣板\n為了方便未來使用，山姆鍋在 GitHub\n上整理了一個專案樣板：https://github.com/sampot/jqm-backbone-template\n想要更實際的例子？那就請直接參考《我.影化身》的前端用戶介面實作(webfront)：https://github.com/eavatar/eavatar-me\n。\n結語\n山姆鍋其實很喜歡 AngularJS\n這個應用框架，但對於它的運作方式不是很了解，所以不在這個專案採用。\n在實際使用後，發現 JQM + Backbone\n這樣的組合還蠻不錯的：夠簡單、運作流程容易理解。 對於只需要簡單 Web UI\n的應用專案，這是個不錯的選擇。\n參考資料\n\n\n\nUsing Backbone.js with jQuery Mobile\nhttp://coenraets.org/blog/2012/03/using-backbone-js-with-jquery-mobile/\n\n\n\n\n\n\n\n如果預期專案需要多人一起開發或者功能較複雜，建議考慮使用 RequireJS。 ↩︎\n\n\n\n","dateCreated":"2015-11-10T09:34:00+08:00","dateModified":"2020-03-02T18:20:45+08:00","datePublished":"2015-11-10T09:34:00+08:00","description":"山姆鍋對 JavaScript 大多數框架都不算熟悉，但因為《我.影化身》專案需要提供 Web 介面， 不得已也要選擇符合自己需要的框架來運用一下。幸好，我的目標只是一個相對簡單的使用者介面， 讓這個過程縮短不少時間，最後決定使用 JQuery Mobile + Backbone 這樣的框架組合。","headline":"簡單好用！JQM 跟 Backbone 做 Web 用戶介面","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2015/11/jquery-mobile-and-backbone-framework/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2015/11/jquery-mobile-and-backbone-framework/","keywords":"Mobile, JQuery, JQM, Backbone, Framework, JavaScript"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"featured_image.jpg"},"articleBody":"山姆鍋對 JavaScript 大多數框架都不算熟悉，但因為《我.影化身》專案需要提供 Web 介面， 不得已也要選擇符合自己需要的框架來運用一下。幸好，我的目標只是一個相對簡單的使用者介面， 讓這個過程縮短不少時間，最後決定使用 JQuery Mobile + Backbone 這樣的框架組合。\n\n為什麼選擇使用 Web 用戶介面?\n《我.影化身》專案有桌面環境用戶介面的需求，也嘗試過使用 Qt\n這種跨平台的程式庫。 但山姆鍋對於產生的發行包因為這樣就要多將近\n20MB 的大小一直覺得耿耿於懷，雖然這只是個人偏好問題，\n還是希望有一個較輕量的跨平台用戶介面。\n另外一個做法就是使用各個平台的特有程式庫來開發 UI，對於 Python\n程式，這表示：\n\n在 Windows 使用 PyWin32\n在 OS X 使用 PyObjC\n在 Linux 使用 PyGObject\n\n理論上是可行，但要同時使用不同 API 在不同平台開發 UI, 只要 UI\n稍微複雜點，\n開發的困難度就會需要每個平台一個專職工程師了。《我.影化身》的確有使用上述\n程式庫來整合桌面環境的訊息通知機制以及選單，但要開發完整\nUI，即使像是《我.影化身》這種設定不需要複雜 UI\n的程式，難度還是太高了。其它如 Toga, PyGUI 等等特殊的跨平台 UI\n程式庫都因為缺乏專案所需的功能而無法採用。\n不管原因為何，最後決定使用 Web 技術來提供跨平台 UI,\n似乎也是很合理的方案。\n為什麼選擇 JQuery Mobile + Backbone?\n由於專業上需要，一直以來山姆鍋都有持續在關注 JavaScript 應用框架的發展，\n也常常對於如雨後春筍般出現的新框架感到無所適從，所以之前都僅止於了解，並沒有太多實際運用的經驗。\n如今要選擇專案所使用的框架，自然要先說說專案的需求：\n\n\n\n提供一個類似應用程式(App)的用戶介面\n\n:   因為這個專案就是個應用程式。\n\n\n\n\n不用太多 HTML5, CSS3 設計\n\n:   作為工程師，山姆鍋對於設計的美感真的不在行。\n\n\n\n\n使用現有的用戶介面元件\n\n:   希望開發的方式可以使用元件概念撰寫，也就是有明確的 Button, List,\n    Table 這樣的概念。\n\n\n\n\n同時支援桌面、平板以及手機裝置\n\n:   沒有太多時間使用不同的框架。\n\n應該也有其它方案符合需求，像是 Sencha Touch 等，但個人偏好 JQuery\nMobile。 作為 UI 框架, JQuery Mobile\n基本功能完整，但要開發應用總還是希望程式要有更好的結構，\n這就需要考慮採用其它應用框架來輔助，目前跟 JQuery Mobile\n搭配最好的看來是 Backbone。\n雖然網路上有許多關於 JQuery Mobile + Backbone 的教學文章，JQuery Mobile\n官網甚至有提供示範案例，但這些例子大多假設專案需求龐大，硬是要使用\nRequireJS 來提供模組化開發機制。 對於《我.影化身》這樣的專案來說，使用\nRequireJS 總有點太過了[1] 。 雖然網路上也找得到關於只使用 JQuery Mobile\n\nBackbone 的範例，但事情如果順利的話， 就不會有這篇文章了！\n\n問題出在哪?\n老實說，山姆鍋對 JavaScript 相關框架真的不熟，只是一邊開發一邊學習。\n對於網路找到的 JQuery Mobile + Backbone\n範例為何不能正常運作也沒有時間深入了解，\n也許是單純版本問題，或者只是山姆鍋眼睛脫窗哪裏沒有設定好！不管怎樣，本來認為一件簡單的事情，\n卡了一段時間後終於試出來一個可以運作的組合。\n除了 JQuery，JQM\n本身並不依賴其它程式庫，雖說是完整的框架，但因為它缺少其它 MV*\n應用框架的功能， 讓它其實更像 Twitter Bootstrap 這種 UI\n框架。為了開發完整的應用，通常還是搭配 Backbone 這樣的應用框架。\n但因為 JQM 有自己的頁面路由(page\nrouting)的機制，所以需要設定讓它不處理這部分功能，而由 Backbone\n全權處理。JQM 相關的設定在 /js/jqm-config.js 這個檔案：\n12345678910111213// JQM config$(document).on(\"mobileinit\", function () &#123;    $.mobile.ajaxEnabled = false;    $.mobile.linkBindingEnabled = false;    $.mobile.hashListeningEnabled = false;    $.mobile.pushStateEnabled = false;    $.mobile.defaultPageTransition = \"fade\";    $.mobile.autoInitializePage = false;    $(\"div[data-role='page']\").on(\"pagehide\", function (event, ui) &#123;        $(event.currentTarget).remove();    &#125;);&#125;);\n\n\n\n\\'mobileinit\\' 事件\n\n:   在 JQM 完成初始化前會呼叫此事件，所以在此設定 JQM。\n\n\n\n\najaxEnabled, linkBindingEnabled, pushStateEnabled 都設為 false\n\n:   分別讓 JQM 不使用 Ajax 方式動態載入頁面, 不處理超連結點選事件,\n    以及瀏覽器的導航歷史管理(navigation history)，這些都會干擾\n    Backbone 的運作。\n\n\n\n\nhashListeningEnabled 設為 false\n\n:   告訴 JQM 不要處理瀏覽器 URL hash 更動事件。 URL\n    hash就是瀏覽器網址中 \\'\\#\\' 那個部分，\n    這個部分按照規範是不會傳給後端伺服器，只能在網頁中存取。JQM 跟\n    Backbone 就是利用這個 hash 來決定要使用的頁面。\n\n\n\n\n由於 JQM 不再負責頁面導航管理，需要由我們自己完成舊的頁面資料從 DOM 中移除的工作\n\n:   `pagehide` 事件處理便是用來完成這個工作。\n\n有了這樣的設定，基本上就可以使用 Backbone\n來處理前端頁面導航以及其它功能。\n其它注意事項\n有幾個在實際開發中遇到的問題：\n\n\n\n動態產生 JQM 頁面內容時，可能會發現網頁呈現不太正常\n\n:   這點在專案樣板中沒有實例。這是因為 JQM\n    沒有機會套用樣式到新增的網頁元素，需要特別通知 JQM:\n\n    1$(this.el).trigger(\"create\");\n\n    如果您有其它更好的方式，請不吝指教。\n\n\n\n\n新版本的更換頁面方式\n\n:   新版本的 JQM 管理頁面的方式有更動，改為下列方式：\n\n    1$(\":mobile-pagecontainer\").pagecontainer( \"change\", $(page.el), &#123; changeHash: false&#125;);\n\n    網路上找到的文章大多使用舊的方法，也就是：\n\n    1$.mobile.changePage($(page.el), &#123;changeHash:false&#125;);\n\n\n\n\njqm-config.js 的引入順序\n\n:   `/js/jqm-config.js` 是用來設定 JQM, 它必須在 JQuery\n    之後， JQM 之前在網頁中引入，如:\n\n123&lt;script src=\"/js/jquery.min.js\"&gt;&lt;/script&gt;&lt;script src=\"/js/jqm-config.js\"&gt;&lt;/script&gt;&lt;script src=\"/js/jquery.mobile.min.js\"&gt;&lt;/script&gt;\nJQM + Backbone 專案樣板\n為了方便未來使用，山姆鍋在 GitHub\n上整理了一個專案樣板：https://github.com/sampot/jqm-backbone-template\n想要更實際的例子？那就請直接參考《我.影化身》的前端用戶介面實作(webfront)：https://github.com/eavatar/eavatar-me\n。\n結語\n山姆鍋其實很喜歡 AngularJS\n這個應用框架，但對於它的運作方式不是很了解，所以不在這個專案採用。\n在實際使用後，發現 JQM + Backbone\n這樣的組合還蠻不錯的：夠簡單、運作流程容易理解。 對於只需要簡單 Web UI\n的應用專案，這是個不錯的選擇。\n參考資料\n\n\n\nUsing Backbone.js with jQuery Mobile\nhttp://coenraets.org/blog/2012/03/using-backbone-js-with-jquery-mobile/\n\n\n\n\n\n\n\n如果預期專案需要多人一起開發或者功能較複雜，建議考慮使用 RequireJS。 ↩︎\n\n\n\n","dateCreated":"2015-11-10T09:34:00+08:00","dateModified":"2020-03-02T18:20:45+08:00","datePublished":"2015-11-10T09:34:00+08:00","description":"山姆鍋對 JavaScript 大多數框架都不算熟悉，但因為《我.影化身》專案需要提供 Web 介面， 不得已也要選擇符合自己需要的框架來運用一下。幸好，我的目標只是一個相對簡單的使用者介面， 讓這個過程縮短不少時間，最後決定使用 JQuery Mobile + Backbone 這樣的框架組合。","headline":"簡單好用！JQM 跟 Backbone 做 Web 用戶介面","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2015/11/jquery-mobile-and-backbone-framework/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"featured_image.jpg","logo":{"@type":"ImageObject","url":"featured_image.jpg"}},"url":"https://samkuo.me/post/2015/11/jquery-mobile-and-backbone-framework/","keywords":"Mobile, JQuery, JQM, Backbone, Framework, JavaScript"}</script>
     <meta name="description" content="山姆鍋對 JavaScript 大多數框架都不算熟悉，但因為《我.影化身》專案需要提供 Web 介面， 不得已也要選擇符合自己需要的框架來運用一下。幸好，我的目標只是一個相對簡單的使用者介面， 讓這個過程縮短不少時間，最後決定使用 JQuery Mobile + Backbone 這樣的框架組合。">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="簡單好用！JQM 跟 Backbone 做 Web 用戶介面">
@@ -42,7 +42,7 @@
         
     
     
-        <meta property="og:image" content="https://samkuo.me/images/logo.png"/>
+        <meta property="og:image" content="https://samkuo.me/images/featured_image.jpg"/>
     
     
     
@@ -117,7 +117,7 @@
                     href="/#about"
                     aria-label="閱讀有關作者的更多信息"
                 >
-                    <img class="sidebar-profile-picture" src="/images/logo.png" alt="作者的圖片"/>
+                    <img class="sidebar-profile-picture" src="/images/featured_image.jpg" alt="作者的圖片"/>
                 </a>
                 <h4 class="sidebar-profile-name">Sampot (山姆鍋)</h4>
                 
@@ -606,7 +606,7 @@ routing)的機制，所以需要設定讓它不處理這部分功能，而由 Ba
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Diesen Beitrag teilen"
+                aria-label="Share this post"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -644,7 +644,7 @@ routing)的機制，所以需要設定讓它不處理這部分功能，而由 Ba
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Kommentieren"
+                        aria-label="Leave a comment"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -653,7 +653,7 @@ routing)的機制，所以需要設定讓它不處理這部分功能，而由 Ba
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -722,7 +722,7 @@ routing)的機制，所以需要設定讓它不處理這部分功能，而由 Ba
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Diesen Beitrag teilen"
+                aria-label="Share this post"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -760,7 +760,7 @@ routing)的機制，所以需要設定讓它不處理這部分功能，而由 Ba
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Kommentieren"
+                        aria-label="Leave a comment"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -769,7 +769,7 @@ routing)的機制，所以需要設定讓它不處理這部分功能，而由 Ba
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -829,7 +829,7 @@ routing)的機制，所以需要設定讓它不處理這部分功能，而由 Ba
             <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="/images/logo.png" alt="作者的圖片"/>
+            <img id="about-card-picture" src="/images/featured_image.jpg" alt="作者的圖片"/>
         
             <h4 id="about-card-name">Sampot (山姆鍋)</h4>
         

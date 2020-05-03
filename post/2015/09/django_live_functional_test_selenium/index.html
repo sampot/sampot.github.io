@@ -17,7 +17,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"不久前，山姆鍋開始學習 Django 這套 Web 應用框架，在不跳脫它既有有框架的情況下，運用它可以快速建構應用程式原型。差不多同一時間，也找到 Test-driven Development with Python 這本好書，書名雖然好像跟 Django 無關，但書中的範例程式是以 Django 為基礎。 可惜，本文不是要示範如何使用 Django 做功能測試，這個主題網路有許多文章可以參考。山姆鍋在使用 Django 的 LiveServerTestCase 時 發現資料庫的資料在第一個測試案例(test case)之後就會被清除，導致後續的測試無法正常運作。\n\nDjango 的功能性測試(或者稱用戶驗收測試)最常使用 Selenium\n來驅動瀏覽器，並利用 django.test.LiveServerTestCase\n在背景建立測試資料庫以及 WSGI 服務器。\n如此，完成一個端到端(end-to-end)的測試環境，基本上可以模擬大多數用戶跟應用之間的互動情境。\n這麼完整的支援，原本是該多麽理想啊！ 本文的解決方法應該只適用 SQLite\n3 。\n執行環境\n在說明山姆鍋遇到的問題前，需要先列出我的測試環境：\n\nPython 2.7.x\nDjango 1.8.3\nSQLite 3\nOS: Mac OS X\n\n注意使用的是 SQLite 3 資料庫。\n問題描述\n除了 LiveServerTestCase 支援功能測試外， Django\n也對單元測試(unit test)提供有 django.test.TestCase\n來協助撰寫。 TestCase\n利用資料庫對於交易(transaction)的支援，在每次測試案例之後，還原資料庫到案例開始前的狀態，這樣來達到案例之間的分隔(isolation)目的。\n基於一個山姆鍋還不了解的原因，畢竟山姆鍋對於 Django\n還沒有那麼多經驗，LiveServerTestCase\n不是使用資料庫的交易來還原狀態，\n而是對資料庫進行清除動作，就是這個神秘的清除動作，導致在功能測試時只有第一個執行的案例能夠正常，\n後續用到資料庫的案例都會發生讀不到資料的情況。\n有人建議功能測試不要使用 SQLite 3，使用 MySQL 或者 PostgreSQL，\n原因不外乎 SQLite 3 在功能測試不穩定等等。\n可是山姆鍋打算開發的應用就需要使用 SQLite 3 啊！所以，並沒有針對 MySQL\n或者 PostgreSQL 來測試過。\n解決方法\n山姆鍋採用的解決方法是直接繼承 TestCase 跟 LiveServerTestCase 這兩個類別，繼承\n[TestCase`使用資料庫交易來還原資料庫狀態， 使用 LiveServerTestCase 來設定測試用的 WSGI\n服務器。這個新的類別很沒有創意地叫做 FunctionalTest，原始碼如下：\ndjango_testcase.pyview raw12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455# -*- coding: utf-8 -*-from __future__ import absolute_import, print_function, unicode_literalsimport osos.environ.setdefault('DJANGO_SETTINGS_MODULE', 'conf.settings.test')import timefrom django.core import signalsfrom django.test.testcases import LiveServerTestCase, TestCasefrom django.contrib.auth import get_user_modelfrom django.contrib.staticfiles.handlers import StaticFilesHandlerclass FunctionalTest(LiveServerTestCase, TestCase):    static_handler = StaticFilesHandler    @classmethod    def setUpClass(cls):        \"\"\"        Django's LiveServerTestCase setupClass but without sqlite :memory check        and with additional Ghost initialization.        \"\"\"        default_address = os.environ.get('DJANGO_LIVE_TEST_SERVER_ADDRESS', 'localhost:8090-9000')        os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = default_address        # Prevents transaction rollback errors from the server thread. Removed        # as from Django 1.8.        try:            from django.db import close_connection            signals.request_finished.disconnect(close_connection)        except ImportError:            pass        super(FunctionalTest, cls).setUpClass()    @classmethod    def tearDownClass(cls):        \"\"\"        Django's LiveServerTestCase tearDownClass, but without sqlite :memory        check and shuts down the Ghost instance.        \"\"\"        super(FunctionalTest, cls).tearDownClass()    def setUp(self):        get_user_model().objects.create_superuser(            username='demo',            password='demo',            email='demo@localhost'        )        super(FunctionalTest, self).setUp()    def tearDown(self):        super(FunctionalTest, self).tearDown()    def sleep(self, secs):        time.sleep(secs)\n結語\nDjango LiveServerTestCase\n的這個問題困擾山姆鍋一陣子，網路上也沒有太多有用的資料。\n本文的解法是參考 Fast functional testing with Django and Ghostrunner\n這篇文章。\n必須老實講，山姆鍋不知道這個問題的確切原因，也不知道有沒有其他解法，所以感覺真是不踏實。不管如何，希望對跟我遇到相同問題的人有所幫助。\n參考資料\n_`Django`: https://www.djangoproject.com/\n_`Test-driven Development with Python`:\nhttp://shop.oreilly.com/product/0636920029533.do\n_`Selenium`: https://selenium-python.readthedocs.org/\n_`SQLite 3`: https://docs.python.org/2/library/sqlite3.html\n_`Fast functional testing with Django and Ghostrunner`:\nhttps://wearespindle.com/articles/fast-functional-testing-with-django-and-ghostrunner/\n_`原始的 LiveServerTestCase 實作`:\nhttps://github.com/wearespindle/ghostrunner/blob/master/ghost/test/testcases.py\n","dateCreated":"2015-09-08T14:21:00+08:00","dateModified":"2020-03-08T10:25:05+08:00","datePublished":"2015-09-08T14:21:00+08:00","description":"不久前，山姆鍋開始學習 Django 這套 Web 應用框架，在不跳脫它既有有框架的情況下，運用它可以快速建構應用程式原型。差不多同一時間，也找到 Test-driven Development with Python 這本好書，書名雖然好像跟 Django 無關，但書中的範例程式是以 Django 為基礎。 可惜，本文不是要示範如何使用 Django 做功能測試，這個主題網路有許多文章可以參考。山姆鍋在使用 Django 的 LiveServerTestCase 時 發現資料庫的資料在第一個測試案例(test case)之後就會被清除，導致後續的測試無法正常運作。","headline":"解決 Django 功能測試中資料會被清除的問題","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2015/09/django_live_functional_test_selenium/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2015/09/django_live_functional_test_selenium/","keywords":"Python, Django, Test"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"featured_image.jpg"},"articleBody":"不久前，山姆鍋開始學習 Django 這套 Web 應用框架，在不跳脫它既有有框架的情況下，運用它可以快速建構應用程式原型。差不多同一時間，也找到 Test-driven Development with Python 這本好書，書名雖然好像跟 Django 無關，但書中的範例程式是以 Django 為基礎。 可惜，本文不是要示範如何使用 Django 做功能測試，這個主題網路有許多文章可以參考。山姆鍋在使用 Django 的 LiveServerTestCase 時 發現資料庫的資料在第一個測試案例(test case)之後就會被清除，導致後續的測試無法正常運作。\n\nDjango 的功能性測試(或者稱用戶驗收測試)最常使用 Selenium\n來驅動瀏覽器，並利用 django.test.LiveServerTestCase\n在背景建立測試資料庫以及 WSGI 服務器。\n如此，完成一個端到端(end-to-end)的測試環境，基本上可以模擬大多數用戶跟應用之間的互動情境。\n這麼完整的支援，原本是該多麽理想啊！ 本文的解決方法應該只適用 SQLite\n3 。\n執行環境\n在說明山姆鍋遇到的問題前，需要先列出我的測試環境：\n\nPython 2.7.x\nDjango 1.8.3\nSQLite 3\nOS: Mac OS X\n\n注意使用的是 SQLite 3 資料庫。\n問題描述\n除了 LiveServerTestCase 支援功能測試外， Django\n也對單元測試(unit test)提供有 django.test.TestCase\n來協助撰寫。 TestCase\n利用資料庫對於交易(transaction)的支援，在每次測試案例之後，還原資料庫到案例開始前的狀態，這樣來達到案例之間的分隔(isolation)目的。\n基於一個山姆鍋還不了解的原因，畢竟山姆鍋對於 Django\n還沒有那麼多經驗，LiveServerTestCase\n不是使用資料庫的交易來還原狀態，\n而是對資料庫進行清除動作，就是這個神秘的清除動作，導致在功能測試時只有第一個執行的案例能夠正常，\n後續用到資料庫的案例都會發生讀不到資料的情況。\n有人建議功能測試不要使用 SQLite 3，使用 MySQL 或者 PostgreSQL，\n原因不外乎 SQLite 3 在功能測試不穩定等等。\n可是山姆鍋打算開發的應用就需要使用 SQLite 3 啊！所以，並沒有針對 MySQL\n或者 PostgreSQL 來測試過。\n解決方法\n山姆鍋採用的解決方法是直接繼承 TestCase 跟 LiveServerTestCase 這兩個類別，繼承\n[TestCase`使用資料庫交易來還原資料庫狀態， 使用 LiveServerTestCase 來設定測試用的 WSGI\n服務器。這個新的類別很沒有創意地叫做 FunctionalTest，原始碼如下：\ndjango_testcase.pyview raw12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455# -*- coding: utf-8 -*-from __future__ import absolute_import, print_function, unicode_literalsimport osos.environ.setdefault('DJANGO_SETTINGS_MODULE', 'conf.settings.test')import timefrom django.core import signalsfrom django.test.testcases import LiveServerTestCase, TestCasefrom django.contrib.auth import get_user_modelfrom django.contrib.staticfiles.handlers import StaticFilesHandlerclass FunctionalTest(LiveServerTestCase, TestCase):    static_handler = StaticFilesHandler    @classmethod    def setUpClass(cls):        \"\"\"        Django's LiveServerTestCase setupClass but without sqlite :memory check        and with additional Ghost initialization.        \"\"\"        default_address = os.environ.get('DJANGO_LIVE_TEST_SERVER_ADDRESS', 'localhost:8090-9000')        os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = default_address        # Prevents transaction rollback errors from the server thread. Removed        # as from Django 1.8.        try:            from django.db import close_connection            signals.request_finished.disconnect(close_connection)        except ImportError:            pass        super(FunctionalTest, cls).setUpClass()    @classmethod    def tearDownClass(cls):        \"\"\"        Django's LiveServerTestCase tearDownClass, but without sqlite :memory        check and shuts down the Ghost instance.        \"\"\"        super(FunctionalTest, cls).tearDownClass()    def setUp(self):        get_user_model().objects.create_superuser(            username='demo',            password='demo',            email='demo@localhost'        )        super(FunctionalTest, self).setUp()    def tearDown(self):        super(FunctionalTest, self).tearDown()    def sleep(self, secs):        time.sleep(secs)\n結語\nDjango LiveServerTestCase\n的這個問題困擾山姆鍋一陣子，網路上也沒有太多有用的資料。\n本文的解法是參考 Fast functional testing with Django and Ghostrunner\n這篇文章。\n必須老實講，山姆鍋不知道這個問題的確切原因，也不知道有沒有其他解法，所以感覺真是不踏實。不管如何，希望對跟我遇到相同問題的人有所幫助。\n參考資料\n_`Django`: https://www.djangoproject.com/\n_`Test-driven Development with Python`:\nhttp://shop.oreilly.com/product/0636920029533.do\n_`Selenium`: https://selenium-python.readthedocs.org/\n_`SQLite 3`: https://docs.python.org/2/library/sqlite3.html\n_`Fast functional testing with Django and Ghostrunner`:\nhttps://wearespindle.com/articles/fast-functional-testing-with-django-and-ghostrunner/\n_`原始的 LiveServerTestCase 實作`:\nhttps://github.com/wearespindle/ghostrunner/blob/master/ghost/test/testcases.py\n","dateCreated":"2015-09-08T14:21:00+08:00","dateModified":"2020-03-08T10:25:05+08:00","datePublished":"2015-09-08T14:21:00+08:00","description":"不久前，山姆鍋開始學習 Django 這套 Web 應用框架，在不跳脫它既有有框架的情況下，運用它可以快速建構應用程式原型。差不多同一時間，也找到 Test-driven Development with Python 這本好書，書名雖然好像跟 Django 無關，但書中的範例程式是以 Django 為基礎。 可惜，本文不是要示範如何使用 Django 做功能測試，這個主題網路有許多文章可以參考。山姆鍋在使用 Django 的 LiveServerTestCase 時 發現資料庫的資料在第一個測試案例(test case)之後就會被清除，導致後續的測試無法正常運作。","headline":"解決 Django 功能測試中資料會被清除的問題","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2015/09/django_live_functional_test_selenium/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"featured_image.jpg","logo":{"@type":"ImageObject","url":"featured_image.jpg"}},"url":"https://samkuo.me/post/2015/09/django_live_functional_test_selenium/","keywords":"Python, Django, Test"}</script>
     <meta name="description" content="不久前，山姆鍋開始學習 Django 這套 Web 應用框架，在不跳脫它既有有框架的情況下，運用它可以快速建構應用程式原型。差不多同一時間，也找到 Test-driven Development with Python 這本好書，書名雖然好像跟 Django 無關，但書中的範例程式是以 Django 為基礎。 可惜，本文不是要示範如何使用 Django 做功能測試，這個主題網路有許多文章可以參考。">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="解決 Django 功能測試中資料會被清除的問題">
@@ -39,7 +39,7 @@
         
     
     
-        <meta property="og:image" content="https://samkuo.me/images/logo.png"/>
+        <meta property="og:image" content="https://samkuo.me/images/featured_image.jpg"/>
     
     
     
@@ -114,7 +114,7 @@
                     href="/#about"
                     aria-label="閱讀有關作者的更多信息"
                 >
-                    <img class="sidebar-profile-picture" src="/images/logo.png" alt="作者的圖片"/>
+                    <img class="sidebar-profile-picture" src="/images/featured_image.jpg" alt="作者的圖片"/>
                 </a>
                 <h4 class="sidebar-profile-name">Sampot (山姆鍋)</h4>
                 
@@ -474,7 +474,7 @@
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Diesen Beitrag teilen"
+                aria-label="Share this post"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -512,7 +512,7 @@
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Kommentieren"
+                        aria-label="Leave a comment"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -521,7 +521,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -590,7 +590,7 @@
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Diesen Beitrag teilen"
+                aria-label="Share this post"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -628,7 +628,7 @@
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Kommentieren"
+                        aria-label="Leave a comment"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -637,7 +637,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -697,7 +697,7 @@
             <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="/images/logo.png" alt="作者的圖片"/>
+            <img id="about-card-picture" src="/images/featured_image.jpg" alt="作者的圖片"/>
         
             <h4 id="about-card-name">Sampot (山姆鍋)</h4>
         

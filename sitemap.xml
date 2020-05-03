@@ -2,9 +2,16 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://samkuo.me/post/2020/03/why-i-work-for-startups/</loc>
+    
+    <lastmod>2020-05-03T21:38:22.958Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://samkuo.me/post/2020/05/wsl-switch-to-docker-ce-in-linux/</loc>
     
-    <lastmod>2020-05-03T08:33:50.726Z</lastmod>
+    <lastmod>2020-05-03T10:41:19.490Z</lastmod>
     
   </url>
   
@@ -257,13 +264,6 @@
     <loc>https://samkuo.me/post/2013/10/setup-consistent-dev-test-environments-with-vagrant/</loc>
     
     <lastmod>2020-03-08T01:45:55.606Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://samkuo.me/post/2020/03/why-i-work-for-startups/</loc>
-    
-    <lastmod>2020-03-05T08:50:32.477Z</lastmod>
     
   </url>
   

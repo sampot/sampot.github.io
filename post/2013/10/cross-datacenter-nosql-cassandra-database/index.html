@@ -19,7 +19,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"「影化身平台」的設計目標之一是高可用性(high availability)，而為了達到這個目的，基本上就表示系統的所有元件都要有冗余(redundancy)容錯(fault-tolerancy)的特性，以避免成為單一失敗點(SPOF)。「高可用性」是個很大的課題，本文山姆鍋只先針對資料本身的可用性來說明「影化身平台」採取的解決方案以及使用的理由。\n\n簡介\n資料可以說是幾乎所有網路服務的根本元素，沒有資料，很多服務根本沒有價值可言。可想而知，要達到系統的高可用性，資料的可用性絕對是必須考量的重要設計之一。資料可用性的問題，隨著雲端規模(cloud scale)應用的要求，挑戰性可說是越來越高，但幸運的是，我們已經有不少的解決方案。\n問題描述\n為了服務來自全球不同地方的用戶，在架構上，「影化身平台」的服務器分布在世界上幾個不同的資料中心。不同的系統的資料會有不同層度的資料可用性需求，對「影化身平台」來說，重要資料有：\n\n帳戶資料(accounts data)。\n訊息資料(messages data)。\n狀態資料(presences data)。\n\n「帳戶資料」除了存放用戶個人基本資料，重要的是存放身份認證的 ID 跟密碼;「訊息資料」是用戶所收到訊息;「狀態資料」則是用戶上線的客戶端的連線資訊。為了讓訊息可以在任意兩人間互相傳遞，不管位於哪個資料中心，每個服務器都會需要存取與修改上述的資料才能完成相關的工作。跟可用性無關，但由於未來應用需求的變動，資料概要(data schema)要可以方便修改，以加速初期設計的工作。\n所以，跨資料中心的讀取與修改，可說是「影化身平台」對資料可用性較特別的需求。\n解決方案\n山姆鍋為「影化身平台」選擇的方案是 Apache Cassandra。很多資料庫都符合基本資料管理與可用性的需求，但山姆鍋選擇 Cassandra 的主要決定因素在於：\n\n跨資料中心的支持。\n對稱式點對點設計。\n資料最終一致性(eventual consistency)。\n無資料概要限制(schemaless)。\n\n有些資料庫有跨資料中心的支持，但採用的廣域網路(WAN)間複製(replication)的方式，也就是說，資料要在兩個以上的叢集(cluster)以特定的方式複製。這樣的做法，對於只需要在少數資料中心複製的系統可能適用，但「影化身平台」需要部署多個資料中心，Cassandra 對稱式的設計讓加入或移除資料服務器的工作變得簡單許多。\n「資料最終一致性」對有些人說是很令人不安的特性，擔心資料不一致導致系統發生錯誤。「資料最終一致性」代表讀取的資料可能不是最新，但也不至於讀到損毀的資料，況且 Cassandra 支援不同等級的讀取一致性，應用需要在「一致性(consistency)」與「可用性(availability)」之間按照需求決定：是要高一致性，還是高可用性？針對這點，「影化身平台」的特性是資料的可用性比一致性需求來得高。\n「無資料慨要（schemaless）」幾乎是 NoSQL 資料庫的一致特性，這樣的特性可以方便日後資料模型(data model)的修改。但要提醒的是：無資料慨要不代表不需要資料模型，這是兩碼事。應用本身需要對資料模型有一定設計，無資料慨要只是讓資料庫不要限制您修改資料模型的彈性。\n小結\n資料的可用性是整體系統可用性的一環，也往往是最難處理的部分。這也是為何在高可用性的系統常常鼓吹要採「無狀態(stateless)」的設計方式。「影化身平台」採用 Cassandra 作為主要的資料庫(是的，在這個 Polyglot 年代，應該不會是唯一一種)，但您需要評估它是否符合您的需要，畢竟它也有所限制：像是不支援「交易(transaction)」，不建議存放高頻率修改的資料等等。\n在過去，因為 Cassandra 資料「最終一致性」的特性會面臨這樣的問題：如何確保不會有使用者註冊相同名稱的帳戶？這在其他資料庫是很簡單的事情，但對 Cassandra 來說卻是一個照門。通常要嗎忽略這個問題，要嗎使用外部系統來避免，不管哪一個都不是很理想。幸好，Cassandra 2.0 之後加入 「輕量交易(lightweight transaction)」的支持，可以解決這個問題了。\n","dateCreated":"2013-10-16T09:21:00+08:00","dateModified":"2020-03-08T10:23:32+08:00","datePublished":"2013-10-16T09:21:00+08:00","description":"「影化身平台」的設計目標之一是高可用性(high availability)，而為了達到這個目的，基本上就表示系統的所有元件都要有冗余(redundancy)容錯(fault-tolerancy)的特性，以避免成為單一失敗點(SPOF)。「高可用性」是個很大的課題，本文山姆鍋只先針對資料本身的可用性來說明「影化身平台」採取的解決方案以及使用的理由。","headline":"跨資料中心的NoSQL資料庫 - Cassandra","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/10/cross-datacenter-nosql-cassandra-database/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2013/10/cross-datacenter-nosql-cassandra-database/","keywords":"Operations, Cloud architecture, NoSQL, Cassandra, MongoDB"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"featured_image.jpg"},"articleBody":"「影化身平台」的設計目標之一是高可用性(high availability)，而為了達到這個目的，基本上就表示系統的所有元件都要有冗余(redundancy)容錯(fault-tolerancy)的特性，以避免成為單一失敗點(SPOF)。「高可用性」是個很大的課題，本文山姆鍋只先針對資料本身的可用性來說明「影化身平台」採取的解決方案以及使用的理由。\n\n簡介\n資料可以說是幾乎所有網路服務的根本元素，沒有資料，很多服務根本沒有價值可言。可想而知，要達到系統的高可用性，資料的可用性絕對是必須考量的重要設計之一。資料可用性的問題，隨著雲端規模(cloud scale)應用的要求，挑戰性可說是越來越高，但幸運的是，我們已經有不少的解決方案。\n問題描述\n為了服務來自全球不同地方的用戶，在架構上，「影化身平台」的服務器分布在世界上幾個不同的資料中心。不同的系統的資料會有不同層度的資料可用性需求，對「影化身平台」來說，重要資料有：\n\n帳戶資料(accounts data)。\n訊息資料(messages data)。\n狀態資料(presences data)。\n\n「帳戶資料」除了存放用戶個人基本資料，重要的是存放身份認證的 ID 跟密碼;「訊息資料」是用戶所收到訊息;「狀態資料」則是用戶上線的客戶端的連線資訊。為了讓訊息可以在任意兩人間互相傳遞，不管位於哪個資料中心，每個服務器都會需要存取與修改上述的資料才能完成相關的工作。跟可用性無關，但由於未來應用需求的變動，資料概要(data schema)要可以方便修改，以加速初期設計的工作。\n所以，跨資料中心的讀取與修改，可說是「影化身平台」對資料可用性較特別的需求。\n解決方案\n山姆鍋為「影化身平台」選擇的方案是 Apache Cassandra。很多資料庫都符合基本資料管理與可用性的需求，但山姆鍋選擇 Cassandra 的主要決定因素在於：\n\n跨資料中心的支持。\n對稱式點對點設計。\n資料最終一致性(eventual consistency)。\n無資料概要限制(schemaless)。\n\n有些資料庫有跨資料中心的支持，但採用的廣域網路(WAN)間複製(replication)的方式，也就是說，資料要在兩個以上的叢集(cluster)以特定的方式複製。這樣的做法，對於只需要在少數資料中心複製的系統可能適用，但「影化身平台」需要部署多個資料中心，Cassandra 對稱式的設計讓加入或移除資料服務器的工作變得簡單許多。\n「資料最終一致性」對有些人說是很令人不安的特性，擔心資料不一致導致系統發生錯誤。「資料最終一致性」代表讀取的資料可能不是最新，但也不至於讀到損毀的資料，況且 Cassandra 支援不同等級的讀取一致性，應用需要在「一致性(consistency)」與「可用性(availability)」之間按照需求決定：是要高一致性，還是高可用性？針對這點，「影化身平台」的特性是資料的可用性比一致性需求來得高。\n「無資料慨要（schemaless）」幾乎是 NoSQL 資料庫的一致特性，這樣的特性可以方便日後資料模型(data model)的修改。但要提醒的是：無資料慨要不代表不需要資料模型，這是兩碼事。應用本身需要對資料模型有一定設計，無資料慨要只是讓資料庫不要限制您修改資料模型的彈性。\n小結\n資料的可用性是整體系統可用性的一環，也往往是最難處理的部分。這也是為何在高可用性的系統常常鼓吹要採「無狀態(stateless)」的設計方式。「影化身平台」採用 Cassandra 作為主要的資料庫(是的，在這個 Polyglot 年代，應該不會是唯一一種)，但您需要評估它是否符合您的需要，畢竟它也有所限制：像是不支援「交易(transaction)」，不建議存放高頻率修改的資料等等。\n在過去，因為 Cassandra 資料「最終一致性」的特性會面臨這樣的問題：如何確保不會有使用者註冊相同名稱的帳戶？這在其他資料庫是很簡單的事情，但對 Cassandra 來說卻是一個照門。通常要嗎忽略這個問題，要嗎使用外部系統來避免，不管哪一個都不是很理想。幸好，Cassandra 2.0 之後加入 「輕量交易(lightweight transaction)」的支持，可以解決這個問題了。\n","dateCreated":"2013-10-16T09:21:00+08:00","dateModified":"2020-03-08T10:23:32+08:00","datePublished":"2013-10-16T09:21:00+08:00","description":"「影化身平台」的設計目標之一是高可用性(high availability)，而為了達到這個目的，基本上就表示系統的所有元件都要有冗余(redundancy)容錯(fault-tolerancy)的特性，以避免成為單一失敗點(SPOF)。「高可用性」是個很大的課題，本文山姆鍋只先針對資料本身的可用性來說明「影化身平台」採取的解決方案以及使用的理由。","headline":"跨資料中心的NoSQL資料庫 - Cassandra","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/10/cross-datacenter-nosql-cassandra-database/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"featured_image.jpg","logo":{"@type":"ImageObject","url":"featured_image.jpg"}},"url":"https://samkuo.me/post/2013/10/cross-datacenter-nosql-cassandra-database/","keywords":"Operations, Cloud architecture, NoSQL, Cassandra, MongoDB"}</script>
     <meta name="description" content="說明影化身雲端服務採用Cassandra的理由。">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="跨資料中心的NoSQL資料庫 - Cassandra">
@@ -41,7 +41,7 @@
         
     
     
-        <meta property="og:image" content="https://samkuo.me/images/logo.png"/>
+        <meta property="og:image" content="https://samkuo.me/images/featured_image.jpg"/>
     
     
     
@@ -116,7 +116,7 @@
                     href="/#about"
                     aria-label="閱讀有關作者的更多信息"
                 >
-                    <img class="sidebar-profile-picture" src="/images/logo.png" alt="作者的圖片"/>
+                    <img class="sidebar-profile-picture" src="/images/featured_image.jpg" alt="作者的圖片"/>
                 </a>
                 <h4 class="sidebar-profile-name">Sampot (山姆鍋)</h4>
                 
@@ -451,7 +451,7 @@
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Diesen Beitrag teilen"
+                aria-label="Share this post"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -489,7 +489,7 @@
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Kommentieren"
+                        aria-label="Leave a comment"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -498,7 +498,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -567,7 +567,7 @@
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Diesen Beitrag teilen"
+                aria-label="Share this post"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -605,7 +605,7 @@
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Kommentieren"
+                        aria-label="Leave a comment"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -614,7 +614,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -674,7 +674,7 @@
             <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="/images/logo.png" alt="作者的圖片"/>
+            <img id="about-card-picture" src="/images/featured_image.jpg" alt="作者的圖片"/>
         
             <h4 id="about-card-name">Sampot (山姆鍋)</h4>
         

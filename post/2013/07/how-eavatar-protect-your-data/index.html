@@ -19,7 +19,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"作為您的匿名分身，影化身盡一切可能保護您個人的資料安全。本文分享在資料安全這個範疇，影化身是如何確保您的資料不會由平台洩露出去。影化身對於「匿名」的定義是您不需提供任何可以關聯到您身份的資訊就能使用平台提供的服務，且第三方無法從平台取得您的身份識別資料，但不代表第三方沒有使用其他方法達到這個目的。\n\n資料安全(data security)\n影化身服務平台對資料安全的定義為：\n\n機密性(Confidentiality):未授權者無法解讀資料內含的資訊。\n完整性(Integrity )：資料可以被驗證是否經過非法修改或者是傳輸過程錯誤。\n可用性(Availability): 資料隨時保持可用狀態且能夠被即時存取。\n\n雜湊函式(hash function)\n雜湊函式確保從轉換後的資料很難猜測原始資料。這樣的特性，讓雜湊函式在資訊安全的領域扮演一個很重要的角色。也就是說，可以很容易計算 b = H(a)，但在只有 b 值的情況下，很難反推出 a 值。\n如何確保平台無法窺視用戶的訊息內容？\n假設 Alice 要傳一個訊息給 Bob，且 Alice 跟 Bob 之間已經有一個共同都知道的密鑰 k(secrect key)。\n\nAlice 使用 AES256 對稱式加密演算法將要傳送的內容 plain text 加密後，得到加密後的內容 cipher text。\nAlice 要求平台服務端將 cipher text 推送給 Bob。\n平台服務端找到 Bob 的推送位址，將 cipher text 傳送給 Bob。\nBob 收到 cipher text。\nBob 使用密鑰 k 將 cipher text 解密得到 plain text。\n\n這個方法有幾個問題：\na. Alice 跟 Bob 都共用的秘鑰 k 是如何產生以及如何散播？\nb. 跟 Alice 以外的人分享同樣的密鑰會導致 Bob 無法確認訊息是來自 Alice。\n為了解決上述問題，提出「接觸點」(contact)這個概念。「接觸點」可以視為一個聯絡通道，具有下列特性：\n\n所有訊息只能透過「接觸點」傳遞。\n「接觸點」只支援單向通訊。\n「接觸點」的擁有者一定是收件人(receiver)，但送件人無法得知收件人的相關資訊。\n一個「接觸點」可以有多個送件人(sender)。\n每個「接觸點」都有且只有一個位址(address)。\n\n透過「接觸點」這樣的機制，可以解決問題 b，以及問題 a 中關於如何產生密鑰的部分。密鑰基本上是透過收送雙方的客戶端直接傳送而沒有透過平台。如此，確保平台無法對傳送的訊息進行了解。\n有了「接觸點」機制後，雖解決了問題，但也衍生另一個問題：\nc. 如何管理眾多「接觸點」使用的密鑰？\n放在客戶端似乎不太恰當，這樣會導致無法在不同裝置上使用服務。存放在服務端，就要避免平台取得這些密鑰。要存放在服務端的接觸點密鑰會經由用戶的主要密鑰加密，而用戶主要密鑰只會存放在客戶端，如此，只要用戶的主要密鑰無法從平台取得，就可基本上確保資訊在平台的安全。\n如何確保平台無法輕易解讀個人輪廓資料(personal profile data)但又可以對資料進行證明？\n影化身可以紀錄其擁有者的個人輪廓資料，且可以證明該擁有者俱備某些屬性(properties)，例如：證明使用者紀錄的資料中，性別登記為男性。雖然需要提供屬性證明，但可以讓平台無法解讀個人輪廓資料嗎？基本上，藉由雜湊函式，影化身可以向第三方證明您的個人輪廓資料具備某些屬性，但影化身以及第三方卻無法輕易反推您的資料中有哪些屬性。這只是進一步強化資料安全，由於輪廓資料不包含任何可以關聯到您個人身份的資訊，因此，影化身平台假設即使這些資訊被竊取，偷竊者也無法從中獲得利益。例如：偷竊者無法從輪廓資料與您取得聯繫，也無法跟您的身份產生關聯。\n如何驗證使用者身份？\n為了完成註冊，使用者最少要提供三項資料：\n\n登入名稱(login name)。\n登入密碼(login password)。\n個人密鑰(person secret key)。\n\n第 1、2 項跟登入也就是使用者身份驗證有關，第 3 項用在確保資料安全且只會存放在客戶端。\n如何確保平台無法取得個人識別資料(personal identification data)？\n影化身的其中一個承若：個人識別資料，像是 Email 位址、手機號碼、暱稱或者登入名稱等等，都不存放在平台。如此，就算是服務端被侵入也不至於造成太大的損失。\n那麼該如何達到這個要求呢？很簡單：登入名稱會以 SHA1 雜湊後的形式存放。這樣，從服務端，侵入者便很難取得使用者的登入名稱;同樣地，登入密碼以經過雜湊的形式存放。\n如何避免因為裝置遺失導致登入名稱與登入密碼被盜用的風險？\n如果登入名稱跟密碼存放在裝置上，一旦裝置遺失，自然必須假設登入名稱與密碼已經洩露。所以，在一開始便不應該將登入名稱跟密碼存放在裝置中。尤其，登入名稱、登入密碼以及用戶密鑰是最終使用者證明自己對某個影化身擁有控制權的必要資訊，保護這三項資料的安全更應該不遺餘力。\n為了降低因為裝置遺失導致使用者登入名稱以及密碼洩露的風風險，登入名稱跟密碼分成兩類：\n使用者登入名稱跟密碼。\n客戶端登入名稱跟密碼。\n客戶端登入名稱以及密碼屬於可拋棄式，也就是說，可以根據需要產生跟丟棄。藉由客戶端登入名稱跟密碼，當使用者發現裝置遺失而想要報銷該組客戶端登入名稱跟密碼時，只要使用另一個裝置，透過影化身客戶端進行銷毀動作。一旦銷毀，該組客戶端登入名稱與密碼就無法使用也無法恢復。\n利用這樣的設計，使用者可以選擇是否要記住登入狀態來簡化操作。例如：如果手機本身已經提供不錯的身份驗證機制，可能就不需要每次要使用影化身客戶端就要再登入一次的麻煩。\n由於個人密鑰必須登錄在客戶端才能進行加解密的動作，這個方法只能保護使用者的登入名稱跟密碼。但是第三者無法單獨使用個人密鑰登入系統，理論上，應該不會有什麼大礙。如果真的很擔心，使用者也可更換個人密鑰，但這需要每台裝置都要重新設置新的個人密鑰，會有些麻煩。\n如何偵測個人密鑰已經更改？\n如果使用者透過某個裝置進行修改個人密鑰且將完成重新加密後，其他的裝置便無法正確解密。為了使用者的便利，平台在這種狀況下，應該在使用者用另一個裝置登入時，自動提醒使用者個人密鑰已經修改，需要重新在該裝置登錄。\n小結\n本文內容雖然牽涉某些技術層面，但重點在於說明為何影化身可以做到保護個人資料的同時還可以做到個人化的服務。除了保護個人資料，影化身更希望協助使用者從個人的資料獲取更多的效益，當然一切都是在不泄露個人身份的前提下。\n","dateCreated":"2013-07-04T10:51:00+08:00","dateModified":"2018-08-23T13:00:30+08:00","datePublished":"2013-07-04T10:51:00+08:00","description":"作為您的匿名分身，影化身盡一切可能保護您個人的資料安全。本文分享在資料安全這個範疇，影化身是如何確保您的資料不會由平台洩露出去。影化身對於「匿名」的定義是您不需提供任何可以關聯到您身份的資訊就能使用平台提供的服務，且第三方無法從平台取得您的身份識別資料，但不代表第三方沒有使用其他方法達到這個目的。","headline":"影化身如何保護您的個人資料？","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/07/how-eavatar-protect-your-data/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2013/07/how-eavatar-protect-your-data/","keywords":"Security, Privacy"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"featured_image.jpg"},"articleBody":"作為您的匿名分身，影化身盡一切可能保護您個人的資料安全。本文分享在資料安全這個範疇，影化身是如何確保您的資料不會由平台洩露出去。影化身對於「匿名」的定義是您不需提供任何可以關聯到您身份的資訊就能使用平台提供的服務，且第三方無法從平台取得您的身份識別資料，但不代表第三方沒有使用其他方法達到這個目的。\n\n資料安全(data security)\n影化身服務平台對資料安全的定義為：\n\n機密性(Confidentiality):未授權者無法解讀資料內含的資訊。\n完整性(Integrity )：資料可以被驗證是否經過非法修改或者是傳輸過程錯誤。\n可用性(Availability): 資料隨時保持可用狀態且能夠被即時存取。\n\n雜湊函式(hash function)\n雜湊函式確保從轉換後的資料很難猜測原始資料。這樣的特性，讓雜湊函式在資訊安全的領域扮演一個很重要的角色。也就是說，可以很容易計算 b = H(a)，但在只有 b 值的情況下，很難反推出 a 值。\n如何確保平台無法窺視用戶的訊息內容？\n假設 Alice 要傳一個訊息給 Bob，且 Alice 跟 Bob 之間已經有一個共同都知道的密鑰 k(secrect key)。\n\nAlice 使用 AES256 對稱式加密演算法將要傳送的內容 plain text 加密後，得到加密後的內容 cipher text。\nAlice 要求平台服務端將 cipher text 推送給 Bob。\n平台服務端找到 Bob 的推送位址，將 cipher text 傳送給 Bob。\nBob 收到 cipher text。\nBob 使用密鑰 k 將 cipher text 解密得到 plain text。\n\n這個方法有幾個問題：\na. Alice 跟 Bob 都共用的秘鑰 k 是如何產生以及如何散播？\nb. 跟 Alice 以外的人分享同樣的密鑰會導致 Bob 無法確認訊息是來自 Alice。\n為了解決上述問題，提出「接觸點」(contact)這個概念。「接觸點」可以視為一個聯絡通道，具有下列特性：\n\n所有訊息只能透過「接觸點」傳遞。\n「接觸點」只支援單向通訊。\n「接觸點」的擁有者一定是收件人(receiver)，但送件人無法得知收件人的相關資訊。\n一個「接觸點」可以有多個送件人(sender)。\n每個「接觸點」都有且只有一個位址(address)。\n\n透過「接觸點」這樣的機制，可以解決問題 b，以及問題 a 中關於如何產生密鑰的部分。密鑰基本上是透過收送雙方的客戶端直接傳送而沒有透過平台。如此，確保平台無法對傳送的訊息進行了解。\n有了「接觸點」機制後，雖解決了問題，但也衍生另一個問題：\nc. 如何管理眾多「接觸點」使用的密鑰？\n放在客戶端似乎不太恰當，這樣會導致無法在不同裝置上使用服務。存放在服務端，就要避免平台取得這些密鑰。要存放在服務端的接觸點密鑰會經由用戶的主要密鑰加密，而用戶主要密鑰只會存放在客戶端，如此，只要用戶的主要密鑰無法從平台取得，就可基本上確保資訊在平台的安全。\n如何確保平台無法輕易解讀個人輪廓資料(personal profile data)但又可以對資料進行證明？\n影化身可以紀錄其擁有者的個人輪廓資料，且可以證明該擁有者俱備某些屬性(properties)，例如：證明使用者紀錄的資料中，性別登記為男性。雖然需要提供屬性證明，但可以讓平台無法解讀個人輪廓資料嗎？基本上，藉由雜湊函式，影化身可以向第三方證明您的個人輪廓資料具備某些屬性，但影化身以及第三方卻無法輕易反推您的資料中有哪些屬性。這只是進一步強化資料安全，由於輪廓資料不包含任何可以關聯到您個人身份的資訊，因此，影化身平台假設即使這些資訊被竊取，偷竊者也無法從中獲得利益。例如：偷竊者無法從輪廓資料與您取得聯繫，也無法跟您的身份產生關聯。\n如何驗證使用者身份？\n為了完成註冊，使用者最少要提供三項資料：\n\n登入名稱(login name)。\n登入密碼(login password)。\n個人密鑰(person secret key)。\n\n第 1、2 項跟登入也就是使用者身份驗證有關，第 3 項用在確保資料安全且只會存放在客戶端。\n如何確保平台無法取得個人識別資料(personal identification data)？\n影化身的其中一個承若：個人識別資料，像是 Email 位址、手機號碼、暱稱或者登入名稱等等，都不存放在平台。如此，就算是服務端被侵入也不至於造成太大的損失。\n那麼該如何達到這個要求呢？很簡單：登入名稱會以 SHA1 雜湊後的形式存放。這樣，從服務端，侵入者便很難取得使用者的登入名稱;同樣地，登入密碼以經過雜湊的形式存放。\n如何避免因為裝置遺失導致登入名稱與登入密碼被盜用的風險？\n如果登入名稱跟密碼存放在裝置上，一旦裝置遺失，自然必須假設登入名稱與密碼已經洩露。所以，在一開始便不應該將登入名稱跟密碼存放在裝置中。尤其，登入名稱、登入密碼以及用戶密鑰是最終使用者證明自己對某個影化身擁有控制權的必要資訊，保護這三項資料的安全更應該不遺餘力。\n為了降低因為裝置遺失導致使用者登入名稱以及密碼洩露的風風險，登入名稱跟密碼分成兩類：\n使用者登入名稱跟密碼。\n客戶端登入名稱跟密碼。\n客戶端登入名稱以及密碼屬於可拋棄式，也就是說，可以根據需要產生跟丟棄。藉由客戶端登入名稱跟密碼，當使用者發現裝置遺失而想要報銷該組客戶端登入名稱跟密碼時，只要使用另一個裝置，透過影化身客戶端進行銷毀動作。一旦銷毀，該組客戶端登入名稱與密碼就無法使用也無法恢復。\n利用這樣的設計，使用者可以選擇是否要記住登入狀態來簡化操作。例如：如果手機本身已經提供不錯的身份驗證機制，可能就不需要每次要使用影化身客戶端就要再登入一次的麻煩。\n由於個人密鑰必須登錄在客戶端才能進行加解密的動作，這個方法只能保護使用者的登入名稱跟密碼。但是第三者無法單獨使用個人密鑰登入系統，理論上，應該不會有什麼大礙。如果真的很擔心，使用者也可更換個人密鑰，但這需要每台裝置都要重新設置新的個人密鑰，會有些麻煩。\n如何偵測個人密鑰已經更改？\n如果使用者透過某個裝置進行修改個人密鑰且將完成重新加密後，其他的裝置便無法正確解密。為了使用者的便利，平台在這種狀況下，應該在使用者用另一個裝置登入時，自動提醒使用者個人密鑰已經修改，需要重新在該裝置登錄。\n小結\n本文內容雖然牽涉某些技術層面，但重點在於說明為何影化身可以做到保護個人資料的同時還可以做到個人化的服務。除了保護個人資料，影化身更希望協助使用者從個人的資料獲取更多的效益，當然一切都是在不泄露個人身份的前提下。\n","dateCreated":"2013-07-04T10:51:00+08:00","dateModified":"2018-08-23T13:00:30+08:00","datePublished":"2013-07-04T10:51:00+08:00","description":"作為您的匿名分身，影化身盡一切可能保護您個人的資料安全。本文分享在資料安全這個範疇，影化身是如何確保您的資料不會由平台洩露出去。影化身對於「匿名」的定義是您不需提供任何可以關聯到您身份的資訊就能使用平台提供的服務，且第三方無法從平台取得您的身份識別資料，但不代表第三方沒有使用其他方法達到這個目的。","headline":"影化身如何保護您的個人資料？","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/07/how-eavatar-protect-your-data/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"featured_image.jpg","logo":{"@type":"ImageObject","url":"featured_image.jpg"}},"url":"https://samkuo.me/post/2013/07/how-eavatar-protect-your-data/","keywords":"Security, Privacy"}</script>
     <meta name="description" content="描述影化身對於使用者資料保護的基本機制。">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="影化身如何保護您的個人資料？">
@@ -42,7 +42,7 @@
         
     
     
-        <meta property="og:image" content="https://samkuo.me/images/logo.png"/>
+        <meta property="og:image" content="https://samkuo.me/images/featured_image.jpg"/>
     
     
     
@@ -117,7 +117,7 @@
                     href="/#about"
                     aria-label="閱讀有關作者的更多信息"
                 >
-                    <img class="sidebar-profile-picture" src="/images/logo.png" alt="作者的圖片"/>
+                    <img class="sidebar-profile-picture" src="/images/featured_image.jpg" alt="作者的圖片"/>
                 </a>
                 <h4 class="sidebar-profile-name">Sampot (山姆鍋)</h4>
                 
@@ -479,7 +479,7 @@ b. 跟 Alice 以外的人分享同樣的密鑰會導致 Bob 無法確認訊息�
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Diesen Beitrag teilen"
+                aria-label="Share this post"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -517,7 +517,7 @@ b. 跟 Alice 以外的人分享同樣的密鑰會導致 Bob 無法確認訊息�
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Kommentieren"
+                        aria-label="Leave a comment"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -526,7 +526,7 @@ b. 跟 Alice 以外的人分享同樣的密鑰會導致 Bob 無法確認訊息�
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -595,7 +595,7 @@ b. 跟 Alice 以外的人分享同樣的密鑰會導致 Bob 無法確認訊息�
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Diesen Beitrag teilen"
+                aria-label="Share this post"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -633,7 +633,7 @@ b. 跟 Alice 以外的人分享同樣的密鑰會導致 Bob 無法確認訊息�
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Kommentieren"
+                        aria-label="Leave a comment"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -642,7 +642,7 @@ b. 跟 Alice 以外的人分享同樣的密鑰會導致 Bob 無法確認訊息�
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -702,7 +702,7 @@ b. 跟 Alice 以外的人分享同樣的密鑰會導致 Bob 無法確認訊息�
             <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="/images/logo.png" alt="作者的圖片"/>
+            <img id="about-card-picture" src="/images/featured_image.jpg" alt="作者的圖片"/>
         
             <h4 id="about-card-name">Sampot (山姆鍋)</h4>
         

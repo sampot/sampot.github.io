@@ -17,7 +17,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"在山姆鍋頭幾年工作中，有一次的經驗讓我到現在還記得並引以為戒。話說這整件事情就跟使用關聯式資料庫當作訊息佇列(message queue)脫不了關係。\n\n將訊息放入資料庫的表格，然後定期輪詢(polling)查看是否有新訊息的這種方式，有點經驗的工程師應該知道會有所謂「忙碌迴圈(busy waiting)」的問題，讓山姆鍋告訴您為什麼「忙碌迴圈」不是問題！\n何謂忙碌迴圈？\n「忙碌迴圈」統指程式迴圈一直以輪詢的方式檢查是否有事件發生，例如：是否有新訊息到達需要處理。 這種方式，在沒有事件發生時，只是一直空耗處理器的運算時間，通常被視為很不好的設計方式。 雖然隨著多工系統(multi-tasking)以及強制排程(preemptive scheduling)作業系統的普及， 這個問題似乎不是那麼嚴重，但在移動設備，程式空耗會造成電池續航力減短。\n故事起源\n這件事情的起源在於公司有位資深軟體工程師被賦予撰寫一個背景工作處理的任務。在他完成工作後， Team leader 要他給團隊做技術展示，說明該程式的設計。在整個展示開始沒多久，\n該位資深軟體工程師介紹他使用資料庫(關聯式, 那時候沒有所謂 NoSQL)作為訊息佇列時， 山姆鍋腦中的警鈴開始響起，便問他：「那你有用什麼方式避免 busy waiting 嗎？」，他回答：「沒有」。 「那這樣不會有問題嗎？」我繼續問，「不會」，他以很肯定的語氣回答。身為工程師， 山姆鍋這時引起了高度興趣，心想也許可以學到一些自己不知道的技巧，繼續追問說：「為什麼不會？」 想不到山姆鍋聽到一個讓我如雷貫耳的答案，至今依舊無法理解其中的奧妙！\n他的答案竟然是：「就是不會」!!! 那個技術展示後續講些什麼，我也無心再聽了。\n這件事情讓山姆鍋津津樂道了好幾年，直到有一天，山姆鍋在另一家 F 公司工作時，遇到類似的情形。 該公司購買以色列一家 B 公司的軟體產品，包含有技術訓練課程。山姆鍋身為該專案經理兼唯一的資深工程師， 理所當然參加這個訓練課程。講解過程中，B 公司的工程師講到，由於他們的產品採分散式架構， 系統間透過訊息傳遞互相合作。由於看不到架構中有使用任何訊息中介軟體(messaging middleware)的跡象， 山姆鍋便好奇問：「你們如何實作訊息傳遞機制？」，對方很自然地回答：「我們使用資料庫表格作為佇列」。 讀者看到這應該知道山姆鍋接下來會問什麼問題了，「這樣不會有 busy waiting 的問題嗎？」， 對方工程師依然很自信地回答：「的確會有 busy waiting 的問題，但當系統沒有事作時，資料庫空轉不是個問題，」 他繼續說：「如果系統忙碌，一直都有訊息要處理就沒有空轉的問題。」 讀者也許會覺得，這樣的說法是不是有點強詞奪理？山姆鍋的感觸不在於他的答案是否正確， 而是在於他能夠為自己的設計決策(design decision)做合理辯護(justify)。\n山姆鍋所要傳達的是：整件事情的問題不在於是否會 busy waiting, 而是身為工程師， 您能不能為您的設計決策做合理辯護。山姆鍋不是要您強詞奪理，而是在解決問題過程中， 我們大部份的決定其實都只是一種妥協(compromise)[1]， 清楚自己為何做這樣的決定，能夠跟別人溝通這樣決定的理由， 絕對是好跟不好的工程師間重要的分野！\n結語\n對於真的想知道「忙碌迴圈」為什麼不是問題的讀者，抱歉讓您失望了。藉由這件事情，山姆鍋清楚知道： 「在軟體開發領域，沒有對跟不對，只有可行跟不可行。」還有就是，永遠不要說：「就是不會」。\n\n\n\n\n囧，這裏山姆鍋原先要表達的是一種取捨(trade-off)。 ↩︎\n\n\n\n","dateCreated":"2015-09-18T15:02:00+08:00","dateModified":"2018-08-25T14:33:18+08:00","datePublished":"2015-09-18T15:02:00+08:00","description":"在山姆鍋頭幾年工作中，有一次的經驗讓我到現在還記得並引以為戒。話說這整件事情就跟使用關聯式資料庫當作訊息佇列(message queue)脫不了關係。","headline":"為什麼使用資料庫當作訊息佇列不是問題？","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2015/09/why-use-database-as-queue/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2015/09/why-use-database-as-queue/","keywords":"database, message, queue"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"featured_image.jpg"},"articleBody":"在山姆鍋頭幾年工作中，有一次的經驗讓我到現在還記得並引以為戒。話說這整件事情就跟使用關聯式資料庫當作訊息佇列(message queue)脫不了關係。\n\n將訊息放入資料庫的表格，然後定期輪詢(polling)查看是否有新訊息的這種方式，有點經驗的工程師應該知道會有所謂「忙碌迴圈(busy waiting)」的問題，讓山姆鍋告訴您為什麼「忙碌迴圈」不是問題！\n何謂忙碌迴圈？\n「忙碌迴圈」統指程式迴圈一直以輪詢的方式檢查是否有事件發生，例如：是否有新訊息到達需要處理。 這種方式，在沒有事件發生時，只是一直空耗處理器的運算時間，通常被視為很不好的設計方式。 雖然隨著多工系統(multi-tasking)以及強制排程(preemptive scheduling)作業系統的普及， 這個問題似乎不是那麼嚴重，但在移動設備，程式空耗會造成電池續航力減短。\n故事起源\n這件事情的起源在於公司有位資深軟體工程師被賦予撰寫一個背景工作處理的任務。在他完成工作後， Team leader 要他給團隊做技術展示，說明該程式的設計。在整個展示開始沒多久，\n該位資深軟體工程師介紹他使用資料庫(關聯式, 那時候沒有所謂 NoSQL)作為訊息佇列時， 山姆鍋腦中的警鈴開始響起，便問他：「那你有用什麼方式避免 busy waiting 嗎？」，他回答：「沒有」。 「那這樣不會有問題嗎？」我繼續問，「不會」，他以很肯定的語氣回答。身為工程師， 山姆鍋這時引起了高度興趣，心想也許可以學到一些自己不知道的技巧，繼續追問說：「為什麼不會？」 想不到山姆鍋聽到一個讓我如雷貫耳的答案，至今依舊無法理解其中的奧妙！\n他的答案竟然是：「就是不會」!!! 那個技術展示後續講些什麼，我也無心再聽了。\n這件事情讓山姆鍋津津樂道了好幾年，直到有一天，山姆鍋在另一家 F 公司工作時，遇到類似的情形。 該公司購買以色列一家 B 公司的軟體產品，包含有技術訓練課程。山姆鍋身為該專案經理兼唯一的資深工程師， 理所當然參加這個訓練課程。講解過程中，B 公司的工程師講到，由於他們的產品採分散式架構， 系統間透過訊息傳遞互相合作。由於看不到架構中有使用任何訊息中介軟體(messaging middleware)的跡象， 山姆鍋便好奇問：「你們如何實作訊息傳遞機制？」，對方很自然地回答：「我們使用資料庫表格作為佇列」。 讀者看到這應該知道山姆鍋接下來會問什麼問題了，「這樣不會有 busy waiting 的問題嗎？」， 對方工程師依然很自信地回答：「的確會有 busy waiting 的問題，但當系統沒有事作時，資料庫空轉不是個問題，」 他繼續說：「如果系統忙碌，一直都有訊息要處理就沒有空轉的問題。」 讀者也許會覺得，這樣的說法是不是有點強詞奪理？山姆鍋的感觸不在於他的答案是否正確， 而是在於他能夠為自己的設計決策(design decision)做合理辯護(justify)。\n山姆鍋所要傳達的是：整件事情的問題不在於是否會 busy waiting, 而是身為工程師， 您能不能為您的設計決策做合理辯護。山姆鍋不是要您強詞奪理，而是在解決問題過程中， 我們大部份的決定其實都只是一種妥協(compromise)[1]， 清楚自己為何做這樣的決定，能夠跟別人溝通這樣決定的理由， 絕對是好跟不好的工程師間重要的分野！\n結語\n對於真的想知道「忙碌迴圈」為什麼不是問題的讀者，抱歉讓您失望了。藉由這件事情，山姆鍋清楚知道： 「在軟體開發領域，沒有對跟不對，只有可行跟不可行。」還有就是，永遠不要說：「就是不會」。\n\n\n\n\n囧，這裏山姆鍋原先要表達的是一種取捨(trade-off)。 ↩︎\n\n\n\n","dateCreated":"2015-09-18T15:02:00+08:00","dateModified":"2018-08-25T14:33:18+08:00","datePublished":"2015-09-18T15:02:00+08:00","description":"在山姆鍋頭幾年工作中，有一次的經驗讓我到現在還記得並引以為戒。話說這整件事情就跟使用關聯式資料庫當作訊息佇列(message queue)脫不了關係。","headline":"為什麼使用資料庫當作訊息佇列不是問題？","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2015/09/why-use-database-as-queue/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"featured_image.jpg","logo":{"@type":"ImageObject","url":"featured_image.jpg"}},"url":"https://samkuo.me/post/2015/09/why-use-database-as-queue/","keywords":"database, message, queue"}</script>
     <meta name="description" content="在山姆鍋頭幾年工作中，有一次的經驗讓我到現在還記得並引以為戒。話說這整件事情就跟使用關聯式資料庫當作訊息佇列(message queue)脫不了關係。">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="為什麼使用資料庫當作訊息佇列不是問題？">
@@ -39,7 +39,7 @@
         
     
     
-        <meta property="og:image" content="https://samkuo.me/images/logo.png"/>
+        <meta property="og:image" content="https://samkuo.me/images/featured_image.jpg"/>
     
     
     
@@ -114,7 +114,7 @@
                     href="/#about"
                     aria-label="閱讀有關作者的更多信息"
                 >
-                    <img class="sidebar-profile-picture" src="/images/logo.png" alt="作者的圖片"/>
+                    <img class="sidebar-profile-picture" src="/images/featured_image.jpg" alt="作者的圖片"/>
                 </a>
                 <h4 class="sidebar-profile-name">Sampot (山姆鍋)</h4>
                 
@@ -443,7 +443,7 @@
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Diesen Beitrag teilen"
+                aria-label="Share this post"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -481,7 +481,7 @@
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Kommentieren"
+                        aria-label="Leave a comment"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -490,7 +490,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -559,7 +559,7 @@
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Diesen Beitrag teilen"
+                aria-label="Share this post"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -597,7 +597,7 @@
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Kommentieren"
+                        aria-label="Leave a comment"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -606,7 +606,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -666,7 +666,7 @@
             <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="/images/logo.png" alt="作者的圖片"/>
+            <img id="about-card-picture" src="/images/featured_image.jpg" alt="作者的圖片"/>
         
             <h4 id="about-card-name">Sampot (山姆鍋)</h4>
         

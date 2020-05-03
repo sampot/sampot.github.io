@@ -17,7 +17,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案(圖檔, CSS 等等)可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點(single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。\n\nGlusterFS 是一套純軟體實現的檔案存儲解決方案，使用它的原因除了因為它具備叢集檔案系統必須的高可用性、 高擴充性以及可靠性等優點外，主要在於其安裝與管理上的簡易性。\n目標\n\n要在兩個節點之間採用複製模式(replication)，建立叢集檔案系統。在此模式下，任一台故障，都不會影響檔案的可存取性。\n\n前提假設\n\n假設叢集中有兩個節點，主機名稱分別為 node1 跟 node2。\n作業系統為: Utuntu 10.04 64-bit\nGlusterFS 版本: 3.2.x\n所有安裝操作都是以 root 權限進行。\nnode1 跟 node2 上作為真正儲存空間的檔案路徑：/exp1。\n叢集的 Volume 名稱(webshare)。\n/srv/cfs\n為共享的檔案目錄，任一主機可以同時對此目錄修改，其他主機可以即時看到修改後的結果。\n\n安裝 GlusterFS\n下載 GlusterFS\n到 GlusterFS 官網提供的下載網址，下載 Ubuntu 專用的安裝包。\nEDIT 2015-09-06: 本文使用的版本， GlusterFS 已經不再提供下載。\n執行安裝指令\n1# apt-get -y install glusterfs_3.2.6-1_amd64.deb\n建立叢集檔案系統\n從 node1 的命令列，執行下列指令:\n1234567# gluster peer probe node2# gluster peer statusNumber of Peers: 1Hostname: node2Uuid: cf79a2b7-39f3-40fc-a629-f980d8683cf2State: Peer in Cluster (Connected)\n注意 UUID 會跟環境有所不同。\n建立 Volume\n123# gluster volume create webshare replica 2 transport tcp node1:/exp1 node2:/exp1Creation of test-volume has been successfulPlease start the volume to access data.\n筆者伺服器內部使用 IP 網段為 192.168.x.x, 因此設定這個 volume 只能由同網段的伺服器存取。\n1# gluster volume set webshare auth.allow 192.168.*\n設定 GlusterFS 客戶端\n本文所介紹的設置方式，檔案系統的客戶端跟伺服端都需要在同一主機設定。由於希望能夠一開機時就自動掛載(mount) /srv/cfs，需要在/etc/fstab 中新增下列內容：\n1localhost:/webshare    /srv/cfs   glusterfs defaults,_netdev      0       0\n可能因為 fuse 模組載入順序或者其他因素，在/etc/fstab 作上述設定並無法成功讓/opt/cfs 自動被掛載，需要在/etc/rc.local 中加入(加在最後的 exit 0 敘述前)：\n1mount /srv/cfs\n結語\n透過這樣的設定，兩個節點可以即時分享檔案，只要將網站要用到的檔案佈署到這個叢集檔案目錄，不管客戶是從哪一台伺服器進入，應該都可以檢視同樣的內容。\n","dateCreated":"2012-04-23T08:40:00+08:00","dateModified":"2018-08-25T14:57:16+08:00","datePublished":"2012-04-23T08:40:00+08:00","description":"在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案(圖檔, CSS 等等)可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點(single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。","headline":"使用 GlusterFS 在 Ubuntu 上建構雙節點叢集檔案系統","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2012/04/build-cluster-filesystem-with-glusterfs-ubuntu/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2012/04/build-cluster-filesystem-with-glusterfs-ubuntu/","keywords":"GlusterFS, Ubuntu, Cluster"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"featured_image.jpg"},"articleBody":"在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案(圖檔, CSS 等等)可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點(single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。\n\nGlusterFS 是一套純軟體實現的檔案存儲解決方案，使用它的原因除了因為它具備叢集檔案系統必須的高可用性、 高擴充性以及可靠性等優點外，主要在於其安裝與管理上的簡易性。\n目標\n\n要在兩個節點之間採用複製模式(replication)，建立叢集檔案系統。在此模式下，任一台故障，都不會影響檔案的可存取性。\n\n前提假設\n\n假設叢集中有兩個節點，主機名稱分別為 node1 跟 node2。\n作業系統為: Utuntu 10.04 64-bit\nGlusterFS 版本: 3.2.x\n所有安裝操作都是以 root 權限進行。\nnode1 跟 node2 上作為真正儲存空間的檔案路徑：/exp1。\n叢集的 Volume 名稱(webshare)。\n/srv/cfs\n為共享的檔案目錄，任一主機可以同時對此目錄修改，其他主機可以即時看到修改後的結果。\n\n安裝 GlusterFS\n下載 GlusterFS\n到 GlusterFS 官網提供的下載網址，下載 Ubuntu 專用的安裝包。\nEDIT 2015-09-06: 本文使用的版本， GlusterFS 已經不再提供下載。\n執行安裝指令\n1# apt-get -y install glusterfs_3.2.6-1_amd64.deb\n建立叢集檔案系統\n從 node1 的命令列，執行下列指令:\n1234567# gluster peer probe node2# gluster peer statusNumber of Peers: 1Hostname: node2Uuid: cf79a2b7-39f3-40fc-a629-f980d8683cf2State: Peer in Cluster (Connected)\n注意 UUID 會跟環境有所不同。\n建立 Volume\n123# gluster volume create webshare replica 2 transport tcp node1:/exp1 node2:/exp1Creation of test-volume has been successfulPlease start the volume to access data.\n筆者伺服器內部使用 IP 網段為 192.168.x.x, 因此設定這個 volume 只能由同網段的伺服器存取。\n1# gluster volume set webshare auth.allow 192.168.*\n設定 GlusterFS 客戶端\n本文所介紹的設置方式，檔案系統的客戶端跟伺服端都需要在同一主機設定。由於希望能夠一開機時就自動掛載(mount) /srv/cfs，需要在/etc/fstab 中新增下列內容：\n1localhost:/webshare    /srv/cfs   glusterfs defaults,_netdev      0       0\n可能因為 fuse 模組載入順序或者其他因素，在/etc/fstab 作上述設定並無法成功讓/opt/cfs 自動被掛載，需要在/etc/rc.local 中加入(加在最後的 exit 0 敘述前)：\n1mount /srv/cfs\n結語\n透過這樣的設定，兩個節點可以即時分享檔案，只要將網站要用到的檔案佈署到這個叢集檔案目錄，不管客戶是從哪一台伺服器進入，應該都可以檢視同樣的內容。\n","dateCreated":"2012-04-23T08:40:00+08:00","dateModified":"2018-08-25T14:57:16+08:00","datePublished":"2012-04-23T08:40:00+08:00","description":"在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案(圖檔, CSS 等等)可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點(single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。","headline":"使用 GlusterFS 在 Ubuntu 上建構雙節點叢集檔案系統","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2012/04/build-cluster-filesystem-with-glusterfs-ubuntu/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"featured_image.jpg","logo":{"@type":"ImageObject","url":"featured_image.jpg"}},"url":"https://samkuo.me/post/2012/04/build-cluster-filesystem-with-glusterfs-ubuntu/","keywords":"GlusterFS, Ubuntu, Cluster"}</script>
     <meta name="description" content="在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案(圖檔, CSS 等等)可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點(single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="使用 GlusterFS 在 Ubuntu 上建構雙節點叢集檔案系統">
@@ -39,7 +39,7 @@
         
     
     
-        <meta property="og:image" content="https://samkuo.me/images/logo.png"/>
+        <meta property="og:image" content="https://samkuo.me/images/featured_image.jpg"/>
     
     
     
@@ -114,7 +114,7 @@
                     href="/#about"
                     aria-label="閱讀有關作者的更多信息"
                 >
-                    <img class="sidebar-profile-picture" src="/images/logo.png" alt="作者的圖片"/>
+                    <img class="sidebar-profile-picture" src="/images/featured_image.jpg" alt="作者的圖片"/>
                 </a>
                 <h4 class="sidebar-profile-name">Sampot (山姆鍋)</h4>
                 
@@ -461,7 +461,7 @@
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Diesen Beitrag teilen"
+                aria-label="Share this post"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -499,7 +499,7 @@
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Kommentieren"
+                        aria-label="Leave a comment"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -508,7 +508,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -577,7 +577,7 @@
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Diesen Beitrag teilen"
+                aria-label="Share this post"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -615,7 +615,7 @@
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Kommentieren"
+                        aria-label="Leave a comment"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -624,7 +624,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -684,7 +684,7 @@
             <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="/images/logo.png" alt="作者的圖片"/>
+            <img id="about-card-picture" src="/images/featured_image.jpg" alt="作者的圖片"/>
         
             <h4 id="about-card-name">Sampot (山姆鍋)</h4>
         

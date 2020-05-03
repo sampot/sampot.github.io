@@ -17,7 +17,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"想要達到系統高可用性(high availability)的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。\n\n系統需求\n\n作業系統: Ubuntu 10.04 LTS 64-bit\nPacemaker 版本: 1.0.8+hg15494-2ubuntu2\nHeartbeat 版本: 1:3.0.3-1ubuntu1\n\n目標\n完成後，兩個節點(node)將可以彼此監控狀態，當某節點發生錯誤時，將在該節點上執行的服務自動轉移到另一個節點。同時為了示範目的，某個浮動 IP 位址會綁定到其中一個節點。\n假設\n假設有兩台伺服器（不管事實體還是虛擬），其名稱\n\n\n\n\n伺服器(一)\n伺服器(二)\n\n\n主機名稱\nnode1\nnode2\n\n\n內部IP位址\n192.168.1.10\n192.168.1.11\n\n\n\n浮動IP位址: 192.168.1.100\n安裝 Pacemaker/heartbeat\n所需要的 heartbeat 跟 pacemaker 套件已經在 Ubuntu 的套件庫中\n1# apt-get install -y heartbeat pacemaker\n設定 Heartbeat\n檔案/etc/heartbeat/ha.cf (Node1)\n123456789101112logfacility daemonkeepalive 2deadtime 15warntime 5initdead 120udpport 694ucast eth0 192.168.1.11auto_failback offnode node1node node2use_logd yescrm respawn\n檔案/etc/heartbeat/ha.cf (Node2)\n123456789101112logfacility daemonkeepalive 2deadtime 15warntime 5initdead 120udpport 694ucast eth0 192.168.1.10auto_failback offnode node1node node2use_logd yescrm respawn\n在 node1 修改或建立檔案 /etc/ha.d/authkeys\n12auth 11 sha1 CHANGEME\n其中 CHANGEME 要改成您自己系統的密碼。\n在 node1 的命令列，執行下列指令:\n12345# chmod 600 /etc/ha.d/authkeys# service heartbeat start# scp /etc/ha.d/authkeys root@node2:/etc/ha.d/# ssh root@node2 \"chmod 600 /etc/ha.d/authkeys\"# ssh root@node2 \"service heartbeat start\"\n因為我們只使用兩個節點，所以需要一些特別設定\n12# crm configure property stonith-enabled=false# crm configure property no-quorum-policy=ignore\n設定浮動 IP 位址\n123# crm configure primitive ClusterIP ocf:heartbeat:IPaddr2 \\    params ip&#x3D;192.168.1.100 cidr_netmask&#x3D;32 \\    op monitor interval&#x3D;30s\n結論\n由於沒有使用 stonith 裝置，不建議使用在需要同時修改資料的服務， 如資料庫。\n只有兩個節點，當兩個節點因為網路問題，彼此無法通訊的話，有可能出現同一個服務在兩個節點都被執行。\n","dateCreated":"2012-04-06T23:18:00+08:00","dateModified":"2018-08-19T21:39:15+08:00","datePublished":"2012-04-06T23:18:00+08:00","description":"想要達到系統高可用性(high availability)的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。","headline":"使用Pacemaker 建構雙節點叢集系統","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2012/04/use-pacemaker-two-node-ha-cluster/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2012/04/use-pacemaker-two-node-ha-cluster/","keywords":"Cluster, Pacemaker, Heartbeat"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"featured_image.jpg"},"articleBody":"想要達到系統高可用性(high availability)的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。\n\n系統需求\n\n作業系統: Ubuntu 10.04 LTS 64-bit\nPacemaker 版本: 1.0.8+hg15494-2ubuntu2\nHeartbeat 版本: 1:3.0.3-1ubuntu1\n\n目標\n完成後，兩個節點(node)將可以彼此監控狀態，當某節點發生錯誤時，將在該節點上執行的服務自動轉移到另一個節點。同時為了示範目的，某個浮動 IP 位址會綁定到其中一個節點。\n假設\n假設有兩台伺服器（不管事實體還是虛擬），其名稱\n\n\n\n\n伺服器(一)\n伺服器(二)\n\n\n主機名稱\nnode1\nnode2\n\n\n內部IP位址\n192.168.1.10\n192.168.1.11\n\n\n\n浮動IP位址: 192.168.1.100\n安裝 Pacemaker/heartbeat\n所需要的 heartbeat 跟 pacemaker 套件已經在 Ubuntu 的套件庫中\n1# apt-get install -y heartbeat pacemaker\n設定 Heartbeat\n檔案/etc/heartbeat/ha.cf (Node1)\n123456789101112logfacility daemonkeepalive 2deadtime 15warntime 5initdead 120udpport 694ucast eth0 192.168.1.11auto_failback offnode node1node node2use_logd yescrm respawn\n檔案/etc/heartbeat/ha.cf (Node2)\n123456789101112logfacility daemonkeepalive 2deadtime 15warntime 5initdead 120udpport 694ucast eth0 192.168.1.10auto_failback offnode node1node node2use_logd yescrm respawn\n在 node1 修改或建立檔案 /etc/ha.d/authkeys\n12auth 11 sha1 CHANGEME\n其中 CHANGEME 要改成您自己系統的密碼。\n在 node1 的命令列，執行下列指令:\n12345# chmod 600 /etc/ha.d/authkeys# service heartbeat start# scp /etc/ha.d/authkeys root@node2:/etc/ha.d/# ssh root@node2 \"chmod 600 /etc/ha.d/authkeys\"# ssh root@node2 \"service heartbeat start\"\n因為我們只使用兩個節點，所以需要一些特別設定\n12# crm configure property stonith-enabled=false# crm configure property no-quorum-policy=ignore\n設定浮動 IP 位址\n123# crm configure primitive ClusterIP ocf:heartbeat:IPaddr2 \\    params ip&#x3D;192.168.1.100 cidr_netmask&#x3D;32 \\    op monitor interval&#x3D;30s\n結論\n由於沒有使用 stonith 裝置，不建議使用在需要同時修改資料的服務， 如資料庫。\n只有兩個節點，當兩個節點因為網路問題，彼此無法通訊的話，有可能出現同一個服務在兩個節點都被執行。\n","dateCreated":"2012-04-06T23:18:00+08:00","dateModified":"2018-08-19T21:39:15+08:00","datePublished":"2012-04-06T23:18:00+08:00","description":"想要達到系統高可用性(high availability)的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。","headline":"使用Pacemaker 建構雙節點叢集系統","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2012/04/use-pacemaker-two-node-ha-cluster/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"featured_image.jpg","logo":{"@type":"ImageObject","url":"featured_image.jpg"}},"url":"https://samkuo.me/post/2012/04/use-pacemaker-two-node-ha-cluster/","keywords":"Cluster, Pacemaker, Heartbeat"}</script>
     <meta name="description" content="想要達到系統高可用性(high availability)的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker&#x2F;heartbeat 來建構一個雙節點的從其系統。">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="使用Pacemaker 建構雙節點叢集系統">
@@ -39,7 +39,7 @@
         
     
     
-        <meta property="og:image" content="https://samkuo.me/images/logo.png"/>
+        <meta property="og:image" content="https://samkuo.me/images/featured_image.jpg"/>
     
     
     
@@ -114,7 +114,7 @@
                     href="/#about"
                     aria-label="閱讀有關作者的更多信息"
                 >
-                    <img class="sidebar-profile-picture" src="/images/logo.png" alt="作者的圖片"/>
+                    <img class="sidebar-profile-picture" src="/images/featured_image.jpg" alt="作者的圖片"/>
                 </a>
                 <h4 class="sidebar-profile-name">Sampot (山姆鍋)</h4>
                 
@@ -474,7 +474,7 @@
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Diesen Beitrag teilen"
+                aria-label="Share this post"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -512,7 +512,7 @@
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Kommentieren"
+                        aria-label="Leave a comment"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -521,7 +521,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -590,7 +590,7 @@
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Diesen Beitrag teilen"
+                aria-label="Share this post"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -628,7 +628,7 @@
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Kommentieren"
+                        aria-label="Leave a comment"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -637,7 +637,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -697,7 +697,7 @@
             <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="/images/logo.png" alt="作者的圖片"/>
+            <img id="about-card-picture" src="/images/featured_image.jpg" alt="作者的圖片"/>
         
             <h4 id="about-card-name">Sampot (山姆鍋)</h4>
         

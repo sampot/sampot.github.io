@@ -19,7 +19,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"一直想在&quot;影化身部落格&quot;的首頁加個標籤雲邊欄，昨天終於利用了一點時間把它做好了。離想要的還有點差距，有時間再來改善。山姆鍋使用的標籤雲插件是這個 octopress-tagcloud，它也支援分類列表，但我目前只使用了標簽雲功能。\n\n安裝 octopress-tagcloud\n首先要先安裝插件，在’&lt;octopress 目錄&gt;/plugins/'目錄中，新增 tag_cloud.rb 檔案，內容拷貝這個：\n插件原始碼\n123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475767778798081828384858687888990919293949596979899100101102103104105106107108109110111112113114115116# encoding: utf-8# Tag Cloud for Octopress# =======================## Description:# ------------# Easy output tag cloud and category list.## Syntax:# -------#     &#123;% tag_cloud [counter:true] %&#125;#     &#123;% category_list [counter:true] %&#125;## Example:# --------# In some template files, you can add the following markups.## ### source/_includes/custom/asides/tag_cloud.html #####     &lt;section&gt;#       &lt;h1&gt;Tag Cloud&lt;/h1&gt;#         &lt;span id=\"tag-cloud\"&gt;&#123;% tag_cloud %&#125;&lt;/span&gt;#     &lt;/section&gt;## ### source/_includes/custom/asides/category_list.html #####     &lt;section&gt;#       &lt;h1&gt;Categories&lt;/h1&gt;#         &lt;ul id=\"category-list\"&gt;&#123;% category_list counter:true %&#125;&lt;/ul&gt;#     &lt;/section&gt;## Notes:# ------# Be sure to insert above template files into `default_asides` array in `_config.yml`.# And also you can define styles for 'tag-cloud' or 'category-list' in a `.scss` file.# (ex: `sass/custom/_styles.scss`)## Licence:# --------# Distributed under the [MIT License][MIT].## [MIT]: http://www.opensource.org/licenses/mit-license.php#require 'stringex'module Jekyll  class TagCloud &lt; Liquid::Tag    def initialize(tag_name, markup, tokens)      @opts = &#123;&#125;      if markup.strip =~ /\\s*counter:(\\w+)/i        @opts['counter'] = ($1 == 'true')        markup = markup.strip.sub(/counter:\\w+/i,'')      end      super    end    def render(context)      lists = &#123;&#125;      max, min = 1, 1      config = context.registers[:site].config      category_dir = config['root'] + config['category_dir'] + '/'      categories = context.registers[:site].categories      categories.keys.sort_by&#123; |str| str.downcase &#125;.each do |category|        count = categories[category].count        lists[category] = count        max = count if count &gt; max      end      html = ''      lists.each do | category, counter |        url = category_dir + category.gsub(/_|\\P&#123;Word&#125;/, '-').gsub(/-&#123;2,&#125;/, '-').downcase        style = \"font-size: #&#123;100 + (60 * Float(counter)/max)&#125;%\"        html &lt;&lt; \"&lt;a href='#&#123;url&#125;' style='#&#123;style&#125;'&gt;#&#123;category&#125;\"        if @opts['counter']          html &lt;&lt; \"(#&#123;categories[category].count&#125;)\"        end        html &lt;&lt; \"&lt;/a&gt; \"      end      html    end  end  class CategoryList &lt; Liquid::Tag    def initialize(tag_name, markup, tokens)      @opts = &#123;&#125;      if markup.strip =~ /\\s*counter:(\\w+)/i        @opts['counter'] = ($1 == 'true')        markup = markup.strip.sub(/counter:\\w+/i,'')      end      super    end    def render(context)      html = \"\"      config = context.registers[:site].config      category_dir = config['category_dir']      categories = context.registers[:site].categories      categories.keys.sort_by&#123; |str| str.downcase &#125;.each do |category|        html &lt;&lt; \"&lt;li&gt;&lt;a href='/#&#123;category_dir&#125;/#&#123;category.to_url&#125;/'&gt;#&#123;category&#125;\"        if @opts['counter']          html &lt;&lt; \" (#&#123;categories[category].count&#125;)\"        end        html &lt;&lt; \"&lt;/a&gt;&lt;/li&gt;\"      end      html    end  endendLiquid::Template.register_tag('tag_cloud', Jekyll::TagCloud)Liquid::Template.register_tag('category_list', Jekyll::CategoryList)\n設定邊欄樣版\n在 '&lt;octopress 目錄&gt;/_source/includes/custom/asides/'目錄中新增一個名為 tag_cloud.html 的檔案，原始的範例內容：\n1234&lt;section&gt;  &lt;h1&gt;Tag Cloud&lt;/h1&gt;    &lt;span id=\"tag-cloud\"&gt;&#123;% tag_cloud %&#125;&lt;/span&gt;&lt;/section&gt;\n以下是影化身部落格使用的內容：\n12345&lt;section id=\"crum_tags_subtitle-2\" class=\"widget-3 widget-last widget tags-widget\"&gt;  &lt;div class=\"widget-inner\"&gt;&lt;h3&gt;文章標籤&lt;/h3&gt;  &#123;% tag_cloud  %&#125;  &lt;/div&gt;&lt;/section&gt;\n網頁插入標籤雲邊欄\n在想要出現標籤雲邊欄的頁面樣板，在希望出現的地方插入下面指令：\n1&#123;% include custom&#x2F;asides&#x2F;tag_cloud.html %&#125;\n小結\nOctopress 中，標籤(tag)跟分類(category)好像是同一件事情，但是山姆鍋想要將它們分開。如果有哪位高手知道如何做的話，請不吝指教！\n","dateCreated":"2013-06-25T11:49:00+08:00","dateModified":"2018-08-31T14:11:55+08:00","datePublished":"2013-06-25T11:49:00+08:00","description":"一直想在&quot;影化身部落格&quot;的首頁加個標籤雲邊欄，昨天終於利用了一點時間把它做好了。離想要的還有點差距，有時間再來改善。山姆鍋使用的標籤雲插件是這個 octopress-tagcloud，它也支援分類列表，但我目前只使用了標簽雲功能。","headline":"Octopress 新增標籤雲邊欄","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/06/octopress-tag-cloud-aside/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2013/06/octopress-tag-cloud-aside/","keywords":"Development, Octopress"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"featured_image.jpg"},"articleBody":"一直想在&quot;影化身部落格&quot;的首頁加個標籤雲邊欄，昨天終於利用了一點時間把它做好了。離想要的還有點差距，有時間再來改善。山姆鍋使用的標籤雲插件是這個 octopress-tagcloud，它也支援分類列表，但我目前只使用了標簽雲功能。\n\n安裝 octopress-tagcloud\n首先要先安裝插件，在’&lt;octopress 目錄&gt;/plugins/'目錄中，新增 tag_cloud.rb 檔案，內容拷貝這個：\n插件原始碼\n123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475767778798081828384858687888990919293949596979899100101102103104105106107108109110111112113114115116# encoding: utf-8# Tag Cloud for Octopress# =======================## Description:# ------------# Easy output tag cloud and category list.## Syntax:# -------#     &#123;% tag_cloud [counter:true] %&#125;#     &#123;% category_list [counter:true] %&#125;## Example:# --------# In some template files, you can add the following markups.## ### source/_includes/custom/asides/tag_cloud.html #####     &lt;section&gt;#       &lt;h1&gt;Tag Cloud&lt;/h1&gt;#         &lt;span id=\"tag-cloud\"&gt;&#123;% tag_cloud %&#125;&lt;/span&gt;#     &lt;/section&gt;## ### source/_includes/custom/asides/category_list.html #####     &lt;section&gt;#       &lt;h1&gt;Categories&lt;/h1&gt;#         &lt;ul id=\"category-list\"&gt;&#123;% category_list counter:true %&#125;&lt;/ul&gt;#     &lt;/section&gt;## Notes:# ------# Be sure to insert above template files into `default_asides` array in `_config.yml`.# And also you can define styles for 'tag-cloud' or 'category-list' in a `.scss` file.# (ex: `sass/custom/_styles.scss`)## Licence:# --------# Distributed under the [MIT License][MIT].## [MIT]: http://www.opensource.org/licenses/mit-license.php#require 'stringex'module Jekyll  class TagCloud &lt; Liquid::Tag    def initialize(tag_name, markup, tokens)      @opts = &#123;&#125;      if markup.strip =~ /\\s*counter:(\\w+)/i        @opts['counter'] = ($1 == 'true')        markup = markup.strip.sub(/counter:\\w+/i,'')      end      super    end    def render(context)      lists = &#123;&#125;      max, min = 1, 1      config = context.registers[:site].config      category_dir = config['root'] + config['category_dir'] + '/'      categories = context.registers[:site].categories      categories.keys.sort_by&#123; |str| str.downcase &#125;.each do |category|        count = categories[category].count        lists[category] = count        max = count if count &gt; max      end      html = ''      lists.each do | category, counter |        url = category_dir + category.gsub(/_|\\P&#123;Word&#125;/, '-').gsub(/-&#123;2,&#125;/, '-').downcase        style = \"font-size: #&#123;100 + (60 * Float(counter)/max)&#125;%\"        html &lt;&lt; \"&lt;a href='#&#123;url&#125;' style='#&#123;style&#125;'&gt;#&#123;category&#125;\"        if @opts['counter']          html &lt;&lt; \"(#&#123;categories[category].count&#125;)\"        end        html &lt;&lt; \"&lt;/a&gt; \"      end      html    end  end  class CategoryList &lt; Liquid::Tag    def initialize(tag_name, markup, tokens)      @opts = &#123;&#125;      if markup.strip =~ /\\s*counter:(\\w+)/i        @opts['counter'] = ($1 == 'true')        markup = markup.strip.sub(/counter:\\w+/i,'')      end      super    end    def render(context)      html = \"\"      config = context.registers[:site].config      category_dir = config['category_dir']      categories = context.registers[:site].categories      categories.keys.sort_by&#123; |str| str.downcase &#125;.each do |category|        html &lt;&lt; \"&lt;li&gt;&lt;a href='/#&#123;category_dir&#125;/#&#123;category.to_url&#125;/'&gt;#&#123;category&#125;\"        if @opts['counter']          html &lt;&lt; \" (#&#123;categories[category].count&#125;)\"        end        html &lt;&lt; \"&lt;/a&gt;&lt;/li&gt;\"      end      html    end  endendLiquid::Template.register_tag('tag_cloud', Jekyll::TagCloud)Liquid::Template.register_tag('category_list', Jekyll::CategoryList)\n設定邊欄樣版\n在 '&lt;octopress 目錄&gt;/_source/includes/custom/asides/'目錄中新增一個名為 tag_cloud.html 的檔案，原始的範例內容：\n1234&lt;section&gt;  &lt;h1&gt;Tag Cloud&lt;/h1&gt;    &lt;span id=\"tag-cloud\"&gt;&#123;% tag_cloud %&#125;&lt;/span&gt;&lt;/section&gt;\n以下是影化身部落格使用的內容：\n12345&lt;section id=\"crum_tags_subtitle-2\" class=\"widget-3 widget-last widget tags-widget\"&gt;  &lt;div class=\"widget-inner\"&gt;&lt;h3&gt;文章標籤&lt;/h3&gt;  &#123;% tag_cloud  %&#125;  &lt;/div&gt;&lt;/section&gt;\n網頁插入標籤雲邊欄\n在想要出現標籤雲邊欄的頁面樣板，在希望出現的地方插入下面指令：\n1&#123;% include custom&#x2F;asides&#x2F;tag_cloud.html %&#125;\n小結\nOctopress 中，標籤(tag)跟分類(category)好像是同一件事情，但是山姆鍋想要將它們分開。如果有哪位高手知道如何做的話，請不吝指教！\n","dateCreated":"2013-06-25T11:49:00+08:00","dateModified":"2018-08-31T14:11:55+08:00","datePublished":"2013-06-25T11:49:00+08:00","description":"一直想在&quot;影化身部落格&quot;的首頁加個標籤雲邊欄，昨天終於利用了一點時間把它做好了。離想要的還有點差距，有時間再來改善。山姆鍋使用的標籤雲插件是這個 octopress-tagcloud，它也支援分類列表，但我目前只使用了標簽雲功能。","headline":"Octopress 新增標籤雲邊欄","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/06/octopress-tag-cloud-aside/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"featured_image.jpg","logo":{"@type":"ImageObject","url":"featured_image.jpg"}},"url":"https://samkuo.me/post/2013/06/octopress-tag-cloud-aside/","keywords":"Development, Octopress"}</script>
     <meta name="description" content="讓影化身部落格顯示標籤雲邊欄。">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="Octopress 新增標籤雲邊欄">
@@ -41,7 +41,7 @@
         
     
     
-        <meta property="og:image" content="https://samkuo.me/images/logo.png"/>
+        <meta property="og:image" content="https://samkuo.me/images/featured_image.jpg"/>
     
     
     
@@ -116,7 +116,7 @@
                     href="/#about"
                     aria-label="閱讀有關作者的更多信息"
                 >
-                    <img class="sidebar-profile-picture" src="/images/logo.png" alt="作者的圖片"/>
+                    <img class="sidebar-profile-picture" src="/images/featured_image.jpg" alt="作者的圖片"/>
                 </a>
                 <h4 class="sidebar-profile-name">Sampot (山姆鍋)</h4>
                 
@@ -434,7 +434,7 @@
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Diesen Beitrag teilen"
+                aria-label="Share this post"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -472,7 +472,7 @@
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Kommentieren"
+                        aria-label="Leave a comment"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -481,7 +481,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -550,7 +550,7 @@
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Diesen Beitrag teilen"
+                aria-label="Share this post"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -588,7 +588,7 @@
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Kommentieren"
+                        aria-label="Leave a comment"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -597,7 +597,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -657,7 +657,7 @@
             <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="/images/logo.png" alt="作者的圖片"/>
+            <img id="about-card-picture" src="/images/featured_image.jpg" alt="作者的圖片"/>
         
             <h4 id="about-card-name">Sampot (山姆鍋)</h4>
         

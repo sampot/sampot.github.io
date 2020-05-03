@@ -19,7 +19,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"”在 Ubuntu 系統上，使用 Deb 套件安裝 Oracle JDK”這篇文章中，山姆鍋分享如何手動安裝 Oracle JDK。雖然比每次都要從 Oracle 官網下載方便許多，但如果能夠加以自動化，自然是更加符合敏捷與精實的精神。本文山姆鍋就提供 Puppet 的腳本，讓未來有需要的話可以加快在不同機器上安裝的動作。\n\n準備工作\n本文假設您的 Ubuntu 系統為 Ubuntu 12.04 LTS x86_64，且已經安裝 Puppet 以及必要套件。您也可以像山姆鍋一樣，使用 Vagrant+VirtualBox 來進行實驗。\n建立 Puppet 模組\n建立一個 Puppet 模組，名稱為’oracle_jdk’，最終此模組的結構會成為：\n123-- oracle_jdk&#x2F;manifests&#x2F;init.pp-- oracle_jdk&#x2F;files&#x2F;java.sh\ninit.pp 檔案內容\n12345678910111213141516171819202122232425262728293031323334353637383940414243class oracle_jdk::oracle_jdk($version&#x3D;&#39;present&#39;) &#123;  exec &#123; &#39;apt_update&#39;:    command &#x3D;&gt; &#39;apt-get update&#39;,    path &#x3D;&gt; &#39;&#x2F;usr&#x2F;bin&#39;  &#125;  package &#123; &quot;python-software-properties&quot;:    ensure &#x3D;&gt; present,    require &#x3D;&gt; Exec[&#39;apt_update&#39;],  &#125;  exec &#123; &quot;add-apt-repository-oracle&quot;:    command &#x3D;&gt; &quot;&#x2F;usr&#x2F;bin&#x2F;add-apt-repository -y ppa:webupd8team&#x2F;java&quot;,    notify &#x3D;&gt; Exec[&#39;apt_update2&#39;],  &#125;  exec &#123; &#39;apt_update2&#39;:    command &#x3D;&gt; &#39;apt-get update&#39;,    path &#x3D;&gt; &#39;&#x2F;usr&#x2F;bin&#39;  &#125;  exec &#123;    &#39;set-licence-selected&#39;:      command &#x3D;&gt; &#39;&#x2F;bin&#x2F;echo debconf shared&#x2F;accepted-oracle-license-v1-1 select true | &#x2F;usr&#x2F;bin&#x2F;debconf-set-selections&#39;;    &#39;set-licence-seen&#39;:      command &#x3D;&gt; &#39;&#x2F;bin&#x2F;echo debconf shared&#x2F;accepted-oracle-license-v1-1 seen true | &#x2F;usr&#x2F;bin&#x2F;debconf-set-selections&#39;;  &#125;  package &#123; &#39;oracle-java7-installer&#39;:    ensure &#x3D;&gt; &quot;$&#123;version&#125;&quot;,    require &#x3D;&gt; [Exec[&#39;add-apt-repository-oracle&#39;]],  &#125;  file &#123; &#39;&#x2F;etc&#x2F;profile.d&#x2F;java.sh&#39;:    ensure &#x3D;&gt; present,    source &#x3D;&gt; &quot;puppet:&#x2F;&#x2F;&#x2F;modules&#x2F;oracle_jdk&#x2F;java.sh&quot;,    owner &#x3D;&gt; &quot;root&quot;,    group &#x3D;&gt; &quot;root&quot;,    mode &#x3D;&gt; 644,    require &#x3D;&gt; Package[&#39;oracle-java7-installer&#39;],  &#125;&#125;\n在 Vargrant 提供的虛擬機中，第一次的’apt_update’如果沒有執行，'python-software-properties’套件就無法正確安裝。'apt_update2’是在安裝 PPA 套件來源後更新列表，讓後續的’oracle-java7-installer’可以安裝成功。其中最讓人不理解的是’set-licence-selected’跟’set-licence-seen’可以消除 Oracle JDK 安裝過程需要人確認的動作，我想這跟 APT/Deb 套件工具的運作有關，目前就當作是黑箱作業。\njava.sh 檔案內容\n1export JAVA_HOME&#x3D;&#x2F;usr&#x2F;lib&#x2F;jvm&#x2F;java-7-oracle\n這個檔案的目的是要設定系統環境變數’JAVA_HOME’，由於有些工具會使用這個變數來找到 Java 安裝的路徑，保險起見加入這個檔案。\n引用 oracle_jdk 模組\n在您的 Puppet 組態檔案中，例如：’/etc/puppet/manifests/site.pp’，加入下列片段：\n1class &#123; &#39;oracle_jdk::oracle_jdk&#39;: version &#x3D;&gt; &#39;7u40-0~webupd8~0&#39;, &#125;\n其中，'7u40-0webupd80’可以換成您指定的版本。如果要安裝最新版本，則使用:\n1class &#123; &#39;oracle_jdk::oracle_jdk&#39;:  &#125;\n參考來源\n\nPuppet: Installing Oracle Java\n\n小結\n在開發、測試或部署的環境，套件都會使用特定的版本以確保整個環境組態盡可能相同。另位請注意：本文提供的腳本還有不少改進的空間，請自行斟酌使用。\n","dateCreated":"2013-10-02T07:41:00+08:00","dateModified":"2020-03-08T10:04:08+08:00","datePublished":"2013-10-02T07:41:00+08:00","description":"”在 Ubuntu 系統上，使用 Deb 套件安裝 Oracle JDK”這篇文章中，山姆鍋分享如何手動安裝 Oracle JDK。雖然比每次都要從 Oracle 官網下載方便許多，但如果能夠加以自動化，自然是更加符合敏捷與精實的精神。本文山姆鍋就提供 Puppet 的腳本，讓未來有需要的話可以加快在不同機器上安裝的動作。","headline":"使用 Puppet 在 Ubuntu 系統上自動安裝 Oracle JDK","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/10/install-oracle-jdk-on-ubuntu-with-puppet/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2013/10/install-oracle-jdk-on-ubuntu-with-puppet/","keywords":"Ubuntu, Vagrant, Puppet, Java, VirtualBox"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"featured_image.jpg"},"articleBody":"”在 Ubuntu 系統上，使用 Deb 套件安裝 Oracle JDK”這篇文章中，山姆鍋分享如何手動安裝 Oracle JDK。雖然比每次都要從 Oracle 官網下載方便許多，但如果能夠加以自動化，自然是更加符合敏捷與精實的精神。本文山姆鍋就提供 Puppet 的腳本，讓未來有需要的話可以加快在不同機器上安裝的動作。\n\n準備工作\n本文假設您的 Ubuntu 系統為 Ubuntu 12.04 LTS x86_64，且已經安裝 Puppet 以及必要套件。您也可以像山姆鍋一樣，使用 Vagrant+VirtualBox 來進行實驗。\n建立 Puppet 模組\n建立一個 Puppet 模組，名稱為’oracle_jdk’，最終此模組的結構會成為：\n123-- oracle_jdk&#x2F;manifests&#x2F;init.pp-- oracle_jdk&#x2F;files&#x2F;java.sh\ninit.pp 檔案內容\n12345678910111213141516171819202122232425262728293031323334353637383940414243class oracle_jdk::oracle_jdk($version&#x3D;&#39;present&#39;) &#123;  exec &#123; &#39;apt_update&#39;:    command &#x3D;&gt; &#39;apt-get update&#39;,    path &#x3D;&gt; &#39;&#x2F;usr&#x2F;bin&#39;  &#125;  package &#123; &quot;python-software-properties&quot;:    ensure &#x3D;&gt; present,    require &#x3D;&gt; Exec[&#39;apt_update&#39;],  &#125;  exec &#123; &quot;add-apt-repository-oracle&quot;:    command &#x3D;&gt; &quot;&#x2F;usr&#x2F;bin&#x2F;add-apt-repository -y ppa:webupd8team&#x2F;java&quot;,    notify &#x3D;&gt; Exec[&#39;apt_update2&#39;],  &#125;  exec &#123; &#39;apt_update2&#39;:    command &#x3D;&gt; &#39;apt-get update&#39;,    path &#x3D;&gt; &#39;&#x2F;usr&#x2F;bin&#39;  &#125;  exec &#123;    &#39;set-licence-selected&#39;:      command &#x3D;&gt; &#39;&#x2F;bin&#x2F;echo debconf shared&#x2F;accepted-oracle-license-v1-1 select true | &#x2F;usr&#x2F;bin&#x2F;debconf-set-selections&#39;;    &#39;set-licence-seen&#39;:      command &#x3D;&gt; &#39;&#x2F;bin&#x2F;echo debconf shared&#x2F;accepted-oracle-license-v1-1 seen true | &#x2F;usr&#x2F;bin&#x2F;debconf-set-selections&#39;;  &#125;  package &#123; &#39;oracle-java7-installer&#39;:    ensure &#x3D;&gt; &quot;$&#123;version&#125;&quot;,    require &#x3D;&gt; [Exec[&#39;add-apt-repository-oracle&#39;]],  &#125;  file &#123; &#39;&#x2F;etc&#x2F;profile.d&#x2F;java.sh&#39;:    ensure &#x3D;&gt; present,    source &#x3D;&gt; &quot;puppet:&#x2F;&#x2F;&#x2F;modules&#x2F;oracle_jdk&#x2F;java.sh&quot;,    owner &#x3D;&gt; &quot;root&quot;,    group &#x3D;&gt; &quot;root&quot;,    mode &#x3D;&gt; 644,    require &#x3D;&gt; Package[&#39;oracle-java7-installer&#39;],  &#125;&#125;\n在 Vargrant 提供的虛擬機中，第一次的’apt_update’如果沒有執行，'python-software-properties’套件就無法正確安裝。'apt_update2’是在安裝 PPA 套件來源後更新列表，讓後續的’oracle-java7-installer’可以安裝成功。其中最讓人不理解的是’set-licence-selected’跟’set-licence-seen’可以消除 Oracle JDK 安裝過程需要人確認的動作，我想這跟 APT/Deb 套件工具的運作有關，目前就當作是黑箱作業。\njava.sh 檔案內容\n1export JAVA_HOME&#x3D;&#x2F;usr&#x2F;lib&#x2F;jvm&#x2F;java-7-oracle\n這個檔案的目的是要設定系統環境變數’JAVA_HOME’，由於有些工具會使用這個變數來找到 Java 安裝的路徑，保險起見加入這個檔案。\n引用 oracle_jdk 模組\n在您的 Puppet 組態檔案中，例如：’/etc/puppet/manifests/site.pp’，加入下列片段：\n1class &#123; &#39;oracle_jdk::oracle_jdk&#39;: version &#x3D;&gt; &#39;7u40-0~webupd8~0&#39;, &#125;\n其中，'7u40-0webupd80’可以換成您指定的版本。如果要安裝最新版本，則使用:\n1class &#123; &#39;oracle_jdk::oracle_jdk&#39;:  &#125;\n參考來源\n\nPuppet: Installing Oracle Java\n\n小結\n在開發、測試或部署的環境，套件都會使用特定的版本以確保整個環境組態盡可能相同。另位請注意：本文提供的腳本還有不少改進的空間，請自行斟酌使用。\n","dateCreated":"2013-10-02T07:41:00+08:00","dateModified":"2020-03-08T10:04:08+08:00","datePublished":"2013-10-02T07:41:00+08:00","description":"”在 Ubuntu 系統上，使用 Deb 套件安裝 Oracle JDK”這篇文章中，山姆鍋分享如何手動安裝 Oracle JDK。雖然比每次都要從 Oracle 官網下載方便許多，但如果能夠加以自動化，自然是更加符合敏捷與精實的精神。本文山姆鍋就提供 Puppet 的腳本，讓未來有需要的話可以加快在不同機器上安裝的動作。","headline":"使用 Puppet 在 Ubuntu 系統上自動安裝 Oracle JDK","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/10/install-oracle-jdk-on-ubuntu-with-puppet/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"featured_image.jpg","logo":{"@type":"ImageObject","url":"featured_image.jpg"}},"url":"https://samkuo.me/post/2013/10/install-oracle-jdk-on-ubuntu-with-puppet/","keywords":"Ubuntu, Vagrant, Puppet, Java, VirtualBox"}</script>
     <meta name="description" content="如何使用 Puppet 在 Ubuntu 系統上自動安裝 Oracle JDK。">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="使用 Puppet 在 Ubuntu 系統上自動安裝 Oracle JDK">
@@ -45,7 +45,7 @@
         
     
     
-        <meta property="og:image" content="https://samkuo.me/images/logo.png"/>
+        <meta property="og:image" content="https://samkuo.me/images/featured_image.jpg"/>
     
     
     
@@ -120,7 +120,7 @@
                     href="/#about"
                     aria-label="閱讀有關作者的更多信息"
                 >
-                    <img class="sidebar-profile-picture" src="/images/logo.png" alt="作者的圖片"/>
+                    <img class="sidebar-profile-picture" src="/images/featured_image.jpg" alt="作者的圖片"/>
                 </a>
                 <h4 class="sidebar-profile-name">Sampot (山姆鍋)</h4>
                 
@@ -452,7 +452,7 @@
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Diesen Beitrag teilen"
+                aria-label="Share this post"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -490,7 +490,7 @@
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Kommentieren"
+                        aria-label="Leave a comment"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -499,7 +499,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -568,7 +568,7 @@
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Diesen Beitrag teilen"
+                aria-label="Share this post"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -606,7 +606,7 @@
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Kommentieren"
+                        aria-label="Leave a comment"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -615,7 +615,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -675,7 +675,7 @@
             <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="/images/logo.png" alt="作者的圖片"/>
+            <img id="about-card-picture" src="/images/featured_image.jpg" alt="作者的圖片"/>
         
             <h4 id="about-card-name">Sampot (山姆鍋)</h4>
         

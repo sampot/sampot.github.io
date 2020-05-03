@@ -17,7 +17,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"最近山姆鍋在建置業餘專案 #呆丸開發者時, 需要一個可以支援多對多溝通模式的 web 應用。幾經思考，覺得論壇軟體可以符合大部分需求。傳統的 web 論壇軟體雖然成熟，功能也完整，但網站需要符合 Mobile-first 的要求以及現代化的使用者體驗，所以需要跳脫傳統論壇軟體框架的選擇。可能合用且比較常見的有下列三個：Discourse、NodeBB 以及 Flarum。本文並非三者的優缺點比較，僅是山姆鍋介紹 NodeBB 的哪些特點，讓它成為最後選擇。\n\nNodeBB 簡介\nNodeBB 是基於 NodeJS 環境，支援 Redis 或 MongoDB 多種資料庫的現代化論壇軟體，透過 socket.io(websocket 或者 long polling)支援雙向即時溝通機制，提供使用者流暢的訊息流。(全是技術用語，山姆鍋果然是很糟的產品行銷人員 :D)\n選擇 NodeBB 的原因\n概略的 Google 比較後，大部分的人可能跟山姆鍋一樣會傾向於使用 Discourse，畢竟從社群大小、功能、畫面等等，Discourse 是這三者最優。一開始，山姆鍋也是從 Discourse 開始試用，但當自己開始實際安裝後就開始撞牆了，再經過幾次不成功的嘗試後(官網的安裝步驟、DigitalOcean 的一鍵安裝等等)，對於自行安裝維運 Discourse 的信心直線下降。轉而試圖安裝 NodeBB, 按照官方文件沒有困難地就完成安裝與基本設定，當然正式生產環境還必須要有主機安全加強、HTTPS 連線等，山姆鍋有時間再分享如何完成 NodeBB 的生產環境設定。話說 Flarum 的社群更小，開發進度緩慢，況且山姆鍋有可能需要對網站進行功能擴充，但不想再學習 PHP，所以連試用它的機會都沒有。Flarum 可謂不戰之罪，偏好 PHP 執行環境的人，可以評估一下 Flarum 是否符合需求。\n簡單地歸納，山姆鍋會選擇 NodeBB 的原因有下列幾點：\n容易安裝\n根據山姆鍋過去的經驗，Flarum 應該更好安裝與設定，但因為上述原因被排除了。跟 Discourse 比起來，NodeBB 的安裝簡單的多，由於是自己維運這點就很重要。如果是使用雲端託管服務，雖然這點就變得不是那麼絕對，但反而費用會變成主要考量。\n系統要求低\n由於 #Developers.TW 是個人業餘項目，自然希望花在主機等維運費用越低越好，目標是初期可以在 DigitalOcean 的最小 Droplet 上執行 (1 core, 1GB, 每月 $5 元)，之後再根據需要擴充。這個規格根據 Discourse 官方資料看來是不實際的。對於一個可能沒有人使用的網站，即使是每個月 $5 也是額外的負擔，畢竟是業餘興趣，能省則省。\n容易擴充\n並不是說 Discourse 或者 Flarum 不容易擴充(山姆鍋對兩者沒有深入研究)，而是山姆鍋已經決定縮小自己的主要程式語言為 JavaScript 跟 Python, 因為NodeBB 採用 NodeJS 且支援外掛(plug-in)方式擴充功能，需要的話山姆鍋可以自行開發。所以，三者中山姆鍋自然是偏向 NodeBB。\nNodeBB 的特點\n有商業支援\n以開源軟體的成熟度指標，有商業支援通常是一個很好的判斷依據。NodeBB 背後有 NodeBB Inc. 這家加拿大公司負責主要開發跟推廣，公司感覺不大，但既然核心團隊對於自己的產品有信心商業化，對使用者來說應該也算是一種保證。\n相對輕量化\n最精簡的安裝的話，執行 NodeBB 只需要 NodeJS 以及 Redis 服務，對於記憶體以及 CPU 運算能力需求比 Discourse 低。 NodeJS 進程負責主程式，Redis 負責資料以及快取的用途，不過正式生產環境還需要在 NodeBB 主程式之前設置 web 伺服器(建議 Nginx)來負責靜態檔案以及 SSL 連線。\n支援 NoSQL\nNodeBB 支援 Redis 或 MongosDB 作為論壇主資料庫這點，其中山姆鍋最關注的是 Redis 的支援。一般 Redis 被用來作為資料快取或者 Pub-sub 模式的訊息傳輸用途，當做主資料庫這點相當少見。由於 #Developers.TW 算是很小的論壇網站，資料量跟使用者不多的情況下，使用 Redis 來存放資料可以有效提升網站存取效率。如果是中大型論壇，則建議採用 MongosDB + Redis 模式。\n支援外掛(plug-in)\n藉由外掛，第三方開發人員可以在不動到核心的情況下擴充軟體功能，這點跟 WordPress 跟 Drupal 的外掛相同。比較不同的是，為了提供前端網頁優化，外掛的啟用通常需要進行重新建置網頁並重啟服務才能生效，這點應該是開發團隊基於網頁效能的取捨，犧牲部署便利性換取應用執行效能。\nNodeBB 的缺點\n建置 #Developers.TW 到目前為止，也發現 NodeBB 的一些問題或者缺點，底下是山姆鍋比較在意的：\n社群比較小\n因為使用者基礎較少，遇到問題有較高的機會在 NodeBB 社群論壇找不到已有的解答。對於山姆鍋這種懶得發問的人算是小小的困擾。\n繁體中文翻譯不全\n雖然 NodeBB 也支援簡體跟繁體中文語系，但繁體中文的翻譯明顯年久失修，猜測原因應該是台灣使用 NodeBB 的人不多。由於簡體中文的翻譯相當完整，山姆鍋偷雞直接把簡體中文翻譯改成台灣習慣的用語並提交給 NodeBB 開發團隊。\n中文搜尋支援不佳\nNodeDB 官方的 dbsearch 外掛只能有效支援拉丁語系，像中文的機緣基本上完全無法使用。按照目前已知的資訊，官方有另一個使用 Solr 的搜尋外掛可以解決，但需要另外安裝 Solr 服務。由於不想耗用太多系統資源，山姆鍋選擇關閉搜尋功能，並沒有安裝 Solr, 所以尚無法證實 Solr 外掛的中文支援是否良好。\n有明顯的錯誤跟問題\n到目前為止，遇到下列幾個明顯但不嚴重的問題，\n\n使用者介面有未本地化的字串，加上中文搜尋的問題，NodeBB 的國際化(i18n)還需要加強。\n使用者介面有幾個小錯誤，例如：版面(category)建立後，因為無法搜尋到其它版面資料導致無法更改版面的上層版面。\n\n小結\nNodeBB 是一個比較符合現代使用者體驗又不耗用太多系統資源的網路論壇，對於想要使用 Discourse 但卻無能力自行安裝的人或者不需要那麼多功能的人，山姆鍋現階段會建議使用 NodeBB。\n","dateCreated":"2020-03-20T11:04:45+08:00","dateModified":"2020-03-20T14:33:10+08:00","datePublished":"2020-03-20T11:04:45+08:00","description":"最近山姆鍋在建置業餘專案 #呆丸開發者時, 需要一個可以支援多對多溝通模式的 web 應用。幾經思考，覺得論壇軟體可以符合大部分需求。傳統的 web 論壇軟體雖然成熟，功能也完整，但網站需要符合 Mobile-first 的要求以及現代化的使用者體驗，所以需要跳脫傳統論壇軟體框架的選擇。可能合用且比較常見的有下列三個：Discourse、NodeBB 以及 Flarum。本文並非三者的優缺點比較，僅是山姆鍋介紹 NodeBB 的哪些特點，讓它成為最後選擇。","headline":"社群論壇軟體 NodeBB","image":[null,"forum-763107_1280.png"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2020/03/morden-web-forum-nodebb/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2020/03/morden-web-forum-nodebb/","keywords":"nodebb, redis, forum, mongosdb","thumbnailUrl":"forum-763107_1280.png"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"featured_image.jpg"},"articleBody":"最近山姆鍋在建置業餘專案 #呆丸開發者時, 需要一個可以支援多對多溝通模式的 web 應用。幾經思考，覺得論壇軟體可以符合大部分需求。傳統的 web 論壇軟體雖然成熟，功能也完整，但網站需要符合 Mobile-first 的要求以及現代化的使用者體驗，所以需要跳脫傳統論壇軟體框架的選擇。可能合用且比較常見的有下列三個：Discourse、NodeBB 以及 Flarum。本文並非三者的優缺點比較，僅是山姆鍋介紹 NodeBB 的哪些特點，讓它成為最後選擇。\n\nNodeBB 簡介\nNodeBB 是基於 NodeJS 環境，支援 Redis 或 MongoDB 多種資料庫的現代化論壇軟體，透過 socket.io(websocket 或者 long polling)支援雙向即時溝通機制，提供使用者流暢的訊息流。(全是技術用語，山姆鍋果然是很糟的產品行銷人員 :D)\n選擇 NodeBB 的原因\n概略的 Google 比較後，大部分的人可能跟山姆鍋一樣會傾向於使用 Discourse，畢竟從社群大小、功能、畫面等等，Discourse 是這三者最優。一開始，山姆鍋也是從 Discourse 開始試用，但當自己開始實際安裝後就開始撞牆了，再經過幾次不成功的嘗試後(官網的安裝步驟、DigitalOcean 的一鍵安裝等等)，對於自行安裝維運 Discourse 的信心直線下降。轉而試圖安裝 NodeBB, 按照官方文件沒有困難地就完成安裝與基本設定，當然正式生產環境還必須要有主機安全加強、HTTPS 連線等，山姆鍋有時間再分享如何完成 NodeBB 的生產環境設定。話說 Flarum 的社群更小，開發進度緩慢，況且山姆鍋有可能需要對網站進行功能擴充，但不想再學習 PHP，所以連試用它的機會都沒有。Flarum 可謂不戰之罪，偏好 PHP 執行環境的人，可以評估一下 Flarum 是否符合需求。\n簡單地歸納，山姆鍋會選擇 NodeBB 的原因有下列幾點：\n容易安裝\n根據山姆鍋過去的經驗，Flarum 應該更好安裝與設定，但因為上述原因被排除了。跟 Discourse 比起來，NodeBB 的安裝簡單的多，由於是自己維運這點就很重要。如果是使用雲端託管服務，雖然這點就變得不是那麼絕對，但反而費用會變成主要考量。\n系統要求低\n由於 #Developers.TW 是個人業餘項目，自然希望花在主機等維運費用越低越好，目標是初期可以在 DigitalOcean 的最小 Droplet 上執行 (1 core, 1GB, 每月 $5 元)，之後再根據需要擴充。這個規格根據 Discourse 官方資料看來是不實際的。對於一個可能沒有人使用的網站，即使是每個月 $5 也是額外的負擔，畢竟是業餘興趣，能省則省。\n容易擴充\n並不是說 Discourse 或者 Flarum 不容易擴充(山姆鍋對兩者沒有深入研究)，而是山姆鍋已經決定縮小自己的主要程式語言為 JavaScript 跟 Python, 因為NodeBB 採用 NodeJS 且支援外掛(plug-in)方式擴充功能，需要的話山姆鍋可以自行開發。所以，三者中山姆鍋自然是偏向 NodeBB。\nNodeBB 的特點\n有商業支援\n以開源軟體的成熟度指標，有商業支援通常是一個很好的判斷依據。NodeBB 背後有 NodeBB Inc. 這家加拿大公司負責主要開發跟推廣，公司感覺不大，但既然核心團隊對於自己的產品有信心商業化，對使用者來說應該也算是一種保證。\n相對輕量化\n最精簡的安裝的話，執行 NodeBB 只需要 NodeJS 以及 Redis 服務，對於記憶體以及 CPU 運算能力需求比 Discourse 低。 NodeJS 進程負責主程式，Redis 負責資料以及快取的用途，不過正式生產環境還需要在 NodeBB 主程式之前設置 web 伺服器(建議 Nginx)來負責靜態檔案以及 SSL 連線。\n支援 NoSQL\nNodeBB 支援 Redis 或 MongosDB 作為論壇主資料庫這點，其中山姆鍋最關注的是 Redis 的支援。一般 Redis 被用來作為資料快取或者 Pub-sub 模式的訊息傳輸用途，當做主資料庫這點相當少見。由於 #Developers.TW 算是很小的論壇網站，資料量跟使用者不多的情況下，使用 Redis 來存放資料可以有效提升網站存取效率。如果是中大型論壇，則建議採用 MongosDB + Redis 模式。\n支援外掛(plug-in)\n藉由外掛，第三方開發人員可以在不動到核心的情況下擴充軟體功能，這點跟 WordPress 跟 Drupal 的外掛相同。比較不同的是，為了提供前端網頁優化，外掛的啟用通常需要進行重新建置網頁並重啟服務才能生效，這點應該是開發團隊基於網頁效能的取捨，犧牲部署便利性換取應用執行效能。\nNodeBB 的缺點\n建置 #Developers.TW 到目前為止，也發現 NodeBB 的一些問題或者缺點，底下是山姆鍋比較在意的：\n社群比較小\n因為使用者基礎較少，遇到問題有較高的機會在 NodeBB 社群論壇找不到已有的解答。對於山姆鍋這種懶得發問的人算是小小的困擾。\n繁體中文翻譯不全\n雖然 NodeBB 也支援簡體跟繁體中文語系，但繁體中文的翻譯明顯年久失修，猜測原因應該是台灣使用 NodeBB 的人不多。由於簡體中文的翻譯相當完整，山姆鍋偷雞直接把簡體中文翻譯改成台灣習慣的用語並提交給 NodeBB 開發團隊。\n中文搜尋支援不佳\nNodeDB 官方的 dbsearch 外掛只能有效支援拉丁語系，像中文的機緣基本上完全無法使用。按照目前已知的資訊，官方有另一個使用 Solr 的搜尋外掛可以解決，但需要另外安裝 Solr 服務。由於不想耗用太多系統資源，山姆鍋選擇關閉搜尋功能，並沒有安裝 Solr, 所以尚無法證實 Solr 外掛的中文支援是否良好。\n有明顯的錯誤跟問題\n到目前為止，遇到下列幾個明顯但不嚴重的問題，\n\n使用者介面有未本地化的字串，加上中文搜尋的問題，NodeBB 的國際化(i18n)還需要加強。\n使用者介面有幾個小錯誤，例如：版面(category)建立後，因為無法搜尋到其它版面資料導致無法更改版面的上層版面。\n\n小結\nNodeBB 是一個比較符合現代使用者體驗又不耗用太多系統資源的網路論壇，對於想要使用 Discourse 但卻無能力自行安裝的人或者不需要那麼多功能的人，山姆鍋現階段會建議使用 NodeBB。\n","dateCreated":"2020-03-20T11:04:45+08:00","dateModified":"2020-03-20T14:33:10+08:00","datePublished":"2020-03-20T11:04:45+08:00","description":"最近山姆鍋在建置業餘專案 #呆丸開發者時, 需要一個可以支援多對多溝通模式的 web 應用。幾經思考，覺得論壇軟體可以符合大部分需求。傳統的 web 論壇軟體雖然成熟，功能也完整，但網站需要符合 Mobile-first 的要求以及現代化的使用者體驗，所以需要跳脫傳統論壇軟體框架的選擇。可能合用且比較常見的有下列三個：Discourse、NodeBB 以及 Flarum。本文並非三者的優缺點比較，僅是山姆鍋介紹 NodeBB 的哪些特點，讓它成為最後選擇。","headline":"社群論壇軟體 NodeBB","image":[null,"forum-763107_1280.png"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2020/03/morden-web-forum-nodebb/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"featured_image.jpg","logo":{"@type":"ImageObject","url":"featured_image.jpg"}},"url":"https://samkuo.me/post/2020/03/morden-web-forum-nodebb/","keywords":"nodebb, redis, forum, mongosdb","thumbnailUrl":"forum-763107_1280.png"}</script>
     <meta name="description" content="最近山姆鍋在建置業餘專案 #呆丸開發者時, 需要一個可以支援多對多溝通模式的 web 應用。幾經思考，覺得論壇軟體可以符合大部分需求。傳統的 web 論壇軟體雖然成熟，功能也完整，但網站需要符合 Mobile-first 的要求以及現代化的使用者體驗，所以需要跳脫傳統論壇軟體框架的選擇。可能合用且比較常見的有下列三個：Discourse、NodeBB 以及 Flarum。本文並非三者的優缺點比較，">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="社群論壇軟體 NodeBB">
@@ -40,7 +40,7 @@
         
     
     
-        <meta property="og:image" content="https://samkuo.me/images/logo.png"/>
+        <meta property="og:image" content="https://samkuo.me/images/featured_image.jpg"/>
     
     
     
@@ -118,7 +118,7 @@
                     href="/#about"
                     aria-label="閱讀有關作者的更多信息"
                 >
-                    <img class="sidebar-profile-picture" src="/images/logo.png" alt="作者的圖片"/>
+                    <img class="sidebar-profile-picture" src="/images/featured_image.jpg" alt="作者的圖片"/>
                 </a>
                 <h4 class="sidebar-profile-name">Sampot (山姆鍋)</h4>
                 
@@ -466,7 +466,7 @@
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Diesen Beitrag teilen"
+                aria-label="Share this post"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -504,7 +504,7 @@
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Kommentieren"
+                        aria-label="Leave a comment"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -513,7 +513,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -582,7 +582,7 @@
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Diesen Beitrag teilen"
+                aria-label="Share this post"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -620,7 +620,7 @@
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Kommentieren"
+                        aria-label="Leave a comment"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -629,7 +629,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -689,7 +689,7 @@
             <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="/images/logo.png" alt="作者的圖片"/>
+            <img id="about-card-picture" src="/images/featured_image.jpg" alt="作者的圖片"/>
         
             <h4 id="about-card-name">Sampot (山姆鍋)</h4>
         

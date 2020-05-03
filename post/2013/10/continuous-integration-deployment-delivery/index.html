@@ -19,7 +19,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"在 DevOps 的發展趨勢中，將新功能儘快自動交付給使用者是其中重要的一環。但觀看相關的文章，會看到幾個好像相關但應該又有點不同概念的名詞：「持續整合(continuous integration)」、「持續部署(continuous deployment)」、與「持續交付(continuous delivery)」， 到底他們之間有什麼差異？山姆鍋也來分享一下自己的想法。\n\n按照精實生產(Lean Production)精神，新開發出來的軟體特性(feature)在交付到最終使用者手中之前所花的時間都算是一種「浪費」，而消除浪費是精實生產的重要指導方針之一。本文所提到的「持續整合」、「持續部署」與「持續交付」都是為了要消除這樣的浪費而存在，但它們之間卻有存在一些差異，底下就針對這些名詞，提供山姆鍋自己的定義。\n持續整合(continuous integration)\n「持續整合」目的在儘快讓新功能的程式碼整合到現存的基礎程式庫(codebase)中來進行測試。如此，才能儘快找出整合上未預想到問題以及解決衝突的程式碼(conflict codes)。有團隊開發經驗的人應該會同意：整合不同人的程式碼的困難度跟要整合的程式碼多少成級數正比。也就是說：越將整合的時間點往後拖，造成整合難度與失敗的機率越高。「持續整合」通常會涵蓋單元測試(unit tests)與煙霧測試(smoke tests)，可以儘快找出回歸錯誤(regression error)的發生。因此，就算是只有一個人在開發，「持續整合」仍有其價值。\n持續部署(continous deployment)\n不管軟體專案大小，一定會有部署軟體的需要，不管是為了測試、驗收或上線。部署軟體會根據部署環境或多或少有些差別，「持續部署」的目的就是要讓軟體可以快速自動部署到不同的環境，至於有多少環境需要部署則會根據不同公司的持續交付管線(pipeline)的設計而定，常見的有：「整合測試環境(Integration Tests Environment)」、「測試環境(QA Environment)」、「用戶驗收測試環境(UAT Environment)」、「 上架環境(Pre-production/Staging Environment)」、以及「生產環境(Production Environment)」。\n為了確保部署軟體的功能一致，「持續部署」必須採用同一個包裝好的套件(package)，不管是 Jar, DEB, RPM 或者其他形式。除了一方面可以簡化組態管理(configuration management)外，一方面也減少部署所需的時間。另一個達到「持續部署」的重要手段是要針對軟體可以客制化的功能，將其組態/設定外部化(configuraiton externalization)，簡單點講：就是不要將設定(settings)寫死(hard-coded)在程式碼裡面。\n持續交付(continous delivery)\n「持續交付」是將新的特性儘快交付到最終使用者(end-user)的手中。也就是說：最終使用者可以真正享受到該新特性所帶來的價值(或者折磨 :-))。所以說，「持續交付」才是最終想要達到的目標，「持續整合」跟「持續部署」只是中間必須的過程，但三者缺一不可。沒有「持續部署」的機制，「持續交付」便不可能實現;而「持續整合」是開發團隊確保軟體品質在「持續部署」的前提下可以達到要求的必要手段。\n小結\n達到持續交付的目標是山姆鍋在軟體開發上想要完成的挑戰之一，要挑戰自然要瞭解目標是什麼。藉由名詞概念的說明，至少在往後的文章中，可以理解山姆鍋對「持續整合」、「持續部署」與「持續交付」的定義，進而減少誤解的發生。雖然這三者有所差異，但是都同樣要求「持續」，而要達到「持續」的目的，「自動化」可說是理所當然的手段。因此，可以說：自動化程度的高低與持續交付的能力息息相關。\n","dateCreated":"2013-10-08T08:56:00+08:00","dateModified":"2018-08-23T15:46:06+08:00","datePublished":"2013-10-08T08:56:00+08:00","description":"在 DevOps 的發展趨勢中，將新功能儘快自動交付給使用者是其中重要的一環。但觀看相關的文章，會看到幾個好像相關但應該又有點不同概念的名詞：「持續整合(continuous integration)」、「持續部署(continuous deployment)」、與「持續交付(continuous delivery)」， 到底他們之間有什麼差異？山姆鍋也來分享一下自己的想法。","headline":"山姆鍋對持續整合、持續部署、持續交付的定義","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/10/continuous-integration-deployment-delivery/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2013/10/continuous-integration-deployment-delivery/","keywords":"continuous integration, continuous deployment, continuous delivery"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"featured_image.jpg"},"articleBody":"在 DevOps 的發展趨勢中，將新功能儘快自動交付給使用者是其中重要的一環。但觀看相關的文章，會看到幾個好像相關但應該又有點不同概念的名詞：「持續整合(continuous integration)」、「持續部署(continuous deployment)」、與「持續交付(continuous delivery)」， 到底他們之間有什麼差異？山姆鍋也來分享一下自己的想法。\n\n按照精實生產(Lean Production)精神，新開發出來的軟體特性(feature)在交付到最終使用者手中之前所花的時間都算是一種「浪費」，而消除浪費是精實生產的重要指導方針之一。本文所提到的「持續整合」、「持續部署」與「持續交付」都是為了要消除這樣的浪費而存在，但它們之間卻有存在一些差異，底下就針對這些名詞，提供山姆鍋自己的定義。\n持續整合(continuous integration)\n「持續整合」目的在儘快讓新功能的程式碼整合到現存的基礎程式庫(codebase)中來進行測試。如此，才能儘快找出整合上未預想到問題以及解決衝突的程式碼(conflict codes)。有團隊開發經驗的人應該會同意：整合不同人的程式碼的困難度跟要整合的程式碼多少成級數正比。也就是說：越將整合的時間點往後拖，造成整合難度與失敗的機率越高。「持續整合」通常會涵蓋單元測試(unit tests)與煙霧測試(smoke tests)，可以儘快找出回歸錯誤(regression error)的發生。因此，就算是只有一個人在開發，「持續整合」仍有其價值。\n持續部署(continous deployment)\n不管軟體專案大小，一定會有部署軟體的需要，不管是為了測試、驗收或上線。部署軟體會根據部署環境或多或少有些差別，「持續部署」的目的就是要讓軟體可以快速自動部署到不同的環境，至於有多少環境需要部署則會根據不同公司的持續交付管線(pipeline)的設計而定，常見的有：「整合測試環境(Integration Tests Environment)」、「測試環境(QA Environment)」、「用戶驗收測試環境(UAT Environment)」、「 上架環境(Pre-production/Staging Environment)」、以及「生產環境(Production Environment)」。\n為了確保部署軟體的功能一致，「持續部署」必須採用同一個包裝好的套件(package)，不管是 Jar, DEB, RPM 或者其他形式。除了一方面可以簡化組態管理(configuration management)外，一方面也減少部署所需的時間。另一個達到「持續部署」的重要手段是要針對軟體可以客制化的功能，將其組態/設定外部化(configuraiton externalization)，簡單點講：就是不要將設定(settings)寫死(hard-coded)在程式碼裡面。\n持續交付(continous delivery)\n「持續交付」是將新的特性儘快交付到最終使用者(end-user)的手中。也就是說：最終使用者可以真正享受到該新特性所帶來的價值(或者折磨 :-))。所以說，「持續交付」才是最終想要達到的目標，「持續整合」跟「持續部署」只是中間必須的過程，但三者缺一不可。沒有「持續部署」的機制，「持續交付」便不可能實現;而「持續整合」是開發團隊確保軟體品質在「持續部署」的前提下可以達到要求的必要手段。\n小結\n達到持續交付的目標是山姆鍋在軟體開發上想要完成的挑戰之一，要挑戰自然要瞭解目標是什麼。藉由名詞概念的說明，至少在往後的文章中，可以理解山姆鍋對「持續整合」、「持續部署」與「持續交付」的定義，進而減少誤解的發生。雖然這三者有所差異，但是都同樣要求「持續」，而要達到「持續」的目的，「自動化」可說是理所當然的手段。因此，可以說：自動化程度的高低與持續交付的能力息息相關。\n","dateCreated":"2013-10-08T08:56:00+08:00","dateModified":"2018-08-23T15:46:06+08:00","datePublished":"2013-10-08T08:56:00+08:00","description":"在 DevOps 的發展趨勢中，將新功能儘快自動交付給使用者是其中重要的一環。但觀看相關的文章，會看到幾個好像相關但應該又有點不同概念的名詞：「持續整合(continuous integration)」、「持續部署(continuous deployment)」、與「持續交付(continuous delivery)」， 到底他們之間有什麼差異？山姆鍋也來分享一下自己的想法。","headline":"山姆鍋對持續整合、持續部署、持續交付的定義","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/10/continuous-integration-deployment-delivery/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"featured_image.jpg","logo":{"@type":"ImageObject","url":"featured_image.jpg"}},"url":"https://samkuo.me/post/2013/10/continuous-integration-deployment-delivery/","keywords":"continuous integration, continuous deployment, continuous delivery"}</script>
     <meta name="description" content="在Devops的發展趨勢中，將新功能儘快自動交付給使用者是其中重要的一環。但到底持續整合、部署、與交付到底有什麼差異？">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="山姆鍋對持續整合、持續部署、持續交付的定義">
@@ -46,7 +46,7 @@
         
     
     
-        <meta property="og:image" content="https://samkuo.me/images/logo.png"/>
+        <meta property="og:image" content="https://samkuo.me/images/featured_image.jpg"/>
     
     
     
@@ -121,7 +121,7 @@
                     href="/#about"
                     aria-label="閱讀有關作者的更多信息"
                 >
-                    <img class="sidebar-profile-picture" src="/images/logo.png" alt="作者的圖片"/>
+                    <img class="sidebar-profile-picture" src="/images/featured_image.jpg" alt="作者的圖片"/>
                 </a>
                 <h4 class="sidebar-profile-name">Sampot (山姆鍋)</h4>
                 
@@ -441,7 +441,7 @@
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Diesen Beitrag teilen"
+                aria-label="Share this post"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -479,7 +479,7 @@
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Kommentieren"
+                        aria-label="Leave a comment"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -488,7 +488,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -557,7 +557,7 @@
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Diesen Beitrag teilen"
+                aria-label="Share this post"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -595,7 +595,7 @@
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Kommentieren"
+                        aria-label="Leave a comment"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -604,7 +604,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -664,7 +664,7 @@
             <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="/images/logo.png" alt="作者的圖片"/>
+            <img id="about-card-picture" src="/images/featured_image.jpg" alt="作者的圖片"/>
         
             <h4 id="about-card-name">Sampot (山姆鍋)</h4>
         

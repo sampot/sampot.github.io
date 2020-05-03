@@ -17,7 +17,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"有時候在需要訊息傳遞的應用場景，因為需求簡單不想使用到像 RabbitMQ\n這種企業級的訊息中介軟體(middleware)， 使用 Redis\n雖然夠簡單但畢竟還是需要執行另一個進程(process)，總還是有殺雞用牛刀的感覺。\n但是另一方面又有訊息不能遺失的需求，自己處理訊息持久性(persistence)實在麻煩， 畢竟訊息儲存還是要支援 ACID\n特性才能號稱做到不遺失。\n\n說到這，山姆鍋相信有些人已經想到使用內嵌式資料庫(embedded\ndatabase)來實現，例如 SQLite。 雖然山姆鍋也會用 SQLite\n做其它用途，但本文山姆鍋使用的是另一個比較少人知道或使用的資料庫：LMDB。\n對於懷疑使用資料庫作為訊息佇列是否恰當的人，可以參考\n「為什麼使用資料庫當作訊息佇列不是問題？」\n這篇文章。本文所討論的情況是訊息生產者與消費者都在同一個進程，透過 Event\n機制來同步， 不會有忙碌迴圈(busy waiting)的問題。\nLMDB\nLMDB, 全名是 Lightning Memory-Mapped\nDatabase，是一個內嵌式資料庫，可歸為 NoSQL 資料庫陣營。 LMDB 的主要特性:\n\n支援交易(transaction)，確保資料持久性(persistence)。\n資料庫採記憶體映射(memory-mapped):\n利用作業系統的虛擬記憶體管理作為緩衝(buffer)機制。\n可以由多個進程(process)共同存取同一個資料庫。這點山姆鍋沒試過，但可作為單一主機進程間的通訊機制。\n\n其它相關資訊，可以參考 LMDB 官方網站 。\nPython 的 LMDB 綁定，以 lmdb\n最為完整， 文件對大部份需求說明的也夠詳細。\n基本上，LMDB 提供有序的(ordered) key-value\n資料庫，在同一個資料庫中記錄會依照鍵值(keys)排序。\n這個特性很適合訊息佇列，訊息以時間為基礎的鍵值放入資料庫中，然後從最舊的訊息開始取出。\n訊息佇列實作\n底下程式片段是山姆鍋基於 LMDB 以及 gevent [1]\n的簡單實作，只支援單一訊息接收端(receiver)。\n為什麼只支援單一接收端，這跟山姆鍋的需求有關就不詳述。\n\n其中的 clock，請參考 用 Python\n實作混合式邏輯時鐘\n這篇文章。\n佇列物件建構\n要建構 LmdbQueue 物件，需要有 LMDB\n的環境(Environment)物件，且為了讓同一個資料庫可以支援多個佇列(queue)，每個佇列使用一個前置詞(prefix)用來區分。\n每個放入佇列中的訊息都會給予一個唯一的鍵值(key)，這個鍵值包涵前置詞以及目前的混合式邏輯時間，\n確保不會有出現同一鍵值的情況發生。\n訊息排序與存取\n訊息的鍵值以 &lt;prefix&gt;'T'&lt;timestamp&gt; 這樣的格式組成，其中:\n\n&lt;prefix&gt;是佇列的前置詞。\n‘T’ 是介於 0x00 跟 0xff(255) 之間任意挑選的值，沒有特殊意義。\n&lt;timestamp&gt; 是訊息置入時的邏輯時間。\n\n運用這樣格式的設計，就可以確保所有訊息的鍵值都會介於`&lt;prefix&gt;0x00`\n與 &lt;prefix&gt;0xff 之間。 程式碼中分別使用\nbegin_key 以及 end_key 來代表這兩個值。\n藉由這兩個邊界值，我們就可以很方便的使用 set_range\n這個方法找到佇列的第一個訊息，\n需要的話也可以用來遍歷(iterate)佇列的所有訊息。\n訊息格式轉換\n訊息的鍵值使用 struct\n這個套件來從多個資料項轉成精簡的格式。 訊息在放入佇列之前會經過\nMessagePack\n序列化(serialized)成 bytes; 在取出時會被反序列化成當初的資料型態。\n交易(事務)處理\n預設情況下，每個方法各自在獨立的交易中執行，如果需要讓多個操作在同一個交易執行的話，需要先產生\n交易物件再傳入被呼叫的方法。\n佇列物件方法\n各個方法(method)的簡短說明如下：\n\n\nget:\n\n提供同步(blocking)的方式來取出佇列中的訊息，可以設定是否要同步，操作逾時(timeout)等。\n\n\n\nget_nowait:\n\n功能類似 get 方法，但沒有訊息的話會，不等待直接回傳\nNone。\n\n\n\nput:\n\n允許訊息生產者(producers)把訊息放入佇列中。\n\n\n\nput_multi:\n\n允許一次放入多個訊息到佇列中。\n\n\n\n測試用程式碼\n使用 pytest 的測試案例 [2] ：\ntest_queue.pyview raw123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475767778798081828384858687888990919293949596979899100# -*- coding: utf-8 -*-from __future__ import absolute_import, print_function, unicode_literalsfrom gevent import monkeymonkey.patch_all(thread=False)  # 1import geventimport lmdbimport pytestfrom ava.queue import LmdbQueue@pytest.fixturedef db_env(tmpdir):    dir = tmpdir.mkdir(\"data\")    _db_env = lmdb.Environment(dir.dirname)    return _db_envclass TestLmdbQueue(object):    def test_create_queue(self, db_env):        queue = LmdbQueue(db_env)    def test_get_and_put(self, db_env):        queue = LmdbQueue(db_env)        queue.put(2)        queue.put(3)        queue.put(1)        # queue.dump()        assert 2 == queue.get_nowait()        assert 3 == queue.get_nowait()        assert 1 == queue.get_nowait()        assert queue.get_nowait() is None    def test_get_with_timeout(self, db_env):        queue = LmdbQueue(db_env)        def producer():            gevent.sleep(0.5)            queue.put(1)        gevent.spawn(producer)        assert 1 == queue.get(timeout=1)    def test_get_indefinitely(self, db_env):        queue = LmdbQueue(db_env)        def producer():            gevent.sleep(0.5)            queue.put(1)        gevent.spawn(producer)        assert 1 == queue.get()    def test_put_with_transaction(self, db_env):        queue = LmdbQueue(db_env)        with db_env.begin(write=True) as txn:            queue.put(1, txn)            queue.put(1, txn)        assert 1 == queue.get_nowait()        assert 1 == queue.get_nowait()        with pytest.raises(RuntimeError):            with db_env.begin(write=True) as txn:                queue.put(2, txn)                queue.put(2, txn)                raise RuntimeError()        assert None == queue.get_nowait()    def test_queue_with_prefix(self, db_env):        queue1 = LmdbQueue(db_env, prefix=b'myqueue1')        queue2 = LmdbQueue(db_env, prefix=b'myqueue2')        with db_env.begin(write=True) as txn:            queue1.put(1, txn)            queue1.put(1, txn)            queue2.put(2, txn)            queue2.put(2, txn)        assert 1 == queue1.get_nowait()        assert 2 == queue2.get_nowait()        assert 1 == queue1.get_nowait()        assert 2 == queue2.get_nowait()    def test_put_multi(self, db_env):        queue = LmdbQueue(db_env)        items = [1, 2, '3']        with db_env.begin(write=True) as txn:            queue.put_multi(items, txn)        assert 1 == queue.get_nowait()        assert 2 == queue.get_nowait()        assert '3' == queue.get_nowait()\n標記 1: gevent 透過 monkey patch\n讓多數標準程式庫不用修改也可以支援並發(concurrent)執行。\n結語\n在一般稍微有點規模的分散式系統，通常會使用訊息中介軟體。如果訊息的遺失無關緊要，其實也就不用自找麻煩。\n偏偏總會有些場合，尤其是在開發客戶端應用時，會需要先將要傳遞的訊息暫存在持久性儲存體，如硬碟。\n但要確保訊息或其它資料的永久性，並沒有想像中的簡單，需要考慮到很多的例外狀況：\n寫到一半系統當機怎麼處理？同時兩個執行緒在寫入怎麼處理？\n也因為如此，SQLite 或者 LMDB 這種內嵌式資料庫，\n對於需要支援資料永久性的客戶端應用來說，是不可少的工具。\n\n\n\n\n應該也可以適用在多執行緒的程式，只是山姆鍋大多時候是使用 gevent。對於需要執行大量並發(concurrent)的 I/O 工作，又不想要非同步編程模式(使用 callbacks)複雜性的人，gevent 值得考慮。 ↩︎\n\n以現在的標準來說，不寫測試程式會被歸類為不好的(bad)的工程師，山姆鍋自然要提供一下 :D。 ↩︎\n\n\n\n","dateCreated":"2015-10-03T21:33:00+08:00","dateModified":"2020-03-08T10:40:41+08:00","datePublished":"2015-10-03T21:33:00+08:00","description":"有時候在需要訊息傳遞的應用場景，因為需求簡單不想使用到像 RabbitMQ\n這種企業級的訊息中介軟體(middleware)， 使用 Redis\n雖然夠簡單但畢竟還是需要執行另一個進程(process)，總還是有殺雞用牛刀的感覺。\n但是另一方面又有訊息不能遺失的需求，自己處理訊息持久性(persistence)實在麻煩， 畢竟訊息儲存還是要支援 ACID\n特性才能號稱做到不遺失。","headline":"如何實作簡單的持久性訊息佇列?","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2015/10/persistent-message-queues-with-lmdb/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2015/10/persistent-message-queues-with-lmdb/","keywords":"Python, Message, Queue, LMDB, gevent"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"featured_image.jpg"},"articleBody":"有時候在需要訊息傳遞的應用場景，因為需求簡單不想使用到像 RabbitMQ\n這種企業級的訊息中介軟體(middleware)， 使用 Redis\n雖然夠簡單但畢竟還是需要執行另一個進程(process)，總還是有殺雞用牛刀的感覺。\n但是另一方面又有訊息不能遺失的需求，自己處理訊息持久性(persistence)實在麻煩， 畢竟訊息儲存還是要支援 ACID\n特性才能號稱做到不遺失。\n\n說到這，山姆鍋相信有些人已經想到使用內嵌式資料庫(embedded\ndatabase)來實現，例如 SQLite。 雖然山姆鍋也會用 SQLite\n做其它用途，但本文山姆鍋使用的是另一個比較少人知道或使用的資料庫：LMDB。\n對於懷疑使用資料庫作為訊息佇列是否恰當的人，可以參考\n「為什麼使用資料庫當作訊息佇列不是問題？」\n這篇文章。本文所討論的情況是訊息生產者與消費者都在同一個進程，透過 Event\n機制來同步， 不會有忙碌迴圈(busy waiting)的問題。\nLMDB\nLMDB, 全名是 Lightning Memory-Mapped\nDatabase，是一個內嵌式資料庫，可歸為 NoSQL 資料庫陣營。 LMDB 的主要特性:\n\n支援交易(transaction)，確保資料持久性(persistence)。\n資料庫採記憶體映射(memory-mapped):\n利用作業系統的虛擬記憶體管理作為緩衝(buffer)機制。\n可以由多個進程(process)共同存取同一個資料庫。這點山姆鍋沒試過，但可作為單一主機進程間的通訊機制。\n\n其它相關資訊，可以參考 LMDB 官方網站 。\nPython 的 LMDB 綁定，以 lmdb\n最為完整， 文件對大部份需求說明的也夠詳細。\n基本上，LMDB 提供有序的(ordered) key-value\n資料庫，在同一個資料庫中記錄會依照鍵值(keys)排序。\n這個特性很適合訊息佇列，訊息以時間為基礎的鍵值放入資料庫中，然後從最舊的訊息開始取出。\n訊息佇列實作\n底下程式片段是山姆鍋基於 LMDB 以及 gevent [1]\n的簡單實作，只支援單一訊息接收端(receiver)。\n為什麼只支援單一接收端，這跟山姆鍋的需求有關就不詳述。\n\n其中的 clock，請參考 用 Python\n實作混合式邏輯時鐘\n這篇文章。\n佇列物件建構\n要建構 LmdbQueue 物件，需要有 LMDB\n的環境(Environment)物件，且為了讓同一個資料庫可以支援多個佇列(queue)，每個佇列使用一個前置詞(prefix)用來區分。\n每個放入佇列中的訊息都會給予一個唯一的鍵值(key)，這個鍵值包涵前置詞以及目前的混合式邏輯時間，\n確保不會有出現同一鍵值的情況發生。\n訊息排序與存取\n訊息的鍵值以 &lt;prefix&gt;'T'&lt;timestamp&gt; 這樣的格式組成，其中:\n\n&lt;prefix&gt;是佇列的前置詞。\n‘T’ 是介於 0x00 跟 0xff(255) 之間任意挑選的值，沒有特殊意義。\n&lt;timestamp&gt; 是訊息置入時的邏輯時間。\n\n運用這樣格式的設計，就可以確保所有訊息的鍵值都會介於`&lt;prefix&gt;0x00`\n與 &lt;prefix&gt;0xff 之間。 程式碼中分別使用\nbegin_key 以及 end_key 來代表這兩個值。\n藉由這兩個邊界值，我們就可以很方便的使用 set_range\n這個方法找到佇列的第一個訊息，\n需要的話也可以用來遍歷(iterate)佇列的所有訊息。\n訊息格式轉換\n訊息的鍵值使用 struct\n這個套件來從多個資料項轉成精簡的格式。 訊息在放入佇列之前會經過\nMessagePack\n序列化(serialized)成 bytes; 在取出時會被反序列化成當初的資料型態。\n交易(事務)處理\n預設情況下，每個方法各自在獨立的交易中執行，如果需要讓多個操作在同一個交易執行的話，需要先產生\n交易物件再傳入被呼叫的方法。\n佇列物件方法\n各個方法(method)的簡短說明如下：\n\n\nget:\n\n提供同步(blocking)的方式來取出佇列中的訊息，可以設定是否要同步，操作逾時(timeout)等。\n\n\n\nget_nowait:\n\n功能類似 get 方法，但沒有訊息的話會，不等待直接回傳\nNone。\n\n\n\nput:\n\n允許訊息生產者(producers)把訊息放入佇列中。\n\n\n\nput_multi:\n\n允許一次放入多個訊息到佇列中。\n\n\n\n測試用程式碼\n使用 pytest 的測試案例 [2] ：\ntest_queue.pyview raw123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475767778798081828384858687888990919293949596979899100# -*- coding: utf-8 -*-from __future__ import absolute_import, print_function, unicode_literalsfrom gevent import monkeymonkey.patch_all(thread=False)  # 1import geventimport lmdbimport pytestfrom ava.queue import LmdbQueue@pytest.fixturedef db_env(tmpdir):    dir = tmpdir.mkdir(\"data\")    _db_env = lmdb.Environment(dir.dirname)    return _db_envclass TestLmdbQueue(object):    def test_create_queue(self, db_env):        queue = LmdbQueue(db_env)    def test_get_and_put(self, db_env):        queue = LmdbQueue(db_env)        queue.put(2)        queue.put(3)        queue.put(1)        # queue.dump()        assert 2 == queue.get_nowait()        assert 3 == queue.get_nowait()        assert 1 == queue.get_nowait()        assert queue.get_nowait() is None    def test_get_with_timeout(self, db_env):        queue = LmdbQueue(db_env)        def producer():            gevent.sleep(0.5)            queue.put(1)        gevent.spawn(producer)        assert 1 == queue.get(timeout=1)    def test_get_indefinitely(self, db_env):        queue = LmdbQueue(db_env)        def producer():            gevent.sleep(0.5)            queue.put(1)        gevent.spawn(producer)        assert 1 == queue.get()    def test_put_with_transaction(self, db_env):        queue = LmdbQueue(db_env)        with db_env.begin(write=True) as txn:            queue.put(1, txn)            queue.put(1, txn)        assert 1 == queue.get_nowait()        assert 1 == queue.get_nowait()        with pytest.raises(RuntimeError):            with db_env.begin(write=True) as txn:                queue.put(2, txn)                queue.put(2, txn)                raise RuntimeError()        assert None == queue.get_nowait()    def test_queue_with_prefix(self, db_env):        queue1 = LmdbQueue(db_env, prefix=b'myqueue1')        queue2 = LmdbQueue(db_env, prefix=b'myqueue2')        with db_env.begin(write=True) as txn:            queue1.put(1, txn)            queue1.put(1, txn)            queue2.put(2, txn)            queue2.put(2, txn)        assert 1 == queue1.get_nowait()        assert 2 == queue2.get_nowait()        assert 1 == queue1.get_nowait()        assert 2 == queue2.get_nowait()    def test_put_multi(self, db_env):        queue = LmdbQueue(db_env)        items = [1, 2, '3']        with db_env.begin(write=True) as txn:            queue.put_multi(items, txn)        assert 1 == queue.get_nowait()        assert 2 == queue.get_nowait()        assert '3' == queue.get_nowait()\n標記 1: gevent 透過 monkey patch\n讓多數標準程式庫不用修改也可以支援並發(concurrent)執行。\n結語\n在一般稍微有點規模的分散式系統，通常會使用訊息中介軟體。如果訊息的遺失無關緊要，其實也就不用自找麻煩。\n偏偏總會有些場合，尤其是在開發客戶端應用時，會需要先將要傳遞的訊息暫存在持久性儲存體，如硬碟。\n但要確保訊息或其它資料的永久性，並沒有想像中的簡單，需要考慮到很多的例外狀況：\n寫到一半系統當機怎麼處理？同時兩個執行緒在寫入怎麼處理？\n也因為如此，SQLite 或者 LMDB 這種內嵌式資料庫，\n對於需要支援資料永久性的客戶端應用來說，是不可少的工具。\n\n\n\n\n應該也可以適用在多執行緒的程式，只是山姆鍋大多時候是使用 gevent。對於需要執行大量並發(concurrent)的 I/O 工作，又不想要非同步編程模式(使用 callbacks)複雜性的人，gevent 值得考慮。 ↩︎\n\n以現在的標準來說，不寫測試程式會被歸類為不好的(bad)的工程師，山姆鍋自然要提供一下 :D。 ↩︎\n\n\n\n","dateCreated":"2015-10-03T21:33:00+08:00","dateModified":"2020-03-08T10:40:41+08:00","datePublished":"2015-10-03T21:33:00+08:00","description":"有時候在需要訊息傳遞的應用場景，因為需求簡單不想使用到像 RabbitMQ\n這種企業級的訊息中介軟體(middleware)， 使用 Redis\n雖然夠簡單但畢竟還是需要執行另一個進程(process)，總還是有殺雞用牛刀的感覺。\n但是另一方面又有訊息不能遺失的需求，自己處理訊息持久性(persistence)實在麻煩， 畢竟訊息儲存還是要支援 ACID\n特性才能號稱做到不遺失。","headline":"如何實作簡單的持久性訊息佇列?","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2015/10/persistent-message-queues-with-lmdb/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"featured_image.jpg","logo":{"@type":"ImageObject","url":"featured_image.jpg"}},"url":"https://samkuo.me/post/2015/10/persistent-message-queues-with-lmdb/","keywords":"Python, Message, Queue, LMDB, gevent"}</script>
     <meta name="description" content="有時候在需要訊息傳遞的應用場景，因為需求簡單不想使用到像 RabbitMQ 這種企業級的訊息中介軟體(middleware)， 使用 Redis 雖然夠簡單但畢竟還是需要執行另一個進程(process)，總還是有殺雞用牛刀的感覺。 但是另一方面又有訊息不能遺失的需求，自己處理訊息持久性(persistence)實在麻煩， 畢竟訊息儲存還是要支援 ACID 特性才能號稱做到不遺失。">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="如何實作簡單的持久性訊息佇列?">
@@ -41,7 +41,7 @@
         
     
     
-        <meta property="og:image" content="https://samkuo.me/images/logo.png"/>
+        <meta property="og:image" content="https://samkuo.me/images/featured_image.jpg"/>
     
     
     
@@ -116,7 +116,7 @@
                     href="/#about"
                     aria-label="閱讀有關作者的更多信息"
                 >
-                    <img class="sidebar-profile-picture" src="/images/logo.png" alt="作者的圖片"/>
+                    <img class="sidebar-profile-picture" src="/images/featured_image.jpg" alt="作者的圖片"/>
                 </a>
                 <h4 class="sidebar-profile-name">Sampot (山姆鍋)</h4>
                 
@@ -537,7 +537,7 @@ None。</p>
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Diesen Beitrag teilen"
+                aria-label="Share this post"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -575,7 +575,7 @@ None。</p>
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Kommentieren"
+                        aria-label="Leave a comment"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -584,7 +584,7 @@ None。</p>
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -653,7 +653,7 @@ None。</p>
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Diesen Beitrag teilen"
+                aria-label="Share this post"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -691,7 +691,7 @@ None。</p>
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Kommentieren"
+                        aria-label="Leave a comment"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -700,7 +700,7 @@ None。</p>
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -760,7 +760,7 @@ None。</p>
             <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="/images/logo.png" alt="作者的圖片"/>
+            <img id="about-card-picture" src="/images/featured_image.jpg" alt="作者的圖片"/>
         
             <h4 id="about-card-name">Sampot (山姆鍋)</h4>
         

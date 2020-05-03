@@ -17,7 +17,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"在網路時代，企業不管大小，都會希望有個網站來強化自己公司的形象、推廣產品等等不同目的。\n在不久之前，相信很多微型企業會選擇使用所謂的「虛擬主機（virtual\nhosting）」， 但這種「虛擬主機」簡單地說，就是透過網頁服務器(Apache,\nNginx, etc.)將不同域名的網站對應到不同目錄，\n來讓一台主機可以服務多個網站(有時可以達到上百個)。因為這樣，這種網站往往在效能、\n安全以及可用性上都大打折扣。\n\n動態網站的優勢與缺點\n為了內容管理方便，微型企業網站通常也會使用像是 Drupal,\nJoomla 或者 WordPress 這些軟體來管理網站內容。這類軟體讓內容編輯人員可以：\n\n可以隨時隨地編輯內容：只要瀏覽器可以連上網就可以編輯跟管理網站內容。\n提供個人化的內容呈現：由於網頁是動態產生，可以根據訪客或者會員來展現不同的內容。\n豐富的第三方插件：由於有眾多的社群用戶，也就有許多插件可以來加強網站功能。\n\n老實說，WordPress 這些都是很好的軟體，但幾個主要問題在於：\n\n程式碼漏洞造成的安全性問題：上述的開源軟體出現漏洞通常都很快被修正，但網站的維護人員是否有足夠時間跟專業來及時更新？\n可用性的問題：這些軟體執行時都需要 PHP 腳本與資料庫，如果故障都會導致網站不可用。\n執行效率的問題：由於動態產生網頁，雖然提供很大的彈性，但只要用戶一多，反應時間往往很明顯受影響。\nSlashdot 效應問題：如果活動網頁受歡迎或者部落格文章被分享到 Slashdot 這類會導入大量訪客的網站，公司網站往往就只能舉雙手投降了。\n\n雖然這些問題大多可以靠技術以及投入更多資源來解決，例如：使用專業看管(managed\nhosting)服務，但大部分微型企業其實沒有這樣的資源來避免上述問題。如果網站的目的只是作為公司資訊的分享或者訊息的發佈，那麼使用靜態網站將是個很好的解決方案。\n靜態網站的優勢與缺點\n「靜態網站」，顧名思義就是網站內容都是預先編輯好後，放在網頁服務器上供人瀏覽。由於服務器上沒有 PHP 程式以及資料庫的存在，減少了安全漏洞的發生。藉由內容遞送網路(content\ndelivery network;\nCDN)，靜態內容可以同步到多個數據中心，同時解決了可用性、效率以及 Slashdot 效應問題。靜態網站有這麼多優點，那麼為什麼很少人採用呢？靜態網站最大的問題就是：編輯網站內容同時還要確保版型、樣式可以一致以及方便調整，使用單純編輯軟體是很不實際的做法。\n運用靜態網站管理軟體\n好消息是有了 Octopress,\nPelican 這些靜態網站管理軟體，這些問題有了很大的改善。雖然還是需要軟體，但是只在編輯人員的工作機上執行，跟\nWordPress 這些需要在網站服務器上執行不同。Octopress 這類軟體的主要特性：\n\n可以將網站樣式與內容分開，因此，編輯人員同樣可以關注在內容的產生而不是樣式上。\n配合版本控制系統，使用靜態網站管理軟體甚至比使用 WordPress 這類軟體提供更強的草稿管理能力。\n網站可以在本地預覽，沒問題後再發佈到服務器上。\n\n結語\n使用靜態或動態網站並不是非黑即白的問題，兩者都有其適用的領域與場合。根據需要選擇適合的方案，才是王道。\n","dateCreated":"2013-11-12T08:50:00+08:00","dateModified":"2018-08-17T12:05:38+08:00","datePublished":"2013-11-12T08:50:00+08:00","description":"在網路時代，企業不管大小，都會希望有個網站來強化自己公司的形象、推廣產品等等不同目的。\n在不久之前，相信很多微型企業會選擇使用所謂的「虛擬主機（virtual\nhosting）」， 但這種「虛擬主機」簡單地說，就是透過網頁服務器(Apache,\nNginx, etc.)將不同域名的網站對應到不同目錄，\n來讓一台主機可以服務多個網站(有時可以達到上百個)。因為這樣，這種網站往往在效能、\n安全以及可用性上都大打折扣。","headline":"為什麼要使用靜態網站?","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/11/why-static-web-sites/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2013/11/why-static-web-sites/","keywords":"static sites generator, octopress"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"featured_image.jpg"},"articleBody":"在網路時代，企業不管大小，都會希望有個網站來強化自己公司的形象、推廣產品等等不同目的。\n在不久之前，相信很多微型企業會選擇使用所謂的「虛擬主機（virtual\nhosting）」， 但這種「虛擬主機」簡單地說，就是透過網頁服務器(Apache,\nNginx, etc.)將不同域名的網站對應到不同目錄，\n來讓一台主機可以服務多個網站(有時可以達到上百個)。因為這樣，這種網站往往在效能、\n安全以及可用性上都大打折扣。\n\n動態網站的優勢與缺點\n為了內容管理方便，微型企業網站通常也會使用像是 Drupal,\nJoomla 或者 WordPress 這些軟體來管理網站內容。這類軟體讓內容編輯人員可以：\n\n可以隨時隨地編輯內容：只要瀏覽器可以連上網就可以編輯跟管理網站內容。\n提供個人化的內容呈現：由於網頁是動態產生，可以根據訪客或者會員來展現不同的內容。\n豐富的第三方插件：由於有眾多的社群用戶，也就有許多插件可以來加強網站功能。\n\n老實說，WordPress 這些都是很好的軟體，但幾個主要問題在於：\n\n程式碼漏洞造成的安全性問題：上述的開源軟體出現漏洞通常都很快被修正，但網站的維護人員是否有足夠時間跟專業來及時更新？\n可用性的問題：這些軟體執行時都需要 PHP 腳本與資料庫，如果故障都會導致網站不可用。\n執行效率的問題：由於動態產生網頁，雖然提供很大的彈性，但只要用戶一多，反應時間往往很明顯受影響。\nSlashdot 效應問題：如果活動網頁受歡迎或者部落格文章被分享到 Slashdot 這類會導入大量訪客的網站，公司網站往往就只能舉雙手投降了。\n\n雖然這些問題大多可以靠技術以及投入更多資源來解決，例如：使用專業看管(managed\nhosting)服務，但大部分微型企業其實沒有這樣的資源來避免上述問題。如果網站的目的只是作為公司資訊的分享或者訊息的發佈，那麼使用靜態網站將是個很好的解決方案。\n靜態網站的優勢與缺點\n「靜態網站」，顧名思義就是網站內容都是預先編輯好後，放在網頁服務器上供人瀏覽。由於服務器上沒有 PHP 程式以及資料庫的存在，減少了安全漏洞的發生。藉由內容遞送網路(content\ndelivery network;\nCDN)，靜態內容可以同步到多個數據中心，同時解決了可用性、效率以及 Slashdot 效應問題。靜態網站有這麼多優點，那麼為什麼很少人採用呢？靜態網站最大的問題就是：編輯網站內容同時還要確保版型、樣式可以一致以及方便調整，使用單純編輯軟體是很不實際的做法。\n運用靜態網站管理軟體\n好消息是有了 Octopress,\nPelican 這些靜態網站管理軟體，這些問題有了很大的改善。雖然還是需要軟體，但是只在編輯人員的工作機上執行，跟\nWordPress 這些需要在網站服務器上執行不同。Octopress 這類軟體的主要特性：\n\n可以將網站樣式與內容分開，因此，編輯人員同樣可以關注在內容的產生而不是樣式上。\n配合版本控制系統，使用靜態網站管理軟體甚至比使用 WordPress 這類軟體提供更強的草稿管理能力。\n網站可以在本地預覽，沒問題後再發佈到服務器上。\n\n結語\n使用靜態或動態網站並不是非黑即白的問題，兩者都有其適用的領域與場合。根據需要選擇適合的方案，才是王道。\n","dateCreated":"2013-11-12T08:50:00+08:00","dateModified":"2018-08-17T12:05:38+08:00","datePublished":"2013-11-12T08:50:00+08:00","description":"在網路時代，企業不管大小，都會希望有個網站來強化自己公司的形象、推廣產品等等不同目的。\n在不久之前，相信很多微型企業會選擇使用所謂的「虛擬主機（virtual\nhosting）」， 但這種「虛擬主機」簡單地說，就是透過網頁服務器(Apache,\nNginx, etc.)將不同域名的網站對應到不同目錄，\n來讓一台主機可以服務多個網站(有時可以達到上百個)。因為這樣，這種網站往往在效能、\n安全以及可用性上都大打折扣。","headline":"為什麼要使用靜態網站?","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/11/why-static-web-sites/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"featured_image.jpg","logo":{"@type":"ImageObject","url":"featured_image.jpg"}},"url":"https://samkuo.me/post/2013/11/why-static-web-sites/","keywords":"static sites generator, octopress"}</script>
     <meta name="description" content="本文山姆鍋解釋使用靜態網站的好處跟它的限制。">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="為什麼要使用靜態網站?">
@@ -38,7 +38,7 @@
         
     
     
-        <meta property="og:image" content="https://samkuo.me/images/logo.png"/>
+        <meta property="og:image" content="https://samkuo.me/images/featured_image.jpg"/>
     
     
     
@@ -113,7 +113,7 @@
                     href="/#about"
                     aria-label="閱讀有關作者的更多信息"
                 >
-                    <img class="sidebar-profile-picture" src="/images/logo.png" alt="作者的圖片"/>
+                    <img class="sidebar-profile-picture" src="/images/featured_image.jpg" alt="作者的圖片"/>
                 </a>
                 <h4 class="sidebar-profile-name">Sampot (山姆鍋)</h4>
                 
@@ -460,7 +460,7 @@ WordPress 這些需要在網站服務器上執行不同。Octopress 這類軟體
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Diesen Beitrag teilen"
+                aria-label="Share this post"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -498,7 +498,7 @@ WordPress 這些需要在網站服務器上執行不同。Octopress 這類軟體
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Kommentieren"
+                        aria-label="Leave a comment"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -507,7 +507,7 @@ WordPress 這些需要在網站服務器上執行不同。Octopress 這類軟體
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -576,7 +576,7 @@ WordPress 這些需要在網站服務器上執行不同。Octopress 這類軟體
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Diesen Beitrag teilen"
+                aria-label="Share this post"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -614,7 +614,7 @@ WordPress 這些需要在網站服務器上執行不同。Octopress 這類軟體
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Kommentieren"
+                        aria-label="Leave a comment"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -623,7 +623,7 @@ WordPress 這些需要在網站服務器上執行不同。Octopress 這類軟體
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -683,7 +683,7 @@ WordPress 這些需要在網站服務器上執行不同。Octopress 這類軟體
             <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="/images/logo.png" alt="作者的圖片"/>
+            <img id="about-card-picture" src="/images/featured_image.jpg" alt="作者的圖片"/>
         
             <h4 id="about-card-name">Sampot (山姆鍋)</h4>
         

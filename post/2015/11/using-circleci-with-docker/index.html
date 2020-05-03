@@ -17,7 +17,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"上篇文章說明 使用 CircleCI 作為《我.影化身》雲端持續整合方案， 其中提到 CircleCI 對於 Docker 的支援是很完整的，本文進一步來看看如何在 CircleCI 上使用 Docker 在每次代碼提交時自動建構應用程式的映像。\n\n為了讓產生的映像夠小 [1] ，《我.影化身》 專案的 Docker 映像是以 eavatar/basebox 為基礎， 關於如何建構 eavatar/basebox 這個映像，請參考：建構一個與 Ubuntu 相容的小型 Docker 映像 。\n讓 CircleCI 知道專案需要 Docker 支援\n要讓 CircleCI 知道專案建置需要使用它提供的 Docker 服務，需要在\ncircle.yml 描述檔中加入：\n123machine:  services:    - docker\n也只需要這樣，CircleCI 就知道在啟動專案建置工作時要同時啟用 Docker 支援，有了這樣的設定， 在我們的建構腳本中就可以使用 Docker 相關的命令。\n專案所需的 Dockerfile\n建構 Docker 映像需要一個 Dockerfile 來讓 Docker 工具知道如何建構專案所需的映像， 底下是本專案經過刪減後的 Dockerfile：\n123456789FROM eavatar/basebox    #1MAINTAINER sampot &lt;goes-to-nowhere@eavatar.com&gt;ADD dist/avame /avame   #2EXPOSE 5080 5443        #3ENV AVA_POD /home/ava/.config/avame  #4USER ava                #5CMD [\"/avame/avame\"]    #6\n其中，\n\n\n指定 eavatar/basebox 作為基礎映像\n\n這是山姆鍋自己使用的基礎映像，在這個映象中已經有預建一個特別用戶:\n\nava， 用來作為執行應用時的身份。\n\n\n\n將打包好的應用檔案加入映像中的 /avame 路徑\n\n執行應用所需的程式碼與檔案都放在 dist/avame 這個相對路徑中。\n\n\n\n設定應用使用的網路埠號(port numbers)\n\n《我.影化身》有提供 Web 使用者介面以及 API，5080 給 HTTP, 5443\n\n則是 HTTPS 協定使用。\n\n\n\n設定 AVA_POD 環境變數\n\n這個環境變數指定程式資料要放置的路徑。照道理應該要根據當下登入的使用者身份自動判別，\n\n但在精簡環境中，會誤判成 \\'/.config/avame\\'\n這個路徑，由於需要以一般使用者身份執行，\n所以強制指定到可以讀寫的路徑去。\n\n\n\n更換執行應用的使用者身份: 基於安全理由，即使在 Docker 容器中也不建議使用 root\n身份執行應用程式。\n\n\n指定映像啟動時預設執行的命令\n\n/avame/avame 是應用的執行檔。\n\n\n\n建構 Docker 映像\n在 CircleCI 中使用 Docker 跟在本地開發相同，使用 docker 命令來執行。 為了可以輕易從映像檔中得知當初建構時的程式碼版本，山姆鍋使用下列指令：\n12docker build -t eavatar/avame:$CIRCLE_BUILD_NUM-$CIRCLE_SHA1 .docker tag eavatar/avame:$CIRCLE_BUILD_NUM-$CIRCLE_SHA1 eavatar/avame:latest\n這樣產生的映像檔名就會包含提交(commit)時的版本號碼，以及建構的序號。有了這個資訊， 之後不幸要重製問題時，才方便使用找出相同版本的程式碼。\n上傳映像到 Docker Hub\n為了之後的部署工作，需要將產生的映像上載到某個儲存所。幸好《我.影化身》是開源專案，可以使用 Docker Hub 這個免費的儲存所。要上載映像到 Docker Hub, 使用下列指令：\n12docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASSdocker push eavatar/avame\n其中，$DOCKER_EMAIL, $DOCKER_USER, $DOCKER_PASS 會以對應的環境變數取代， 代表登入 Docker Hub 所需的資料，這些環境變數需要在 CircleCI 的後台設定。\n完整的 circle.yml 檔案\n為了方便參考，下面是寫本文時專案完整的 circle.yml 檔：\n123456789101112131415161718192021222324252627282930313233343536machine:  services:    - dockergeneral:  artifacts:    - \"dist/avame-0.1.0+$&#123;CIRCLE_BUILD_NUM&#125;.tgz\"dependencies:  override:    - sudo mkdir -p /usr/local/lib    - sudo pip install -U pip    - sudo easy_install -U setuptools    - pip install -r requirements.txt    - pip install seleniumtest:  override:    - sudo cp plat.libs/libsodium.so.13.1.0 /usr/local/lib/    - sudo ln -s /usr/local/lib/libsodium.so.13.1.0 /usr/local/lib/libsodium.so.13    - sudo ln -s /usr/local/lib/libsodium.so.13.1.0 /usr/local/lib/libsodium.so    - PYTHONPATH=\".:./src\" py.test -vvv --cov=src/ava tests/unit/    - PYTHONPATH=\".:./src\" py.test -vvv tests/integration/    - PYTHONPATH=\".:./src\" py.test -vvv tests/functional/    - PYTHONPATH=\".:./src\" pyinstaller pack/avame-tui.spec --clean -ypost:  - cd dist &amp;&amp; tar zcvf avame-0.1.0+$&#123;CIRCLE_BUILD_NUM&#125;.tgz avame/deployment:  hub:    branch: master    commands:      - docker build -t eavatar/avame:$CIRCLE_BUILD_NUM-$CIRCLE_SHA1 .      - docker tag eavatar/avame:$CIRCLE_BUILD_NUM-$CIRCLE_SHA1 eavatar/avame:latest      - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS      - docker push eavatar/avame\n執行產生的應用映像檔\n在一個已經安裝好 Docker 環境的主機，可以使用下列指令啟動《我.影化身》：\n1docker run -it --rm -p 5080:5080 eavatar/avame\n在輸出的訊息中，找到 [INFO - Access Token: 9dfDU4GqZ1vgHGnL5wsXsC, 其中\n9dfDU4GqZ1vgHGnL5wsXsC 是登入使用者介面需要的密碼，每次都會更動。 也可以在啟動時，透過環境變數 AVA_ACCESS_TOKEN 來指定一個固定值。\n1docker run -it --rm -p 5080:5080 -e AVA_ACCESS_TOKEN&#x3D;1234 eavatar&#x2F;avame\n假設 Docker 容器的 IP 位址是 192.168.99.101, 則可以使用瀏覽器開啟網址http://192.168.99.101:5080 來登入，畫面應該跟本文開頭的圖檔相似。\n《我.影化身》還在開發階段，歡迎任何改進建議！\n結語\n既然做到隨著每次代碼的提交(commit)，只要通過測試，一個新的 Docker\n映像就會被發佈到 Docker Hub 上。\n下一步，自然是利用產生的映像來自動部署到測試或生產環境。對了，《我.影化身》使用\nJQuery Mobile + Backbone 這樣的框架組合做 Web UI，有機會再來分享。\n\n\n\n\n這裏當然是山姆鍋自己的主觀認定。 ↩︎\n\n\n\n","dateCreated":"2015-11-05T14:49:00+08:00","dateModified":"2018-08-29T20:07:10+08:00","datePublished":"2015-11-05T14:49:00+08:00","description":"上篇文章說明 使用 CircleCI 作為《我.影化身》雲端持續整合方案， 其中提到 CircleCI 對於 Docker 的支援是很完整的，本文進一步來看看如何在 CircleCI 上使用 Docker 在每次代碼提交時自動建構應用程式的映像。","headline":"在 CircleCI 上使用 Docker","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2015/11/using-circleci-with-docker/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2015/11/using-circleci-with-docker/","keywords":"Docker, CircleCI, Continuous, Integration"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"featured_image.jpg"},"articleBody":"上篇文章說明 使用 CircleCI 作為《我.影化身》雲端持續整合方案， 其中提到 CircleCI 對於 Docker 的支援是很完整的，本文進一步來看看如何在 CircleCI 上使用 Docker 在每次代碼提交時自動建構應用程式的映像。\n\n為了讓產生的映像夠小 [1] ，《我.影化身》 專案的 Docker 映像是以 eavatar/basebox 為基礎， 關於如何建構 eavatar/basebox 這個映像，請參考：建構一個與 Ubuntu 相容的小型 Docker 映像 。\n讓 CircleCI 知道專案需要 Docker 支援\n要讓 CircleCI 知道專案建置需要使用它提供的 Docker 服務，需要在\ncircle.yml 描述檔中加入：\n123machine:  services:    - docker\n也只需要這樣，CircleCI 就知道在啟動專案建置工作時要同時啟用 Docker 支援，有了這樣的設定， 在我們的建構腳本中就可以使用 Docker 相關的命令。\n專案所需的 Dockerfile\n建構 Docker 映像需要一個 Dockerfile 來讓 Docker 工具知道如何建構專案所需的映像， 底下是本專案經過刪減後的 Dockerfile：\n123456789FROM eavatar/basebox    #1MAINTAINER sampot &lt;goes-to-nowhere@eavatar.com&gt;ADD dist/avame /avame   #2EXPOSE 5080 5443        #3ENV AVA_POD /home/ava/.config/avame  #4USER ava                #5CMD [\"/avame/avame\"]    #6\n其中，\n\n\n指定 eavatar/basebox 作為基礎映像\n\n這是山姆鍋自己使用的基礎映像，在這個映象中已經有預建一個特別用戶:\n\nava， 用來作為執行應用時的身份。\n\n\n\n將打包好的應用檔案加入映像中的 /avame 路徑\n\n執行應用所需的程式碼與檔案都放在 dist/avame 這個相對路徑中。\n\n\n\n設定應用使用的網路埠號(port numbers)\n\n《我.影化身》有提供 Web 使用者介面以及 API，5080 給 HTTP, 5443\n\n則是 HTTPS 協定使用。\n\n\n\n設定 AVA_POD 環境變數\n\n這個環境變數指定程式資料要放置的路徑。照道理應該要根據當下登入的使用者身份自動判別，\n\n但在精簡環境中，會誤判成 \\'/.config/avame\\'\n這個路徑，由於需要以一般使用者身份執行，\n所以強制指定到可以讀寫的路徑去。\n\n\n\n更換執行應用的使用者身份: 基於安全理由，即使在 Docker 容器中也不建議使用 root\n身份執行應用程式。\n\n\n指定映像啟動時預設執行的命令\n\n/avame/avame 是應用的執行檔。\n\n\n\n建構 Docker 映像\n在 CircleCI 中使用 Docker 跟在本地開發相同，使用 docker 命令來執行。 為了可以輕易從映像檔中得知當初建構時的程式碼版本，山姆鍋使用下列指令：\n12docker build -t eavatar/avame:$CIRCLE_BUILD_NUM-$CIRCLE_SHA1 .docker tag eavatar/avame:$CIRCLE_BUILD_NUM-$CIRCLE_SHA1 eavatar/avame:latest\n這樣產生的映像檔名就會包含提交(commit)時的版本號碼，以及建構的序號。有了這個資訊， 之後不幸要重製問題時，才方便使用找出相同版本的程式碼。\n上傳映像到 Docker Hub\n為了之後的部署工作，需要將產生的映像上載到某個儲存所。幸好《我.影化身》是開源專案，可以使用 Docker Hub 這個免費的儲存所。要上載映像到 Docker Hub, 使用下列指令：\n12docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASSdocker push eavatar/avame\n其中，$DOCKER_EMAIL, $DOCKER_USER, $DOCKER_PASS 會以對應的環境變數取代， 代表登入 Docker Hub 所需的資料，這些環境變數需要在 CircleCI 的後台設定。\n完整的 circle.yml 檔案\n為了方便參考，下面是寫本文時專案完整的 circle.yml 檔：\n123456789101112131415161718192021222324252627282930313233343536machine:  services:    - dockergeneral:  artifacts:    - \"dist/avame-0.1.0+$&#123;CIRCLE_BUILD_NUM&#125;.tgz\"dependencies:  override:    - sudo mkdir -p /usr/local/lib    - sudo pip install -U pip    - sudo easy_install -U setuptools    - pip install -r requirements.txt    - pip install seleniumtest:  override:    - sudo cp plat.libs/libsodium.so.13.1.0 /usr/local/lib/    - sudo ln -s /usr/local/lib/libsodium.so.13.1.0 /usr/local/lib/libsodium.so.13    - sudo ln -s /usr/local/lib/libsodium.so.13.1.0 /usr/local/lib/libsodium.so    - PYTHONPATH=\".:./src\" py.test -vvv --cov=src/ava tests/unit/    - PYTHONPATH=\".:./src\" py.test -vvv tests/integration/    - PYTHONPATH=\".:./src\" py.test -vvv tests/functional/    - PYTHONPATH=\".:./src\" pyinstaller pack/avame-tui.spec --clean -ypost:  - cd dist &amp;&amp; tar zcvf avame-0.1.0+$&#123;CIRCLE_BUILD_NUM&#125;.tgz avame/deployment:  hub:    branch: master    commands:      - docker build -t eavatar/avame:$CIRCLE_BUILD_NUM-$CIRCLE_SHA1 .      - docker tag eavatar/avame:$CIRCLE_BUILD_NUM-$CIRCLE_SHA1 eavatar/avame:latest      - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS      - docker push eavatar/avame\n執行產生的應用映像檔\n在一個已經安裝好 Docker 環境的主機，可以使用下列指令啟動《我.影化身》：\n1docker run -it --rm -p 5080:5080 eavatar/avame\n在輸出的訊息中，找到 [INFO - Access Token: 9dfDU4GqZ1vgHGnL5wsXsC, 其中\n9dfDU4GqZ1vgHGnL5wsXsC 是登入使用者介面需要的密碼，每次都會更動。 也可以在啟動時，透過環境變數 AVA_ACCESS_TOKEN 來指定一個固定值。\n1docker run -it --rm -p 5080:5080 -e AVA_ACCESS_TOKEN&#x3D;1234 eavatar&#x2F;avame\n假設 Docker 容器的 IP 位址是 192.168.99.101, 則可以使用瀏覽器開啟網址http://192.168.99.101:5080 來登入，畫面應該跟本文開頭的圖檔相似。\n《我.影化身》還在開發階段，歡迎任何改進建議！\n結語\n既然做到隨著每次代碼的提交(commit)，只要通過測試，一個新的 Docker\n映像就會被發佈到 Docker Hub 上。\n下一步，自然是利用產生的映像來自動部署到測試或生產環境。對了，《我.影化身》使用\nJQuery Mobile + Backbone 這樣的框架組合做 Web UI，有機會再來分享。\n\n\n\n\n這裏當然是山姆鍋自己的主觀認定。 ↩︎\n\n\n\n","dateCreated":"2015-11-05T14:49:00+08:00","dateModified":"2018-08-29T20:07:10+08:00","datePublished":"2015-11-05T14:49:00+08:00","description":"上篇文章說明 使用 CircleCI 作為《我.影化身》雲端持續整合方案， 其中提到 CircleCI 對於 Docker 的支援是很完整的，本文進一步來看看如何在 CircleCI 上使用 Docker 在每次代碼提交時自動建構應用程式的映像。","headline":"在 CircleCI 上使用 Docker","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2015/11/using-circleci-with-docker/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"featured_image.jpg","logo":{"@type":"ImageObject","url":"featured_image.jpg"}},"url":"https://samkuo.me/post/2015/11/using-circleci-with-docker/","keywords":"Docker, CircleCI, Continuous, Integration"}</script>
     <meta name="description" content="上篇文章說明 使用 CircleCI 作為《我.影化身》雲端持續整合方案， 其中提到 CircleCI 對於 Docker 的支援是很完整的，本文進一步來看看如何在 CircleCI 上使用 Docker 在每次代碼提交時自動建構應用程式的映像。">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="在 CircleCI 上使用 Docker">
@@ -40,7 +40,7 @@
         
     
     
-        <meta property="og:image" content="https://samkuo.me/images/logo.png"/>
+        <meta property="og:image" content="https://samkuo.me/images/featured_image.jpg"/>
     
     
     
@@ -115,7 +115,7 @@
                     href="/#about"
                     aria-label="閱讀有關作者的更多信息"
                 >
-                    <img class="sidebar-profile-picture" src="/images/logo.png" alt="作者的圖片"/>
+                    <img class="sidebar-profile-picture" src="/images/featured_image.jpg" alt="作者的圖片"/>
                 </a>
                 <h4 class="sidebar-profile-name">Sampot (山姆鍋)</h4>
                 
@@ -511,7 +511,7 @@ JQuery Mobile + Backbone 這樣的框架組合做 Web UI，有機會再來分享
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Diesen Beitrag teilen"
+                aria-label="Share this post"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -549,7 +549,7 @@ JQuery Mobile + Backbone 這樣的框架組合做 Web UI，有機會再來分享
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Kommentieren"
+                        aria-label="Leave a comment"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -558,7 +558,7 @@ JQuery Mobile + Backbone 這樣的框架組合做 Web UI，有機會再來分享
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -627,7 +627,7 @@ JQuery Mobile + Backbone 這樣的框架組合做 Web UI，有機會再來分享
             <a
                 class="post-action-btn btn btn--default btn-open-shareoptions"
                 href="#btn-open-shareoptions"
-                aria-label="Diesen Beitrag teilen"
+                aria-label="Share this post"
             >
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
@@ -665,7 +665,7 @@ JQuery Mobile + Backbone 這樣的框架組合做 Web UI，有機會再來分享
                     <a
                         class="post-action-btn btn btn--default"
                         href="#disqus_thread"
-                        aria-label="Kommentieren"
+                        aria-label="Leave a comment"
                     >
                         <i class="fa fa-comment"></i>
                     </a>
@@ -674,7 +674,7 @@ JQuery Mobile + Backbone 這樣的框架組合做 Web UI，有機會再來分享
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -734,7 +734,7 @@ JQuery Mobile + Backbone 這樣的框架組合做 Web UI，有機會再來分享
             <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="/images/logo.png" alt="作者的圖片"/>
+            <img id="about-card-picture" src="/images/featured_image.jpg" alt="作者的圖片"/>
         
             <h4 id="about-card-name">Sampot (山姆鍋)</h4>
         
