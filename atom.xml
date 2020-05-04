@@ -125,6 +125,32 @@
   </entry>
   
   <entry>
+    <title>Web 新創也該使用 Kubernetes</title>
+    <link href="https://samkuo.me/post/2020/04/kubernetes-is-for-startup/"/>
+    <id>https://samkuo.me/post/2020/04/kubernetes-is-for-startup/</id>
+    <published>2020-04-03T00:12:13.000Z</published>
+    <updated>2020-05-04T00:15:12.680Z</updated>
+    
+    <content type="html"><![CDATA[<p>導入 Kubernetes 的門檻不低，在過去我並不建議新創團隊一開始就採用。隨著雲端託管的 K8S 服務越來越普及，本地開發、測試工具與環境容易取得，加上自建與維運一個 K8S 叢集的解決方案越加成熟，再再都顯示使用 K8S 作為應用部署平台的好處已超過導入的成本。時至今日，對於開發網路軟體產品的團隊，我已經會建議一開始就是以 K8S 作為預設的部署環境，除了利用 K8S 的高可用性與擴充性架構外，也讓網路應用可以更容易移植 (portable) 到不同的基礎設施。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;導入 Kubernetes 的門檻不低，在過去我並不建議新創團隊一開始就採用。隨著雲端託管的 K8S 服務越來越普及，本地開發、測試工具與環境容易取得，加上自建與維運一個 K8S 叢集的解決方案越加成熟，再再都顯示使用 K8S 作為應用部署平台的好處已超過導入的成本。時至今
+      
+    
+    </summary>
+    
+    
+    
+      <category term="Kubernetes" scheme="https://samkuo.me/tag/kubernetes/"/>
+    
+      <category term="Web Startup" scheme="https://samkuo.me/tag/web-startup/"/>
+    
+  </entry>
+  
+  <entry>
     <title>一個故事說明軟體架構的必要性</title>
     <link href="https://samkuo.me/post/2020/03/why-sotfware-architecture-is-necessary-by-story/"/>
     <id>https://samkuo.me/post/2020/03/why-sotfware-architecture-is-necessary-by-story/</id>
@@ -538,39 +564,6 @@
       <category term="Continuous" scheme="https://samkuo.me/tag/continuous/"/>
     
       <category term="Integration" scheme="https://samkuo.me/tag/integration/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>使用 CircleCI 作為《我.影化身》雲端持續整合方案</title>
-    <link href="https://samkuo.me/post/2015/10/eavatar-circleci-continuous-integration/"/>
-    <id>https://samkuo.me/post/2015/10/eavatar-circleci-continuous-integration/</id>
-    <published>2015-10-30T01:40:00.000Z</published>
-    <updated>2018-08-29T12:19:08.058Z</updated>
-    
-    <content type="html"><![CDATA[<p>CircleCI 是山姆鍋到目前為止認為最好用的雲端持續整合方案。《我.影化身》開發自然也需要利用持續整合來自動執行軟體測試與建置工作。本文便以《我.影化身》作為應用實例，說明如何簡單完成與 CircleCI 的設定。</p><a id="more"></a><p>山姆鍋假設您已經有 GitHub 以及 CircleCI<br>關聯的帳戶，且有可以使用的開源專案。 如果沒有，您也可以直接 Fork<br>《我.影化身》開源專案：<a href="https://github.com/eavatar/eavatar-me" target="_blank" rel="noopener">https://github.com/eavatar/eavatar-me</a></p><h2 id="設定目標">設定目標</h2><p>山姆鍋希望每次有程式碼簽入(check-in)時，便會啟動整個建置流程完成下列工作：</p><ul><li>執行單元測試</li><li>執行功能測試</li><li>製作應用發行包(distribution package)</li></ul><p>未來目標之一是能夠建置 Docker<br>映像(image)，但本文並沒有相關說明。想了解如何使用 CircleCI 建置 Docker<br>映像， 可以參考 Amo Wu 的<br><a href="http://blog.amowu.com/2015/04/devops-continuous-integration-delivery-docker-circleci-aws-beanstalk.html" target="_blank" rel="noopener">DevOps：持續整合＆持續交付（Docker、CircleCI、AWS）</a><br>。</p><h2 id="建置環境需求">建置環境需求</h2><p>自動跟手動建置軟體對於環境的需求基本上是類似的，對於《我.影化身》建置環境的基本需求，請參考專案文件：<br><a href="http://docs.eavatar.me/en/latest/development.html" target="_blank" rel="noopener">http://docs.eavatar.me/en/latest/development.html</a></p><h2 id="準備描述檔-circle-yml">準備描述檔 circle.yml</h2><p>要讓專案可以在 CircleCI 建置，基本上只需要一個描述檔,<br>circle.yml。透過這個描述檔， CircleCI<br>便可以了解專案所需要的執行環境，以及根據描述安裝相依套件、執行測試、建置與部署工作。</p><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">general:</span></span><br><span class="line">    <span class="attr">artifacts:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">"dist/avame-0.1.0+$&#123;CIRCLE_BUILD_NUM&#125;.tgz"</span></span><br><span class="line"></span><br><span class="line"><span class="attr">dependencies:</span></span><br><span class="line">    <span class="attr">override:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">sudo</span> <span class="string">mkdir</span> <span class="string">-p</span> <span class="string">/usr/local/lib</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">sudo</span> <span class="string">pip</span> <span class="string">install</span> <span class="string">-U</span> <span class="string">pip</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">sudo</span> <span class="string">easy_install</span> <span class="string">-U</span> <span class="string">setuptools</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">pip</span> <span class="string">install</span> <span class="string">-r</span> <span class="string">requirements.txt</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">pip</span> <span class="string">install</span> <span class="string">selenium</span></span><br><span class="line"></span><br><span class="line"><span class="attr">test:</span></span><br><span class="line">    <span class="attr">override:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">sudo</span> <span class="string">cp</span> <span class="string">plat.libs/libsodium.so.13.1.0</span> <span class="string">/usr/local/lib/</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">sudo</span> <span class="string">ln</span> <span class="string">-s</span> <span class="string">/usr/local/lib/libsodium.so.13.1.0</span> <span class="string">/usr/local/lib/libsodium.so.13</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">sudo</span> <span class="string">ln</span> <span class="string">-s</span> <span class="string">/usr/local/lib/libsodium.so.13.1.0</span> <span class="string">/usr/local/lib/libsodium.so</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">PYTHONPATH=".:./src"</span> <span class="string">py.test</span> <span class="string">-vvv</span> <span class="string">tests/unit/</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">PYTHONPATH=".:./src"</span> <span class="string">py.test</span> <span class="string">-vvv</span> <span class="string">tests/functional/test_home_page.py</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">PYTHONPATH=".:./src"</span> <span class="string">pyinstaller</span> <span class="string">pack/avame.spec</span> <span class="string">--clean</span> <span class="string">-y</span></span><br><span class="line">    <span class="attr">post:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">cd</span> <span class="string">dist</span> <span class="string">&amp;&amp;</span> <span class="string">tar</span> <span class="string">zcvf</span> <span class="string">avame-0.1.0+$&#123;CIRCLE_BUILD_NUM&#125;.tgz</span> <span class="string">avame/</span></span><br></pre></td></tr></table></figure><p>其中，</p><ul><li></li></ul><pre><code>general::   描述建置完成後要保留的產出物(artifacts)，這裏山姆鍋指定建置出來的應用發行包。</code></pre><ul><li></li></ul><pre><code>dependencies::   安裝編譯、測試過程會用的系統與應用套件。這裏也升級    `pip` 以及 `setuptools` 套件，    這是從之前的專案移植過來，已經不確定需不需要了。 安裝    `selenium` 是為了網頁介面的功能測試，CircleCI    已經有安裝測試時需要的 Firefox 瀏覽器。</code></pre><ul><li></li></ul><pre><code>test/override::   把 Ubuntu 環境需要使用的 `libsodium`    動態連結檔複製到正確的位置。 《我.影化身》使用它來支援非對稱式    加解密功能。如果沒有這個步驟，相關測試會出現找不到程式庫的問題。    本文範例只使用一個簡單的功能測試案例，這部分內容會根據專案進展而更動。</code></pre><ul><li></li></ul><pre><code>test/post::   如果單元以及功能測試都完成，打包發行套件所需的檔案。這裏檔名中\${CIRCLE\_BUILD\_NUM}部分，    會根據環境變數 `CIRCLE_BUILD_NUM`    來決定，代表目前建置工作的順序編號。 CircleCI    在建置時會提供一些環境變數，可以參考這篇文件:    &lt;https://circleci.com/docs/environment-variables&gt;</code></pre><h2 id="開始持續集成工作">開始持續集成工作</h2><p>要讓 CircleCI 開始為專案工作，需要完成下列步驟：</p><ol><li>登入 CircleCI, 從選單(應該在左邊)選擇 “Add Projects”</li><li>選擇要使用的 GitHub 用戶或組織帳戶</li><li>選擇要建置的專案，點擊 “Build project”</li></ol><p>以上步驟是根據撰寫本文時的使用介面流程，如果跟您看到的不同，請自行斟酌調整。由於已經授權過<br>CircleCI 自動設定 GitHub 上的開源專案，CircleCI<br>會幫我們把相關的設定完成。之後只要有程式碼 check-in,<br>便會自動執行建置工作。其它有更多的設定可以運用，請自行參考 <a href="https://circleci.com/docs" target="_blank" rel="noopener">CircleCI<br>文件</a> 。</p><h2 id="結語">結語</h2><p>雖然文章沒有提到，但 CircleCI 對於 Docker<br>映像(image)建置的支援也很完整。<br>不過這是根據山姆鍋之前的經驗，現在其它雲端持續整合方案應該也有 Docker<br>支援才對。<br>因為《我.影化身》有圖形用戶介面，需要針對不同桌面環境做建置工作， 採用<br>CircleCI 主要是做持續整合測試與 Docker 映像的建置與發佈工作。</p>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;CircleCI 是山姆鍋到目前為止認為最好用的雲端持續整合方案。《我.影化身》開發自然也需要利用持續整合來自動執行軟體測試與建置工作。本文便以《我.影化身》作為應用實例，說明如何簡單完成與 CircleCI 的設定。&lt;/p&gt;
-    
-    </summary>
-    
-    <content src="https://samkuo.me/shared/software-418231_640.jpg" type="image" />
-    
-    
-      <category term="Software Development" scheme="https://samkuo.me/category/software-development/"/>
-    
-    
-      <category term="continuous integration" scheme="https://samkuo.me/tag/continuous-integration/"/>
-    
-      <category term="CircleCI" scheme="https://samkuo.me/tag/circleci/"/>
-    
-      <category term="software" scheme="https://samkuo.me/tag/software/"/>
-    
-      <category term="build" scheme="https://samkuo.me/tag/build/"/>
-    
-      <category term="test" scheme="https://samkuo.me/tag/test/"/>
     
   </entry>
   
