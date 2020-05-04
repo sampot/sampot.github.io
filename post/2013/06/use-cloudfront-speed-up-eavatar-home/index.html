@@ -19,7 +19,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"「影化身科技」主站的網頁資料放置在 Amazon S3 東京機房，同樣利用 Octopress 產生靜態網頁。雖然從台灣測試，ping 值大約在 80 毫秒左右，算是相當不錯;但為了台灣以外的其他用戶，還是需要使用 CDN 來將網站內容部署到不同節點。\n\n相關步驟說明如下：\n取得網站的 Bucket 的網站 Endpoint\n雖然在建立 CloudFront 的 distribution 時會自動提示可以用的 S3 bucket 名稱，但好像目前給的名稱並不正確。需要到 S3 console 按照下列步驟取得正確的網站 Endpoint URL。\n\n選擇網站的 bucket，影化身用的是’eavatar.com’。\n選擇 'Properties’標籤。\n展開 'Static Website Hosting’段落就可以看到需要的 Endpoint URL。\n\n建立新的 CloudFront distribution\n有了正確的網站 Endpoint URL\n到 CloudFront console, 選擇 'Create distribution’來開始建立。\n\n因為是網站內容，選擇’Download’作為遞送方法(delivery method)。\n\n在’Original Domain Name’欄位，輸入網站的實際 Endpoint URL。\n\n在 ‘Alternate Domain Names (CNAMEs)欄位輸入’eavartar.com’。\n\n\n注意，‘Default Root Object’ 不要填，不然存取網頁子目錄時會出錯。\n設定 DNS CNAME 紀錄，指向 CloudFront 的 distribution 名稱\n正確產生 CloudFront 的 distribution 後，應該就有了它給定的域名（domain name)。最後，需要設定 DNS 服務來讓 eavatar.com 指向這個域名。\n","dateCreated":"2013-06-06T12:02:00+08:00","dateModified":"2018-08-28T10:45:35+08:00","datePublished":"2013-06-06T12:02:00+08:00","description":"「影化身科技」主站的網頁資料放置在 Amazon S3 東京機房，同樣利用 Octopress 產生靜態網頁。雖然從台灣測試，ping 值大約在 80 毫秒左右，算是相當不錯;但為了台灣以外的其他用戶，還是需要使用 CDN 來將網站內容部署到不同節點。","headline":"使用 CloudFront 來加速網頁存取","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/06/use-cloudfront-speed-up-eavatar-home/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2013/06/use-cloudfront-speed-up-eavatar-home/","keywords":"Cloud service, CloudFront, CDN"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"「影化身科技」主站的網頁資料放置在 Amazon S3 東京機房，同樣利用 Octopress 產生靜態網頁。雖然從台灣測試，ping 值大約在 80 毫秒左右，算是相當不錯；但為了台灣以外的其他用戶，還是需要使用 CDN 來將網站內容部署到不同節點。\n\n相關步驟說明如下：\n取得網站的 Bucket 的網站 Endpoint\n雖然在建立 CloudFront 的 distribution 時會自動提示可以用的 S3 bucket 名稱，但好像目前給的名稱並不正確。需要到 S3 console 按照下列步驟取得正確的網站 Endpoint URL。\n\n選擇網站的 bucket，影化身用的是’eavatar.com’。\n選擇 'Properties’標籤。\n展開 'Static Website Hosting’段落就可以看到需要的 Endpoint URL。\n\n建立新的 CloudFront distribution\n有了正確的網站 Endpoint URL\n到 CloudFront console, 選擇 'Create distribution’來開始建立。\n\n因為是網站內容，選擇’Download’作為遞送方法 (delivery method)。\n\n在’Original Domain Name’欄位，輸入網站的實際 Endpoint URL。\n\n在 ‘Alternate Domain Names (CNAMEs) 欄位輸入’eavartar.com’。\n\n\n注意，‘Default Root Object’ 不要填，不然存取網頁子目錄時會出錯。\n設定 DNS CNAME 紀錄，指向 CloudFront 的 distribution 名稱\n正確產生 CloudFront 的 distribution 後，應該就有了它給定的域名（domain name)。最後，需要設定 DNS 服務來讓 eavatar.com 指向這個域名。\n","dateCreated":"2013-06-06T12:02:00+08:00","dateModified":"2018-08-28T10:45:35+08:00","datePublished":"2013-06-06T12:02:00+08:00","description":"「影化身科技」主站的網頁資料放置在 Amazon S3 東京機房，同樣利用 Octopress 產生靜態網頁。雖然從台灣測試，ping 值大約在 80 毫秒左右，算是相當不錯；但為了台灣以外的其他用戶，還是需要使用 CDN 來將網站內容部署到不同節點。","headline":"使用 CloudFront 來加速網頁存取","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/06/use-cloudfront-speed-up-eavatar-home/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2013/06/use-cloudfront-speed-up-eavatar-home/","keywords":"Cloud service, CloudFront, CDN"}</script>
     <meta name="description" content="如何使用 Amazon CloudFront CDN服務來加速影化身網站的存取速度。">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="使用 CloudFront 來加速網頁存取">
@@ -371,7 +371,11 @@
     
     <div class="post-content markdown">
         <div class="main-content-wrap">
-            <p>「<a href="http://www.eavatar.com" target="_blank" rel="noopener">影化身科技</a>」主站的網頁資料放置在 Amazon S3 東京機房，同樣利用 Octopress 產生靜態網頁。雖然從台灣測試，ping 值大約在 80 毫秒左右，算是相當不錯;但為了台灣以外的其他用戶，還是需要使用 CDN 來將網站內容部署到不同節點。</p>
+            <div class="alert info no-icon">
+                <a href="https://www.facebook.com/sampotkuo" target="_blank" rel="noopener">「我是山姆鍋」有臉書專頁</a>
+            </div>
+
+            <p>「<a href="http://www.eavatar.com" target="_blank" rel="noopener">影化身科技</a>」主站的網頁資料放置在 Amazon S3 東京機房，同樣利用 Octopress 產生靜態網頁。雖然從台灣測試，ping 值大約在 80 毫秒左右，算是相當不錯；但為了台灣以外的其他用戶，還是需要使用 CDN 來將網站內容部署到不同節點。</p>
 <a id="more"></a>
 <p>相關步驟說明如下：</p>
 <h3 id="取得網站的-Bucket-的網站-Endpoint">取得網站的 Bucket 的網站 Endpoint</h3>
@@ -385,17 +389,20 @@
 <p>有了正確的網站 Endpoint URL<br>
 到 CloudFront console, 選擇 'Create distribution’來開始建立。</p>
 <ol>
-<li>因為是網站內容，選擇’Download’作為遞送方法(delivery method)。<div class="figure " style="width:;"><a class="fancybox" href="/media/2013/05/CloudFront-Management-Console-1.png" title="" data-caption="" data-fancybox="default"><img class="fig-img" src="/media/2013/05/CloudFront-Management-Console-1.png" alt=""></a></div>
+<li>因為是網站內容，選擇’Download’作為遞送方法 (delivery method)。<div class="figure " style="width:;"><a class="fancybox" href="/media/2013/05/CloudFront-Management-Console-1.png" title="" data-caption="" data-fancybox="default"><img class="fig-img" src="/media/2013/05/CloudFront-Management-Console-1.png" alt=""></a></div>
 </li>
 <li>在’Original Domain Name’欄位，輸入網站的實際 Endpoint URL。<div class="figure " style="width:;"><a class="fancybox" href="/media/2013/05/CloudFront-Management-Console-2.png" title="" data-caption="" data-fancybox="default"><img class="fig-img" src="/media/2013/05/CloudFront-Management-Console-2.png" alt=""></a></div>
 </li>
-<li>在 ‘Alternate Domain Names (CNAMEs)欄位輸入’<a href="http://eavartar.com" target="_blank" rel="noopener">eavartar.com</a>’。<div class="figure " style="width:;"><a class="fancybox" href="/media/2013/05/CloudFront-Management-Console-3.png" title="" data-caption="" data-fancybox="default"><img class="fig-img" src="/media/2013/05/CloudFront-Management-Console-3.png" alt=""></a></div>
+<li>在 ‘Alternate Domain Names (CNAMEs) 欄位輸入’<a href="http://eavartar.com" target="_blank" rel="noopener">eavartar.com</a>’。<div class="figure " style="width:;"><a class="fancybox" href="/media/2013/05/CloudFront-Management-Console-3.png" title="" data-caption="" data-fancybox="default"><img class="fig-img" src="/media/2013/05/CloudFront-Management-Console-3.png" alt=""></a></div>
 </li>
 </ol>
 <p>注意，‘Default Root Object’ 不要填，不然存取網頁子目錄時會出錯。</p>
 <h3 id="設定-DNS-CNAME-紀錄，指向-CloudFront-的-distribution-名稱">設定 DNS CNAME 紀錄，指向 CloudFront 的 distribution 名稱</h3>
 <p>正確產生 CloudFront 的 distribution 後，應該就有了它給定的域名（domain name)。最後，需要設定 DNS 服務來讓 <a href="http://eavatar.com" target="_blank" rel="noopener">eavatar.com</a> 指向這個域名。</p>
 
+            <div class="alert info no-icon">
+                山姆鍋是<a href="https://developers.tw/@山姆鍋" target="_blank" rel="noopener">#呆丸開發者</a>成員
+            </div>
             
 
 
@@ -522,6 +529,14 @@
     <span class="copyrights">
         Copyrights &copy; 2020 Sampot (山姆鍋). All Rights Reserved.
     </span>
+    <br/>
+        <a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW"><img
+                alt="創用 CC 授權條款" style="border-width:0"
+                src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+        除另有標示，本著作係採用<a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW">創用 CC
+            姓名標示-非商業性-相同方式分享 4.0 國際 授權條款</a>授權。
 </footer>
 
             </div>
@@ -746,9 +761,9 @@
                         <a
                             class="link-unstyled"
                             href="https://samkuo.me/post/2012/04/use-pacemaker-two-node-ha-cluster/"
-                            aria-label=": 使用Pacemaker 建構雙節點叢集系統"
+                            aria-label=": 使用 Pacemaker 建構雙節點叢集系統"
                         >
-                            <h3 class="media-heading">使用Pacemaker 建構雙節點叢集系統</h3>
+                            <h3 class="media-heading">使用 Pacemaker 建構雙節點叢集系統</h3>
                         </a>
                         <span class="media-meta">
                             <span class="media-date text-small">
@@ -757,7 +772,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>想要達到系統高可用性(high availability)的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。</p></div>
+                        <div class="media-content hide-xs font-merryweather"><p>想要達到系統高可用性 (high availability) 的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。</p></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>
@@ -780,7 +795,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案(圖檔, CSS 等等)可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點(single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。</p></div>
+                        <div class="media-content hide-xs font-merryweather"><p>在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案 (圖檔，CSS 等等) 可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點 (single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。</p></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>

@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="我是山姆鍋">
-    <title>使用Vert.x作為即時網頁應用平台 - 我是山姆鍋</title>
+    <title>使用 Vert.x 作為即時網頁應用平台 - 我是山姆鍋</title>
     <meta name="author" content="Sampot (山姆鍋)">
     
         <meta name="keywords" content="vert.x,real-time,web application,node.js,asynchronous">
@@ -19,10 +19,10 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"不管是網站或者網頁應用(web applications)，提供支援的語言、框架、工具等等可以說已經相當成熟，對初學者來說：最大的問題應該只是常常不知道該如何選擇哪個。但隨著行動網路裝置的普及，網頁應用開發面臨新的挑戰，像是：要求大量連線、即時雙向互動等，這些都讓傳統的應用服務器(application server)出現捉襟見拙的窘況。本文山姆鍋介紹 Vert.x這個即時網頁應用框架，作為雲端應用基礎架構的一部分。\n\n想像一下，您需要寫一個網頁即時通(Web IM)軟體，要如何達到讓大量的用戶可以即時雙向的溝通？為了達到這個要求，大部份的做法都會讓客戶端(JavaScript)跟服務端建立(真實或者模擬的)雙向持續的連線。說到這裡，對服務端有經驗的人應該都會想到 C10K的問題，更進一步會知道可以採用非同步處理方式來解決。提供非同步處理的解決方案，目前最熱門的應該屬於 Node.js，對於非同步處理的支援，它可說是很完善的方案。但從實務的觀點來考量，非同步處理只是整個方案的一部分，還有其他面向需要考量。\nJavaScript 以外的語言\n雖然 JavaScript 可說是網頁應用開發領域最多人熟悉的語言，但後端服務開發人員卻未必熟悉。雖然 Node.js 支援像 CoffeeScript 這種可以轉譯成 JavaScript 的語言，但基本上可說只支援 JavaScript。對於希望使用像 Node.js 這麼優秀的工具但卻希望使用不同腳本語言的人來說，Node.js 的這個限制會增加學習的門檻。\nVert.x 提供 Java, JavaScript, Ruby, Groovy 等語言支持，Scala 以及 Closure 也在計劃中。對於現有 Node.js 使用者，Vert.x 支援 JavaScript 應該很有吸引力，可惜目前 Vert.x 尚沒有 Node.js 的完整 相容界面，很難說未來會不會出現或者需不需要這樣的相容界面。\n大量現存的程式庫\n從實務面來講，現存大量的程式庫都不是採用非同步方式設計，運用這些程式庫顯然是無可避免的問題。由於 Node.js 只支援非同步處理，需要透過像是 Celery這樣的分散式任務佇列(distributed task queue)來呼叫後端處理程序。\n針對這個問題，Vert.x 採用混和(hybrid)的處理模式來解決。除了非同步處理，Vert.x 也提供背景工作的執行，兩者採用不同的執行緒池(thread pool)。非同步處理執行緒不允許進行阻斷式操作(blockgin operation)，但背景工作則沒有這個限制。因此，可以使用背景工作執行像是資料庫存取動作，再將結果傳給非同步處理。\n這兩者設計方式，沒有孰優熟劣的問題，但 Vert.x 的方式不用另外設定，顯然比較單純。\n服務端執行效能\n通常山姆鍋不會建議您基於執行效能來選擇一個應用平台，況且 Node.js 對大部份的應用都已經夠快，沒有理由因為其他方案快個 10%就轉換跑道。\nJava 語言雖然有許多缺點，但是 JVM 卻是很好的虛擬機器，執行速度很快。使用 JVM 作為後端的執行平台，對很多人來說還是有較大的吸引力。\n水平擴充的能力\nVert.x 的模組間只能透過 Event bus 來溝通，如此，確保模組間達到低偶合的要求。Vert.x 的 Event bus 可以橫跨多台主機，也就是，多台主機可以形成一個叢集(cluster)一起提供服務。藉由這樣分散式 Event bus 的設計，訊息可以從主機Ａ送給連到主機 B 的其他客戶端，更好的是，程式可以不用修改便可以有這樣的支援。\nVert.x 的分散式 Event bus 或者叢集功能是採用 Hazelcast這套 IMDb 來實現。對於即時性的要求越來越高的情況下，在整體架構上，應該都要有一個像 Hazelcast 這樣的分散式快取(distributed cache)存在，如此，才能減少資料庫存取進而有效降低反應時間。\n小結\n山姆鍋本人很欣賞 Node.js 這樣創新的解決方案，本文僅就一個 Java 平台的開發者的觀點說明：如果 Node.js 不符合您的需求，還有另一個不錯的替代方案。\n","dateCreated":"2013-10-07T09:27:00+08:00","dateModified":"2020-03-08T10:03:14+08:00","datePublished":"2013-10-07T09:27:00+08:00","description":"不管是網站或者網頁應用(web applications)，提供支援的語言、框架、工具等等可以說已經相當成熟，對初學者來說：最大的問題應該只是常常不知道該如何選擇哪個。但隨著行動網路裝置的普及，網頁應用開發面臨新的挑戰，像是：要求大量連線、即時雙向互動等，這些都讓傳統的應用服務器(application server)出現捉襟見拙的窘況。本文山姆鍋介紹 Vert.x這個即時網頁應用框架，作為雲端應用基礎架構的一部分。","headline":"使用Vert.x作為即時網頁應用平台","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/10/real-time-web-with-vert-dot-x/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2013/10/real-time-web-with-vert-dot-x/","keywords":"Development, Vertx"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"不管是網站或者網頁應用 (web applications)，提供支援的語言、框架、工具等等可以說已經相當成熟，對初學者來說：最大的問題應該只是常常不知道該如何選擇哪個。但隨著行動網路裝置的普及，網頁應用開發面臨新的挑戰，像是：要求大量連線、即時雙向互動等，這些都讓傳統的應用服務器 (application server) 出現捉襟見拙的窘況。本文山姆鍋介紹 Vert.x 這個即時網頁應用框架，作為雲端應用基礎架構的一部分。\n\n想像一下，您需要寫一個網頁即時通 (Web IM) 軟體，要如何達到讓大量的用戶可以即時雙向的溝通？為了達到這個要求，大部份的做法都會讓客戶端 (JavaScript) 跟服務端建立 (真實或者模擬的) 雙向持續的連線。說到這裡，對服務端有經驗的人應該都會想到 C10K 的問題，更進一步會知道可以採用非同步處理方式來解決。提供非同步處理的解決方案，目前最熱門的應該屬於 Node.js，對於非同步處理的支援，它可說是很完善的方案。但從實務的觀點來考量，非同步處理只是整個方案的一部分，還有其他面向需要考量。\nJavaScript 以外的語言\n雖然 JavaScript 可說是網頁應用開發領域最多人熟悉的語言，但後端服務開發人員卻未必熟悉。雖然 Node.js 支援像 CoffeeScript 這種可以轉譯成 JavaScript 的語言，但基本上可說只支援 JavaScript。對於希望使用像 Node.js 這麼優秀的工具但卻希望使用不同腳本語言的人來說，Node.js 的這個限制會增加學習的門檻。\nVert.x 提供 Java, JavaScript, Ruby, Groovy 等語言支持，Scala 以及 Closure 也在計劃中。對於現有 Node.js 使用者，Vert.x 支援 JavaScript 應該很有吸引力，可惜目前 Vert.x 尚沒有 Node.js 的完整 相容界面，很難說未來會不會出現或者需不需要這樣的相容界面。\n大量現存的程式庫\n從實務面來講，現存大量的程式庫都不是採用非同步方式設計，運用這些程式庫顯然是無可避免的問題。由於 Node.js 只支援非同步處理，需要透過像是 Celery 這樣的分散式任務佇列 (distributed task queue) 來呼叫後端處理程序。\n針對這個問題，Vert.x 採用混和 (hybrid) 的處理模式來解決。除了非同步處理，Vert.x 也提供背景工作的執行，兩者採用不同的執行緒池 (thread pool)。非同步處理執行緒不允許進行阻斷式操作 (blockgin operation)，但背景工作則沒有這個限制。因此，可以使用背景工作執行像是資料庫存取動作，再將結果傳給非同步處理。\n這兩者設計方式，沒有孰優熟劣的問題，但 Vert.x 的方式不用另外設定，顯然比較單純。\n服務端執行效能\n通常山姆鍋不會建議您基於執行效能來選擇一個應用平台，況且 Node.js 對大部份的應用都已經夠快，沒有理由因為其他方案快個 10% 就轉換跑道。\nJava 語言雖然有許多缺點，但是 JVM 卻是很好的虛擬機器，執行速度很快。使用 JVM 作為後端的執行平台，對很多人來說還是有較大的吸引力。\n水平擴充的能力\nVert.x 的模組間只能透過 Event bus 來溝通，如此，確保模組間達到低偶合的要求。Vert.x 的 Event bus 可以橫跨多台主機，也就是，多台主機可以形成一個叢集 (cluster) 一起提供服務。藉由這樣分散式 Event bus 的設計，訊息可以從主機Ａ送給連到主機 B 的其他客戶端，更好的是，程式可以不用修改便可以有這樣的支援。\nVert.x 的分散式 Event bus 或者叢集功能是採用 Hazelcast 這套 IMDb 來實現。對於即時性的要求越來越高的情況下，在整體架構上，應該都要有一個像 Hazelcast 這樣的分散式快取 (distributed cache) 存在，如此，才能減少資料庫存取進而有效降低反應時間。\n小結\n山姆鍋本人很欣賞 Node.js 這樣創新的解決方案，本文僅就一個 Java 平台的開發者的觀點說明：如果 Node.js 不符合您的需求，還有另一個不錯的替代方案。\n","dateCreated":"2013-10-07T09:27:00+08:00","dateModified":"2020-03-08T10:03:14+08:00","datePublished":"2013-10-07T09:27:00+08:00","description":"不管是網站或者網頁應用 (web applications)，提供支援的語言、框架、工具等等可以說已經相當成熟，對初學者來說：最大的問題應該只是常常不知道該如何選擇哪個。但隨著行動網路裝置的普及，網頁應用開發面臨新的挑戰，像是：要求大量連線、即時雙向互動等，這些都讓傳統的應用服務器 (application server) 出現捉襟見拙的窘況。本文山姆鍋介紹 Vert.x 這個即時網頁應用框架，作為雲端應用基礎架構的一部分。","headline":"使用 Vert.x 作為即時網頁應用平台","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/10/real-time-web-with-vert-dot-x/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2013/10/real-time-web-with-vert-dot-x/","keywords":"Development, Vertx"}</script>
     <meta name="description" content="介紹Vert.x的基本特點，以及採用它作為網路應用平台的理由。">
 <meta property="og:type" content="blog">
-<meta property="og:title" content="使用Vert.x作為即時網頁應用平台">
+<meta property="og:title" content="使用 Vert.x 作為即時網頁應用平台">
 <meta property="og:url" content="https://samkuo.me/post/2013/10/real-time-web-with-vert-dot-x/">
 <meta property="og:site_name" content="我是山姆鍋">
 <meta property="og:description" content="介紹Vert.x的基本特點，以及採用它作為網路應用平台的理由。">
@@ -345,7 +345,7 @@
         <div class="post-header main-content-wrap text-left">
     
         <h1 class="post-title">
-            使用Vert.x作為即時網頁應用平台
+            使用 Vert.x 作為即時網頁應用平台
         </h1>
     
     
@@ -370,25 +370,32 @@
     
     <div class="post-content markdown">
         <div class="main-content-wrap">
-            <p>不管是網站或者網頁應用(web applications)，提供支援的語言、框架、工具等等可以說已經相當成熟，對初學者來說：最大的問題應該只是常常不知道該如何選擇哪個。但隨著行動網路裝置的普及，網頁應用開發面臨新的挑戰，像是：要求大量連線、即時雙向互動等，這些都讓傳統的應用服務器(application server)出現捉襟見拙的窘況。本文山姆鍋介紹 <a href="http://vertx.io/" target="_blank" rel="noopener">Vert.x</a>這個即時網頁應用框架，作為雲端應用基礎架構的一部分。</p>
+            <div class="alert info no-icon">
+                <a href="https://www.facebook.com/sampotkuo" target="_blank" rel="noopener">「我是山姆鍋」有臉書專頁</a>
+            </div>
+
+            <p>不管是網站或者網頁應用 (web applications)，提供支援的語言、框架、工具等等可以說已經相當成熟，對初學者來說：最大的問題應該只是常常不知道該如何選擇哪個。但隨著行動網路裝置的普及，網頁應用開發面臨新的挑戰，像是：要求大量連線、即時雙向互動等，這些都讓傳統的應用服務器 (application server) 出現捉襟見拙的窘況。本文山姆鍋介紹 <a href="http://vertx.io/" target="_blank" rel="noopener">Vert.x</a> 這個即時網頁應用框架，作為雲端應用基礎架構的一部分。</p>
 <a id="more"></a>
-<p>想像一下，您需要寫一個網頁即時通(Web IM)軟體，要如何達到讓大量的用戶可以即時雙向的溝通？為了達到這個要求，大部份的做法都會讓客戶端(JavaScript)跟服務端建立(真實或者模擬的)雙向持續的連線。說到這裡，對服務端有經驗的人應該都會想到 <a href="http://www.kegel.com/c10k.html" target="_blank" rel="noopener">C10K</a>的問題，更進一步會知道可以採用非同步處理方式來解決。提供非同步處理的解決方案，目前最熱門的應該屬於 <a href="http://nodejs.org/" target="_blank" rel="noopener">Node.js</a>，對於非同步處理的支援，它可說是很完善的方案。但從實務的觀點來考量，非同步處理只是整個方案的一部分，還有其他面向需要考量。</p>
+<p>想像一下，您需要寫一個網頁即時通 (Web IM) 軟體，要如何達到讓大量的用戶可以即時雙向的溝通？為了達到這個要求，大部份的做法都會讓客戶端 (JavaScript) 跟服務端建立 (真實或者模擬的) 雙向持續的連線。說到這裡，對服務端有經驗的人應該都會想到 <a href="http://www.kegel.com/c10k.html" target="_blank" rel="noopener">C10K</a> 的問題，更進一步會知道可以採用非同步處理方式來解決。提供非同步處理的解決方案，目前最熱門的應該屬於 <a href="http://nodejs.org/" target="_blank" rel="noopener">Node.js</a>，對於非同步處理的支援，它可說是很完善的方案。但從實務的觀點來考量，非同步處理只是整個方案的一部分，還有其他面向需要考量。</p>
 <h3 id="JavaScript-以外的語言">JavaScript 以外的語言</h3>
 <p>雖然 JavaScript 可說是網頁應用開發領域最多人熟悉的語言，但後端服務開發人員卻未必熟悉。雖然 Node.js 支援像 CoffeeScript 這種可以轉譯成 JavaScript 的語言，但基本上可說只支援 JavaScript。對於希望使用像 Node.js 這麼優秀的工具但卻希望使用不同腳本語言的人來說，Node.js 的這個限制會增加學習的門檻。</p>
 <p>Vert.x 提供 Java, JavaScript, Ruby, Groovy 等語言支持，Scala 以及 Closure 也在計劃中。對於現有 Node.js 使用者，Vert.x 支援 JavaScript 應該很有吸引力，可惜目前 Vert.x 尚沒有 Node.js 的完整 <a href="http://nodyn.io/" target="_blank" rel="noopener">相容界面</a>，很難說未來會不會出現或者需不需要這樣的相容界面。</p>
 <h3 id="大量現存的程式庫">大量現存的程式庫</h3>
-<p>從實務面來講，現存大量的程式庫都不是採用非同步方式設計，運用這些程式庫顯然是無可避免的問題。由於 Node.js 只支援非同步處理，需要透過像是 <a href="http://www.celeryproject.org/" target="_blank" rel="noopener">Celery</a>這樣的分散式任務佇列(distributed task queue)來呼叫後端處理程序。</p>
-<p>針對這個問題，Vert.x 採用混和(hybrid)的處理模式來解決。除了非同步處理，Vert.x 也提供背景工作的執行，兩者採用不同的執行緒池(thread pool)。非同步處理執行緒不允許進行阻斷式操作(blockgin operation)，但背景工作則沒有這個限制。因此，可以使用背景工作執行像是資料庫存取動作，再將結果傳給非同步處理。</p>
+<p>從實務面來講，現存大量的程式庫都不是採用非同步方式設計，運用這些程式庫顯然是無可避免的問題。由於 Node.js 只支援非同步處理，需要透過像是 <a href="http://www.celeryproject.org/" target="_blank" rel="noopener">Celery</a> 這樣的分散式任務佇列 (distributed task queue) 來呼叫後端處理程序。</p>
+<p>針對這個問題，Vert.x 採用混和 (hybrid) 的處理模式來解決。除了非同步處理，Vert.x 也提供背景工作的執行，兩者採用不同的執行緒池 (thread pool)。非同步處理執行緒不允許進行阻斷式操作 (blockgin operation)，但背景工作則沒有這個限制。因此，可以使用背景工作執行像是資料庫存取動作，再將結果傳給非同步處理。</p>
 <p>這兩者設計方式，沒有孰優熟劣的問題，但 Vert.x 的方式不用另外設定，顯然比較單純。</p>
 <h3 id="服務端執行效能">服務端執行效能</h3>
-<p>通常山姆鍋不會建議您基於執行效能來選擇一個應用平台，況且 Node.js 對大部份的應用都已經夠快，沒有理由因為其他方案快個 10%就轉換跑道。<br>
+<p>通常山姆鍋不會建議您基於執行效能來選擇一個應用平台，況且 Node.js 對大部份的應用都已經夠快，沒有理由因為其他方案快個 10% 就轉換跑道。<br>
 Java 語言雖然有許多缺點，但是 JVM 卻是很好的虛擬機器，執行速度很快。使用 JVM 作為後端的執行平台，對很多人來說還是有較大的吸引力。</p>
 <h3 id="水平擴充的能力">水平擴充的能力</h3>
-<p>Vert.x 的模組間只能透過 Event bus 來溝通，如此，確保模組間達到低偶合的要求。Vert.x 的 Event bus 可以橫跨多台主機，也就是，多台主機可以形成一個叢集(cluster)一起提供服務。藉由這樣分散式 Event bus 的設計，訊息可以從主機Ａ送給連到主機 B 的其他客戶端，更好的是，程式可以不用修改便可以有這樣的支援。</p>
-<p>Vert.x 的分散式 Event bus 或者叢集功能是採用 <a href="http://www.hazelcast.com/" target="_blank" rel="noopener">Hazelcast</a>這套 IMDb 來實現。對於即時性的要求越來越高的情況下，在整體架構上，應該都要有一個像 Hazelcast 這樣的分散式快取(distributed cache)存在，如此，才能減少資料庫存取進而有效降低反應時間。</p>
+<p>Vert.x 的模組間只能透過 Event bus 來溝通，如此，確保模組間達到低偶合的要求。Vert.x 的 Event bus 可以橫跨多台主機，也就是，多台主機可以形成一個叢集 (cluster) 一起提供服務。藉由這樣分散式 Event bus 的設計，訊息可以從主機Ａ送給連到主機 B 的其他客戶端，更好的是，程式可以不用修改便可以有這樣的支援。</p>
+<p>Vert.x 的分散式 Event bus 或者叢集功能是採用 <a href="http://www.hazelcast.com/" target="_blank" rel="noopener">Hazelcast</a> 這套 IMDb 來實現。對於即時性的要求越來越高的情況下，在整體架構上，應該都要有一個像 Hazelcast 這樣的分散式快取 (distributed cache) 存在，如此，才能減少資料庫存取進而有效降低反應時間。</p>
 <h3 id="小結">小結</h3>
 <p>山姆鍋本人很欣賞 Node.js 這樣創新的解決方案，本文僅就一個 Java 平台的開發者的觀點說明：如果 Node.js 不符合您的需求，還有另一個不錯的替代方案。</p>
 
+            <div class="alert info no-icon">
+                山姆鍋是<a href="https://developers.tw/@山姆鍋" target="_blank" rel="noopener">#呆丸開發者</a>成員
+            </div>
             
 
 
@@ -515,6 +522,14 @@ Java 語言雖然有許多缺點，但是 JVM 卻是很好的虛擬機器，執�
     <span class="copyrights">
         Copyrights &copy; 2020 Sampot (山姆鍋). All Rights Reserved.
     </span>
+    <br/>
+        <a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW"><img
+                alt="創用 CC 授權條款" style="border-width:0"
+                src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+        除另有標示，本著作係採用<a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW">創用 CC
+            姓名標示-非商業性-相同方式分享 4.0 國際 授權條款</a>授權。
 </footer>
 
             </div>
@@ -739,9 +754,9 @@ Java 語言雖然有許多缺點，但是 JVM 卻是很好的虛擬機器，執�
                         <a
                             class="link-unstyled"
                             href="https://samkuo.me/post/2012/04/use-pacemaker-two-node-ha-cluster/"
-                            aria-label=": 使用Pacemaker 建構雙節點叢集系統"
+                            aria-label=": 使用 Pacemaker 建構雙節點叢集系統"
                         >
-                            <h3 class="media-heading">使用Pacemaker 建構雙節點叢集系統</h3>
+                            <h3 class="media-heading">使用 Pacemaker 建構雙節點叢集系統</h3>
                         </a>
                         <span class="media-meta">
                             <span class="media-date text-small">
@@ -750,7 +765,7 @@ Java 語言雖然有許多缺點，但是 JVM 卻是很好的虛擬機器，執�
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>想要達到系統高可用性(high availability)的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。</p></div>
+                        <div class="media-content hide-xs font-merryweather"><p>想要達到系統高可用性 (high availability) 的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。</p></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>
@@ -773,7 +788,7 @@ Java 語言雖然有許多缺點，但是 JVM 卻是很好的虛擬機器，執�
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案(圖檔, CSS 等等)可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點(single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。</p></div>
+                        <div class="media-content hide-xs font-merryweather"><p>在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案 (圖檔，CSS 等等) 可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點 (single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。</p></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>

@@ -2,9 +2,23 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://samkuo.me/post/2015/09/why-developers-should-have-a-blog/</loc>
+    
+    <lastmod>2020-05-04T00:29:49.644Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://samkuo.me/post/2020/04/kubernetes-is-for-startup/</loc>
     
     <lastmod>2020-05-04T00:15:12.680Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2013/06/change-octopress-blog-dir/</loc>
+    
+    <lastmod>2020-05-03T22:50:10.529Z</lastmod>
     
   </url>
   
@@ -716,13 +730,6 @@
   </url>
   
   <url>
-    <loc>https://samkuo.me/post/2013/06/change-octopress-blog-dir/</loc>
-    
-    <lastmod>2018-08-23T04:55:41.489Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://samkuo.me/post/2013/05/migrated-to-octopress/</loc>
     
     <lastmod>2018-08-23T04:30:42.202Z</lastmod>
@@ -873,13 +880,6 @@
     <loc>https://samkuo.me/post/2013/06/use-post-url-internal-link-octopress/</loc>
     
     <lastmod>2018-08-19T04:25:24.739Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://samkuo.me/post/2015/09/why-developers-should-have-a-blog/</loc>
-    
-    <lastmod>2018-08-19T03:39:54.874Z</lastmod>
     
   </url>
   

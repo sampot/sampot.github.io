@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="我是山姆鍋">
-    <title>微型企業之雲端「平台即服務(PaaS)」 - 我是山姆鍋</title>
+    <title>微型企業之雲端「平台即服務 (PaaS)」 - 我是山姆鍋</title>
     <meta name="author" content="Sampot (山姆鍋)">
     
         <meta name="keywords" content="PaaS,platfrom as a service,java,war,appfog,gae,heroku,jelastic,dotCloud">
@@ -19,10 +19,10 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"雖著雲端服務越來越成熟，相關的服務供應商也逐漸增加，對於微型企業來說，代表有更多的機會可以降低成本並提高競爭力。「影化身科技」主要專注在 Java 平台的應用服務，對於某些應用，尤其是 Web 應用，可以利用現有的 PaaS 供應商來免除初期投入成本以及服務器維運的負擔。本文收集幾個適合用來部署 Java 應用的 PaaS 供應商，作為未來部署時的參考。本文是「運用雲端服務建構企業基礎建設」系列文章之一。\n\n何謂 PaaS？\nPaaS 是 Platform-as-a-Service 縮寫,中文常稱為「平台即服務」。PaaS 是一種雲端服務，提供應用程式基本的執行環境，但讓開發者可以免於處理可用性(availabiility)、擴充性(scalability)、服務主機與網路等等相關的問題。由於不需要處理系統的基礎設施(infrastructure)，開發人員可以比較專注在應用本身的開發上。對於雲端運算架構，請參考 Wikipedia。\n選擇「平台即服務」供應商的考量\n跟其他選擇一樣，對於判斷採用哪一家的 PaaS，只有適不適合，沒有最好的答案。以下是山姆鍋在選擇 PaaS 會做的考量。\n支援 Java 應用。\n「影化身科技」主要是採用 Java 平台來提供服務，使用的 PaaS 自然要支援 Java 應用，至少要支援 Java web 應用。\n部署的形式。\n有些 PaaS 支援標準的 WAR 應用部署形式，像是 Google App Engine;有些則需要連同執行中介軟體一起包裝，像是 Heroku。熟悉傳統 Java web 應用部署的人，可能會覺得可以直接部署 WAR 檔比較好，但是，通常這也表示您可能面臨更多的執行時期限制。\n部署的難易度\n由於現在的 Java 應用越來越龐大，夯不啷噹裡面包一大堆第三方的程式庫，林林總總也是不小。如果 PaaS 要求每次部署時都要將整個應用全部重新上載，自然是有點不實際。所以，應用如何部署到平台也是一個相當重要的考量因素。與部署相關的是：部署時是否要將原始碼(source codes)上傳到平台進行編譯。某些 PaaS 的部署方式是上傳原始碼，對有些人來說可能無法接受。\n延伸的加值服務\n除了應用的執行環境本身，雲端應用往往也需要其他服務才能實現完整功能。有些應用需要寄送大量電子郵件，有些需要使用雙向即時連線，不是所有 PaaS 供應商都能夠完整的加值服務。因此，PaaS 本身是否存在足夠的第三方加值服務以及整合的難易度便成為重要考量。\n供應商套牢(Vedor Lock-in)的問題\n為了提供雲端等級(cloud-scale)的應用，很多設計自然無法採用傳統的設計方式，這也是為何很多新技術產生的根本原因，其中，要以 NoSQL 跟 BigData 引人注目。為了讓您的應用可以隨著用戶數量無縫地擴充，您希望一開始就使用 NoSQL 技術，但如此會面對一個難題：是否該使用 PaaS 供應商專屬的 NoSQL 資料庫？如果供應商提供的 NoSQL 屬於開源軟體，那問題會比較小;但如果像 Google App Engine 的 DataStore 這樣的專屬 API，您就必須擔心未來轉換供應商的障礙是否太高。\n基礎設施的因素\n雖然 PaaS 讓開發人員可以不用花太多心思在底層的基礎設施上，但 PaaS 供應商所使用的 IaaS 供應會有不同面向的影響。\n如果您的應用需要底層的平台或基礎設施符合一定的安全規範，例如：CSA, HIPPA 等等。如果您的應用需要符合這樣的規範，自然會影響可以選擇的 PaaS 供應商。\n另一個基礎設施會影響選擇 PaaS 供應商的因素是支援的資料中心普及性。例如：您的 web 應用預計使用的人都在亞洲，但 PaaS 使用的基礎設施卻在美國，這種情況下，就要考慮之間的頻寬與延遲是否符合需要。\nJava 以外的支持\n除了 Java，如果 PaaS 能夠支援其他語言自然更好。雖說「影化身科技」主要是以 Java 平台為主，但也不是純 Java 的公司，所以，這點也是要納入考量。\n支援 Java 的 PaaS 供應商\n底下是網路比較知名的 PaaS 供應商，山姆鍋無法對它們進行太深入的瞭解，所以請當作是一個參考列表就好。\nGoogle App Engine\nGoogle 提供的 PaaS，您可以假設您部署的應用會跟 GMail, Google Calendar 等 web 應用採用相同的基礎設施。\n對於擔心被 GAE 套牢的人有福了，最近發現 AppScale可以提供跟 GAE 相容的執行環境，但可以部署在自己的服務主機或其他 IaaS 供應商，如 Amazon。\n\n使用 Google 自己的基礎設施。\n支援 Pyton, Java, Go 以及 PHP。\n執行環境有眾多限制，例如：不能建立新的執行緒。\n\nHeroku\n一開始主要支援 Ruby，但後來延伸到其它眾多的平台，像是 Java, Python 等等。跟 GAE 不同，它使用的是 Amazon 提供的基礎設施且只在美國區域。除了以 PostgreSQL 為基礎的 Database-as-a-Service 外，Heroku 依賴其他供應商來提供應用需要的加值服務。\n\n支援多語言平台。\n使用 Amazon 的基礎設施。\n提供免費使用額度。\n目前為止，整合最多的第三方加值服務。\n\ndotCloud\n\n支援多種語言平台。\n提供免費使用額度。\n\nJelastic\n算是少數一開始就鎖定 Java 平台的 PaaS，不知道是不是因為使用 Java PaaS 的人太少, 後來加入了 PHP 的支持。\n\n可以自行調整節點數量。\n有整合第三方加值服務。\n\nAppFog\n\n同樣支援多種語言平台。\n使用 Amazon/HP 的基礎設施。\n有提供免費的使用額度。\n\n小結\n不少 PaaS 供應商都有提供免費試用，對於微型企業自然是一大利多。但天下沒有白吃的午餐，不要貪圖一開始的免費，而讓自己以後難脫身。最好要有隨時轉換供應商的假設跟準備！\n","dateCreated":"2013-10-10T12:45:00+08:00","dateModified":"2020-03-08T09:53:48+08:00","datePublished":"2013-10-10T12:45:00+08:00","description":"雖著雲端服務越來越成熟，相關的服務供應商也逐漸增加，對於微型企業來說，代表有更多的機會可以降低成本並提高競爭力。「影化身科技」主要專注在 Java 平台的應用服務，對於某些應用，尤其是 Web 應用，可以利用現有的 PaaS 供應商來免除初期投入成本以及服務器維運的負擔。本文收集幾個適合用來部署 Java 應用的 PaaS 供應商，作為未來部署時的參考。本文是「運用雲端服務建構企業基礎建設」系列文章之一。","headline":"微型企業之雲端「平台即服務(PaaS)」","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/10/paas-for-java-applications/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2013/10/paas-for-java-applications/","keywords":"Java, Heroku, PaaS, Jelastic, AppFog, Google App Engine, dotCloud"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"雖著雲端服務越來越成熟，相關的服務供應商也逐漸增加，對於微型企業來說，代表有更多的機會可以降低成本並提高競爭力。「影化身科技」主要專注在 Java 平台的應用服務，對於某些應用，尤其是 Web 應用，可以利用現有的 PaaS 供應商來免除初期投入成本以及服務器維運的負擔。本文收集幾個適合用來部署 Java 應用的 PaaS 供應商，作為未來部署時的參考。本文是「運用雲端服務建構企業基礎建設」系列文章之一。\n\n何謂 PaaS？\nPaaS 是 Platform-as-a-Service 縮寫，中文常稱為「平台即服務」。PaaS 是一種雲端服務，提供應用程式基本的執行環境，但讓開發者可以免於處理可用性 (availabiility)、擴充性 (scalability)、服務主機與網路等等相關的問題。由於不需要處理系統的基礎設施 (infrastructure)，開發人員可以比較專注在應用本身的開發上。對於雲端運算架構，請參考 Wikipedia。\n選擇「平台即服務」供應商的考量\n跟其他選擇一樣，對於判斷採用哪一家的 PaaS，只有適不適合，沒有最好的答案。以下是山姆鍋在選擇 PaaS 會做的考量。\n支援 Java 應用。\n「影化身科技」主要是採用 Java 平台來提供服務，使用的 PaaS 自然要支援 Java 應用，至少要支援 Java web 應用。\n部署的形式。\n有些 PaaS 支援標準的 WAR 應用部署形式，像是 Google App Engine; 有些則需要連同執行中介軟體一起包裝，像是 Heroku。熟悉傳統 Java web 應用部署的人，可能會覺得可以直接部署 WAR 檔比較好，但是，通常這也表示您可能面臨更多的執行時期限制。\n部署的難易度\n由於現在的 Java 應用越來越龐大，夯不啷噹裡面包一大堆第三方的程式庫，林林總總也是不小。如果 PaaS 要求每次部署時都要將整個應用全部重新上載，自然是有點不實際。所以，應用如何部署到平台也是一個相當重要的考量因素。與部署相關的是：部署時是否要將原始碼 (source codes) 上傳到平台進行編譯。某些 PaaS 的部署方式是上傳原始碼，對有些人來說可能無法接受。\n延伸的加值服務\n除了應用的執行環境本身，雲端應用往往也需要其他服務才能實現完整功能。有些應用需要寄送大量電子郵件，有些需要使用雙向即時連線，不是所有 PaaS 供應商都能夠完整的加值服務。因此，PaaS 本身是否存在足夠的第三方加值服務以及整合的難易度便成為重要考量。\n供應商套牢 (Vedor Lock-in) 的問題\n為了提供雲端等級 (cloud-scale) 的應用，很多設計自然無法採用傳統的設計方式，這也是為何很多新技術產生的根本原因，其中，要以 NoSQL 跟 BigData 引人注目。為了讓您的應用可以隨著用戶數量無縫地擴充，您希望一開始就使用 NoSQL 技術，但如此會面對一個難題：是否該使用 PaaS 供應商專屬的 NoSQL 資料庫？如果供應商提供的 NoSQL 屬於開源軟體，那問題會比較小；但如果像 Google App Engine 的 DataStore 這樣的專屬 API，您就必須擔心未來轉換供應商的障礙是否太高。\n基礎設施的因素\n雖然 PaaS 讓開發人員可以不用花太多心思在底層的基礎設施上，但 PaaS 供應商所使用的 IaaS 供應會有不同面向的影響。\n如果您的應用需要底層的平台或基礎設施符合一定的安全規範，例如：CSA, HIPPA 等等。如果您的應用需要符合這樣的規範，自然會影響可以選擇的 PaaS 供應商。\n另一個基礎設施會影響選擇 PaaS 供應商的因素是支援的資料中心普及性。例如：您的 web 應用預計使用的人都在亞洲，但 PaaS 使用的基礎設施卻在美國，這種情況下，就要考慮之間的頻寬與延遲是否符合需要。\nJava 以外的支持\n除了 Java，如果 PaaS 能夠支援其他語言自然更好。雖說「影化身科技」主要是以 Java 平台為主，但也不是純 Java 的公司，所以，這點也是要納入考量。\n支援 Java 的 PaaS 供應商\n底下是網路比較知名的 PaaS 供應商，山姆鍋無法對它們進行太深入的瞭解，所以請當作是一個參考列表就好。\nGoogle App Engine\nGoogle 提供的 PaaS，您可以假設您部署的應用會跟 GMail, Google Calendar 等 web 應用採用相同的基礎設施。\n對於擔心被 GAE 套牢的人有福了，最近發現 AppScale 可以提供跟 GAE 相容的執行環境，但可以部署在自己的服務主機或其他 IaaS 供應商，如 Amazon。\n\n使用 Google 自己的基礎設施。\n支援 Pyton, Java, Go 以及 PHP。\n執行環境有眾多限制，例如：不能建立新的執行緒。\n\nHeroku\n一開始主要支援 Ruby，但後來延伸到其它眾多的平台，像是 Java, Python 等等。跟 GAE 不同，它使用的是 Amazon 提供的基礎設施且只在美國區域。除了以 PostgreSQL 為基礎的 Database-as-a-Service 外，Heroku 依賴其他供應商來提供應用需要的加值服務。\n\n支援多語言平台。\n使用 Amazon 的基礎設施。\n提供免費使用額度。\n目前為止，整合最多的第三方加值服務。\n\ndotCloud\n\n 支援多種語言平台。\n提供免費使用額度。\n\nJelastic\n算是少數一開始就鎖定 Java 平台的 PaaS，不知道是不是因為使用 Java PaaS 的人太少，後來加入了 PHP 的支持。\n\n可以自行調整節點數量。\n有整合第三方加值服務。\n\nAppFog\n\n 同樣支援多種語言平台。\n使用 Amazon/HP 的基礎設施。\n有提供免費的使用額度。\n\n小結\n不少 PaaS 供應商都有提供免費試用，對於微型企業自然是一大利多。但天下沒有白吃的午餐，不要貪圖一開始的免費，而讓自己以後難脫身。最好要有隨時轉換供應商的假設跟準備！\n","dateCreated":"2013-10-10T12:45:00+08:00","dateModified":"2020-03-08T09:53:48+08:00","datePublished":"2013-10-10T12:45:00+08:00","description":"雖著雲端服務越來越成熟，相關的服務供應商也逐漸增加，對於微型企業來說，代表有更多的機會可以降低成本並提高競爭力。「影化身科技」主要專注在 Java 平台的應用服務，對於某些應用，尤其是 Web 應用，可以利用現有的 PaaS 供應商來免除初期投入成本以及服務器維運的負擔。本文收集幾個適合用來部署 Java 應用的 PaaS 供應商，作為未來部署時的參考。本文是「運用雲端服務建構企業基礎建設」系列文章之一。","headline":"微型企業之雲端「平台即服務 (PaaS)」","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/10/paas-for-java-applications/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2013/10/paas-for-java-applications/","keywords":"Java, Heroku, PaaS, Jelastic, AppFog, Google App Engine, dotCloud"}</script>
     <meta name="description" content="山姆鍋收集適合「影化身科技」用來部署 Java 應用的 PaaS 供應商。">
 <meta property="og:type" content="blog">
-<meta property="og:title" content="微型企業之雲端「平台即服務(PaaS)」">
+<meta property="og:title" content="微型企業之雲端「平台即服務 (PaaS)」">
 <meta property="og:url" content="https://samkuo.me/post/2013/10/paas-for-java-applications/">
 <meta property="og:site_name" content="我是山姆鍋">
 <meta property="og:description" content="山姆鍋收集適合「影化身科技」用來部署 Java 應用的 PaaS 供應商。">
@@ -349,7 +349,7 @@
         <div class="post-header main-content-wrap text-left">
     
         <h1 class="post-title">
-            微型企業之雲端「平台即服務(PaaS)」
+            微型企業之雲端「平台即服務 (PaaS)」
         </h1>
     
     
@@ -374,22 +374,26 @@
     
     <div class="post-content markdown">
         <div class="main-content-wrap">
+            <div class="alert info no-icon">
+                <a href="https://www.facebook.com/sampotkuo" target="_blank" rel="noopener">「我是山姆鍋」有臉書專頁</a>
+            </div>
+
             <p>雖著雲端服務越來越成熟，相關的服務供應商也逐漸增加，對於微型企業來說，代表有更多的機會可以降低成本並提高競爭力。「影化身科技」主要專注在 Java 平台的應用服務，對於某些應用，尤其是 Web 應用，可以利用現有的 PaaS 供應商來免除初期投入成本以及服務器維運的負擔。本文收集幾個適合用來部署 Java 應用的 PaaS 供應商，作為未來部署時的參考。本文是「<a href="/post/2013/06/infrastructure-software-shop-with-cloud-services/">運用雲端服務建構企業基礎建設</a>」系列文章之一。</p>
 <a id="more"></a>
 <h3 id="何謂-PaaS？">何謂 PaaS？</h3>
-<p>PaaS 是 Platform-as-a-Service 縮寫,中文常稱為「平台即服務」。PaaS 是一種雲端服務，提供應用程式基本的執行環境，但讓開發者可以免於處理可用性(availabiility)、擴充性(scalability)、服務主機與網路等等相關的問題。由於不需要處理系統的基礎設施(infrastructure)，開發人員可以比較專注在應用本身的開發上。對於雲端運算架構，請參考 <a href="http://zh.wikipedia.org/wiki/%E9%9B%B2%E7%AB%AF%E9%81%8B%E7%AE%97" target="_blank" rel="noopener">Wikipedia</a>。</p>
+<p>PaaS 是 Platform-as-a-Service 縮寫，中文常稱為「平台即服務」。PaaS 是一種雲端服務，提供應用程式基本的執行環境，但讓開發者可以免於處理可用性 (availabiility)、擴充性 (scalability)、服務主機與網路等等相關的問題。由於不需要處理系統的基礎設施 (infrastructure)，開發人員可以比較專注在應用本身的開發上。對於雲端運算架構，請參考 <a href="http://zh.wikipedia.org/wiki/%E9%9B%B2%E7%AB%AF%E9%81%8B%E7%AE%97" target="_blank" rel="noopener">Wikipedia</a>。</p>
 <h3 id="選擇「平台即服務」供應商的考量">選擇「平台即服務」供應商的考量</h3>
 <p>跟其他選擇一樣，對於判斷採用哪一家的 PaaS，只有適不適合，沒有最好的答案。以下是山姆鍋在選擇 PaaS 會做的考量。</p>
 <h4 id="支援-Java-應用。">支援 Java 應用。</h4>
 <p>「影化身科技」主要是採用 Java 平台來提供服務，使用的 PaaS 自然要支援 Java 應用，至少要支援 Java web 應用。</p>
 <h4 id="部署的形式。">部署的形式。</h4>
-<p>有些 PaaS 支援標準的 WAR 應用部署形式，像是 Google App Engine;有些則需要連同執行中介軟體一起包裝，像是 Heroku。熟悉傳統 Java web 應用部署的人，可能會覺得可以直接部署 WAR 檔比較好，但是，通常這也表示您可能面臨更多的執行時期限制。</p>
+<p>有些 PaaS 支援標準的 WAR 應用部署形式，像是 Google App Engine; 有些則需要連同執行中介軟體一起包裝，像是 Heroku。熟悉傳統 Java web 應用部署的人，可能會覺得可以直接部署 WAR 檔比較好，但是，通常這也表示您可能面臨更多的執行時期限制。</p>
 <h4 id="部署的難易度">部署的難易度</h4>
-<p>由於現在的 Java 應用越來越龐大，夯不啷噹裡面包一大堆第三方的程式庫，林林總總也是不小。如果 PaaS 要求每次部署時都要將整個應用全部重新上載，自然是有點不實際。所以，應用如何部署到平台也是一個相當重要的考量因素。與部署相關的是：部署時是否要將原始碼(source codes)上傳到平台進行編譯。某些 PaaS 的部署方式是上傳原始碼，對有些人來說可能無法接受。</p>
+<p>由於現在的 Java 應用越來越龐大，夯不啷噹裡面包一大堆第三方的程式庫，林林總總也是不小。如果 PaaS 要求每次部署時都要將整個應用全部重新上載，自然是有點不實際。所以，應用如何部署到平台也是一個相當重要的考量因素。與部署相關的是：部署時是否要將原始碼 (source codes) 上傳到平台進行編譯。某些 PaaS 的部署方式是上傳原始碼，對有些人來說可能無法接受。</p>
 <h4 id="延伸的加值服務">延伸的加值服務</h4>
 <p>除了應用的執行環境本身，雲端應用往往也需要其他服務才能實現完整功能。有些應用需要寄送大量電子郵件，有些需要使用雙向即時連線，不是所有 PaaS 供應商都能夠完整的加值服務。因此，PaaS 本身是否存在足夠的第三方加值服務以及整合的難易度便成為重要考量。</p>
-<h4 id="供應商套牢-Vedor-Lock-in-的問題">供應商套牢(Vedor Lock-in)的問題</h4>
-<p>為了提供雲端等級(cloud-scale)的應用，很多設計自然無法採用傳統的設計方式，這也是為何很多新技術產生的根本原因，其中，要以 NoSQL 跟 BigData 引人注目。為了讓您的應用可以隨著用戶數量無縫地擴充，您希望一開始就使用 NoSQL 技術，但如此會面對一個難題：是否該使用 PaaS 供應商專屬的 NoSQL 資料庫？如果供應商提供的 NoSQL 屬於開源軟體，那問題會比較小;但如果像 Google App Engine 的 DataStore 這樣的專屬 API，您就必須擔心未來轉換供應商的障礙是否太高。</p>
+<h4 id="供應商套牢-Vedor-Lock-in-的問題">供應商套牢 (Vedor Lock-in) 的問題</h4>
+<p>為了提供雲端等級 (cloud-scale) 的應用，很多設計自然無法採用傳統的設計方式，這也是為何很多新技術產生的根本原因，其中，要以 NoSQL 跟 BigData 引人注目。為了讓您的應用可以隨著用戶數量無縫地擴充，您希望一開始就使用 NoSQL 技術，但如此會面對一個難題：是否該使用 PaaS 供應商專屬的 NoSQL 資料庫？如果供應商提供的 NoSQL 屬於開源軟體，那問題會比較小；但如果像 Google App Engine 的 DataStore 這樣的專屬 API，您就必須擔心未來轉換供應商的障礙是否太高。</p>
 <h4 id="基礎設施的因素">基礎設施的因素</h4>
 <p>雖然 PaaS 讓開發人員可以不用花太多心思在底層的基礎設施上，但 PaaS 供應商所使用的 IaaS 供應會有不同面向的影響。<br>
 如果您的應用需要底層的平台或基礎設施符合一定的安全規範，例如：CSA, HIPPA 等等。如果您的應用需要符合這樣的規範，自然會影響可以選擇的 PaaS 供應商。<br>
@@ -400,7 +404,7 @@
 <p>底下是網路比較知名的 PaaS 供應商，山姆鍋無法對它們進行太深入的瞭解，所以請當作是一個參考列表就好。</p>
 <h4 id="Google-App-Engine"><a href="https://developers.google.com/appengine/?hl=zh-tw" target="_blank" rel="noopener">Google App Engine</a></h4>
 <p>Google 提供的 PaaS，您可以假設您部署的應用會跟 GMail, Google Calendar 等 web 應用採用相同的基礎設施。</p>
-<p>對於擔心被 GAE 套牢的人有福了，最近發現 <a href="http://www.appscale.com/" target="_blank" rel="noopener">AppScale</a>可以提供跟 GAE 相容的執行環境，但可以部署在自己的服務主機或其他 IaaS 供應商，如 Amazon。</p>
+<p>對於擔心被 GAE 套牢的人有福了，最近發現 <a href="http://www.appscale.com/" target="_blank" rel="noopener">AppScale</a> 可以提供跟 GAE 相容的執行環境，但可以部署在自己的服務主機或其他 IaaS 供應商，如 Amazon。</p>
 <ul>
 <li>使用 Google 自己的基礎設施。</li>
 <li>支援 Pyton, Java, Go 以及 PHP。</li>
@@ -416,24 +420,27 @@
 </ul>
 <h4 id="dotCloud"><a href="https://www.dotcloud.com/" target="_blank" rel="noopener">dotCloud</a></h4>
 <ul>
-<li>支援多種語言平台。</li>
+<li> 支援多種語言平台。</li>
 <li>提供免費使用額度。</li>
 </ul>
 <h4 id="Jelastic"><a href="http://jelastic.com/" target="_blank" rel="noopener">Jelastic</a></h4>
-<p>算是少數一開始就鎖定 Java 平台的 PaaS，不知道是不是因為使用 Java PaaS 的人太少, 後來加入了 PHP 的支持。</p>
+<p>算是少數一開始就鎖定 Java 平台的 PaaS，不知道是不是因為使用 Java PaaS 的人太少，後來加入了 PHP 的支持。</p>
 <ul>
 <li>可以自行調整節點數量。</li>
 <li>有整合第三方加值服務。</li>
 </ul>
 <h4 id="AppFog"><a href="https://www.appfog.com/" target="_blank" rel="noopener">AppFog</a></h4>
 <ul>
-<li>同樣支援多種語言平台。</li>
+<li> 同樣支援多種語言平台。</li>
 <li>使用 Amazon/HP 的基礎設施。</li>
 <li>有提供免費的使用額度。</li>
 </ul>
 <h3 id="小結">小結</h3>
 <p>不少 PaaS 供應商都有提供免費試用，對於微型企業自然是一大利多。但天下沒有白吃的午餐，不要貪圖一開始的免費，而讓自己以後難脫身。最好要有隨時轉換供應商的假設跟準備！</p>
 
+            <div class="alert info no-icon">
+                山姆鍋是<a href="https://developers.tw/@山姆鍋" target="_blank" rel="noopener">#呆丸開發者</a>成員
+            </div>
             
 
 
@@ -458,8 +465,8 @@
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
                     href="/post/2013/10/maven-repository-amazon-s3/"
-                    data-tooltip="使用 Amazon S3 作為Maven 套件倉儲"
-                    aria-label="上一篇: 使用 Amazon S3 作為Maven 套件倉儲"
+                    data-tooltip="使用 Amazon S3 作為 Maven 套件倉儲"
+                    aria-label="上一篇: 使用 Amazon S3 作為 Maven 套件倉儲"
                 >
                     
                         <i class="fa fa-angle-left" aria-hidden="true"></i>
@@ -472,8 +479,8 @@
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
                     href="/post/2013/10/run-java-process-as-daemon-or-service-on-linux-windows/"
-                    data-tooltip="在Linux/Windows系統上，以服務方式執行Java程式"
-                    aria-label="下一篇: 在Linux/Windows系統上，以服務方式執行Java程式"
+                    data-tooltip="在 Linux/Windows 系統上，以服務方式執行 Java 程式"
+                    aria-label="下一篇: 在 Linux/Windows 系統上，以服務方式執行 Java 程式"
                 >
                     
                         <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
@@ -560,6 +567,14 @@
     <span class="copyrights">
         Copyrights &copy; 2020 Sampot (山姆鍋). All Rights Reserved.
     </span>
+    <br/>
+        <a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW"><img
+                alt="創用 CC 授權條款" style="border-width:0"
+                src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+        除另有標示，本著作係採用<a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW">創用 CC
+            姓名標示-非商業性-相同方式分享 4.0 國際 授權條款</a>授權。
 </footer>
 
             </div>
@@ -574,8 +589,8 @@
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
                     href="/post/2013/10/maven-repository-amazon-s3/"
-                    data-tooltip="使用 Amazon S3 作為Maven 套件倉儲"
-                    aria-label="上一篇: 使用 Amazon S3 作為Maven 套件倉儲"
+                    data-tooltip="使用 Amazon S3 作為 Maven 套件倉儲"
+                    aria-label="上一篇: 使用 Amazon S3 作為 Maven 套件倉儲"
                 >
                     
                         <i class="fa fa-angle-left" aria-hidden="true"></i>
@@ -588,8 +603,8 @@
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
                     href="/post/2013/10/run-java-process-as-daemon-or-service-on-linux-windows/"
-                    data-tooltip="在Linux/Windows系統上，以服務方式執行Java程式"
-                    aria-label="下一篇: 在Linux/Windows系統上，以服務方式執行Java程式"
+                    data-tooltip="在 Linux/Windows 系統上，以服務方式執行 Java 程式"
+                    aria-label="下一篇: 在 Linux/Windows 系統上，以服務方式執行 Java 程式"
                 >
                     
                         <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
@@ -784,9 +799,9 @@
                         <a
                             class="link-unstyled"
                             href="https://samkuo.me/post/2012/04/use-pacemaker-two-node-ha-cluster/"
-                            aria-label=": 使用Pacemaker 建構雙節點叢集系統"
+                            aria-label=": 使用 Pacemaker 建構雙節點叢集系統"
                         >
-                            <h3 class="media-heading">使用Pacemaker 建構雙節點叢集系統</h3>
+                            <h3 class="media-heading">使用 Pacemaker 建構雙節點叢集系統</h3>
                         </a>
                         <span class="media-meta">
                             <span class="media-date text-small">
@@ -795,7 +810,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>想要達到系統高可用性(high availability)的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。</p></div>
+                        <div class="media-content hide-xs font-merryweather"><p>想要達到系統高可用性 (high availability) 的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。</p></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>
@@ -818,7 +833,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案(圖檔, CSS 等等)可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點(single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。</p></div>
+                        <div class="media-content hide-xs font-merryweather"><p>在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案 (圖檔，CSS 等等) 可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點 (single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。</p></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>

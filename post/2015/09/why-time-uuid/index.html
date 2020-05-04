@@ -17,13 +17,13 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"什麼是 UUID? 相信多數參與軟體開發的人應該都知道。知道什麼是 UUID， 暸解\nTimeUUID 也是輕而易舉的事情。雖然 TimeUUID 感覺無足輕重，\n但在特定的使用案例(use case)，又是這麼方便，山姆鍋覺得值得為它介紹一番。\n\n何謂 UUID?\nUUID，是 Universally Unique Identifier 的縮寫，中文可以翻譯為「通用唯一識別碼」。 軟體常常需要使用識別碼(identifier)來辨識不同實體或物件，這樣的識別碼也常常使用在資料庫中作為主 (Primary key)。 UUID 跟其它識別碼相比，主要特點在於：\n\n不同的系統可以各自產生 UUID, 不需要中央資料庫或服務協助。\n由各自系統產生的 UUID 衝突(產生相同 UUID)的機率很低，低到可以忽略。\n\n所以，對於需要使用識別碼，卻又不能或者不想使用中央資料庫的系統，UUID 便成為很有吸引力的選擇。 當然如果應用(applications)一定不能出現重複的代碼，且發生重複時無法處理，UUID 自然不適合。 另外，因為 UUID 需要較多的位元組(16 bytes)才能表示，對於不能接受使用這麼大容量的應用也不適合。\n除非是儲存容量或者頻寬真的非常小，不然 UUID 的長度已經不是使用上主要的考量。\n何謂 TimeUUID?\n簡單地說：TimeUUID 是一種 UUID，跟 UUID 相比多了下列特性：\n\n同一系統產生的 TimeUUID，後產生的 TimeUUID\n在位元組排序上一定比較大。\n\n以另一個方式解釋，因為 UUID 跟 TimeUUID 在記憶體內部通常以 16 個 bytes 或者轉成 16 進位表示的字串， 使用按照字母順序(Alphabetically)由小到大排序，後產生的 TimeUUID 一定排在後面。\n這個特點對於軟體開發有什麼用處？\nTimeUUID 的用途\n隨著物聯網(Internet of Things)的流行[1] ，越來越多的資料都需要以發生時間順序來排序。 由於這些事件發生的頻率可能高過系統時鐘的解析度(resolution)[2]， 直接以系統時間當作識別碼並不可行。 這種情況下， TimeUUID 便成為一個簡單的方案。\n另外以訊息傳輸(messaging)為例，同一組訊息(messages)，不管訊息的來源，不管接收的順序， 假設沒有遺失的條件下，所有接收者最終都可以得到相同的排序。 TimeUUID 單純的時間特性，使得它非常適合這種去中央化(decentralized)的方式決定訊息的順序。\nTimeUUID 實作\n許多不同的程式語言都有 TimeUUID 的實作。 Python 有個 time-uuid 套件可以使用， 以下是該專案提供的範例：\n12345678910&gt;&gt;&gt; import random, time_uuid&gt;&gt;&gt; rand_time = lambda: float(random.randrange(0,30))+time_uuid.utctime()&gt;&gt;&gt; uuids = [time_uuid.TimeUUID.with_timestamp(rand_time()) for i in xrange(3)][TimeUUID('2e4ac100-31f1-11e2-9286-14109fcdd33b'),TimeUUID('2db393a2-31f1-11e2-abda-14109fcdd33b'),TimeUUID('2987779e-31f1-11e2-a699-14109fcdd33b')]&gt;&gt;&gt; list(sorted(uuids))[TimeUUID('2987779e-31f1-11e2-a699-14109fcdd33b'),TimeUUID('2db393a2-31f1-11e2-abda-14109fcdd33b'),TimeUUID('2e4ac100-31f1-11e2-9286-14109fcdd33b')]\n結語\n山姆鍋最常使用 TimeUUID 來作為訊息的鍵值(key)，使用 TimeUUID 來查詢最新或者一定時間範圍內的訊息。 只要是需要依照時間排序又需要避免重複(conflict)的情況，TimeUUID 就是一個很好用的時間標記。\n\n\n\n\n山姆鍋也來湊熱鬧，硬是用物聯網當例子。 ↩︎\n\n指系統時鐘變動的最小值，例如：時鐘每秒 100 次變動，則間隔最少為 10ms。 ↩︎\n\n\n\n","dateCreated":"2015-09-27T13:10:00+08:00","dateModified":"2018-08-25T14:35:16+08:00","datePublished":"2015-09-27T13:10:00+08:00","description":"什麼是 UUID? 相信多數參與軟體開發的人應該都知道。知道什麼是 UUID， 暸解\nTimeUUID 也是輕而易舉的事情。雖然 TimeUUID 感覺無足輕重，\n但在特定的使用案例(use case)，又是這麼方便，山姆鍋覺得值得為它介紹一番。","headline":"什麼時候適合用 TimeUUID?","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2015/09/why-time-uuid/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2015/09/why-time-uuid/","keywords":"Python, Time, UUID"}</script>
-    <meta name="description" content="什麼是 UUID? 相信多數參與軟體開發的人應該都知道。知道什麼是 UUID， 暸解 TimeUUID 也是輕而易舉的事情。雖然 TimeUUID 感覺無足輕重， 但在特定的使用案例(use case)，又是這麼方便，山姆鍋覺得值得為它介紹一番。">
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"什麼是 UUID? 相信多數參與軟體開發的人應該都知道。知道什麼是 UUID， 暸解\nTimeUUID 也是輕而易舉的事情。雖然 TimeUUID 感覺無足輕重，\n但在特定的使用案例 (use case)，又是這麼方便，山姆鍋覺得值得為它介紹一番。\n\n何謂 UUID?\nUUID，是 Universally Unique Identifier 的縮寫，中文可以翻譯為「通用唯一識別碼」。 軟體常常需要使用識別碼 (identifier) 來辨識不同實體或物件，這樣的識別碼也常常使用在資料庫中作為主 (Primary key)。 UUID 跟其它識別碼相比，主要特點在於：\n\n不同的系統可以各自產生 UUID, 不需要中央資料庫或服務協助。\n由各自系統產生的 UUID 衝突 (產生相同 UUID) 的機率很低，低到可以忽略。\n\n所以，對於需要使用識別碼，卻又不能或者不想使用中央資料庫的系統，UUID 便成為很有吸引力的選擇。 當然如果應用 (applications) 一定不能出現重複的代碼，且發生重複時無法處理，UUID 自然不適合。 另外，因為 UUID 需要較多的位元組 (16 bytes) 才能表示，對於不能接受使用這麼大容量的應用也不適合。\n除非是儲存容量或者頻寬真的非常小，不然 UUID 的長度已經不是使用上主要的考量。\n何謂 TimeUUID?\n簡單地說：TimeUUID 是一種 UUID，跟 UUID 相比多了下列特性：\n\n同一系統產生的 TimeUUID，後產生的 TimeUUID\n在位元組排序上一定比較大。\n\n以另一個方式解釋，因為 UUID 跟 TimeUUID 在記憶體內部通常以 16 個 bytes 或者轉成 16 進位表示的字串， 使用按照字母順序 (Alphabetically) 由小到大排序，後產生的 TimeUUID 一定排在後面。\n這個特點對於軟體開發有什麼用處？\nTimeUUID 的用途\n隨著物聯網 (Internet of Things) 的流行 [1] ，越來越多的資料都需要以發生時間順序來排序。 由於這些事件發生的頻率可能高過系統時鐘的解析度 (resolution)[2]， 直接以系統時間當作識別碼並不可行。 這種情況下， TimeUUID 便成為一個簡單的方案。\n另外以訊息傳輸 (messaging) 為例，同一組訊息 (messages)，不管訊息的來源，不管接收的順序， 假設沒有遺失的條件下，所有接收者最終都可以得到相同的排序。 TimeUUID 單純的時間特性，使得它非常適合這種去中央化 (decentralized) 的方式決定訊息的順序。\nTimeUUID 實作\n許多不同的程式語言都有 TimeUUID 的實作。 Python 有個 time-uuid 套件可以使用， 以下是該專案提供的範例：\n12345678910&gt;&gt;&gt; import random, time_uuid&gt;&gt;&gt; rand_time = lambda: float(random.randrange(0,30))+time_uuid.utctime()&gt;&gt;&gt; uuids = [time_uuid.TimeUUID.with_timestamp(rand_time()) for i in xrange(3)][TimeUUID('2e4ac100-31f1-11e2-9286-14109fcdd33b'),TimeUUID('2db393a2-31f1-11e2-abda-14109fcdd33b'),TimeUUID('2987779e-31f1-11e2-a699-14109fcdd33b')]&gt;&gt;&gt; list(sorted(uuids))[TimeUUID('2987779e-31f1-11e2-a699-14109fcdd33b'),TimeUUID('2db393a2-31f1-11e2-abda-14109fcdd33b'),TimeUUID('2e4ac100-31f1-11e2-9286-14109fcdd33b')]\n結語\n山姆鍋最常使用 TimeUUID 來作為訊息的鍵值 (key)，使用 TimeUUID 來查詢最新或者一定時間範圍內的訊息。 只要是需要依照時間排序又需要避免重複 (conflict) 的情況，TimeUUID 就是一個很好用的時間標記。\n\n\n\n\n山姆鍋也來湊熱鬧，硬是用物聯網當例子。 ↩︎\n\n指系統時鐘變動的最小值，例如：時鐘每秒 100 次變動，則間隔最少為 10ms。 ↩︎\n\n\n\n","dateCreated":"2015-09-27T13:10:00+08:00","dateModified":"2018-08-25T14:35:16+08:00","datePublished":"2015-09-27T13:10:00+08:00","description":"什麼是 UUID? 相信多數參與軟體開發的人應該都知道。知道什麼是 UUID， 暸解\nTimeUUID 也是輕而易舉的事情。雖然 TimeUUID 感覺無足輕重，\n但在特定的使用案例 (use case)，又是這麼方便，山姆鍋覺得值得為它介紹一番。","headline":"什麼時候適合用 TimeUUID?","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2015/09/why-time-uuid/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2015/09/why-time-uuid/","keywords":"Python, Time, UUID"}</script>
+    <meta name="description" content="什麼是 UUID? 相信多數參與軟體開發的人應該都知道。知道什麼是 UUID， 暸解 TimeUUID 也是輕而易舉的事情。雖然 TimeUUID 感覺無足輕重， 但在特定的使用案例 (use case)，又是這麼方便，山姆鍋覺得值得為它介紹一番。">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="什麼時候適合用 TimeUUID?">
 <meta property="og:url" content="https://samkuo.me/post/2015/09/why-time-uuid/">
 <meta property="og:site_name" content="我是山姆鍋">
-<meta property="og:description" content="什麼是 UUID? 相信多數參與軟體開發的人應該都知道。知道什麼是 UUID， 暸解 TimeUUID 也是輕而易舉的事情。雖然 TimeUUID 感覺無足輕重， 但在特定的使用案例(use case)，又是這麼方便，山姆鍋覺得值得為它介紹一番。">
+<meta property="og:description" content="什麼是 UUID? 相信多數參與軟體開發的人應該都知道。知道什麼是 UUID， 暸解 TimeUUID 也是輕而易舉的事情。雖然 TimeUUID 感覺無足輕重， 但在特定的使用案例 (use case)，又是這麼方便，山姆鍋覺得值得為它介紹一番。">
 <meta property="og:locale" content="zh_TW">
 <meta property="article:published_time" content="2015-09-27T05:10:00.000Z">
 <meta property="article:modified_time" content="2018-08-25T06:35:16.654Z">
@@ -366,17 +366,21 @@
     
     <div class="post-content markdown">
         <div class="main-content-wrap">
+            <div class="alert info no-icon">
+                <a href="https://www.facebook.com/sampotkuo" target="_blank" rel="noopener">「我是山姆鍋」有臉書專頁</a>
+            </div>
+
             <p>什麼是 UUID? 相信多數參與軟體開發的人應該都知道。知道什麼是 UUID， 暸解<br>
 TimeUUID 也是輕而易舉的事情。雖然 TimeUUID 感覺無足輕重，<br>
-但在特定的使用案例(use case)，又是這麼方便，山姆鍋覺得值得為它介紹一番。</p>
+但在特定的使用案例 (use case)，又是這麼方便，山姆鍋覺得值得為它介紹一番。</p>
 <a id="more"></a>
 <h2 id="何謂-UUID">何謂 UUID?</h2>
-<p>UUID，是 Universally Unique Identifier 的縮寫，中文可以翻譯為「通用唯一識別碼」。 軟體常常需要使用識別碼(identifier)來辨識不同實體或物件，這樣的識別碼也常常使用在資料庫中作為主 (Primary key)。 UUID 跟其它識別碼相比，主要特點在於：</p>
+<p>UUID，是 Universally Unique Identifier 的縮寫，中文可以翻譯為「通用唯一識別碼」。 軟體常常需要使用識別碼 (identifier) 來辨識不同實體或物件，這樣的識別碼也常常使用在資料庫中作為主 (Primary key)。 UUID 跟其它識別碼相比，主要特點在於：</p>
 <ol>
 <li>不同的系統可以各自產生 UUID, 不需要中央資料庫或服務協助。</li>
-<li>由各自系統產生的 UUID 衝突(產生相同 UUID)的機率很低，低到可以忽略。</li>
+<li>由各自系統產生的 UUID 衝突 (產生相同 UUID) 的機率很低，低到可以忽略。</li>
 </ol>
-<p>所以，對於需要使用識別碼，卻又不能或者不想使用中央資料庫的系統，UUID 便成為很有吸引力的選擇。 當然如果應用(applications)一定不能出現重複的代碼，且發生重複時無法處理，UUID 自然不適合。 另外，因為 UUID 需要較多的位元組(16 bytes)才能表示，對於不能接受使用這麼大容量的應用也不適合。<br>
+<p>所以，對於需要使用識別碼，卻又不能或者不想使用中央資料庫的系統，UUID 便成為很有吸引力的選擇。 當然如果應用 (applications) 一定不能出現重複的代碼，且發生重複時無法處理，UUID 自然不適合。 另外，因為 UUID 需要較多的位元組 (16 bytes) 才能表示，對於不能接受使用這麼大容量的應用也不適合。<br>
 除非是儲存容量或者頻寬真的非常小，不然 UUID 的長度已經不是使用上主要的考量。</p>
 <h2 id="何謂-TimeUUID">何謂 TimeUUID?</h2>
 <p>簡單地說：TimeUUID 是一種 UUID，跟 UUID 相比多了下列特性：</p>
@@ -384,16 +388,16 @@ TimeUUID 也是輕而易舉的事情。雖然 TimeUUID 感覺無足輕重，<br>
 <li>同一系統產生的 TimeUUID，後產生的 TimeUUID<br>
 在位元組排序上一定比較大。</li>
 </ul>
-<p>以另一個方式解釋，因為 UUID 跟 TimeUUID 在記憶體內部通常以 16 個 bytes 或者轉成 16 進位表示的字串， 使用按照字母順序(Alphabetically)由小到大排序，後產生的 TimeUUID 一定排在後面。</p>
+<p>以另一個方式解釋，因為 UUID 跟 TimeUUID 在記憶體內部通常以 16 個 bytes 或者轉成 16 進位表示的字串， 使用按照字母順序 (Alphabetically) 由小到大排序，後產生的 TimeUUID 一定排在後面。</p>
 <p>這個特點對於軟體開發有什麼用處？</p>
 <h2 id="TimeUUID-的用途">TimeUUID 的用途</h2>
-<p>隨著物聯網(Internet of Things)的流行<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup> ，越來越多的資料都需要以發生時間順序來排序。 由於這些事件發生的頻率可能高過系統時鐘的解析度(resolution)<sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup>， 直接以系統時間當作識別碼並不可行。 這種情況下， TimeUUID 便成為一個簡單的方案。</p>
-<p>另外以訊息傳輸(messaging)為例，同一組訊息(messages)，不管訊息的來源，不管接收的順序， 假設沒有遺失的條件下，所有接收者最終都可以得到相同的排序。 TimeUUID 單純的時間特性，使得它非常適合這種去中央化(decentralized)的方式決定訊息的順序。</p>
+<p>隨著物聯網 (Internet of Things) 的流行 <sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup> ，越來越多的資料都需要以發生時間順序來排序。 由於這些事件發生的頻率可能高過系統時鐘的解析度 (resolution)<sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup>， 直接以系統時間當作識別碼並不可行。 這種情況下， TimeUUID 便成為一個簡單的方案。</p>
+<p>另外以訊息傳輸 (messaging) 為例，同一組訊息 (messages)，不管訊息的來源，不管接收的順序， 假設沒有遺失的條件下，所有接收者最終都可以得到相同的排序。 TimeUUID 單純的時間特性，使得它非常適合這種去中央化 (decentralized) 的方式決定訊息的順序。</p>
 <h2 id="TimeUUID-實作">TimeUUID 實作</h2>
 <p>許多不同的程式語言都有 TimeUUID 的實作。 Python 有個 <a href="https://pypi.python.org/pypi/time-uuid/" target="_blank" rel="noopener">time-uuid</a> 套件可以使用， 以下是該專案提供的範例：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> random, time_uuid</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>rand_time = <span class="keyword">lambda</span>: float(random.randrange(<span class="number">0</span>,<span class="number">30</span>))+time_uuid.utctime()</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>uuids = [time_uuid.TimeUUID.with_timestamp(rand_time()) <span class="keyword">for</span> i <span class="keyword">in</span> xrange(<span class="number">3</span>)]</span><br><span class="line">[TimeUUID(<span class="string">'2e4ac100-31f1-11e2-9286-14109fcdd33b'</span>),</span><br><span class="line">TimeUUID(<span class="string">'2db393a2-31f1-11e2-abda-14109fcdd33b'</span>),</span><br><span class="line">TimeUUID(<span class="string">'2987779e-31f1-11e2-a699-14109fcdd33b'</span>)]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>list(sorted(uuids))</span><br><span class="line">[TimeUUID(<span class="string">'2987779e-31f1-11e2-a699-14109fcdd33b'</span>),</span><br><span class="line">TimeUUID(<span class="string">'2db393a2-31f1-11e2-abda-14109fcdd33b'</span>),</span><br><span class="line">TimeUUID(<span class="string">'2e4ac100-31f1-11e2-9286-14109fcdd33b'</span>)]</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> random, time_uuid</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>rand_time = <span class="keyword">lambda</span>: float(random.randrange(<span class="number">0</span>,<span class="number">30</span>))+time_uuid.utctime()</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>uuids = [time_uuid.TimeUUID.with_timestamp(rand_time()) <span class="keyword">for</span> i <span class="keyword">in</span> xrange(<span class="number">3</span>)]</span><br><span class="line">[TimeUUID(<span class="string">'2e4ac100-31f1-11e2-9286-14109fcdd33b'</span>),</span><br><span class="line">TimeUUID(<span class="string">'2db393a2-31f1-11e2-abda-14109fcdd33b'</span>),</span><br><span class="line">TimeUUID(<span class="string">'2987779e-31f1-11e2-a699-14109fcdd33b'</span>)]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>list(sorted(uuids))</span><br><span class="line">[TimeUUID(<span class="string">'2987779e-31f1-11e2-a699-14109fcdd33b'</span>),</span><br><span class="line">TimeUUID(<span class="string">'2db393a2-31f1-11e2-abda-14109fcdd33b'</span>),</span><br><span class="line">TimeUUID(<span class="string">'2e4ac100-31f1-11e2-9286-14109fcdd33b'</span>)]</span><br></pre></td></tr></tbody></table></figure>
 <h2 id="結語">結語</h2>
-<p>山姆鍋最常使用 TimeUUID 來作為訊息的鍵值(key)，使用 TimeUUID 來查詢最新或者一定時間範圍內的訊息。 只要是需要依照時間排序又需要避免重複(conflict)的情況，TimeUUID 就是一個很好用的時間標記。</p>
+<p>山姆鍋最常使用 TimeUUID 來作為訊息的鍵值 (key)，使用 TimeUUID 來查詢最新或者一定時間範圍內的訊息。 只要是需要依照時間排序又需要避免重複 (conflict) 的情況，TimeUUID 就是一個很好用的時間標記。</p>
 <hr>
 <hr class="footnotes-sep">
 <section class="footnotes">
@@ -405,6 +409,9 @@ TimeUUID 也是輕而易舉的事情。雖然 TimeUUID 感覺無足輕重，<br>
 </ol>
 </section>
 
+            <div class="alert info no-icon">
+                山姆鍋是<a href="https://developers.tw/@山姆鍋" target="_blank" rel="noopener">#呆丸開發者</a>成員
+            </div>
             
 
 
@@ -531,6 +538,14 @@ TimeUUID 也是輕而易舉的事情。雖然 TimeUUID 感覺無足輕重，<br>
     <span class="copyrights">
         Copyrights &copy; 2020 Sampot (山姆鍋). All Rights Reserved.
     </span>
+    <br/>
+        <a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW"><img
+                alt="創用 CC 授權條款" style="border-width:0"
+                src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+        除另有標示，本著作係採用<a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW">創用 CC
+            姓名標示-非商業性-相同方式分享 4.0 國際 授權條款</a>授權。
 </footer>
 
             </div>
@@ -755,9 +770,9 @@ TimeUUID 也是輕而易舉的事情。雖然 TimeUUID 感覺無足輕重，<br>
                         <a
                             class="link-unstyled"
                             href="https://samkuo.me/post/2012/04/use-pacemaker-two-node-ha-cluster/"
-                            aria-label=": 使用Pacemaker 建構雙節點叢集系統"
+                            aria-label=": 使用 Pacemaker 建構雙節點叢集系統"
                         >
-                            <h3 class="media-heading">使用Pacemaker 建構雙節點叢集系統</h3>
+                            <h3 class="media-heading">使用 Pacemaker 建構雙節點叢集系統</h3>
                         </a>
                         <span class="media-meta">
                             <span class="media-date text-small">
@@ -766,7 +781,7 @@ TimeUUID 也是輕而易舉的事情。雖然 TimeUUID 感覺無足輕重，<br>
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>想要達到系統高可用性(high availability)的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。</p></div>
+                        <div class="media-content hide-xs font-merryweather"><p>想要達到系統高可用性 (high availability) 的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。</p></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>
@@ -789,7 +804,7 @@ TimeUUID 也是輕而易舉的事情。雖然 TimeUUID 感覺無足輕重，<br>
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案(圖檔, CSS 等等)可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點(single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。</p></div>
+                        <div class="media-content hide-xs font-merryweather"><p>在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案 (圖檔，CSS 等等) 可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點 (single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。</p></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>

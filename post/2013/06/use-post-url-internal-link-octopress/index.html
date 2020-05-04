@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="我是山姆鍋">
-    <title>在Octopress中使用post_url來簡化內部文章連接 - 我是山姆鍋</title>
+    <title>在 Octopress 中使用 post_url 來簡化內部文章連接 - 我是山姆鍋</title>
     <meta name="author" content="Sampot (山姆鍋)">
     
         <meta name="keywords" content="octopress, post_url">
@@ -19,10 +19,10 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"部落格文章常常需要連到其他內部文章，Jekyll/Octopress 提供 post_url 標籤來簡化內部文章連結的建立。由於山姆鍋在使用這個標籤時遇到一些問題，本文是為了協助那些同樣遇到問題的人避免再浪費時間。\n\n安裝 post_url 插件\nJekyll 提供的 post_url 聽說跟 Octopress 不太相容。但我實際使用，這個問題應該已經不存在。如果您使用 Jekyll 的 post_url 內建標籤遇到問題，可以嘗試使用下列方法安裝。\n\n從 GitHub上下載這個 post_url.rb 檔案。\n放到您 Octopress 的 plugins 目錄。\n\npost_url 使用的語法如下：\n1[Post Name](&#123;% post_url 2013-05-30-start-up %&#125;)\n其中, '2013-05-30-start-up’要換成被連結文章的檔名，但不要包含副檔名(.md/.markdown, 等等)。\n更換成 kramdown 剖析器(parser)\n按照上述步驟後，在文章中加入 post_url 標籤，您可能會遇到這個錯誤：\n12345678Liquid Exception: can&#39;t convert nil into String in atom.xml&#x2F;Users&#x2F;sam&#x2F;.rbenv&#x2F;versions&#x2F;1.9.3-p194&#x2F;lib&#x2F;ruby&#x2F;1.9.1&#x2F;time.rb:265:in &#96;_parse&#39;&#x2F;Users&#x2F;sam&#x2F;.rbenv&#x2F;versions&#x2F;1.9.3-p194&#x2F;lib&#x2F;ruby&#x2F;1.9.1&#x2F;time.rb:265:in &#96;parse&#39;&#x2F;Users&#x2F;sam&#x2F;workspace&#x2F;blog.eavatar.com&#x2F;plugins&#x2F;post_link.rb:11:in &#96;initialize&#39;&#x2F;Users&#x2F;sam&#x2F;workspace&#x2F;blog.eavatar.com&#x2F;plugins&#x2F;post_link.rb:31:in &#96;new&#39;...\nOctopress 預設使用的 Markdown 剖析器(parser)，也就是 rdiscount，才會遇到這個問題。所以，只好更換成 kramdown 這個剖析器。\n在 _config.yml 檔案中，將 ‘markdown: rdistcount’ 換成 ‘markdown: kramdown’\n12#markdown: rdiscountmarkdown: kramdown\n如果您沒有裝過，使用下列指令安裝 kramdown。\n1$ gem install kramdown\n小結\n本來認為應該很簡單的工作，想不到出了一些意外。幸好，網路上許多先進不吝分享，才能快速解決問題。\n參考來源\nInternal links to posts\n","dateCreated":"2013-06-14T09:49:00+08:00","dateModified":"2018-08-19T12:25:24+08:00","datePublished":"2013-06-14T09:49:00+08:00","description":"部落格文章常常需要連到其他內部文章，Jekyll/Octopress 提供 post_url 標籤來簡化內部文章連結的建立。由於山姆鍋在使用這個標籤時遇到一些問題，本文是為了協助那些同樣遇到問題的人避免再浪費時間。","headline":"在Octopress中使用post_url來簡化內部文章連接","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/06/use-post-url-internal-link-octopress/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2013/06/use-post-url-internal-link-octopress/","keywords":"Octopress, Jekyll"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"部落格文章常常需要連到其他內部文章，Jekyll/Octopress 提供 post_url 標籤來簡化內部文章連結的建立。由於山姆鍋在使用這個標籤時遇到一些問題，本文是為了協助那些同樣遇到問題的人避免再浪費時間。\n\n安裝 post_url 插件\nJekyll 提供的 post_url 聽說跟 Octopress 不太相容。但我實際使用，這個問題應該已經不存在。如果您使用 Jekyll 的 post_url 內建標籤遇到問題，可以嘗試使用下列方法安裝。\n\n從 GitHub 上下載這個 post_url.rb 檔案。\n放到您 Octopress 的 plugins 目錄。\n\npost_url 使用的語法如下：\n1[Post Name]({% post_url 2013-05-30-start-up %})\n其中，'2013-05-30-start-up’要換成被連結文章的檔名，但不要包含副檔名 (.md/.markdown, 等等)。\n更換成 kramdown 剖析器 (parser)\n按照上述步驟後，在文章中加入 post_url 標籤，您可能會遇到這個錯誤：\n12345678Liquid Exception: can't convert nil into String in atom.xml/Users/sam/.rbenv/versions/1.9.3-p194/lib/ruby/1.9.1/time.rb:265:in `_parse'/Users/sam/.rbenv/versions/1.9.3-p194/lib/ruby/1.9.1/time.rb:265:in `parse'/Users/sam/workspace/blog.eavatar.com/plugins/post_link.rb:11:in `initialize'/Users/sam/workspace/blog.eavatar.com/plugins/post_link.rb:31:in `new'...\nOctopress 預設使用的 Markdown 剖析器 (parser)，也就是 rdiscount，才會遇到這個問題。所以，只好更換成 kramdown 這個剖析器。\n在 _config.yml 檔案中，將 ‘markdown: rdistcount’ 換成 ‘markdown: kramdown’\n12#markdown: rdiscountmarkdown: kramdown\n如果您沒有裝過，使用下列指令安裝 kramdown。\n1$ gem install kramdown\n小結\n本來認為應該很簡單的工作，想不到出了一些意外。幸好，網路上許多先進不吝分享，才能快速解決問題。\n參考來源\nInternal links to posts\n","dateCreated":"2013-06-14T09:49:00+08:00","dateModified":"2018-08-19T12:25:24+08:00","datePublished":"2013-06-14T09:49:00+08:00","description":"部落格文章常常需要連到其他內部文章，Jekyll/Octopress 提供 post_url 標籤來簡化內部文章連結的建立。由於山姆鍋在使用這個標籤時遇到一些問題，本文是為了協助那些同樣遇到問題的人避免再浪費時間。","headline":"在 Octopress 中使用 post_url 來簡化內部文章連接","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/06/use-post-url-internal-link-octopress/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2013/06/use-post-url-internal-link-octopress/","keywords":"Octopress, Jekyll"}</script>
     <meta name="description" content="描述如何在Octopress中使用post_url以及遇到的問題。">
 <meta property="og:type" content="blog">
-<meta property="og:title" content="在Octopress中使用post_url來簡化內部文章連接">
+<meta property="og:title" content="在 Octopress 中使用 post_url 來簡化內部文章連接">
 <meta property="og:url" content="https://samkuo.me/post/2013/06/use-post-url-internal-link-octopress/">
 <meta property="og:site_name" content="我是山姆鍋">
 <meta property="og:description" content="描述如何在Octopress中使用post_url以及遇到的問題。">
@@ -342,7 +342,7 @@
         <div class="post-header main-content-wrap text-left">
     
         <h1 class="post-title">
-            在Octopress中使用post_url來簡化內部文章連接
+            在 Octopress 中使用 post_url 來簡化內部文章連接
         </h1>
     
     
@@ -361,30 +361,37 @@
     
     <div class="post-content markdown">
         <div class="main-content-wrap">
+            <div class="alert info no-icon">
+                <a href="https://www.facebook.com/sampotkuo" target="_blank" rel="noopener">「我是山姆鍋」有臉書專頁</a>
+            </div>
+
             <p>部落格文章常常需要連到其他內部文章，Jekyll/Octopress 提供 post_url 標籤來簡化內部文章連結的建立。由於山姆鍋在使用這個標籤時遇到一些問題，本文是為了協助那些同樣遇到問題的人避免再浪費時間。</p>
 <a id="more"></a>
 <h3 id="安裝-post-url-插件">安裝 post_url 插件</h3>
 <p>Jekyll 提供的 post_url 聽說跟 Octopress 不太相容。但我實際使用，這個問題應該已經不存在。如果您使用 Jekyll 的 post_url 內建標籤遇到問題，可以嘗試使用下列方法安裝。</p>
 <ul>
-<li>從 <a href="https://raw.github.com/michael-groble/jekyll/fix_post_url/lib/jekyll/tags/post_url.rb" target="_blank" rel="noopener">GitHub</a>上下載這個 post_url.rb 檔案。</li>
+<li>從 <a href="https://raw.github.com/michael-groble/jekyll/fix_post_url/lib/jekyll/tags/post_url.rb" target="_blank" rel="noopener">GitHub</a> 上下載這個 post_url.rb 檔案。</li>
 <li>放到您 Octopress 的 plugins 目錄。</li>
 </ul>
 <p>post_url 使用的語法如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[Post Name](&#123;% post_url 2013-05-30-start-up %&#125;)</span><br></pre></td></tr></table></figure>
-<p>其中, '2013-05-30-start-up’要換成被連結文章的檔名，但不要包含副檔名(.md/.markdown, 等等)。</p>
-<h3 id="更換成-kramdown-剖析器-parser">更換成 kramdown 剖析器(parser)</h3>
+<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[Post Name]({% post_url 2013-05-30-start-up %})</span><br></pre></td></tr></tbody></table></figure>
+<p>其中，'2013-05-30-start-up’要換成被連結文章的檔名，但不要包含副檔名 (.md/.markdown, 等等)。</p>
+<h3 id="更換成-kramdown-剖析器-parser">更換成 kramdown 剖析器 (parser)</h3>
 <p>按照上述步驟後，在文章中加入 post_url 標籤，您可能會遇到這個錯誤：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Liquid Exception: can&#39;t convert nil into String in atom.xml</span><br><span class="line">&#x2F;Users&#x2F;sam&#x2F;.rbenv&#x2F;versions&#x2F;1.9.3-p194&#x2F;lib&#x2F;ruby&#x2F;1.9.1&#x2F;time.rb:265:in &#96;_parse&#39;</span><br><span class="line">&#x2F;Users&#x2F;sam&#x2F;.rbenv&#x2F;versions&#x2F;1.9.3-p194&#x2F;lib&#x2F;ruby&#x2F;1.9.1&#x2F;time.rb:265:in &#96;parse&#39;</span><br><span class="line">&#x2F;Users&#x2F;sam&#x2F;workspace&#x2F;blog.eavatar.com&#x2F;plugins&#x2F;post_link.rb:11:in &#96;initialize&#39;</span><br><span class="line">&#x2F;Users&#x2F;sam&#x2F;workspace&#x2F;blog.eavatar.com&#x2F;plugins&#x2F;post_link.rb:31:in &#96;new&#39;</span><br><span class="line">.</span><br><span class="line">.</span><br><span class="line">.</span><br></pre></td></tr></table></figure>
-<p>Octopress 預設使用的 Markdown 剖析器(parser)，也就是 rdiscount，才會遇到這個問題。所以，只好更換成 kramdown 這個剖析器。<br>
+<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Liquid Exception: can't convert nil into String in atom.xml</span><br><span class="line">/Users/sam/.rbenv/versions/1.9.3-p194/lib/ruby/1.9.1/time.rb:265:in `_parse'</span><br><span class="line">/Users/sam/.rbenv/versions/1.9.3-p194/lib/ruby/1.9.1/time.rb:265:in `parse'</span><br><span class="line">/Users/sam/workspace/blog.eavatar.com/plugins/post_link.rb:11:in `initialize'</span><br><span class="line">/Users/sam/workspace/blog.eavatar.com/plugins/post_link.rb:31:in `new'</span><br><span class="line">.</span><br><span class="line">.</span><br><span class="line">.</span><br></pre></td></tr></tbody></table></figure>
+<p>Octopress 預設使用的 Markdown 剖析器 (parser)，也就是 rdiscount，才會遇到這個問題。所以，只好更換成 kramdown 這個剖析器。<br>
 在 _config.yml 檔案中，將 ‘markdown: rdistcount’ 換成 ‘markdown: kramdown’</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#markdown: rdiscount</span><br><span class="line">markdown: kramdown</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#markdown: rdiscount</span><br><span class="line">markdown: kramdown</span><br></pre></td></tr></tbody></table></figure>
 <p>如果您沒有裝過，使用下列指令安裝 kramdown。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ gem install kramdown</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ gem install kramdown</span><br></pre></td></tr></tbody></table></figure>
 <h3 id="小結">小結</h3>
 <p>本來認為應該很簡單的工作，想不到出了一些意外。幸好，網路上許多先進不吝分享，才能快速解決問題。</p>
 <h3 id="參考來源">參考來源</h3>
 <p><a href="http://plumlee.org/archive/2013/06/03/internal-links-to-posts/" target="_blank" rel="noopener">Internal links to posts</a></p>
 
+            <div class="alert info no-icon">
+                山姆鍋是<a href="https://developers.tw/@山姆鍋" target="_blank" rel="noopener">#呆丸開發者</a>成員
+            </div>
             
 
 
@@ -511,6 +518,14 @@
     <span class="copyrights">
         Copyrights &copy; 2020 Sampot (山姆鍋). All Rights Reserved.
     </span>
+    <br/>
+        <a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW"><img
+                alt="創用 CC 授權條款" style="border-width:0"
+                src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+        除另有標示，本著作係採用<a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW">創用 CC
+            姓名標示-非商業性-相同方式分享 4.0 國際 授權條款</a>授權。
 </footer>
 
             </div>
@@ -735,9 +750,9 @@
                         <a
                             class="link-unstyled"
                             href="https://samkuo.me/post/2012/04/use-pacemaker-two-node-ha-cluster/"
-                            aria-label=": 使用Pacemaker 建構雙節點叢集系統"
+                            aria-label=": 使用 Pacemaker 建構雙節點叢集系統"
                         >
-                            <h3 class="media-heading">使用Pacemaker 建構雙節點叢集系統</h3>
+                            <h3 class="media-heading">使用 Pacemaker 建構雙節點叢集系統</h3>
                         </a>
                         <span class="media-meta">
                             <span class="media-date text-small">
@@ -746,7 +761,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>想要達到系統高可用性(high availability)的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。</p></div>
+                        <div class="media-content hide-xs font-merryweather"><p>想要達到系統高可用性 (high availability) 的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。</p></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>
@@ -769,7 +784,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案(圖檔, CSS 等等)可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點(single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。</p></div>
+                        <div class="media-content hide-xs font-merryweather"><p>在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案 (圖檔，CSS 等等) 可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點 (single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。</p></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>

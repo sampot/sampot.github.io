@@ -17,13 +17,13 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"雖然這個部落格主要語言是正體中文，但偶爾會需要將英文轉成中文來顯示。例如：將導覽路徑(breadcrumb)轉成中文，但在網址路徑中維持使用英文。 要達到這個目的，使用 Jinja 2 模板的過濾器(filter)應該是個簡單方案。本文山姆鍋說明如何增加一個客製化過濾器， 來將模板中部分的英文字串對應到中文。\n\nJinja 過濾器簡介\nJinja 2 的過濾器可以用來修改主題模板中的變數，過濾器以管道符號( |) 分隔，多個過濾器可以串連在一起，例如： {{ name|striptags|title }} 。實作上，過濾器只是單純的 Python 函式，用來轉換參數。\n客製化過濾器\n山姆鍋定義了 customer_filters.py 作為所有客製化過濾器的模組，其中定義一個過濾器 mytrans , 負責將英文對應到中文字串。\n1234567891011121314_trans = &#123;    'categories': '文章分類',    'software-development': '軟體開發',    'service-operations': '服務運營',    'customer-support': '客戶服務',    'teamwork': '團隊合作',    'others': '其他文章',&#125;def mytrans(s):    \"\"\" Translates the given string to its translation, or return it if no mapping is found.  \"\"\"    global _trans    r = _trans.get(s)    return r if r else s\n設定 Pelican 加入過濾器\nPelican 設定檔中的 JINJA_FILTERS 可以用來新增客製化的過濾器，不過需要引入(import) custom_filters.py 模組先。為了讓 Pelicanconf.py 可以引入該模組，我們同時需要將目前路徑加入系統的引入路徑中(sys.path)。\n下面是片段展示 pelicanconf.py 的部分內容：\n1234567import osimport syssys.path.append(os.curdir)import custom_filtersJINJA_FILTERS = &#123;'mytrans': custom_filters.mytrans, &#125;\n在主題樣板中套用過濾器\n要在主題樣板中套用我們開發的過濾器，只需要按照 Jinja 2[^1] 的語法即可。如下面範例：\n1&lt;li class=\"active\"&gt;&#123;&#123; category|mytrans &#125;&#125;&lt;/li&gt;\n結語\n本來山姆鍋以為需要使用 Jinja 2 的 i18n 擴充功能，不過後來稍微研究一下，因為部落格使用正體中文作為預設語言，使用 i18n 擴充功能並無法用來翻譯英文成中文，反過來倒是可以。最後，山姆鍋選擇撰寫一個過濾器來達到目的。\n參考資料\n\n\nJinja 2: http://jinja2.readthedocs.org/en/latest/intro.html\n\n\nHow to add a custom Jinja filter to Pelican: http://linkpeek.com/blog/how-to-add-a-custom-jinja-filter-to-pelican.html\n\n\n","dateCreated":"2015-09-08T08:40:00+08:00","dateModified":"2018-08-29T19:12:01+08:00","datePublished":"2015-09-08T08:40:00+08:00","description":"雖然這個部落格主要語言是正體中文，但偶爾會需要將英文轉成中文來顯示。例如：將導覽路徑(breadcrumb)轉成中文，但在網址路徑中維持使用英文。 要達到這個目的，使用 Jinja 2 模板的過濾器(filter)應該是個簡單方案。本文山姆鍋說明如何增加一個客製化過濾器， 來將模板中部分的英文字串對應到中文。","headline":"如何給 Pelican 增加 Jinja2 過濾器","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2015/09/add-custom-jinja2-filter-to-pelican/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2015/09/add-custom-jinja2-filter-to-pelican/","keywords":"Pelican, Jinja2, Python"}</script>
-    <meta name="description" content="雖然這個部落格主要語言是正體中文，但偶爾會需要將英文轉成中文來顯示。例如：將導覽路徑(breadcrumb)轉成中文，但在網址路徑中維持使用英文。 要達到這個目的，使用 Jinja 2 模板的過濾器(filter)應該是個簡單方案。本文山姆鍋說明如何增加一個客製化過濾器， 來將模板中部分的英文字串對應到中文。">
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"雖然這個部落格主要語言是正體中文，但偶爾會需要將英文轉成中文來顯示。例如：將導覽路徑 (breadcrumb) 轉成中文，但在網址路徑中維持使用英文。 要達到這個目的，使用 Jinja 2 模板的過濾器 (filter) 應該是個簡單方案。本文山姆鍋說明如何增加一個客製化過濾器， 來將模板中部分的英文字串對應到中文。\n\nJinja 過濾器簡介\nJinja 2 的過濾器可以用來修改主題模板中的變數，過濾器以管道符號 ( |) 分隔，多個過濾器可以串連在一起，例如： {{name|striptags|title}} 。實作上，過濾器只是單純的 Python 函式，用來轉換參數。\n客製化過濾器\n山姆鍋定義了 customer_filters.py 作為所有客製化過濾器的模組，其中定義一個過濾器 mytrans , 負責將英文對應到中文字串。\n1234567891011121314_trans = {    'categories': '文章分類',    'software-development': '軟體開發',    'service-operations': '服務運營',    'customer-support': '客戶服務',    'teamwork': '團隊合作',    'others': '其他文章',}def mytrans(s):    \"\"\" Translates the given string to its translation, or return it if no mapping is found.  \"\"\"    global _trans    r = _trans.get(s)    return r if r else s\n設定 Pelican 加入過濾器\nPelican 設定檔中的 JINJA_FILTERS 可以用來新增客製化的過濾器，不過需要引入 (import) custom_filters.py 模組先。為了讓 Pelicanconf.py 可以引入該模組，我們同時需要將目前路徑加入系統的引入路徑中 (sys.path)。\n下面是片段展示 pelicanconf.py 的部分內容：\n1234567import osimport syssys.path.append(os.curdir)import custom_filtersJINJA_FILTERS = {'mytrans': custom_filters.mytrans, }\n在主題樣板中套用過濾器\n要在主題樣板中套用我們開發的過濾器，只需要按照 Jinja 2 [^1] 的語法即可。如下面範例：\n1&lt;li class=\"active\"&gt;{{ category|mytrans }}&lt;/li&gt;\n結語\n本來山姆鍋以為需要使用 Jinja 2 的 i18n 擴充功能，不過後來稍微研究一下，因為部落格使用正體中文作為預設語言，使用 i18n 擴充功能並無法用來翻譯英文成中文，反過來倒是可以。最後，山姆鍋選擇撰寫一個過濾器來達到目的。\n參考資料\n\n\nJinja 2: http://jinja2.readthedocs.org/en/latest/intro.html\n\n\nHow to add a custom Jinja filter to Pelican: http://linkpeek.com/blog/how-to-add-a-custom-jinja-filter-to-pelican.html\n\n\n","dateCreated":"2015-09-08T08:40:00+08:00","dateModified":"2018-08-29T19:12:01+08:00","datePublished":"2015-09-08T08:40:00+08:00","description":"雖然這個部落格主要語言是正體中文，但偶爾會需要將英文轉成中文來顯示。例如：將導覽路徑 (breadcrumb) 轉成中文，但在網址路徑中維持使用英文。 要達到這個目的，使用 Jinja 2 模板的過濾器 (filter) 應該是個簡單方案。本文山姆鍋說明如何增加一個客製化過濾器， 來將模板中部分的英文字串對應到中文。","headline":"如何給 Pelican 增加 Jinja2 過濾器","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2015/09/add-custom-jinja2-filter-to-pelican/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2015/09/add-custom-jinja2-filter-to-pelican/","keywords":"Pelican, Jinja2, Python"}</script>
+    <meta name="description" content="雖然這個部落格主要語言是正體中文，但偶爾會需要將英文轉成中文來顯示。例如：將導覽路徑 (breadcrumb) 轉成中文，但在網址路徑中維持使用英文。 要達到這個目的，使用 Jinja 2 模板的過濾器 (filter) 應該是個簡單方案。本文山姆鍋說明如何增加一個客製化過濾器， 來將模板中部分的英文字串對應到中文。">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="如何給 Pelican 增加 Jinja2 過濾器">
 <meta property="og:url" content="https://samkuo.me/post/2015/09/add-custom-jinja2-filter-to-pelican/">
 <meta property="og:site_name" content="我是山姆鍋">
-<meta property="og:description" content="雖然這個部落格主要語言是正體中文，但偶爾會需要將英文轉成中文來顯示。例如：將導覽路徑(breadcrumb)轉成中文，但在網址路徑中維持使用英文。 要達到這個目的，使用 Jinja 2 模板的過濾器(filter)應該是個簡單方案。本文山姆鍋說明如何增加一個客製化過濾器， 來將模板中部分的英文字串對應到中文。">
+<meta property="og:description" content="雖然這個部落格主要語言是正體中文，但偶爾會需要將英文轉成中文來顯示。例如：將導覽路徑 (breadcrumb) 轉成中文，但在網址路徑中維持使用英文。 要達到這個目的，使用 Jinja 2 模板的過濾器 (filter) 應該是個簡單方案。本文山姆鍋說明如何增加一個客製化過濾器， 來將模板中部分的英文字串對應到中文。">
 <meta property="og:locale" content="zh_TW">
 <meta property="article:published_time" content="2015-09-08T00:40:00.000Z">
 <meta property="article:modified_time" content="2018-08-29T11:12:01.645Z">
@@ -366,20 +366,24 @@
     
     <div class="post-content markdown">
         <div class="main-content-wrap">
-            <p>雖然這個部落格主要語言是正體中文，但偶爾會需要將英文轉成中文來顯示。例如：將導覽路徑(breadcrumb)轉成中文，但在網址路徑中維持使用英文。 要達到這個目的，使用 <a href="http://jinja.pocoo.org/docs/2.10/" target="_blank" rel="noopener">Jinja 2</a> 模板的過濾器(filter)應該是個簡單方案。本文山姆鍋說明如何增加一個客製化過濾器， 來將模板中部分的英文字串對應到中文。</p>
+            <div class="alert info no-icon">
+                <a href="https://www.facebook.com/sampotkuo" target="_blank" rel="noopener">「我是山姆鍋」有臉書專頁</a>
+            </div>
+
+            <p>雖然這個部落格主要語言是正體中文，但偶爾會需要將英文轉成中文來顯示。例如：將導覽路徑 (breadcrumb) 轉成中文，但在網址路徑中維持使用英文。 要達到這個目的，使用 <a href="http://jinja.pocoo.org/docs/2.10/" target="_blank" rel="noopener">Jinja 2</a> 模板的過濾器 (filter) 應該是個簡單方案。本文山姆鍋說明如何增加一個客製化過濾器， 來將模板中部分的英文字串對應到中文。</p>
 <a id="more"></a>
 <h2 id="Jinja-過濾器簡介">Jinja 過濾器簡介</h2>
-<p><a href="http://jinja.pocoo.org/docs/2.10/" target="_blank" rel="noopener">Jinja 2</a> 的過濾器可以用來修改主題模板中的變數，過濾器以管道符號( <code>|</code>) 分隔，多個過濾器可以串連在一起，例如： {{ name|striptags|title }} 。實作上，過濾器只是單純的 Python 函式，用來轉換參數。</p>
+<p><a href="http://jinja.pocoo.org/docs/2.10/" target="_blank" rel="noopener">Jinja 2</a> 的過濾器可以用來修改主題模板中的變數，過濾器以管道符號 ( <code>|</code>) 分隔，多個過濾器可以串連在一起，例如： {{name|striptags|title}} 。實作上，過濾器只是單純的 Python 函式，用來轉換參數。</p>
 <h2 id="客製化過濾器">客製化過濾器</h2>
 <p>山姆鍋定義了 <code>customer_filters.py</code> 作為所有客製化過濾器的模組，其中定義一個過濾器 <code>mytrans</code> , 負責將英文對應到中文字串。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">_trans = &#123;</span><br><span class="line">    <span class="string">'categories'</span>: <span class="string">'文章分類'</span>,</span><br><span class="line">    <span class="string">'software-development'</span>: <span class="string">'軟體開發'</span>,</span><br><span class="line">    <span class="string">'service-operations'</span>: <span class="string">'服務運營'</span>,</span><br><span class="line">    <span class="string">'customer-support'</span>: <span class="string">'客戶服務'</span>,</span><br><span class="line">    <span class="string">'teamwork'</span>: <span class="string">'團隊合作'</span>,</span><br><span class="line">    <span class="string">'others'</span>: <span class="string">'其他文章'</span>,</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">mytrans</span><span class="params">(s)</span>:</span></span><br><span class="line">    <span class="string">""" Translates the given string to its translation, or return it if no mapping is found.  """</span></span><br><span class="line">    <span class="keyword">global</span> _trans</span><br><span class="line">    r = _trans.get(s)</span><br><span class="line">    <span class="keyword">return</span> r <span class="keyword">if</span> r <span class="keyword">else</span> s</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">_trans = {</span><br><span class="line">    <span class="string">'categories'</span>: <span class="string">'文章分類'</span>,</span><br><span class="line">    <span class="string">'software-development'</span>: <span class="string">'軟體開發'</span>,</span><br><span class="line">    <span class="string">'service-operations'</span>: <span class="string">'服務運營'</span>,</span><br><span class="line">    <span class="string">'customer-support'</span>: <span class="string">'客戶服務'</span>,</span><br><span class="line">    <span class="string">'teamwork'</span>: <span class="string">'團隊合作'</span>,</span><br><span class="line">    <span class="string">'others'</span>: <span class="string">'其他文章'</span>,</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">mytrans</span><span class="params">(s)</span>:</span></span><br><span class="line">    <span class="string">""" Translates the given string to its translation, or return it if no mapping is found.  """</span></span><br><span class="line">    <span class="keyword">global</span> _trans</span><br><span class="line">    r = _trans.get(s)</span><br><span class="line">    <span class="keyword">return</span> r <span class="keyword">if</span> r <span class="keyword">else</span> s</span><br></pre></td></tr></tbody></table></figure>
 <h2 id="設定-Pelican-加入過濾器">設定 Pelican 加入過濾器</h2>
-<p>Pelican 設定檔中的 <code>JINJA_FILTERS</code> 可以用來新增客製化的過濾器，不過需要引入(import) custom_filters.py 模組先。為了讓 <a href="http://Pelicanconf.py" target="_blank" rel="noopener">Pelicanconf.py</a> 可以引入該模組，我們同時需要將目前路徑加入系統的引入路徑中(sys.path)。</p>
+<p>Pelican 設定檔中的 <code>JINJA_FILTERS</code> 可以用來新增客製化的過濾器，不過需要引入 (import) custom_filters.py 模組先。為了讓 <a href="http://Pelicanconf.py" target="_blank" rel="noopener">Pelicanconf.py</a> 可以引入該模組，我們同時需要將目前路徑加入系統的引入路徑中 (sys.path)。</p>
 <p>下面是片段展示 <a href="http://pelicanconf.py" target="_blank" rel="noopener">pelicanconf.py</a> 的部分內容：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line">sys.path.append(os.curdir)</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> custom_filters</span><br><span class="line"></span><br><span class="line">JINJA_FILTERS = &#123;<span class="string">'mytrans'</span>: custom_filters.mytrans, &#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line">sys.path.append(os.curdir)</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> custom_filters</span><br><span class="line"></span><br><span class="line">JINJA_FILTERS = {<span class="string">'mytrans'</span>: custom_filters.mytrans, }</span><br></pre></td></tr></tbody></table></figure>
 <h2 id="在主題樣板中套用過濾器">在主題樣板中套用過濾器</h2>
-<p>要在主題樣板中套用我們開發的過濾器，只需要按照 Jinja 2[^1] 的語法即可。如下面範例：</p>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">li</span> <span class="attr">class</span>=<span class="string">"active"</span>&gt;</span>&#123;&#123; category|mytrans &#125;&#125;<span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>要在主題樣板中套用我們開發的過濾器，只需要按照 Jinja 2 [^1] 的語法即可。如下面範例：</p>
+<figure class="highlight html"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">li</span> <span class="attr">class</span>=<span class="string">"active"</span>&gt;</span>{{ category|mytrans }}<span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure>
 <h2 id="結語">結語</h2>
 <p>本來山姆鍋以為需要使用 Jinja 2 的 i18n 擴充功能，不過後來稍微研究一下，因為部落格使用正體中文作為預設語言，使用 i18n 擴充功能並無法用來翻譯英文成中文，反過來倒是可以。最後，山姆鍋選擇撰寫一個過濾器來達到目的。</p>
 <h2 id="參考資料">參考資料</h2>
@@ -392,6 +396,9 @@
 </li>
 </ol>
 
+            <div class="alert info no-icon">
+                山姆鍋是<a href="https://developers.tw/@山姆鍋" target="_blank" rel="noopener">#呆丸開發者</a>成員
+            </div>
             
 
 
@@ -518,6 +525,14 @@
     <span class="copyrights">
         Copyrights &copy; 2020 Sampot (山姆鍋). All Rights Reserved.
     </span>
+    <br/>
+        <a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW"><img
+                alt="創用 CC 授權條款" style="border-width:0"
+                src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+        除另有標示，本著作係採用<a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW">創用 CC
+            姓名標示-非商業性-相同方式分享 4.0 國際 授權條款</a>授權。
 </footer>
 
             </div>
@@ -742,9 +757,9 @@
                         <a
                             class="link-unstyled"
                             href="https://samkuo.me/post/2012/04/use-pacemaker-two-node-ha-cluster/"
-                            aria-label=": 使用Pacemaker 建構雙節點叢集系統"
+                            aria-label=": 使用 Pacemaker 建構雙節點叢集系統"
                         >
-                            <h3 class="media-heading">使用Pacemaker 建構雙節點叢集系統</h3>
+                            <h3 class="media-heading">使用 Pacemaker 建構雙節點叢集系統</h3>
                         </a>
                         <span class="media-meta">
                             <span class="media-date text-small">
@@ -753,7 +768,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>想要達到系統高可用性(high availability)的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。</p></div>
+                        <div class="media-content hide-xs font-merryweather"><p>想要達到系統高可用性 (high availability) 的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。</p></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>
@@ -776,7 +791,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案(圖檔, CSS 等等)可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點(single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。</p></div>
+                        <div class="media-content hide-xs font-merryweather"><p>在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案 (圖檔，CSS 等等) 可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點 (single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。</p></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>

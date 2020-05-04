@@ -19,7 +19,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"對於軟體開發者來說，選擇建構工具(build tool)是個重要的決定，對於 Java 開發者來說，擁有更多選擇的情況下更是如此。雖然山姆鍋目前最熟悉的建構工具是 Maven，但是還是來看看在 Java 建構工具這個領域，有哪些變化。\n\nAnt\nAnt是比較早先流行的建構工具，山姆鍋只有一些零星使用的經驗。基本上，採用類似 Makefile 的描述與建構邏輯，提供相當大的彈性。作為基本的建構工具，Ant 已經足夠。但對於大型專案來說，需要的不只單單能夠建構就可以，例如：很難想像沒有自動相依套件管理，在大型專案中如何有效進行程式庫的發佈。\nIvy\nIvy 基於 Ant 為基礎，主要特點是加入相依管理(dependency management)，支援 Maven 套件庫。發現這個工具的時候，山姆鍋已經使用 Maven 且是基於 Ant，所以從來沒用過。\nMaven\nMaven 可以說是目前 Java 領域，建構工具事實上的標準(de facto)。跟 Ant 相比，主要特點有:\n\n相依套件管理(dependency management)。\n約定優於配置(Convention-over-configuration)。\n可以插件擴充功能，但需要的功能往往已經有第三方提供。\n提供專案的物件模型，作為了解專案基本資訊的主要來源。\n\n越來越多人不滿於 Maven 的嚴格限制，以及使用 XML 作為建構描述檔的肥大，有不少有名的專案改採用其它建構工具，例如：Hibernate 換到 Gradle。\nGradle\nGradle 使用 Groovy 語言，提供領域特定語言(Domain-Specific Language)的建構工具。採取任務(task)導向的描述方式，但 Gradle 的任務類似 Ant 的目標(target)。任務間可以有相依性，進而可以完成複雜的建構工作。\n\n支援 Maven 套件庫。\n支援相依套件管理(dependency management)。\n使用 Groovy 客制話建構工作。\n可以重用現存 Ant 開發的程式庫。\n\n基本上是一套相當彈性且針對大部份 Maven 的使用者需要的功能都有直接的支援。對於覺得 Maven 的“約定優於配置”綁手綁腳的人來說，這是個不錯的選擇。\nBuildr\nBuildr 這個工具最有趣的地方在於它是基於 Ruby 的 Rake 來發展，但是卻是面向 Java 的開發。跟 Gradle 一樣，可以讓您使用腳本語言(Ruby)來彈性設定建構方案。另一個值得一提的是：如果您已經有安裝 Ruby 環境，那麼安裝 Buildr 就很簡單，只要一個指令就可完成。\n1gem install buildr\n除了使用 Ruby 作為領域特定語言以及較少人使用外，功能上其實跟 Gradle 相近。\n小結\n針對開發工作，山姆鍋還是會先以 Maven 來進行，但是會逐漸實驗 Gradle 跟 Buildr 來取代。\n","dateCreated":"2013-10-03T09:57:00+08:00","dateModified":"2018-08-19T22:03:09+08:00","datePublished":"2013-10-03T09:57:00+08:00","description":"對於軟體開發者來說，選擇建構工具(build tool)是個重要的決定，對於 Java 開發者來說，擁有更多選擇的情況下更是如此。雖然山姆鍋目前最熟悉的建構工具是 Maven，但是還是來看看在 Java 建構工具這個領域，有哪些變化。","headline":"選擇 Java 軟體建構工具","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/10/java-build-tools/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2013/10/java-build-tools/","keywords":"Gradle, Maven, Development, Continuous integration"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"對於軟體開發者來說，選擇建構工具 (build tool) 是個重要的決定，對於 Java 開發者來說，擁有更多選擇的情況下更是如此。雖然山姆鍋目前最熟悉的建構工具是 Maven，但是還是來看看在 Java 建構工具這個領域，有哪些變化。\n\nAnt\nAnt 是比較早先流行的建構工具，山姆鍋只有一些零星使用的經驗。基本上，採用類似 Makefile 的描述與建構邏輯，提供相當大的彈性。作為基本的建構工具，Ant 已經足夠。但對於大型專案來說，需要的不只單單能夠建構就可以，例如：很難想像沒有自動相依套件管理，在大型專案中如何有效進行程式庫的發佈。\nIvy\nIvy 基於 Ant 為基礎，主要特點是加入相依管理 (dependency management)，支援 Maven 套件庫。發現這個工具的時候，山姆鍋已經使用 Maven 且是基於 Ant，所以從來沒用過。\nMaven\nMaven 可以說是目前 Java 領域，建構工具事實上的標準 (de facto)。跟 Ant 相比，主要特點有:\n\n相依套件管理 (dependency management)。\n約定優於配置 (Convention-over-configuration)。\n可以插件擴充功能，但需要的功能往往已經有第三方提供。\n提供專案的物件模型，作為了解專案基本資訊的主要來源。\n\n越來越多人不滿於 Maven 的嚴格限制，以及使用 XML 作為建構描述檔的肥大，有不少有名的專案改採用其它建構工具，例如：Hibernate 換到 Gradle。\nGradle\nGradle 使用 Groovy 語言，提供領域特定語言 (Domain-Specific Language) 的建構工具。採取任務 (task) 導向的描述方式，但 Gradle 的任務類似 Ant 的目標 (target)。任務間可以有相依性，進而可以完成複雜的建構工作。\n\n支援 Maven 套件庫。\n支援相依套件管理 (dependency management)。\n使用 Groovy 客制話建構工作。\n可以重用現存 Ant 開發的程式庫。\n\n基本上是一套相當彈性且針對大部份 Maven 的使用者需要的功能都有直接的支援。對於覺得 Maven 的 “約定優於配置” 綁手綁腳的人來說，這是個不錯的選擇。\nBuildr\nBuildr 這個工具最有趣的地方在於它是基於 Ruby 的 Rake 來發展，但是卻是面向 Java 的開發。跟 Gradle 一樣，可以讓您使用腳本語言 (Ruby) 來彈性設定建構方案。另一個值得一提的是：如果您已經有安裝 Ruby 環境，那麼安裝 Buildr 就很簡單，只要一個指令就可完成。\n1gem install buildr\n除了使用 Ruby 作為領域特定語言以及較少人使用外，功能上其實跟 Gradle 相近。\n小結\n針對開發工作，山姆鍋還是會先以 Maven 來進行，但是會逐漸實驗 Gradle 跟 Buildr 來取代。\n","dateCreated":"2013-10-03T09:57:00+08:00","dateModified":"2018-08-19T22:03:09+08:00","datePublished":"2013-10-03T09:57:00+08:00","description":"對於軟體開發者來說，選擇建構工具 (build tool) 是個重要的決定，對於 Java 開發者來說，擁有更多選擇的情況下更是如此。雖然山姆鍋目前最熟悉的建構工具是 Maven，但是還是來看看在 Java 建構工具這個領域，有哪些變化。","headline":"選擇 Java 軟體建構工具","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/10/java-build-tools/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2013/10/java-build-tools/","keywords":"Gradle, Maven, Development, Continuous integration"}</script>
     <meta name="description" content="幾個常見用在開發 Java 軟體的建構工具(build tools)。">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="選擇 Java 軟體建構工具">
@@ -371,37 +371,44 @@
     
     <div class="post-content markdown">
         <div class="main-content-wrap">
-            <p>對於軟體開發者來說，選擇建構工具(build tool)是個重要的決定，對於 Java 開發者來說，擁有更多選擇的情況下更是如此。雖然山姆鍋目前最熟悉的建構工具是 Maven，但是還是來看看在 Java 建構工具這個領域，有哪些變化。</p>
+            <div class="alert info no-icon">
+                <a href="https://www.facebook.com/sampotkuo" target="_blank" rel="noopener">「我是山姆鍋」有臉書專頁</a>
+            </div>
+
+            <p>對於軟體開發者來說，選擇建構工具 (build tool) 是個重要的決定，對於 Java 開發者來說，擁有更多選擇的情況下更是如此。雖然山姆鍋目前最熟悉的建構工具是 Maven，但是還是來看看在 Java 建構工具這個領域，有哪些變化。</p>
 <a id="more"></a>
 <h3 id="Ant">Ant</h3>
-<p><a href="http://ant.apache.org/" target="_blank" rel="noopener">Ant</a>是比較早先流行的建構工具，山姆鍋只有一些零星使用的經驗。基本上，採用類似 Makefile 的描述與建構邏輯，提供相當大的彈性。作為基本的建構工具，Ant 已經足夠。但對於大型專案來說，需要的不只單單能夠建構就可以，例如：很難想像沒有自動相依套件管理，在大型專案中如何有效進行程式庫的發佈。</p>
+<p><a href="http://ant.apache.org/" target="_blank" rel="noopener">Ant</a> 是比較早先流行的建構工具，山姆鍋只有一些零星使用的經驗。基本上，採用類似 Makefile 的描述與建構邏輯，提供相當大的彈性。作為基本的建構工具，Ant 已經足夠。但對於大型專案來說，需要的不只單單能夠建構就可以，例如：很難想像沒有自動相依套件管理，在大型專案中如何有效進行程式庫的發佈。</p>
 <h3 id="Ivy">Ivy</h3>
-<p><a href="http://ant.apache.org/ivy/" target="_blank" rel="noopener">Ivy</a> 基於 Ant 為基礎，主要特點是加入相依管理(dependency management)，支援 Maven 套件庫。發現這個工具的時候，山姆鍋已經使用 Maven 且是基於 Ant，所以從來沒用過。</p>
+<p><a href="http://ant.apache.org/ivy/" target="_blank" rel="noopener">Ivy</a> 基於 Ant 為基礎，主要特點是加入相依管理 (dependency management)，支援 Maven 套件庫。發現這個工具的時候，山姆鍋已經使用 Maven 且是基於 Ant，所以從來沒用過。</p>
 <h3 id="Maven">Maven</h3>
-<p><a href="http://maven.apache.org/" target="_blank" rel="noopener">Maven</a> 可以說是目前 Java 領域，建構工具事實上的標準(de facto)。跟 Ant 相比，主要特點有:</p>
+<p><a href="http://maven.apache.org/" target="_blank" rel="noopener">Maven</a> 可以說是目前 Java 領域，建構工具事實上的標準 (de facto)。跟 Ant 相比，主要特點有:</p>
 <ol>
-<li>相依套件管理(dependency management)。</li>
-<li>約定優於配置(Convention-over-configuration)。</li>
+<li>相依套件管理 (dependency management)。</li>
+<li>約定優於配置 (Convention-over-configuration)。</li>
 <li>可以插件擴充功能，但需要的功能往往已經有第三方提供。</li>
 <li>提供專案的物件模型，作為了解專案基本資訊的主要來源。</li>
 </ol>
 <p>越來越多人不滿於 Maven 的嚴格限制，以及使用 XML 作為建構描述檔的肥大，有不少有名的專案改採用其它建構工具，例如：Hibernate 換到 Gradle。</p>
 <h3 id="Gradle">Gradle</h3>
-<p><a href="http://www.gradle.org/" target="_blank" rel="noopener">Gradle</a> 使用 Groovy 語言，提供領域特定語言(Domain-Specific Language)的建構工具。採取任務(task)導向的描述方式，但 Gradle 的任務類似 Ant 的目標(target)。任務間可以有相依性，進而可以完成複雜的建構工作。</p>
+<p><a href="http://www.gradle.org/" target="_blank" rel="noopener">Gradle</a> 使用 Groovy 語言，提供領域特定語言 (Domain-Specific Language) 的建構工具。採取任務 (task) 導向的描述方式，但 Gradle 的任務類似 Ant 的目標 (target)。任務間可以有相依性，進而可以完成複雜的建構工作。</p>
 <ol>
 <li>支援 Maven 套件庫。</li>
-<li>支援相依套件管理(dependency management)。</li>
+<li>支援相依套件管理 (dependency management)。</li>
 <li>使用 Groovy 客制話建構工作。</li>
 <li>可以重用現存 Ant 開發的程式庫。</li>
 </ol>
-<p>基本上是一套相當彈性且針對大部份 Maven 的使用者需要的功能都有直接的支援。對於覺得 Maven 的“約定優於配置”綁手綁腳的人來說，這是個不錯的選擇。</p>
+<p>基本上是一套相當彈性且針對大部份 Maven 的使用者需要的功能都有直接的支援。對於覺得 Maven 的 “約定優於配置” 綁手綁腳的人來說，這是個不錯的選擇。</p>
 <h3 id="Buildr">Buildr</h3>
-<p><a href="http://buildr.apache.org/" target="_blank" rel="noopener">Buildr</a> 這個工具最有趣的地方在於它是基於 Ruby 的 Rake 來發展，但是卻是面向 Java 的開發。跟 Gradle 一樣，可以讓您使用腳本語言(Ruby)來彈性設定建構方案。另一個值得一提的是：如果您已經有安裝 Ruby 環境，那麼安裝 Buildr 就很簡單，只要一個指令就可完成。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gem install buildr</span><br></pre></td></tr></table></figure>
+<p><a href="http://buildr.apache.org/" target="_blank" rel="noopener">Buildr</a> 這個工具最有趣的地方在於它是基於 Ruby 的 Rake 來發展，但是卻是面向 Java 的開發。跟 Gradle 一樣，可以讓您使用腳本語言 (Ruby) 來彈性設定建構方案。另一個值得一提的是：如果您已經有安裝 Ruby 環境，那麼安裝 Buildr 就很簡單，只要一個指令就可完成。</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gem install buildr</span><br></pre></td></tr></tbody></table></figure>
 <p>除了使用 Ruby 作為領域特定語言以及較少人使用外，功能上其實跟 Gradle 相近。</p>
 <h3 id="小結">小結</h3>
 <p>針對開發工作，山姆鍋還是會先以 Maven 來進行，但是會逐漸實驗 Gradle 跟 Buildr 來取代。</p>
 
+            <div class="alert info no-icon">
+                山姆鍋是<a href="https://developers.tw/@山姆鍋" target="_blank" rel="noopener">#呆丸開發者</a>成員
+            </div>
             
 
 
@@ -426,8 +433,8 @@
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
                     href="/post/2013/10/real-time-web-with-vert-dot-x/"
-                    data-tooltip="使用Vert.x作為即時網頁應用平台"
-                    aria-label="上一篇: 使用Vert.x作為即時網頁應用平台"
+                    data-tooltip="使用 Vert.x 作為即時網頁應用平台"
+                    aria-label="上一篇: 使用 Vert.x 作為即時網頁應用平台"
                 >
                     
                         <i class="fa fa-angle-left" aria-hidden="true"></i>
@@ -528,6 +535,14 @@
     <span class="copyrights">
         Copyrights &copy; 2020 Sampot (山姆鍋). All Rights Reserved.
     </span>
+    <br/>
+        <a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW"><img
+                alt="創用 CC 授權條款" style="border-width:0"
+                src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+        除另有標示，本著作係採用<a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW">創用 CC
+            姓名標示-非商業性-相同方式分享 4.0 國際 授權條款</a>授權。
 </footer>
 
             </div>
@@ -542,8 +557,8 @@
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
                     href="/post/2013/10/real-time-web-with-vert-dot-x/"
-                    data-tooltip="使用Vert.x作為即時網頁應用平台"
-                    aria-label="上一篇: 使用Vert.x作為即時網頁應用平台"
+                    data-tooltip="使用 Vert.x 作為即時網頁應用平台"
+                    aria-label="上一篇: 使用 Vert.x 作為即時網頁應用平台"
                 >
                     
                         <i class="fa fa-angle-left" aria-hidden="true"></i>
@@ -752,9 +767,9 @@
                         <a
                             class="link-unstyled"
                             href="https://samkuo.me/post/2012/04/use-pacemaker-two-node-ha-cluster/"
-                            aria-label=": 使用Pacemaker 建構雙節點叢集系統"
+                            aria-label=": 使用 Pacemaker 建構雙節點叢集系統"
                         >
-                            <h3 class="media-heading">使用Pacemaker 建構雙節點叢集系統</h3>
+                            <h3 class="media-heading">使用 Pacemaker 建構雙節點叢集系統</h3>
                         </a>
                         <span class="media-meta">
                             <span class="media-date text-small">
@@ -763,7 +778,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>想要達到系統高可用性(high availability)的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。</p></div>
+                        <div class="media-content hide-xs font-merryweather"><p>想要達到系統高可用性 (high availability) 的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。</p></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>
@@ -786,7 +801,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案(圖檔, CSS 等等)可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點(single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。</p></div>
+                        <div class="media-content hide-xs font-merryweather"><p>在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案 (圖檔，CSS 等等) 可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點 (single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。</p></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>

@@ -19,7 +19,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"在使用 Vert.x 作為即時網頁應用平台這篇文章，山姆鍋提到「影化身平台」利用 Vert.x 作為即時 Web 應用的服務框架，看中的是它對網路服務的執行效率。除了方便網路服務開發外，Vert.x 的模組(module)支援，對於寫大型網路服務來說是個很重要。\n\nVert.x 的模組功能\nVert.x 的模組支援功能並不是只是讓您可以邏輯性的模組化方式來設計應用，而是更進一步將模組包裝成可以獨立部署的套件(package)以方便不同環境的部署要求。Vert.x 的模組功能其實跟 Node.js 的 npm 或者 Ruby gem 是很類似的設計，說 Vert.x 是抄襲它們也不為過。\n下列是 Vert.x 模組重要的特性：\n1. 模組有自己的 classloader\n為了避免模組間透過靜態全域(static global)變數來互相溝通，每個模組使用的類別(class)都由各自獨立的 classloader 來載入以確保模組間的獨立性。在並行程式的開發上，共用的變數常常是錯誤發生的根源之一，Vert.x 藉由這樣的限制，避免像是 race condition 的錯誤發生。\n2. 模組可以包含相關的 Jar 檔\nVert.x 的模組設計主要用來封裝較大粒度的單位，通常一個模組也會包含相依的 Jar 檔，或其他資源。在「影化身平台」，我們就將整個 Cassandra 視為一個模組而不是讓各自的 Jar 檔成為一個模組。\n3. 模組間可以有相依性\n除了將需要的資源或者 Jar 檔包含在模組本身外，Vert.x 的模組間可以宣告相依的關係。依賴的模組可以存取被依賴模組提供的資源或者程式，但沒有像 OSGi 那樣精細的存取控制。\n4. 模組可以按需要自動下載安裝\n如果模組被存取時還不存在，Vert.x 可以自動從已知的套件庫下載並安裝該模組套件。這個特性在開發階段比較有用，在實際部署時，通常會需要確定相關模組都已經安裝完成。\n應用到影化身平台\n將應用的所有功能分散成多個高聚合的模組，但在測試、開發與部署時期又可以按照環境組合出需要的功能，這樣的特點，讓模組化應用一直被視為良好的軟體架構。藉由 Vert.x 模組支援，在開發階段，「影化身平台」的所有應用模組可以在同一個 JVM 上面執行來進行整合測試;而到了部署階段，又可以根據部署環境的不同來配置哪些模組在哪一台主機上執行。\n這樣的延展性，讓軟體的開發、測試與部署的方式盡可能接近外，也減輕準備開發環境的負擔。例如：將 Cassandra 也包裝成一個模組，除了 Eclipse IDE 外，開發人員幾乎不用另外安裝什麼就可以進行開發。運用 Gradle/Maven 的套件相依管理，需要的模組可以自動從套件庫自動下載，進一步簡化開發環境的設置要求。\n除了方便開發，更進一步讓軟體直接採用模組/套件方式部署。由於每個模組是以可以部署的套件形式包裝並存放在本地或者遠端的套件庫(Artifact repository)中，在部署階段，只要下載指定版本的套件進行安裝便可完成應用的安裝與升級工作，這點對於之後達成持續部署的要求可說是一大助力。\n小結\n雖然 Vert.x 不像 Tomcat/Jetty 是符合標準規範的應用服務軟體，但作為即時 Web 應用服務容器，它也支援了最基本的應用部署功能。雖然它模組的設計有點陽春，但對於模組分離(isolation)要求不高的應用情境，簡單反而是一個優勢。\n","dateCreated":"2013-10-23T12:23:00+08:00","dateModified":"2018-08-16T11:11:31+08:00","datePublished":"2013-10-23T12:23:00+08:00","description":"在使用 Vert.x 作為即時網頁應用平台這篇文章，山姆鍋提到「影化身平台」利用 Vert.x 作為即時 Web 應用的服務框架，看中的是它對網路服務的執行效率。除了方便網路服務開發外，Vert.x 的模組(module)支援，對於寫大型網路服務來說是個很重要。","headline":"利用 Vert.x 作為模組化應用框架","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/10/modular-apps-with-vertx/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2013/10/modular-apps-with-vertx/","keywords":"Development, Vertx"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"在使用 Vert.x 作為即時網頁應用平台這篇文章，山姆鍋提到「影化身平台」利用 Vert.x 作為即時 Web 應用的服務框架，看中的是它對網路服務的執行效率。除了方便網路服務開發外，Vert.x 的模組 (module) 支援，對於寫大型網路服務來說是個很重要。\n\nVert.x 的模組功能\nVert.x 的模組支援功能並不是只是讓您可以邏輯性的模組化方式來設計應用，而是更進一步將模組包裝成可以獨立部署的套件 (package) 以方便不同環境的部署要求。Vert.x 的模組功能其實跟 Node.js 的 npm 或者 Ruby gem 是很類似的設計，說 Vert.x 是抄襲它們也不為過。\n下列是 Vert.x 模組重要的特性：\n1. 模組有自己的 classloader\n為了避免模組間透過靜態全域 (static global) 變數來互相溝通，每個模組使用的類別 (class) 都由各自獨立的 classloader 來載入以確保模組間的獨立性。在並行程式的開發上，共用的變數常常是錯誤發生的根源之一，Vert.x 藉由這樣的限制，避免像是 race condition 的錯誤發生。\n2. 模組可以包含相關的 Jar 檔\nVert.x 的模組設計主要用來封裝較大粒度的單位，通常一個模組也會包含相依的 Jar 檔，或其他資源。在「影化身平台」，我們就將整個 Cassandra 視為一個模組而不是讓各自的 Jar 檔成為一個模組。\n3. 模組間可以有相依性\n除了將需要的資源或者 Jar 檔包含在模組本身外，Vert.x 的模組間可以宣告相依的關係。依賴的模組可以存取被依賴模組提供的資源或者程式，但沒有像 OSGi 那樣精細的存取控制。\n4. 模組可以按需要自動下載安裝\n如果模組被存取時還不存在，Vert.x 可以自動從已知的套件庫下載並安裝該模組套件。這個特性在開發階段比較有用，在實際部署時，通常會需要確定相關模組都已經安裝完成。\n應用到影化身平台\n將應用的所有功能分散成多個高聚合的模組，但在測試、開發與部署時期又可以按照環境組合出需要的功能，這樣的特點，讓模組化應用一直被視為良好的軟體架構。藉由 Vert.x 模組支援，在開發階段，「影化身平台」的所有應用模組可以在同一個 JVM 上面執行來進行整合測試；而到了部署階段，又可以根據部署環境的不同來配置哪些模組在哪一台主機上執行。\n這樣的延展性，讓軟體的開發、測試與部署的方式盡可能接近外，也減輕準備開發環境的負擔。例如：將 Cassandra 也包裝成一個模組，除了 Eclipse IDE 外，開發人員幾乎不用另外安裝什麼就可以進行開發。運用 Gradle/Maven 的套件相依管理，需要的模組可以自動從套件庫自動下載，進一步簡化開發環境的設置要求。\n除了方便開發，更進一步讓軟體直接採用模組 / 套件方式部署。由於每個模組是以可以部署的套件形式包裝並存放在本地或者遠端的套件庫 (Artifact repository) 中，在部署階段，只要下載指定版本的套件進行安裝便可完成應用的安裝與升級工作，這點對於之後達成持續部署的要求可說是一大助力。\n小結\n雖然 Vert.x 不像 Tomcat/Jetty 是符合標準規範的應用服務軟體，但作為即時 Web 應用服務容器，它也支援了最基本的應用部署功能。雖然它模組的設計有點陽春，但對於模組分離 (isolation) 要求不高的應用情境，簡單反而是一個優勢。\n","dateCreated":"2013-10-23T12:23:00+08:00","dateModified":"2018-08-16T11:11:31+08:00","datePublished":"2013-10-23T12:23:00+08:00","description":"在使用 Vert.x 作為即時網頁應用平台這篇文章，山姆鍋提到「影化身平台」利用 Vert.x 作為即時 Web 應用的服務框架，看中的是它對網路服務的執行效率。除了方便網路服務開發外，Vert.x 的模組 (module) 支援，對於寫大型網路服務來說是個很重要。","headline":"利用 Vert.x 作為模組化應用框架","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/10/modular-apps-with-vertx/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2013/10/modular-apps-with-vertx/","keywords":"Development, Vertx"}</script>
     <meta name="description" content="說明「影化身平台」如何利用 Vert.x 的模組支援。">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="利用 Vert.x 作為模組化應用框架">
@@ -367,13 +367,17 @@
     
     <div class="post-content markdown">
         <div class="main-content-wrap">
-            <p>在<a href="/post/2013/10/real-time-web-with-vert-dot-x/">使用 Vert.x 作為即時網頁應用平台</a>這篇文章，山姆鍋提到「影化身平台」利用 Vert.x 作為即時 Web 應用的服務框架，看中的是它對網路服務的執行效率。除了方便網路服務開發外，Vert.x 的模組(module)支援，對於寫大型網路服務來說是個很重要。</p>
+            <div class="alert info no-icon">
+                <a href="https://www.facebook.com/sampotkuo" target="_blank" rel="noopener">「我是山姆鍋」有臉書專頁</a>
+            </div>
+
+            <p>在<a href="/post/2013/10/real-time-web-with-vert-dot-x/">使用 Vert.x 作為即時網頁應用平台</a>這篇文章，山姆鍋提到「影化身平台」利用 Vert.x 作為即時 Web 應用的服務框架，看中的是它對網路服務的執行效率。除了方便網路服務開發外，Vert.x 的模組 (module) 支援，對於寫大型網路服務來說是個很重要。</p>
 <a id="more"></a>
 <h3 id="Vert-x-的模組功能">Vert.x 的模組功能</h3>
-<p>Vert.x 的模組支援功能並不是只是讓您可以邏輯性的模組化方式來設計應用，而是更進一步將模組包裝成可以獨立部署的套件(package)以方便不同環境的部署要求。Vert.x 的模組功能其實跟 Node.js 的 npm 或者 Ruby gem 是很類似的設計，說 Vert.x 是抄襲它們也不為過。</p>
+<p>Vert.x 的模組支援功能並不是只是讓您可以邏輯性的模組化方式來設計應用，而是更進一步將模組包裝成可以獨立部署的套件 (package) 以方便不同環境的部署要求。Vert.x 的模組功能其實跟 Node.js 的 npm 或者 Ruby gem 是很類似的設計，說 Vert.x 是抄襲它們也不為過。</p>
 <p>下列是 Vert.x 模組重要的特性：</p>
 <h4 id="1-模組有自己的-classloader">1. 模組有自己的 classloader</h4>
-<p>為了避免模組間透過靜態全域(static global)變數來互相溝通，每個模組使用的類別(class)都由各自獨立的 classloader 來載入以確保模組間的獨立性。在並行程式的開發上，共用的變數常常是錯誤發生的根源之一，Vert.x 藉由這樣的限制，避免像是 race condition 的錯誤發生。</p>
+<p>為了避免模組間透過靜態全域 (static global) 變數來互相溝通，每個模組使用的類別 (class) 都由各自獨立的 classloader 來載入以確保模組間的獨立性。在並行程式的開發上，共用的變數常常是錯誤發生的根源之一，Vert.x 藉由這樣的限制，避免像是 race condition 的錯誤發生。</p>
 <h4 id="2-模組可以包含相關的-Jar-檔">2. 模組可以包含相關的 Jar 檔</h4>
 <p>Vert.x 的模組設計主要用來封裝較大粒度的單位，通常一個模組也會包含相依的 Jar 檔，或其他資源。在「影化身平台」，我們就將整個 Cassandra 視為一個模組而不是讓各自的 Jar 檔成為一個模組。</p>
 <h4 id="3-模組間可以有相依性">3. 模組間可以有相依性</h4>
@@ -381,12 +385,15 @@
 <h4 id="4-模組可以按需要自動下載安裝">4. 模組可以按需要自動下載安裝</h4>
 <p>如果模組被存取時還不存在，Vert.x 可以自動從已知的套件庫下載並安裝該模組套件。這個特性在開發階段比較有用，在實際部署時，通常會需要確定相關模組都已經安裝完成。</p>
 <h3 id="應用到影化身平台">應用到影化身平台</h3>
-<p>將應用的所有功能分散成多個高聚合的模組，但在測試、開發與部署時期又可以按照環境組合出需要的功能，這樣的特點，讓模組化應用一直被視為良好的軟體架構。藉由 Vert.x 模組支援，在開發階段，「影化身平台」的所有應用模組可以在同一個 JVM 上面執行來進行整合測試;而到了部署階段，又可以根據部署環境的不同來配置哪些模組在哪一台主機上執行。</p>
+<p>將應用的所有功能分散成多個高聚合的模組，但在測試、開發與部署時期又可以按照環境組合出需要的功能，這樣的特點，讓模組化應用一直被視為良好的軟體架構。藉由 Vert.x 模組支援，在開發階段，「影化身平台」的所有應用模組可以在同一個 JVM 上面執行來進行整合測試；而到了部署階段，又可以根據部署環境的不同來配置哪些模組在哪一台主機上執行。</p>
 <p>這樣的延展性，讓軟體的開發、測試與部署的方式盡可能接近外，也減輕準備開發環境的負擔。例如：將 Cassandra 也包裝成一個模組，除了 Eclipse IDE 外，開發人員幾乎不用另外安裝什麼就可以進行開發。運用 Gradle/Maven 的套件相依管理，需要的模組可以自動從套件庫自動下載，進一步簡化開發環境的設置要求。</p>
-<p>除了方便開發，更進一步讓軟體直接採用模組/套件方式部署。由於每個模組是以可以部署的套件形式包裝並存放在本地或者遠端的套件庫(Artifact repository)中，在部署階段，只要下載指定版本的套件進行安裝便可完成應用的安裝與升級工作，這點對於之後達成持續部署的要求可說是一大助力。</p>
+<p>除了方便開發，更進一步讓軟體直接採用模組 / 套件方式部署。由於每個模組是以可以部署的套件形式包裝並存放在本地或者遠端的套件庫 (Artifact repository) 中，在部署階段，只要下載指定版本的套件進行安裝便可完成應用的安裝與升級工作，這點對於之後達成持續部署的要求可說是一大助力。</p>
 <h3 id="小結">小結</h3>
-<p>雖然 Vert.x 不像 Tomcat/Jetty 是符合標準規範的應用服務軟體，但作為即時 Web 應用服務容器，它也支援了最基本的應用部署功能。雖然它模組的設計有點陽春，但對於模組分離(isolation)要求不高的應用情境，簡單反而是一個優勢。</p>
+<p>雖然 Vert.x 不像 Tomcat/Jetty 是符合標準規範的應用服務軟體，但作為即時 Web 應用服務容器，它也支援了最基本的應用部署功能。雖然它模組的設計有點陽春，但對於模組分離 (isolation) 要求不高的應用情境，簡單反而是一個優勢。</p>
 
+            <div class="alert info no-icon">
+                山姆鍋是<a href="https://developers.tw/@山姆鍋" target="_blank" rel="noopener">#呆丸開發者</a>成員
+            </div>
             
 
 
@@ -411,8 +418,8 @@
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
                     href="/post/2013/10/amazon-s3-as-maven-repository-with-gradle/"
-                    data-tooltip="運用Amazon S3作為Maven套件倉儲 - Gradle篇"
-                    aria-label="上一篇: 運用Amazon S3作為Maven套件倉儲 - Gradle篇"
+                    data-tooltip="運用 Amazon S3 作為 Maven 套件倉儲 - Gradle 篇"
+                    aria-label="上一篇: 運用 Amazon S3 作為 Maven 套件倉儲 - Gradle 篇"
                 >
                     
                         <i class="fa fa-angle-left" aria-hidden="true"></i>
@@ -425,8 +432,8 @@
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
                     href="/post/2013/10/use-asciidoc-for-documentation/"
-                    data-tooltip="運用AsciiDoc作為文件撰寫格式"
-                    aria-label="下一篇: 運用AsciiDoc作為文件撰寫格式"
+                    data-tooltip="運用 AsciiDoc 作為文件撰寫格式"
+                    aria-label="下一篇: 運用 AsciiDoc 作為文件撰寫格式"
                 >
                     
                         <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
@@ -513,6 +520,14 @@
     <span class="copyrights">
         Copyrights &copy; 2020 Sampot (山姆鍋). All Rights Reserved.
     </span>
+    <br/>
+        <a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW"><img
+                alt="創用 CC 授權條款" style="border-width:0"
+                src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+        除另有標示，本著作係採用<a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW">創用 CC
+            姓名標示-非商業性-相同方式分享 4.0 國際 授權條款</a>授權。
 </footer>
 
             </div>
@@ -527,8 +542,8 @@
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
                     href="/post/2013/10/amazon-s3-as-maven-repository-with-gradle/"
-                    data-tooltip="運用Amazon S3作為Maven套件倉儲 - Gradle篇"
-                    aria-label="上一篇: 運用Amazon S3作為Maven套件倉儲 - Gradle篇"
+                    data-tooltip="運用 Amazon S3 作為 Maven 套件倉儲 - Gradle 篇"
+                    aria-label="上一篇: 運用 Amazon S3 作為 Maven 套件倉儲 - Gradle 篇"
                 >
                     
                         <i class="fa fa-angle-left" aria-hidden="true"></i>
@@ -541,8 +556,8 @@
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
                     href="/post/2013/10/use-asciidoc-for-documentation/"
-                    data-tooltip="運用AsciiDoc作為文件撰寫格式"
-                    aria-label="下一篇: 運用AsciiDoc作為文件撰寫格式"
+                    data-tooltip="運用 AsciiDoc 作為文件撰寫格式"
+                    aria-label="下一篇: 運用 AsciiDoc 作為文件撰寫格式"
                 >
                     
                         <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
@@ -737,9 +752,9 @@
                         <a
                             class="link-unstyled"
                             href="https://samkuo.me/post/2012/04/use-pacemaker-two-node-ha-cluster/"
-                            aria-label=": 使用Pacemaker 建構雙節點叢集系統"
+                            aria-label=": 使用 Pacemaker 建構雙節點叢集系統"
                         >
-                            <h3 class="media-heading">使用Pacemaker 建構雙節點叢集系統</h3>
+                            <h3 class="media-heading">使用 Pacemaker 建構雙節點叢集系統</h3>
                         </a>
                         <span class="media-meta">
                             <span class="media-date text-small">
@@ -748,7 +763,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>想要達到系統高可用性(high availability)的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。</p></div>
+                        <div class="media-content hide-xs font-merryweather"><p>想要達到系統高可用性 (high availability) 的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。</p></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>
@@ -771,7 +786,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案(圖檔, CSS 等等)可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點(single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。</p></div>
+                        <div class="media-content hide-xs font-merryweather"><p>在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案 (圖檔，CSS 等等) 可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點 (single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。</p></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>

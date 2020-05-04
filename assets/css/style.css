@@ -8332,6 +8332,11 @@ blockquote {
     top: 12.5px;
     right: 20px;
     color: #88909a; }
+  #header .header-avatar-picture {
+    width: 30px;
+    height: 30px;
+    border-radius: 15px;
+    vertical-align: middle; }
   #header .header-title {
     text-align: center;
     font-size: 1.6rem;

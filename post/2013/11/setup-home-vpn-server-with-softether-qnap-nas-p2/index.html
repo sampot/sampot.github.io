@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="我是山姆鍋">
-    <title>利用 SoftEther 以及 QNAP NAS 架設 L2TP/IPSec VPN 服務器(下) - 我是山姆鍋</title>
+    <title>利用 SoftEther 以及 QNAP NAS 架設 L2TP/IPSec VPN 服務器 (下) - 我是山姆鍋</title>
     <meta name="author" content="Sampot (山姆鍋)">
     
     
@@ -17,10 +17,10 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"在上一篇文章中，山姆鍋說明如何在 QNAP NAS 裝置上安裝 SoftEther\nVPN 軟體來架設 VPN 服務器。 雖然需要一些額外套件來進行編譯才能安裝，但不排斥編譯的人來說應該也不至於太難。不過講到設定，那最好使用 SoftEther 提供的工具，本文就來說明如何使用 SoftEther VPN Server Manager for Windows 來設定您的 VPN 服務器。\n\n安裝 SoftEther VPN Server Manager for Windows\n首先到 SoftEther 的\n下載網址\n，下載適合您的 Windows 系統的工具。\n\n執行下載的程式，按照步驟完成安裝。\n建立與 VPN 服務器的連線設定\n假設您的 VPN 服務器已經啟動，執行 SoftEther Server Manager for\nWindows 後，您應該會看到下列畫面：\n\n選擇&quot;New Setting&quot;後，出現新增服務器連線設定的視窗：\n\n\n\n\n選擇一個名稱, 例如:\n\n:   \\'Local VPN\\'\n\n\n\n\n設定 \\'Host Name\\':\n\n:   VPN服務器的IP位址。\n\n\n\n\n設定Port Number:\n\n:   預設是使用 443(HTTPS\n    port)，但QNAP已經使用443做其他用途，所以，這裡山姆鍋使用的是992。\n\n    Note: 第一次連線時，SoftEther會讓您設定新的管理者密碼。\n\n連線到 VPN 服務器\n設定好 VPN 服務器連線設定後，出現下方畫面：\n\n選擇 “Connect” 來連到 VPN 服務器進行管理，下圖是主畫面：\n\n因為山姆鍋已經有建立兩個 Virtual Hub，您的列表應該是空的。\n建立新的 Virtual Hub\n從主畫面選擇 “Create a Virtual Hub”：\n\n\n\n\n設定\\&quot;Virtual Hub Name\\&quot;：\n\n:   這是您的專屬VPN, 所以取個別人不易猜測的名稱。\n\n\n選擇&quot;OK&quot;建立。\n\n建立 Virtual Hub 連線帳戶\n從主畫面，點選您要管理的 “Virtual Hub&quot;後，選擇&quot;Manage Virtual\nHub”。如此，會進到 Virtual Hub 的管理界面，如下圖：\n\n從 Virtual Hub 管理界面，選擇&quot;Manage Users&quot; --&gt;\n再選’New’按鈕，出現新增用戶視窗：\n\n\n\n\nUser Name:\n\n:   輸入登入用的用戶名稱。\n\n\n\n\nFull Name:\n\n:   用戶的全名，只是輔助性資料。\n\n\n\n\nAuth Type:\n\n:   認證方式，選擇\\'Password Authentication\\'。\n\n\n\n\nPassword 跟 Confirm Password:\n\n:   輸入認證用的密碼。\n\n啟用 L2TP/IPSec 服務\n\n從主畫面，選擇 “IPSec/L2TP Setting”\n\n\n\n\n\n選用 \\&quot;Enable L2TP Server Function (L2TP over IPSec)\\&quot;\n\n:   設定這個選項，讓SoftEther啟用L2TP服務。\n\n\n\n\n選擇 \\&quot;Default Virtual Hub\\&quot;\n\n:   這個欄位的用途是在VPN客戶端提供的用戶名稱沒有包含Virtual\n    hub名稱時，預設使用的Virtual Hub。\n    SoftEther服務器可以同時支援多個Virtual\n    Hub，如果用戶名稱以這種形式\n    \\'[tester\\@your-private-hub\\'表示](mailto:tester@your-private-hub'表示)，\\'@\\'後面就是Virtual\n    hub的名稱。\n\n\n\n\n設定 \\&quot;IPSec Pre-Shared Key\\&quot;\n\n:   這個是連線時，客戶端與服務端認證需要的。如果您要讓朋友使用您的VPN服務器，則這個也需要提供給他們。\n\n設定 NAT Port forwarding\n通常家用網路環境會有一個 NAT 裝置，可能是 ADSL 的 router 或者是頻寬分享器。不管如何，要讓客戶端可以連到您的 VPN 服務器，您需要在 router 上設定 port\nforwarding。底下是需要設定轉到 VPN 服務器的 port：\n\n500/UDP\n4500/UDP\n1701/UDP\n\n使用 Local bridge 跟實體網路串接\n雖然到這裡已經可以使用 VPN 客戶端來連到 VPN 服務器，但您會發現卻無法存取網路，這是因為每個\nVirtual Hub\n就相當於一個獨立網段，彼此並沒有關聯。為了讓 VPN 連線可以存取網路，SoftEther 有幾個不同做法，這裡山姆鍋使用 Local\nbridge 的方式來將 Virtual\nHub 與實體網路串接，如此可以讓 VPN 客戶端以 VPN 服務器當作閘道器(gateway)來存取網際網路。\n\n在管理主畫面，選擇 Local Bridge Setting。\n\n\n\n在 “Virtual Hub” 欄位，選擇您建立的 Virtual Hub 名稱。\n“LAN adapter” 欄位，選擇要串接的網卡。\n這裡山姆鍋使用第二張網卡’eth1’，這樣讓 VPN 客戶端依然可以 VPN 服務器本身。\n如果您只有一張網卡，那就選擇那張。\n\n客戶端設定\n底下是設定 VPN 客戶端需要使用的資訊：\n\n\n\n主機名稱:\n\n:   VPN服務器位址，如有使用NAT則是NAT的外部位址。\n\n\n\n\n用戶名稱：\n\n:   &lt;tester@your-private-vpn&gt;。需要使用全名，也就是要包含\\'\\@your-private-vpn\\'這部分。\n    當然，\\'your-private-vpn\\'是您設定的Virtual Hub名稱。\n\n\n\n\n登入密碼：\n\n:   認證密碼。\n\n\n\n\nPre-Shared Key:\n\n:   設定L2TP 服務時設定的Pre-Shared Key。\n\n結語\n經過這番折騰後，希望您已經有一個可以使用的專屬 VPN 服務了。\n本文介紹的設定是要讓您個人使用，可不要隨便開帳號給別人。\n","dateCreated":"2013-11-25T15:24:00+08:00","dateModified":"2018-08-22T19:36:37+08:00","datePublished":"2013-11-25T15:24:00+08:00","description":"在上一篇文章中，山姆鍋說明如何在 QNAP NAS 裝置上安裝 SoftEther\nVPN 軟體來架設 VPN 服務器。 雖然需要一些額外套件來進行編譯才能安裝，但不排斥編譯的人來說應該也不至於太難。不過講到設定，那最好使用 SoftEther 提供的工具，本文就來說明如何使用 SoftEther VPN Server Manager for Windows 來設定您的 VPN 服務器。","headline":"利用 SoftEther 以及 QNAP NAS 架設 L2TP/IPSec VPN 服務器(下)","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/11/setup-home-vpn-server-with-softether-qnap-nas-p2/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2013/11/setup-home-vpn-server-with-softether-qnap-nas-p2/","keywords":"Security, VPN, VLAN, SoftEther"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"在上一篇文章中，山姆鍋說明如何在 QNAP NAS 裝置上安裝 SoftEther\nVPN 軟體來架設 VPN 服務器。 雖然需要一些額外套件來進行編譯才能安裝，但不排斥編譯的人來說應該也不至於太難。不過講到設定，那最好使用 SoftEther 提供的工具，本文就來說明如何使用 SoftEther VPN Server Manager for Windows 來設定您的 VPN 服務器。\n\n安裝 SoftEther VPN Server Manager for Windows\n首先到 SoftEther 的\n下載網址\n，下載適合您的 Windows 系統的工具。\n\n執行下載的程式，按照步驟完成安裝。\n建立與 VPN 服務器的連線設定\n假設您的 VPN 服務器已經啟動，執行 SoftEther Server Manager for\nWindows 後，您應該會看到下列畫面：\n\n選擇 \"New Setting\" 後，出現新增服務器連線設定的視窗：\n\n\n\n\n選擇一個名稱, 例如:\n\n:   \\'Local VPN\\'\n\n\n\n\n設定 \\'Host Name\\':\n\n:   VPN服務器的IP位址。\n\n\n\n\n設定Port Number:\n\n:   預設是使用 443(HTTPS\n    port)，但QNAP已經使用443做其他用途，所以，這裡山姆鍋使用的是992。\n\n    Note: 第一次連線時，SoftEther會讓您設定新的管理者密碼。\n\n連線到 VPN 服務器\n設定好 VPN 服務器連線設定後，出現下方畫面：\n\n選擇 “Connect” 來連到 VPN 服務器進行管理，下圖是主畫面：\n\n因為山姆鍋已經有建立兩個 Virtual Hub，您的列表應該是空的。\n建立新的 Virtual Hub\n從主畫面選擇 “Create a Virtual Hub”：\n\n\n\n\n設定\\\"Virtual Hub Name\\\"：\n\n:   這是您的專屬VPN, 所以取個別人不易猜測的名稱。\n\n\n選擇 \"OK\" 建立。\n\n建立 Virtual Hub 連線帳戶\n從主畫面，點選您要管理的 “Virtual Hub\"後，選擇\"Manage Virtual\nHub”。如此，會進到 Virtual Hub 的管理界面，如下圖：\n\n從 Virtual Hub 管理界面，選擇 \"Manage Users\" --&gt;\n再選’New’按鈕，出現新增用戶視窗：\n\n\n\n\nUser Name:\n\n:   輸入登入用的用戶名稱。\n\n\n\n\nFull Name:\n\n:   用戶的全名，只是輔助性資料。\n\n\n\n\nAuth Type:\n\n:   認證方式，選擇\\'Password Authentication\\'。\n\n\n\n\nPassword 跟 Confirm Password:\n\n:   輸入認證用的密碼。\n\n啟用 L2TP/IPSec 服務\n\n從主畫面，選擇 “IPSec/L2TP Setting” \n\n\n\n\n\n選用 \\\"Enable L2TP Server Function (L2TP over IPSec)\\\"\n\n:   設定這個選項，讓SoftEther啟用L2TP服務。\n\n\n\n\n選擇 \\\"Default Virtual Hub\\\"\n\n:   這個欄位的用途是在VPN客戶端提供的用戶名稱沒有包含Virtual\n    hub名稱時，預設使用的Virtual Hub。\n    SoftEther服務器可以同時支援多個Virtual\n    Hub，如果用戶名稱以這種形式\n    \\'[tester\\@your-private-hub\\'表示](mailto:tester@your-private-hub'表示)，\\'@\\'後面就是Virtual\n    hub的名稱。\n\n\n\n\n設定 \\\"IPSec Pre-Shared Key\\\"\n\n:   這個是連線時，客戶端與服務端認證需要的。如果您要讓朋友使用您的VPN服務器，則這個也需要提供給他們。\n\n設定 NAT Port forwarding\n通常家用網路環境會有一個 NAT 裝置，可能是 ADSL 的 router 或者是頻寬分享器。不管如何，要讓客戶端可以連到您的 VPN 服務器，您需要在 router 上設定 port\nforwarding。底下是需要設定轉到 VPN 服務器的 port：\n\n500/UDP\n4500/UDP\n1701/UDP\n\n使用 Local bridge 跟實體網路串接\n雖然到這裡已經可以使用 VPN 客戶端來連到 VPN 服務器，但您會發現卻無法存取網路，這是因為每個\nVirtual Hub\n就相當於一個獨立網段，彼此並沒有關聯。為了讓 VPN 連線可以存取網路，SoftEther 有幾個不同做法，這裡山姆鍋使用 Local\nbridge 的方式來將 Virtual\nHub 與實體網路串接，如此可以讓 VPN 客戶端以 VPN 服務器當作閘道器 (gateway) 來存取網際網路。\n\n在管理主畫面，選擇 Local Bridge Setting。\n\n\n\n在 “Virtual Hub” 欄位，選擇您建立的 Virtual Hub 名稱。\n“LAN adapter” 欄位，選擇要串接的網卡。\n這裡山姆鍋使用第二張網卡’eth1’，這樣讓 VPN 客戶端依然可以 VPN 服務器本身。\n如果您只有一張網卡，那就選擇那張。\n\n客戶端設定\n底下是設定 VPN 客戶端需要使用的資訊：\n\n\n\n主機名稱:\n\n:   VPN服務器位址，如有使用NAT則是NAT的外部位址。\n\n\n\n\n用戶名稱：\n\n:   &lt;tester@your-private-vpn&gt;。需要使用全名，也就是要包含\\'\\@your-private-vpn\\'這部分。\n    當然，\\'your-private-vpn\\'是您設定的Virtual Hub名稱。\n\n\n\n\n登入密碼：\n\n:   認證密碼。\n\n\n\n\nPre-Shared Key:\n\n:   設定L2TP 服務時設定的Pre-Shared Key。\n\n結語\n經過這番折騰後，希望您已經有一個可以使用的專屬 VPN 服務了。\n本文介紹的設定是要讓您個人使用，可不要隨便開帳號給別人。\n","dateCreated":"2013-11-25T15:24:00+08:00","dateModified":"2018-08-22T19:36:37+08:00","datePublished":"2013-11-25T15:24:00+08:00","description":"在上一篇文章中，山姆鍋說明如何在 QNAP NAS 裝置上安裝 SoftEther\nVPN 軟體來架設 VPN 服務器。 雖然需要一些額外套件來進行編譯才能安裝，但不排斥編譯的人來說應該也不至於太難。不過講到設定，那最好使用 SoftEther 提供的工具，本文就來說明如何使用 SoftEther VPN Server Manager for Windows 來設定您的 VPN 服務器。","headline":"利用 SoftEther 以及 QNAP NAS 架設 L2TP/IPSec VPN 服務器 (下)","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/11/setup-home-vpn-server-with-softether-qnap-nas-p2/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2013/11/setup-home-vpn-server-with-softether-qnap-nas-p2/","keywords":"Security, VPN, VLAN, SoftEther"}</script>
     <meta name="description" content="在上一篇文章中，山姆鍋說明如何在 QNAP NAS 裝置上安裝 SoftEther VPN 軟體來架設 VPN 服務器。 雖然需要一些額外套件來進行編譯才能安裝，但不排斥編譯的人來說應該也不至於太難。不過講到設定，那最好使用 SoftEther 提供的工具，本文就來說明如何使用 SoftEther VPN Server Manager for Windows 來設定您的 VPN 服務器。">
 <meta property="og:type" content="blog">
-<meta property="og:title" content="利用 SoftEther 以及 QNAP NAS 架設 L2TP&#x2F;IPSec VPN 服務器(下)">
+<meta property="og:title" content="利用 SoftEther 以及 QNAP NAS 架設 L2TP&#x2F;IPSec VPN 服務器 (下)">
 <meta property="og:url" content="https://samkuo.me/post/2013/11/setup-home-vpn-server-with-softether-qnap-nas-p2/">
 <meta property="og:site_name" content="我是山姆鍋">
 <meta property="og:description" content="在上一篇文章中，山姆鍋說明如何在 QNAP NAS 裝置上安裝 SoftEther VPN 軟體來架設 VPN 服務器。 雖然需要一些額外套件來進行編譯才能安裝，但不排斥編譯的人來說應該也不至於太難。不過講到設定，那最好使用 SoftEther 提供的工具，本文就來說明如何使用 SoftEther VPN Server Manager for Windows 來設定您的 VPN 服務器。">
@@ -353,7 +353,7 @@
         <div class="post-header main-content-wrap text-left">
     
         <h1 class="post-title">
-            利用 SoftEther 以及 QNAP NAS 架設 L2TP/IPSec VPN 服務器(下)
+            利用 SoftEther 以及 QNAP NAS 架設 L2TP/IPSec VPN 服務器 (下)
         </h1>
     
     
@@ -378,6 +378,10 @@
     
     <div class="post-content markdown">
         <div class="main-content-wrap">
+            <div class="alert info no-icon">
+                <a href="https://www.facebook.com/sampotkuo" target="_blank" rel="noopener">「我是山姆鍋」有臉書專頁</a>
+            </div>
+
             <p>在上一篇文章中，山姆鍋說明如何在 QNAP NAS 裝置上安裝 SoftEther<br>
 VPN 軟體來架設 VPN 服務器。 雖然需要一些額外套件來進行編譯才能安裝，但不排斥編譯的人來說應該也不至於太難。不過講到設定，那最好使用 SoftEther 提供的工具，本文就來說明如何使用 SoftEther VPN Server Manager for Windows 來設定您的 VPN 服務器。</p>
 <a id="more"></a>
@@ -391,7 +395,7 @@ VPN 軟體來架設 VPN 服務器。 雖然需要一些額外套件來進行編�
 <p>假設您的 VPN 服務器已經啟動，執行 SoftEther Server Manager for<br>
 Windows 後，您應該會看到下列畫面：</p>
 <p><img src="/media/2013/11/softether-manager-screen1.png" alt="softether-manager-screen1"></p>
-<p>選擇&quot;New Setting&quot;後，出現新增服務器連線設定的視窗：</p>
+<p>選擇 "New Setting" 後，出現新增服務器連線設定的視窗：</p>
 <p><img src="/media/2013/11/softether-manager-screen2.png" alt="softether-manager-screen2"></p>
 <ol>
 <li></li>
@@ -429,18 +433,18 @@ Windows 後，您應該會看到下列畫面：</p>
 <ol>
 <li></li>
 </ol>
-<pre><code>設定\&quot;Virtual Hub Name\&quot;：
+<pre><code>設定\"Virtual Hub Name\"：
 
 :   這是您的專屬VPN, 所以取個別人不易猜測的名稱。
 </code></pre>
 <ol start="2">
-<li>選擇&quot;OK&quot;建立。</li>
+<li>選擇 "OK" 建立。</li>
 </ol>
 <h2 id="建立-Virtual-Hub-連線帳戶">建立 Virtual Hub 連線帳戶</h2>
-<p>從主畫面，點選您要管理的 “Virtual Hub&quot;後，選擇&quot;Manage Virtual<br>
+<p>從主畫面，點選您要管理的 “Virtual Hub"後，選擇"Manage Virtual<br>
 Hub”。如此，會進到 Virtual Hub 的管理界面，如下圖：</p>
 <p><img src="/media/2013/11/softether-manager-screen5.png" alt="softether-manager-screen5"></p>
-<p>從 Virtual Hub 管理界面，選擇&quot;Manage Users&quot; --&gt;<br>
+<p>從 Virtual Hub 管理界面，選擇 "Manage Users" --&gt;<br>
 再選’New’按鈕，出現新增用戶視窗：</p>
 <p><img src="/media/2013/11/softether-manager-screen6.png" alt="softether-manager-screen6"></p>
 <ol>
@@ -473,20 +477,20 @@ Hub”。如此，會進到 Virtual Hub 的管理界面，如下圖：</p>
 </code></pre>
 <h2 id="啟用-L2TP-IPSec-服務">啟用 L2TP/IPSec 服務</h2>
 <ol>
-<li>從主畫面，選擇 “IPSec/L2TP Setting”</li>
+<li>從主畫面，選擇 “IPSec/L2TP Setting” </li>
 </ol>
 <p><img src="/media/2013/11/softether-manager-screen10.png" alt="softether-manager-screen10"></p>
 <ol start="2">
 <li></li>
 </ol>
-<pre><code>選用 \&quot;Enable L2TP Server Function (L2TP over IPSec)\&quot;
+<pre><code>選用 \"Enable L2TP Server Function (L2TP over IPSec)\"
 
 :   設定這個選項，讓SoftEther啟用L2TP服務。
 </code></pre>
 <ol start="3">
 <li></li>
 </ol>
-<pre><code>選擇 \&quot;Default Virtual Hub\&quot;
+<pre><code>選擇 \"Default Virtual Hub\"
 
 :   這個欄位的用途是在VPN客戶端提供的用戶名稱沒有包含Virtual
     hub名稱時，預設使用的Virtual Hub。
@@ -498,7 +502,7 @@ Hub”。如此，會進到 Virtual Hub 的管理界面，如下圖：</p>
 <ol start="4">
 <li></li>
 </ol>
-<pre><code>設定 \&quot;IPSec Pre-Shared Key\&quot;
+<pre><code>設定 \"IPSec Pre-Shared Key\"
 
 :   這個是連線時，客戶端與服務端認證需要的。如果您要讓朋友使用您的VPN服務器，則這個也需要提供給他們。
 </code></pre>
@@ -515,7 +519,7 @@ forwarding。底下是需要設定轉到 VPN 服務器的 port：</p>
 Virtual Hub<br>
 就相當於一個獨立網段，彼此並沒有關聯。為了讓 VPN 連線可以存取網路，SoftEther 有幾個不同做法，這裡山姆鍋使用 Local<br>
 bridge 的方式來將 Virtual<br>
-Hub 與實體網路串接，如此可以讓 VPN 客戶端以 VPN 服務器當作閘道器(gateway)來存取網際網路。</p>
+Hub 與實體網路串接，如此可以讓 VPN 客戶端以 VPN 服務器當作閘道器 (gateway) 來存取網際網路。</p>
 <ol>
 <li>在管理主畫面，選擇 Local Bridge Setting。</li>
 </ol>
@@ -561,6 +565,9 @@ Hub 與實體網路串接，如此可以讓 VPN 客戶端以 VPN 服務器當作
 <p>經過這番折騰後，希望您已經有一個可以使用的專屬 VPN 服務了。<br>
 本文介紹的設定是要讓您個人使用，可不要隨便開帳號給別人。</p>
 
+            <div class="alert info no-icon">
+                山姆鍋是<a href="https://developers.tw/@山姆鍋" target="_blank" rel="noopener">#呆丸開發者</a>成員
+            </div>
             
 
 
@@ -599,8 +606,8 @@ Hub 與實體網路串接，如此可以讓 VPN 客戶端以 VPN 服務器當作
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
                     href="/post/2013/11/setup-home-vpn-server-with-softether-qnap-nas/"
-                    data-tooltip="利用 SoftEther 以及 QNAP NAS 架設 L2TP/IPSec VPN 服務器(上)"
-                    aria-label="下一篇: 利用 SoftEther 以及 QNAP NAS 架設 L2TP/IPSec VPN 服務器(上)"
+                    data-tooltip="利用 SoftEther 以及 QNAP NAS 架設 L2TP/IPSec VPN 服務器 (上)"
+                    aria-label="下一篇: 利用 SoftEther 以及 QNAP NAS 架設 L2TP/IPSec VPN 服務器 (上)"
                 >
                     
                         <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
@@ -687,6 +694,14 @@ Hub 與實體網路串接，如此可以讓 VPN 客戶端以 VPN 服務器當作
     <span class="copyrights">
         Copyrights &copy; 2020 Sampot (山姆鍋). All Rights Reserved.
     </span>
+    <br/>
+        <a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW"><img
+                alt="創用 CC 授權條款" style="border-width:0"
+                src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+        除另有標示，本著作係採用<a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW">創用 CC
+            姓名標示-非商業性-相同方式分享 4.0 國際 授權條款</a>授權。
 </footer>
 
             </div>
@@ -715,8 +730,8 @@ Hub 與實體網路串接，如此可以讓 VPN 客戶端以 VPN 服務器當作
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
                     href="/post/2013/11/setup-home-vpn-server-with-softether-qnap-nas/"
-                    data-tooltip="利用 SoftEther 以及 QNAP NAS 架設 L2TP/IPSec VPN 服務器(上)"
-                    aria-label="下一篇: 利用 SoftEther 以及 QNAP NAS 架設 L2TP/IPSec VPN 服務器(上)"
+                    data-tooltip="利用 SoftEther 以及 QNAP NAS 架設 L2TP/IPSec VPN 服務器 (上)"
+                    aria-label="下一篇: 利用 SoftEther 以及 QNAP NAS 架設 L2TP/IPSec VPN 服務器 (上)"
                 >
                     
                         <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
@@ -911,9 +926,9 @@ Hub 與實體網路串接，如此可以讓 VPN 客戶端以 VPN 服務器當作
                         <a
                             class="link-unstyled"
                             href="https://samkuo.me/post/2012/04/use-pacemaker-two-node-ha-cluster/"
-                            aria-label=": 使用Pacemaker 建構雙節點叢集系統"
+                            aria-label=": 使用 Pacemaker 建構雙節點叢集系統"
                         >
-                            <h3 class="media-heading">使用Pacemaker 建構雙節點叢集系統</h3>
+                            <h3 class="media-heading">使用 Pacemaker 建構雙節點叢集系統</h3>
                         </a>
                         <span class="media-meta">
                             <span class="media-date text-small">
@@ -922,7 +937,7 @@ Hub 與實體網路串接，如此可以讓 VPN 客戶端以 VPN 服務器當作
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>想要達到系統高可用性(high availability)的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。</p></div>
+                        <div class="media-content hide-xs font-merryweather"><p>想要達到系統高可用性 (high availability) 的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。</p></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>
@@ -945,7 +960,7 @@ Hub 與實體網路串接，如此可以讓 VPN 客戶端以 VPN 服務器當作
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案(圖檔, CSS 等等)可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點(single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。</p></div>
+                        <div class="media-content hide-xs font-merryweather"><p>在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案 (圖檔，CSS 等等) 可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點 (single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。</p></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>

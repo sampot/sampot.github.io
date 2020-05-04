@@ -17,7 +17,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"Dropbox 是一個很受歡迎的雲端資料儲存與備份服務，從使用者的角度，它真的很方便，有些很大的檔案往往也能很快就能完成上載。 但您想過它為什麼可以做到這樣快速上傳，背後的技術原理是什麼？對於您的資料安全與個人隱私又有什麼影響？ 山姆鍋根據自己的了解，為您解釋 Dropbox 到底是如何運作的。\n\n雲端儲存或備份是目前很受歡迎的服務，尤其是以 Dropbox\n為其中的代表。本文主要目的在說明類似 Dropbox 這樣的服務如何運 作，不代表\nDropbox 完全按照本文所描述的方式執行。雖然以 Dropbox\n為例子，但基本概念也適用其他服務供應商。\n為了確保資料的可用性，雲端儲存服務必須提供一定的資料冗餘性(Redundancy)，不管是藉由「資料複製(Data\nreplication)」 或者透過 「資訊擴散演算法(Information Dispersal\nAlgorithm)」[1] 來達成。 關於「資訊擴散演算法」， 您也可以參考山姆鍋的\n這篇文章 。\n「資料複製」適合用在常常需要讀取的資料;\n「資訊擴散演算法」通常用在備份資料上。為了方便說明，之後當文章提到存一份檔案或區塊時，根據冗餘性需求，\n其實應該有多個備份。\n避免資料重複儲存\n對於所有使用者上傳的資料，由於成本上的考量，同樣的資料系統只會存一份。何謂同樣的資料？同樣的檔案自然是只有存一份，\n但是系統不是傻傻地以檔案為單位，來判斷資料有沒有重複。而是將每個要存放的檔案切割成很多較小區塊，\n然後根據這些區塊內容計算出雜湊值(Hash\nvalue)當作鍵值(key)來判斷是否有重複。\n如果您稍微思考一下會發現：即使是不同檔案，還是有可能大部份的內容是相同的，例如：\n同一個檔案在不同時間點的不同版本。這對於使用檔案系統作版本管理的人很常見。所以，\n將檔案切割成區塊來儲存，用於重複資料刪除(Data\ndeduplicaiton)可以是很有效的作法。\n這裏衍生出一個有趣的技術問題：系統如何切割檔案成較小區塊？自然不會是切割成固定大小，\n因為這樣做只要檔案小小的修改，就可能造成後面區塊切割點的改變，而造成區塊內容的改變。\n各家業者的演算法也許不同，但可以確定的是：都不會因為檔案小小的修改就造成多數區塊變動。\n針對切割演算法，山姆鍋打算在後續文章中提供一個我在網路上發現的有趣方法。\n大致了解資料如何儲存後，才好理解客戶端如何與雲端共同合作來避免資料重複上傳。\n避免資料重複上傳\n當 Dropbox\n客戶端偵測到有新增或修改的檔案時，它基本上會依照下列步驟來上載資料：\n\n使用檔案切割演算法計算一組區塊檢查碼後，上載這組檢查碼到雲端服務器 [2]\n。\n雲端服務器根據這組檢查碼以及目前已經存在系統的資料區塊，通知客戶端哪些資料區塊需要上傳。\n客戶端根據服務器的指示，只上傳必要的資料區塊。\n\n按照這樣的步驟，您可以知道：Dropbox\n很聰明地避免了資料重複上傳。但細心的讀者也許會注意到， 即使是第一次放入\nDropbox 的檔案，有時也很快就上傳完畢，尤其是從別的地方取得的檔案。\n事實上，如果有人已經上傳過您要上傳到 Dropbox\n的檔案，您可以省下上載的時間跟頻寬。\n節省時間跟頻寬？從某個角度來說，這是優點。但是資料在上傳之前不是應該就加密過嗎？為什麼資料還會跟別人的重複？\n這就牽涉到下一小節要說明的 Convergent\nencryption 。\nConvergent Encryption\n能夠加密資料同時做到重複資料刪除的秘密在於 Convergent\nencryption 這個加密技巧。 在\n避免資料重複儲存\n這一小節，山姆鍋提到儲存的檔案會被切割成較小的資料區塊。\n其實，除了這些資料區塊外，系統還會儲存中介(Meta)資料區塊，這些中介資料區塊提供實際資料區塊的索引。\n屬於同一個檔案的中介與實際資料區塊，通常會組織成樹狀資料結構，如下圖所示：\n\n為了幫每個資料區塊加密，需要使用某個 對稱式加密(Symmetric\nencryption)以及雜湊演算法(Hashing algorithm)， 這裏山姆鍋假設加密使用\nAES-256 CBC 模式，雜湊使用\nSHA-256，這兩者的組合很常被實際應用在雲端儲存服務。 針對葉節點(Leaf\nnode)資料區塊的加密步驟如下：\n\n計算資料區塊的 SHA-256 雜湊值(Hash value)。\n以上述步驟得到的雜湊值當作金鑰，使用 AES-256 CBC 加密此資料區塊。\n\n針對內部節點(Internal node)資料區塊加密步驟如下：\n\n將子節點的位址、SHA-256 雜湊值以及其他中介資料寫入此資料區塊。\n計算此資料區塊的 SHA-256 雜湊值(hash value)。\n以上述步驟得到的雜湊值當作金鑰，使用 AES-256 CBC 加密此資料區塊。\n\n最後，根節點(Root node)的加密步驟跟內部節點相同。根節點的位址以及雜湊值會存放在一個使用者專屬的資料索引中，資料索引的大部份資料會以 Master key 來進行加密。總結一下 Convergent Encryption 的特性：\n\n相同內容的資料區塊雜湊值一定相同。\n使用相同的雜湊值當金鑰，經過加密後的資料區塊自然相同。\n只要保護好 Master key，就有了完整加密保護機制。\n\n由於資料區塊的加密只跟區塊的原始內容有關，因此，不管資料區塊來自哪個使用者，加密後都會產生相同的內容！！！\n這個特性對於資料安全與個人隱私會有某種程度的影響。\n資料安全與個人隱私\n像 Dropbox 這樣的雲端儲存服務，對於您的資料安全性以及個人隱私，有多少保障？\n針對資料安全這點，先記住：Dropbox 擁有您的解密金鑰(Master\nkey)，能夠在雲端將您的資料解碼， 這也是使用者可以使用 Web\n介面存取檔案的原因。 倒不是說，Dropbox\n會故意洩漏您的資料，但是下列原因，可能會讓您的資料暴露在危險中：\n\n\n\nDropbox 遭到駭客入侵：\n可能性雖然低，但也不能忽略。\n\n\n\n\n內部人員操守問題：\n內部人員可能受到威脅利誘，監守自盜。\n\n\n\n\n受到當局強制要求：\n政府單位在某些情況下，可以依法強制 Dropbox 提供使用者資料。\n\n\n\n\n收到法院強制命令：\n電影、音樂等版權業者，透過證明有人在 Dropbox\n放置侵權內容，向法院申請要求 Dropbox\n提供有存放該侵權內容的使用者資料。\n\n\n\n針對第 4 點: 只要計算檔案上載時間便可以判斷是否有人已經在 Dropbox\n上放置相同內容。\n那麼要怎樣改進 Convergent encryption\n的缺點呢？其實只要資料區塊在做加密時，\n使用區塊雜湊值加上使用者個人的秘鑰 [3] 。\n由於每人使用不同的金鑰，不同的使用者間，就算是相同的資料也不會產生相同的編碼。如此，就可以避免資料區塊在使用者間共享，\n但依然達成同一使用者重複資料刪除的優點。\n結語\n如果您有使用 Dropbox\n這樣的服務，您必須在安全與便利之間做選擇。要維持便利，就接受服務安全性上的限制。\n針對需要較高安全性或者隱私性的檔案，使用工具先加密後再上傳;\n或者選擇一家不會在使用者間分享資料區塊的供應商。\n參考資料\nRsync: https://en.wikipedia.org/wiki/Rsync\n關於 rsync algorithm 演算法:\nhttp://ijecorp.blogspot.tw/2014/02/rsync-algorithm.html\nData deduplication:\nhttps://en.wikipedia.org/wiki/Data_deduplication\n對稱式加密:\nhttps://en.wikipedia.org/wiki/Symmetric-key_algorithm\nConvergent encryption:\nhttps://en.wikipedia.org/wiki/Convergent_encryption\nHow Does Dropbox Store Data?:\nhttp://blog.fosketts.net/2011/07/11/dropbox-data-format-deduplication/\n\n\n\n\n資訊擴散演算法(Information Dispersal Algorithm) 將資料切割成 K 個區塊，使用 Reed-solomom 這樣的糾刪碼產生 M 個同位檢查(parity)區塊，將這些 (K + M) 個區塊分散到不同的節點。讀取時，只要其中任意 K 個資料區塊便可以還原原始資料。 ↩︎\n\n由於 Dropbox 有使用 Rsync 程式庫，可以假設它利用跟 Rsync類似方法做切割。 ↩︎\n\n只要是單一使用者專屬的亂數值就可以。 ↩︎\n\n\n\n","dateCreated":"2015-09-14T08:38:00+08:00","dateModified":"2019-11-29T18:01:24+08:00","datePublished":"2015-09-14T08:38:00+08:00","description":"Dropbox 是一個很受歡迎的雲端資料儲存與備份服務，從使用者的角度，它真的很方便，有些很大的檔案往往也能很快就能完成上載。 但您想過它為什麼可以做到這樣快速上傳，背後的技術原理是什麼？對於您的資料安全與個人隱私又有什麼影響？ 山姆鍋根據自己的了解，為您解釋 Dropbox 到底是如何運作的。","headline":"Dropbox 做到資料加密又避免重複儲存的秘密","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2015/09/how-dropbox-encrypt-data-with-convergent-encryption/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2015/09/how-dropbox-encrypt-data-with-convergent-encryption/","keywords":"Security, Encryption, Storage, Cloud, Backup, Algorithm"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"Dropbox 是一個很受歡迎的雲端資料儲存與備份服務，從使用者的角度，它真的很方便，有些很大的檔案往往也能很快就能完成上載。 但您想過它為什麼可以做到這樣快速上傳，背後的技術原理是什麼？對於您的資料安全與個人隱私又有什麼影響？ 山姆鍋根據自己的了解，為您解釋 Dropbox 到底是如何運作的。\n\n雲端儲存或備份是目前很受歡迎的服務，尤其是以 Dropbox\n為其中的代表。本文主要目的在說明類似 Dropbox 這樣的服務如何運 作，不代表\nDropbox 完全按照本文所描述的方式執行。雖然以 Dropbox\n為例子，但基本概念也適用其他服務供應商。\n為了確保資料的可用性，雲端儲存服務必須提供一定的資料冗餘性 (Redundancy)，不管是藉由「資料複製 (Data\nreplication)」 或者透過 「資訊擴散演算法 (Information Dispersal\nAlgorithm)」[1] 來達成。 關於「資訊擴散演算法」， 您也可以參考山姆鍋的\n這篇文章 。\n「資料複製」適合用在常常需要讀取的資料；\n「資訊擴散演算法」通常用在備份資料上。為了方便說明，之後當文章提到存一份檔案或區塊時，根據冗餘性需求，\n其實應該有多個備份。\n避免資料重複儲存\n對於所有使用者上傳的資料，由於成本上的考量，同樣的資料系統只會存一份。何謂同樣的資料？同樣的檔案自然是只有存一份，\n但是系統不是傻傻地以檔案為單位，來判斷資料有沒有重複。而是將每個要存放的檔案切割成很多較小區塊，\n然後根據這些區塊內容計算出雜湊值 (Hash\nvalue) 當作鍵值 (key) 來判斷是否有重複。\n如果您稍微思考一下會發現：即使是不同檔案，還是有可能大部份的內容是相同的，例如：\n同一個檔案在不同時間點的不同版本。這對於使用檔案系統作版本管理的人很常見。所以，\n將檔案切割成區塊來儲存，用於重複資料刪除 (Data\ndeduplicaiton) 可以是很有效的作法。\n這裏衍生出一個有趣的技術問題：系統如何切割檔案成較小區塊？自然不會是切割成固定大小，\n因為這樣做只要檔案小小的修改，就可能造成後面區塊切割點的改變，而造成區塊內容的改變。\n各家業者的演算法也許不同，但可以確定的是：都不會因為檔案小小的修改就造成多數區塊變動。\n針對切割演算法，山姆鍋打算在後續文章中提供一個我在網路上發現的有趣方法。\n大致了解資料如何儲存後，才好理解客戶端如何與雲端共同合作來避免資料重複上傳。\n避免資料重複上傳\n當 Dropbox\n客戶端偵測到有新增或修改的檔案時，它基本上會依照下列步驟來上載資料：\n\n使用檔案切割演算法計算一組區塊檢查碼後，上載這組檢查碼到雲端服務器 [2]\n。\n雲端服務器根據這組檢查碼以及目前已經存在系統的資料區塊，通知客戶端哪些資料區塊需要上傳。\n客戶端根據服務器的指示，只上傳必要的資料區塊。\n\n按照這樣的步驟，您可以知道：Dropbox\n很聰明地避免了資料重複上傳。但細心的讀者也許會注意到， 即使是第一次放入\nDropbox 的檔案，有時也很快就上傳完畢，尤其是從別的地方取得的檔案。\n事實上，如果有人已經上傳過您要上傳到 Dropbox\n的檔案，您可以省下上載的時間跟頻寬。\n節省時間跟頻寬？從某個角度來說，這是優點。但是資料在上傳之前不是應該就加密過嗎？為什麼資料還會跟別人的重複？\n這就牽涉到下一小節要說明的 Convergent\nencryption 。\nConvergent Encryption\n能夠加密資料同時做到重複資料刪除的秘密在於 Convergent\nencryption 這個加密技巧。 在\n避免資料重複儲存\n這一小節，山姆鍋提到儲存的檔案會被切割成較小的資料區塊。\n其實，除了這些資料區塊外，系統還會儲存中介 (Meta) 資料區塊，這些中介資料區塊提供實際資料區塊的索引。\n屬於同一個檔案的中介與實際資料區塊，通常會組織成樹狀資料結構，如下圖所示：\n\n為了幫每個資料區塊加密，需要使用某個 對稱式加密 (Symmetric\nencryption) 以及雜湊演算法 (Hashing algorithm)， 這裏山姆鍋假設加密使用\nAES-256 CBC 模式，雜湊使用\nSHA-256，這兩者的組合很常被實際應用在雲端儲存服務。 針對葉節點 (Leaf\nnode) 資料區塊的加密步驟如下：\n\n計算資料區塊的 SHA-256 雜湊值 (Hash value)。\n以上述步驟得到的雜湊值當作金鑰，使用 AES-256 CBC 加密此資料區塊。\n\n針對內部節點 (Internal node) 資料區塊加密步驟如下：\n\n將子節點的位址、SHA-256 雜湊值以及其他中介資料寫入此資料區塊。\n計算此資料區塊的 SHA-256 雜湊值 (hash value)。\n以上述步驟得到的雜湊值當作金鑰，使用 AES-256 CBC 加密此資料區塊。\n\n最後，根節點 (Root node) 的加密步驟跟內部節點相同。根節點的位址以及雜湊值會存放在一個使用者專屬的資料索引中，資料索引的大部份資料會以 Master key 來進行加密。總結一下 Convergent Encryption 的特性：\n\n相同內容的資料區塊雜湊值一定相同。\n使用相同的雜湊值當金鑰，經過加密後的資料區塊自然相同。\n只要保護好 Master key，就有了完整加密保護機制。\n\n由於資料區塊的加密只跟區塊的原始內容有關，因此，不管資料區塊來自哪個使用者，加密後都會產生相同的內容！！！\n這個特性對於資料安全與個人隱私會有某種程度的影響。\n資料安全與個人隱私\n像 Dropbox 這樣的雲端儲存服務，對於您的資料安全性以及個人隱私，有多少保障？\n針對資料安全這點，先記住：Dropbox 擁有您的解密金鑰 (Master\nkey)，能夠在雲端將您的資料解碼， 這也是使用者可以使用 Web\n介面存取檔案的原因。 倒不是說，Dropbox\n會故意洩漏您的資料，但是下列原因，可能會讓您的資料暴露在危險中：\n\n\n\nDropbox 遭到駭客入侵：\n可能性雖然低，但也不能忽略。\n\n\n\n\n內部人員操守問題：\n內部人員可能受到威脅利誘，監守自盜。\n\n\n\n\n受到當局強制要求：\n政府單位在某些情況下，可以依法強制 Dropbox 提供使用者資料。\n\n\n\n\n收到法院強制命令：\n電影、音樂等版權業者，透過證明有人在 Dropbox\n放置侵權內容，向法院申請要求 Dropbox\n提供有存放該侵權內容的使用者資料。\n\n\n\n針對第 4 點：只要計算檔案上載時間便可以判斷是否有人已經在 Dropbox\n上放置相同內容。\n那麼要怎樣改進 Convergent encryption\n的缺點呢？其實只要資料區塊在做加密時，\n使用區塊雜湊值加上使用者個人的秘鑰 [3] 。\n由於每人使用不同的金鑰，不同的使用者間，就算是相同的資料也不會產生相同的編碼。如此，就可以避免資料區塊在使用者間共享，\n但依然達成同一使用者重複資料刪除的優點。\n結語\n如果您有使用 Dropbox\n這樣的服務，您必須在安全與便利之間做選擇。要維持便利，就接受服務安全性上的限制。\n針對需要較高安全性或者隱私性的檔案，使用工具先加密後再上傳；\n或者選擇一家不會在使用者間分享資料區塊的供應商。\n參考資料\nRsync: https://en.wikipedia.org/wiki/Rsync\n關於 rsync algorithm 演算法:\nhttp://ijecorp.blogspot.tw/2014/02/rsync-algorithm.html\nData deduplication:\nhttps://en.wikipedia.org/wiki/Data_deduplication\n對稱式加密:\nhttps://en.wikipedia.org/wiki/Symmetric-key_algorithm\nConvergent encryption:\nhttps://en.wikipedia.org/wiki/Convergent_encryption\nHow Does Dropbox Store Data?:\nhttp://blog.fosketts.net/2011/07/11/dropbox-data-format-deduplication/\n\n\n\n\n 資訊擴散演算法 (Information Dispersal Algorithm) 將資料切割成 K 個區塊，使用 Reed-solomom 這樣的糾刪碼產生 M 個同位檢查 (parity) 區塊，將這些 (K + M) 個區塊分散到不同的節點。讀取時，只要其中任意 K 個資料區塊便可以還原原始資料。 ↩︎\n\n由於 Dropbox 有使用 Rsync 程式庫，可以假設它利用跟 Rsync 類似方法做切割。 ↩︎\n\n只要是單一使用者專屬的亂數值就可以。 ↩︎\n\n\n\n","dateCreated":"2015-09-14T08:38:00+08:00","dateModified":"2019-11-29T18:01:24+08:00","datePublished":"2015-09-14T08:38:00+08:00","description":"Dropbox 是一個很受歡迎的雲端資料儲存與備份服務，從使用者的角度，它真的很方便，有些很大的檔案往往也能很快就能完成上載。 但您想過它為什麼可以做到這樣快速上傳，背後的技術原理是什麼？對於您的資料安全與個人隱私又有什麼影響？ 山姆鍋根據自己的了解，為您解釋 Dropbox 到底是如何運作的。","headline":"Dropbox 做到資料加密又避免重複儲存的秘密","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2015/09/how-dropbox-encrypt-data-with-convergent-encryption/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2015/09/how-dropbox-encrypt-data-with-convergent-encryption/","keywords":"Security, Encryption, Storage, Cloud, Backup, Algorithm"}</script>
     <meta name="description" content="Dropbox 是一個很受歡迎的雲端資料儲存與備份服務，從使用者的角度，它真的很方便，有些很大的檔案往往也能很快就能完成上載。 但您想過它為什麼可以做到這樣快速上傳，背後的技術原理是什麼？對於您的資料安全與個人隱私又有什麼影響？ 山姆鍋根據自己的了解，為您解釋 Dropbox 到底是如何運作的。">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="Dropbox 做到資料加密又避免重複儲存的秘密">
@@ -371,28 +371,32 @@
     
     <div class="post-content markdown">
         <div class="main-content-wrap">
+            <div class="alert info no-icon">
+                <a href="https://www.facebook.com/sampotkuo" target="_blank" rel="noopener">「我是山姆鍋」有臉書專頁</a>
+            </div>
+
             <p>Dropbox 是一個很受歡迎的雲端資料儲存與備份服務，從使用者的角度，它真的很方便，有些很大的檔案往往也能很快就能完成上載。 但您想過它為什麼可以做到這樣快速上傳，背後的技術原理是什麼？對於您的資料安全與個人隱私又有什麼影響？ 山姆鍋根據自己的了解，為您解釋 Dropbox 到底是如何運作的。</p>
 <a id="more"></a>
 <p>雲端儲存或備份是目前很受歡迎的服務，尤其是以 Dropbox<br>
 為其中的代表。本文主要目的在說明類似 Dropbox 這樣的服務如何運 作，不代表<br>
 Dropbox 完全按照本文所描述的方式執行。雖然以 Dropbox<br>
 為例子，但基本概念也適用其他服務供應商。</p>
-<p>為了確保資料的可用性，雲端儲存服務必須提供一定的資料冗餘性(Redundancy)，不管是藉由「資料複製(Data<br>
-replication)」 或者透過 「資訊擴散演算法(Information Dispersal<br>
+<p>為了確保資料的可用性，雲端儲存服務必須提供一定的資料冗餘性 (Redundancy)，不管是藉由「資料複製 (Data<br>
+replication)」 或者透過 「資訊擴散演算法 (Information Dispersal<br>
 Algorithm)」<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup> 來達成。 關於「資訊擴散演算法」， 您也可以參考山姆鍋的<br>
 <a href="/post/2015/09/python-with-erasure-code/">這篇文章</a> 。</p>
-<p>「資料複製」適合用在常常需要讀取的資料;<br>
+<p>「資料複製」適合用在常常需要讀取的資料；<br>
 「資訊擴散演算法」通常用在備份資料上。為了方便說明，之後當文章提到存一份檔案或區塊時，根據冗餘性需求，<br>
 其實應該有多個備份。</p>
 <h2 id="避免資料重複儲存">避免資料重複儲存</h2>
 <p>對於所有使用者上傳的資料，由於成本上的考量，同樣的資料系統只會存一份。何謂同樣的資料？同樣的檔案自然是只有存一份，<br>
 但是系統不是傻傻地以檔案為單位，來判斷資料有沒有重複。而是將每個要存放的檔案切割成很多較小區塊，<br>
-然後根據這些區塊內容計算出雜湊值(Hash<br>
-value)當作鍵值(key)來判斷是否有重複。</p>
+然後根據這些區塊內容計算出雜湊值 (Hash<br>
+value) 當作鍵值 (key) 來判斷是否有重複。</p>
 <p>如果您稍微思考一下會發現：即使是不同檔案，還是有可能大部份的內容是相同的，例如：<br>
 同一個檔案在不同時間點的不同版本。這對於使用檔案系統作版本管理的人很常見。所以，<br>
-將檔案切割成區塊來儲存，用於重複資料刪除(Data<br>
-deduplicaiton)可以是很有效的作法。</p>
+將檔案切割成區塊來儲存，用於重複資料刪除 (Data<br>
+deduplicaiton) 可以是很有效的作法。</p>
 <p>這裏衍生出一個有趣的技術問題：系統如何切割檔案成較小區塊？自然不會是切割成固定大小，<br>
 因為這樣做只要檔案小小的修改，就可能造成後面區塊切割點的改變，而造成區塊內容的改變。<br>
 各家業者的演算法也許不同，但可以確定的是：都不會因為檔案小小的修改就造成多數區塊變動。<br>
@@ -420,25 +424,25 @@ encryption</a> 。</p>
 encryption</a> 這個加密技巧。 在<br>
 <a href="#%E9%81%BF%E5%85%8D%E8%B3%87%E6%96%99%E9%87%8D%E8%A4%87%E5%84%B2%E5%AD%98">避免資料重複儲存</a><br>
 這一小節，山姆鍋提到儲存的檔案會被切割成較小的資料區塊。<br>
-其實，除了這些資料區塊外，系統還會儲存中介(Meta)資料區塊，這些中介資料區塊提供實際資料區塊的索引。<br>
+其實，除了這些資料區塊外，系統還會儲存中介 (Meta) 資料區塊，這些中介資料區塊提供實際資料區塊的索引。<br>
 屬於同一個檔案的中介與實際資料區塊，通常會組織成樹狀資料結構，如下圖所示：</p>
 <p><img src="/media/2015/09/convergent-encryption-1.png" alt="Convergent-encryption"></p>
-<p>為了幫每個資料區塊加密，需要使用某個 對稱式加密(Symmetric<br>
-encryption)以及雜湊演算法(Hashing algorithm)， 這裏山姆鍋假設加密使用<br>
+<p>為了幫每個資料區塊加密，需要使用某個 對稱式加密 (Symmetric<br>
+encryption) 以及雜湊演算法 (Hashing algorithm)， 這裏山姆鍋假設加密使用<br>
 AES-256 CBC 模式，雜湊使用<br>
-SHA-256，這兩者的組合很常被實際應用在雲端儲存服務。 針對葉節點(Leaf<br>
-node)資料區塊的加密步驟如下：</p>
+SHA-256，這兩者的組合很常被實際應用在雲端儲存服務。 針對葉節點 (Leaf<br>
+node) 資料區塊的加密步驟如下：</p>
 <ol>
-<li>計算資料區塊的 SHA-256 雜湊值(Hash value)。</li>
+<li>計算資料區塊的 SHA-256 雜湊值 (Hash value)。</li>
 <li>以上述步驟得到的雜湊值當作金鑰，使用 AES-256 CBC 加密此資料區塊。</li>
 </ol>
-<p>針對內部節點(Internal node)資料區塊加密步驟如下：</p>
+<p>針對內部節點 (Internal node) 資料區塊加密步驟如下：</p>
 <ol>
 <li>將子節點的位址、SHA-256 雜湊值以及其他中介資料寫入此資料區塊。</li>
-<li>計算此資料區塊的 SHA-256 雜湊值(hash value)。</li>
+<li>計算此資料區塊的 SHA-256 雜湊值 (hash value)。</li>
 <li>以上述步驟得到的雜湊值當作金鑰，使用 AES-256 CBC 加密此資料區塊。</li>
 </ol>
-<p>最後，根節點(Root node)的加密步驟跟內部節點相同。根節點的位址以及雜湊值會存放在一個使用者專屬的資料索引中，資料索引的大部份資料會以 Master key 來進行加密。總結一下 Convergent Encryption 的特性：</p>
+<p>最後，根節點 (Root node) 的加密步驟跟內部節點相同。根節點的位址以及雜湊值會存放在一個使用者專屬的資料索引中，資料索引的大部份資料會以 Master key 來進行加密。總結一下 Convergent Encryption 的特性：</p>
 <ol>
 <li>相同內容的資料區塊雜湊值一定相同。</li>
 <li>使用相同的雜湊值當金鑰，經過加密後的資料區塊自然相同。</li>
@@ -448,7 +452,7 @@ node)資料區塊的加密步驟如下：</p>
 這個特性對於資料安全與個人隱私會有某種程度的影響。</p>
 <h2 id="資料安全與個人隱私">資料安全與個人隱私</h2>
 <p>像 Dropbox 這樣的雲端儲存服務，對於您的資料安全性以及個人隱私，有多少保障？<br>
-針對資料安全這點，先記住：Dropbox 擁有您的解密金鑰(Master<br>
+針對資料安全這點，先記住：Dropbox 擁有您的解密金鑰 (Master<br>
 key)，能夠在雲端將您的資料解碼， 這也是使用者可以使用 Web<br>
 介面存取檔案的原因。 倒不是說，Dropbox<br>
 會故意洩漏您的資料，但是下列原因，可能會讓您的資料暴露在危險中：</p>
@@ -480,7 +484,7 @@ key)，能夠在雲端將您的資料解碼， 這也是使用者可以使用 We
 </dl>
 </li>
 </ol>
-<p>針對第 4 點: 只要計算檔案上載時間便可以判斷是否有人已經在 Dropbox<br>
+<p>針對第 4 點：只要計算檔案上載時間便可以判斷是否有人已經在 Dropbox<br>
 上放置相同內容。</p>
 <p>那麼要怎樣改進 Convergent encryption<br>
 的缺點呢？其實只要資料區塊在做加密時，<br>
@@ -490,7 +494,7 @@ key)，能夠在雲端將您的資料解碼， 這也是使用者可以使用 We
 <h2 id="結語">結語</h2>
 <p>如果您有使用 Dropbox<br>
 這樣的服務，您必須在安全與便利之間做選擇。要維持便利，就接受服務安全性上的限制。<br>
-針對需要較高安全性或者隱私性的檔案，使用工具先加密後再上傳;<br>
+針對需要較高安全性或者隱私性的檔案，使用工具先加密後再上傳；<br>
 或者選擇一家不會在使用者間分享資料區塊的供應商。</p>
 <h2 id="參考資料">參考資料</h2>
 <p><em>Rsync</em>: <a href="https://en.wikipedia.org/wiki/Rsync" target="_blank" rel="noopener">https://en.wikipedia.org/wiki/Rsync</a></p>
@@ -508,15 +512,18 @@ key)，能夠在雲端將您的資料解碼， 這也是使用者可以使用 We
 <hr class="footnotes-sep">
 <section class="footnotes">
 <ol class="footnotes-list">
-<li id="fn1" class="footnote-item"><p>資訊擴散演算法(Information Dispersal Algorithm) 將資料切割成 K 個區塊，使用 Reed-solomom 這樣的糾刪碼產生 M 個同位檢查(parity)區塊，將這些 (K + M) 個區塊分散到不同的節點。讀取時，只要其中任意 K 個資料區塊便可以還原原始資料。 <a href="#fnref1" class="footnote-backref">↩︎</a></p>
+<li id="fn1" class="footnote-item"><p> 資訊擴散演算法 (Information Dispersal Algorithm) 將資料切割成 K 個區塊，使用 Reed-solomom 這樣的糾刪碼產生 M 個同位檢查 (parity) 區塊，將這些 (K + M) 個區塊分散到不同的節點。讀取時，只要其中任意 K 個資料區塊便可以還原原始資料。 <a href="#fnref1" class="footnote-backref">↩︎</a></p>
 </li>
-<li id="fn2" class="footnote-item"><p>由於 Dropbox 有使用 Rsync 程式庫，可以假設它利用跟 Rsync類似方法做切割。 <a href="#fnref2" class="footnote-backref">↩︎</a></p>
+<li id="fn2" class="footnote-item"><p>由於 Dropbox 有使用 Rsync 程式庫，可以假設它利用跟 Rsync 類似方法做切割。 <a href="#fnref2" class="footnote-backref">↩︎</a></p>
 </li>
 <li id="fn3" class="footnote-item"><p>只要是單一使用者專屬的亂數值就可以。 <a href="#fnref3" class="footnote-backref">↩︎</a></p>
 </li>
 </ol>
 </section>
 
+            <div class="alert info no-icon">
+                山姆鍋是<a href="https://developers.tw/@山姆鍋" target="_blank" rel="noopener">#呆丸開發者</a>成員
+            </div>
             
 
 
@@ -555,8 +562,8 @@ key)，能夠在雲端將您的資料解碼， 這也是使用者可以使用 We
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
                     href="/post/2015/09/python-with-erasure-code/"
-                    data-tooltip="很酷的糾刪碼(erasure code)技術"
-                    aria-label="下一篇: 很酷的糾刪碼(erasure code)技術"
+                    data-tooltip="很酷的糾刪碼 (erasure code) 技術"
+                    aria-label="下一篇: 很酷的糾刪碼 (erasure code) 技術"
                 >
                     
                         <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
@@ -643,6 +650,14 @@ key)，能夠在雲端將您的資料解碼， 這也是使用者可以使用 We
     <span class="copyrights">
         Copyrights &copy; 2020 Sampot (山姆鍋). All Rights Reserved.
     </span>
+    <br/>
+        <a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW"><img
+                alt="創用 CC 授權條款" style="border-width:0"
+                src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+        除另有標示，本著作係採用<a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW">創用 CC
+            姓名標示-非商業性-相同方式分享 4.0 國際 授權條款</a>授權。
 </footer>
 
             </div>
@@ -671,8 +686,8 @@ key)，能夠在雲端將您的資料解碼， 這也是使用者可以使用 We
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
                     href="/post/2015/09/python-with-erasure-code/"
-                    data-tooltip="很酷的糾刪碼(erasure code)技術"
-                    aria-label="下一篇: 很酷的糾刪碼(erasure code)技術"
+                    data-tooltip="很酷的糾刪碼 (erasure code) 技術"
+                    aria-label="下一篇: 很酷的糾刪碼 (erasure code) 技術"
                 >
                     
                         <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
@@ -867,9 +882,9 @@ key)，能夠在雲端將您的資料解碼， 這也是使用者可以使用 We
                         <a
                             class="link-unstyled"
                             href="https://samkuo.me/post/2012/04/use-pacemaker-two-node-ha-cluster/"
-                            aria-label=": 使用Pacemaker 建構雙節點叢集系統"
+                            aria-label=": 使用 Pacemaker 建構雙節點叢集系統"
                         >
-                            <h3 class="media-heading">使用Pacemaker 建構雙節點叢集系統</h3>
+                            <h3 class="media-heading">使用 Pacemaker 建構雙節點叢集系統</h3>
                         </a>
                         <span class="media-meta">
                             <span class="media-date text-small">
@@ -878,7 +893,7 @@ key)，能夠在雲端將您的資料解碼， 這也是使用者可以使用 We
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>想要達到系統高可用性(high availability)的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。</p></div>
+                        <div class="media-content hide-xs font-merryweather"><p>想要達到系統高可用性 (high availability) 的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。</p></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>
@@ -901,7 +916,7 @@ key)，能夠在雲端將您的資料解碼， 這也是使用者可以使用 We
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案(圖檔, CSS 等等)可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點(single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。</p></div>
+                        <div class="media-content hide-xs font-merryweather"><p>在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案 (圖檔，CSS 等等) 可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點 (single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。</p></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>

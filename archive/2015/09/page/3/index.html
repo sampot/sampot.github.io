@@ -331,7 +331,7 @@
     <section class="postShorten-group main-content-wrap">
     
     
-    <article class="postShorten postShorten--thumbnailimg-right">
+    <article class="postShorten postShorten--thumbnailimg-bottom">
         <div class="postShorten-wrap">
             
             <div class="postShorten-header">
@@ -371,7 +371,7 @@
                             class="postShorten-excerpt_link link"
                             aria-label=": 如何在 PySide 顯示 QR Code"
                         >
-                            繼續閱讀
+                            閱讀全文
                         </a>
                         
                     
@@ -382,7 +382,7 @@
     </article>
     
     
-    <article class="postShorten postShorten--thumbnailimg-right">
+    <article class="postShorten postShorten--thumbnailimg-bottom">
         <div class="postShorten-wrap">
             
             <div class="postShorten-header">
@@ -409,15 +409,15 @@
             </div>
             
                 <div class="postShorten-excerpt">
-                    <p>山姆鍋喜歡文章至少有張圖檔，沒有特別相關的主題的話，也希望可以顯示一張預設的圖。為了設定這個圖檔，文章的標頭資料(metadata)中， 我使用 ‘image’<br>
-這個標頭來表示圖檔相對路徑。在樣板主題(theme)中，如果有這個標頭就插入該圖檔，否則就使用預設圖檔。 如果在每個樣板需要插入這個圖檔的樣板或者 RSS 中，都需要做這樣的判斷，就有點麻煩。本文山姆鍋介紹使用簡單的插件，來插入這個預設標頭， 確保所有文章都會有這個標頭存在。</p>
+                    <p>山姆鍋喜歡文章至少有張圖檔，沒有特別相關的主題的話，也希望可以顯示一張預設的圖。為了設定這個圖檔，文章的標頭資料 (metadata) 中， 我使用 ‘image’<br>
+這個標頭來表示圖檔相對路徑。在樣板主題 (theme) 中，如果有這個標頭就插入該圖檔，否則就使用預設圖檔。 如果在每個樣板需要插入這個圖檔的樣板或者 RSS 中，都需要做這樣的判斷，就有點麻煩。本文山姆鍋介紹使用簡單的插件，來插入這個預設標頭， 確保所有文章都會有這個標頭存在。</p>
                     
                         <a
                             href="/post/2015/09/insert-default-image-pelican-post/"
                             class="postShorten-excerpt_link link"
                             aria-label=": 如何使用插件自動在 Pelican 插入預設圖檔"
                         >
-                            繼續閱讀
+                            閱讀全文
                         </a>
                         
                     
@@ -428,7 +428,7 @@
     </article>
     
     
-    <article class="postShorten postShorten--thumbnailimg-right">
+    <article class="postShorten postShorten--thumbnailimg-bottom">
         <div class="postShorten-wrap">
             
             <div class="postShorten-header">
@@ -462,7 +462,7 @@
                             class="postShorten-excerpt_link link"
                             aria-label=": 如何讓 Tipue search 可以支援離線搜尋"
                         >
-                            繼續閱讀
+                            閱讀全文
                         </a>
                         
                     
@@ -499,6 +499,14 @@
     <span class="copyrights">
         Copyrights &copy; 2020 Sampot (山姆鍋). All Rights Reserved.
     </span>
+    <br/>
+        <a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW"><img
+                alt="創用 CC 授權條款" style="border-width:0"
+                src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+        除另有標示，本著作係採用<a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW">創用 CC
+            姓名標示-非商業性-相同方式分享 4.0 國際 授權條款</a>授權。
 </footer>
 
             </div>
@@ -591,9 +599,9 @@
                         <a
                             class="link-unstyled"
                             href="https://samkuo.me/post/2012/04/use-pacemaker-two-node-ha-cluster/"
-                            aria-label=": 使用Pacemaker 建構雙節點叢集系統"
+                            aria-label=": 使用 Pacemaker 建構雙節點叢集系統"
                         >
-                            <h3 class="media-heading">使用Pacemaker 建構雙節點叢集系統</h3>
+                            <h3 class="media-heading">使用 Pacemaker 建構雙節點叢集系統</h3>
                         </a>
                         <span class="media-meta">
                             <span class="media-date text-small">
@@ -602,7 +610,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>想要達到系統高可用性(high availability)的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。</p></div>
+                        <div class="media-content hide-xs font-merryweather"><p>想要達到系統高可用性 (high availability) 的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。</p></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>
@@ -625,7 +633,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案(圖檔, CSS 等等)可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點(single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。</p></div>
+                        <div class="media-content hide-xs font-merryweather"><p>在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案 (圖檔，CSS 等等) 可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點 (single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。</p></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>

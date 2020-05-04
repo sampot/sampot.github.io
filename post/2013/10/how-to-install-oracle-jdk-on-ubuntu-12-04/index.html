@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="我是山姆鍋">
-    <title>在Ubuntu系統上，使用Deb套件安裝Oracle JDK - 我是山姆鍋</title>
+    <title>在 Ubuntu 系統上，使用 Deb 套件安裝 Oracle JDK - 我是山姆鍋</title>
     <meta name="author" content="Sampot (山姆鍋)">
     
         <meta name="keywords" content="java, jdk, oracle, ubuntu, Linux, deb">
@@ -19,10 +19,10 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"由於 Ubuntu 發行版本已經不再內建 Oracle/Sun JDK，對現在的 Java 平台開發者而言，要在 Ubuntu 系統上安裝 Java 環境變得有點麻煩。所幸網路上有志人士提供了輔助的方法，本文山姆鍋就來分享一下如何在 Ubuntu 系統上，安裝 Oracle JDK 7。\n\n為什麼要安裝 Oracle JDK?\n雖然 Ubuntu 跟其他 Linux 發行套件都有支援 OpenJDK，但是大部份公司或開發者還是採用 Oracle JDK/JRE 來作為開發與部署環境。有些 Java 開發的軟體也宣稱只支援 Oracle JRE，因此，採用 Oracle JDK/JRE 是比較保險的做法。\n安裝環境\n\n作業系統: Ubuntu 12.04 LTS x86_64\n\n安裝步驟\n新增 WebUpd8 的 PPA\n12$ sudo apt-get install python-software-properties$ sudo add-apt-repository ppa:webupd8team/java\n第一個指令目的在安裝’add-apt-repository’命令，因為他並沒有預先安裝好。\n更新套件列表\n更新套件列表的目的是讓 apt-get 可以找到由 ppa:webupd8team/java 提供的套件。\n1$ sudo apt-get update\n安裝 Oracle JDK\n1$ sudo apt-get install oracle-java7-installer\n如果要安裝 JDK 6 或 8，只要換成 ‘oracle-java6-installer’ 或’oracle-java8-installer’即可。\n小結\n透過 PPA 安裝套件可以方便以後的更新，免得每次都要從 Oracle 官網下載安裝。\n","dateCreated":"2013-10-01T13:44:00+08:00","dateModified":"2018-08-23T13:00:47+08:00","datePublished":"2013-10-01T13:44:00+08:00","description":"由於 Ubuntu 發行版本已經不再內建 Oracle/Sun JDK，對現在的 Java 平台開發者而言，要在 Ubuntu 系統上安裝 Java 環境變得有點麻煩。所幸網路上有志人士提供了輔助的方法，本文山姆鍋就來分享一下如何在 Ubuntu 系統上，安裝 Oracle JDK 7。","headline":"在Ubuntu系統上，使用Deb套件安裝Oracle JDK","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/10/how-to-install-oracle-jdk-on-ubuntu-12-04/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2013/10/how-to-install-oracle-jdk-on-ubuntu-12-04/","keywords":"Ubuntu, Java"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"由於 Ubuntu 發行版本已經不再內建 Oracle/Sun JDK，對現在的 Java 平台開發者而言，要在 Ubuntu 系統上安裝 Java 環境變得有點麻煩。所幸網路上有志人士提供了輔助的方法，本文山姆鍋就來分享一下如何在 Ubuntu 系統上，安裝 Oracle JDK 7。\n\n為什麼要安裝 Oracle JDK?\n雖然 Ubuntu 跟其他 Linux 發行套件都有支援 OpenJDK，但是大部份公司或開發者還是採用 Oracle JDK/JRE 來作為開發與部署環境。有些 Java 開發的軟體也宣稱只支援 Oracle JRE，因此，採用 Oracle JDK/JRE 是比較保險的做法。\n安裝環境\n\n作業系統: Ubuntu 12.04 LTS x86_64\n\n安裝步驟\n新增 WebUpd8 的 PPA\n12$ sudo apt-get install python-software-properties$ sudo add-apt-repository ppa:webupd8team/java\n第一個指令目的在安裝’add-apt-repository’命令，因為他並沒有預先安裝好。\n更新套件列表\n更新套件列表的目的是讓 apt-get 可以找到由 ppa:webupd8team/java 提供的套件。\n1$ sudo apt-get update\n安裝 Oracle JDK\n1$ sudo apt-get install oracle-java7-installer\n如果要安裝 JDK 6 或 8，只要換成 ‘oracle-java6-installer’ 或’oracle-java8-installer’即可。\n小結\n透過 PPA 安裝套件可以方便以後的更新，免得每次都要從 Oracle 官網下載安裝。\n","dateCreated":"2013-10-01T13:44:00+08:00","dateModified":"2018-08-23T13:00:47+08:00","datePublished":"2013-10-01T13:44:00+08:00","description":"由於 Ubuntu 發行版本已經不再內建 Oracle/Sun JDK，對現在的 Java 平台開發者而言，要在 Ubuntu 系統上安裝 Java 環境變得有點麻煩。所幸網路上有志人士提供了輔助的方法，本文山姆鍋就來分享一下如何在 Ubuntu 系統上，安裝 Oracle JDK 7。","headline":"在 Ubuntu 系統上，使用 Deb 套件安裝 Oracle JDK","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/10/how-to-install-oracle-jdk-on-ubuntu-12-04/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2013/10/how-to-install-oracle-jdk-on-ubuntu-12-04/","keywords":"Ubuntu, Java"}</script>
     <meta name="description" content="在Ubuntu系統上，使用deb套件手動安裝Oracle JDK 7。">
 <meta property="og:type" content="blog">
-<meta property="og:title" content="在Ubuntu系統上，使用Deb套件安裝Oracle JDK">
+<meta property="og:title" content="在 Ubuntu 系統上，使用 Deb 套件安裝 Oracle JDK">
 <meta property="og:url" content="https://samkuo.me/post/2013/10/how-to-install-oracle-jdk-on-ubuntu-12-04/">
 <meta property="og:site_name" content="我是山姆鍋">
 <meta property="og:description" content="在Ubuntu系統上，使用deb套件手動安裝Oracle JDK 7。">
@@ -346,7 +346,7 @@
         <div class="post-header main-content-wrap text-left">
     
         <h1 class="post-title">
-            在Ubuntu系統上，使用Deb套件安裝Oracle JDK
+            在 Ubuntu 系統上，使用 Deb 套件安裝 Oracle JDK
         </h1>
     
     
@@ -371,6 +371,10 @@
     
     <div class="post-content markdown">
         <div class="main-content-wrap">
+            <div class="alert info no-icon">
+                <a href="https://www.facebook.com/sampotkuo" target="_blank" rel="noopener">「我是山姆鍋」有臉書專頁</a>
+            </div>
+
             <p>由於 Ubuntu 發行版本已經不再內建 Oracle/Sun JDK，對現在的 Java 平台開發者而言，要在 Ubuntu 系統上安裝 Java 環境變得有點麻煩。所幸網路上有志人士提供了輔助的方法，本文山姆鍋就來分享一下如何在 Ubuntu 系統上，安裝 Oracle JDK 7。</p>
 <a id="more"></a>
 <h3 id="為什麼要安裝-Oracle-JDK">為什麼要安裝 Oracle JDK?</h3>
@@ -381,17 +385,20 @@
 </ul>
 <h3 id="安裝步驟">安裝步驟</h3>
 <h4 id="新增-WebUpd8-的-PPA">新增 WebUpd8 的 PPA</h4>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ sudo apt-get install python-software-properties</span><br><span class="line">$ sudo add-apt-repository ppa:webupd8team/java</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ sudo apt-get install python-software-properties</span><br><span class="line">$ sudo add-apt-repository ppa:webupd8team/java</span><br></pre></td></tr></tbody></table></figure>
 <p>第一個指令目的在安裝’add-apt-repository’命令，因為他並沒有預先安裝好。</p>
 <h4 id="更新套件列表">更新套件列表</h4>
 <p>更新套件列表的目的是讓 apt-get 可以找到由 ppa:webupd8team/java 提供的套件。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo apt-get update</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo apt-get update</span><br></pre></td></tr></tbody></table></figure>
 <h4 id="安裝-Oracle-JDK">安裝 Oracle JDK</h4>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo apt-get install oracle-java7-installer</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo apt-get install oracle-java7-installer</span><br></pre></td></tr></tbody></table></figure>
 <p>如果要安裝 JDK 6 或 8，只要換成 ‘oracle-java6-installer’ 或’oracle-java8-installer’即可。</p>
 <h3 id="小結">小結</h3>
 <p>透過 PPA 安裝套件可以方便以後的更新，免得每次都要從 Oracle 官網下載安裝。</p>
 
+            <div class="alert info no-icon">
+                山姆鍋是<a href="https://developers.tw/@山姆鍋" target="_blank" rel="noopener">#呆丸開發者</a>成員
+            </div>
             
 
 
@@ -518,6 +525,14 @@
     <span class="copyrights">
         Copyrights &copy; 2020 Sampot (山姆鍋). All Rights Reserved.
     </span>
+    <br/>
+        <a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW"><img
+                alt="創用 CC 授權條款" style="border-width:0"
+                src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+        除另有標示，本著作係採用<a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW">創用 CC
+            姓名標示-非商業性-相同方式分享 4.0 國際 授權條款</a>授權。
 </footer>
 
             </div>
@@ -742,9 +757,9 @@
                         <a
                             class="link-unstyled"
                             href="https://samkuo.me/post/2012/04/use-pacemaker-two-node-ha-cluster/"
-                            aria-label=": 使用Pacemaker 建構雙節點叢集系統"
+                            aria-label=": 使用 Pacemaker 建構雙節點叢集系統"
                         >
-                            <h3 class="media-heading">使用Pacemaker 建構雙節點叢集系統</h3>
+                            <h3 class="media-heading">使用 Pacemaker 建構雙節點叢集系統</h3>
                         </a>
                         <span class="media-meta">
                             <span class="media-date text-small">
@@ -753,7 +768,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>想要達到系統高可用性(high availability)的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。</p></div>
+                        <div class="media-content hide-xs font-merryweather"><p>想要達到系統高可用性 (high availability) 的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。</p></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>
@@ -776,7 +791,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案(圖檔, CSS 等等)可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點(single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。</p></div>
+                        <div class="media-content hide-xs font-merryweather"><p>在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案 (圖檔，CSS 等等) 可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點 (single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。</p></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>

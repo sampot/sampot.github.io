@@ -19,7 +19,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"為了希望能夠儘早的得到潛在用戶的反饋，「影化身科技」一開始就打算設置客戶服務系統。這樣的系統，由於主要面向用戶，因此，不能全然以技術面向來考量。跟持續整合一樣，客戶服務系統提供敏捷開發流程重要的反饋，從而讓讓團隊可以不斷學習用戶真正需求以設計真正需要的產品。 本文屬於 「善用雲端服務，微型企業的自強之道」系列文章之一。\n\n需求說明\n底下是山姆鍋針對「影化身科技」需要的雲端客服系統歸納的主要需求：\n快速回饋 (Quick feedback)\n要有方法讓用戶可以快速簡單反饋，既然要快速簡單，所以要用戶離開頁面、需要登入等等不必要的動作都要避免。\n提供知識庫（Knowledge base）\n雲端客服系統需要能夠管理用戶常見的問題，並且方便用戶在提出重複問題前可以簡單找到之前的答案。\n支持討論區（Discussion Forums）\n討論區目前還是一種很有效的溝通管道，借由討論區，除了可以將過去的問答累積下來外，也提供用戶間互相協助的管道。最近幾年流行像是 StackOverflow 這樣 Q&amp;A 的界面設計，也是不錯的選擇。\n支援品牌客制功能\n既然是面對用戶，當然希望客服系統與企業其它系統的界面、Logo 越接近越好。為了達到這點，雲端客服系統的品牌客制功能通常提供修改界面色系、Logo、公司網址等機制。\n多語文支援(Multi-lingual support)\n最基本的支援是界面可以更換成特定語系，例如：中文，這當然需要根據服務的對象而定。如果面向的全球用戶，可能會希望可以有多語文支援，亦即能夠根據用戶的瀏覽器預設或用戶偏好來動態決定界面使用的語系。\n要能夠與專案管理軟體整合\n藉由與專案管理軟體(「影化身科技」採用 Pivotal Tracker)的整合，可以達到研發、用戶與客服形成反饋循環，而這正是一開始要使用客服系統的主要目的。\n評估方案\n底下是山姆鍋評估過，適合微型企業使用的雲端客服系統。\nUserVoice\nUserVoice 提供不同的服務計劃，微型企業可以根據需要的特性選擇進階的套裝服務，但同時也提供免費的使用方案，在尚未有大量用戶之前，可以作為用戶快速反饋的機制。如果只是需要簡單的用戶反饋機制，那相信 UserVoice 已經很夠了。 跟其他廠商比起來，UserVoice 有個特點：就是可以直接與 Facebook Tab 整合，這樣用戶就可以從粉絲專頁直接反應意見。雖然沒有直接支援，但是 Zendesk 透過間接的方式也可以做到接近的效果。\nZendesk\n作為雲端客服系統，Zendesk 可以說功能相當完整，但如果要符合「影化身科技」期望的功能，每個月可就要花 59 美元以上才行。不過還好，可以等到真正需要用到時才升級，一開始可以先從經濟方案上手。 Zendesk 可以與 Pivotal Tracker 整合，對於客服人員無法解決的問題可以轉發給技術團隊處理。技術上，雖然 UserVoice 也可以做到，但 Pivotal Tracker 直接支援 Zendesk 的整合這點還是比較方便。\n除了比較貴之外，Zendesk 主要的缺點是後台管理界面操作需要比較久才能上手，但這點其實是見仁見智，這點對於前端用戶應該影響不大。\nDesk.com\n提供的功能與 Zendesk 類似，但管理/客服人員操作界面比 Zendesk 直覺。Desk.com 採用的計費模式與其他廠商有些不同，它基本上只分成兩種收費計劃：\n\n每個月 3 元美金，可以支援最多 3 位客服人員，但只能使用基本功能。\n每一位客服人員每個月需要 29 美元(整年預付)或 39 美元（按月付款），可以使用全部功能。\n\n對微型企業來說，這種收費模式其實比較有利，一方面希望可以使用更多或全部功能，一方面同時希望費用在可以接收的範圍內。像微型企業這種客服人員不多的情形，可以用差不多的價格就可以使用別的廠商進階的功能。Desk.com 的另一個特點是允許非全職的客服人員一樣可以使用服務，採彈性按小時收費。\n雖然覺得 Desk.com 對於微型企業應該是 C/P 值比較高的服務，但在試用過程中，山姆鍋遇到跟 Google Apps for Business 帳戶整合的問題。雖然 Desk.com 客服人員反應很快速，但因為一直無法解決這個問題而作罷。\n採行方案\n雲端客服系統的選擇，山姆鍋必須聲明一直沒有太確定哪個比較適合。由於尚無法決定使用哪個方案，「影化身科技」目前僅會先使用 Zendesk 的反饋標簽(Feedback Tab)。您應該會在網頁右方看到哪個「反饋」標簽，有任何建議，請不吝提供！\n小結\n跟選擇雲端專案管理系統一樣，顧客服務系統同樣是為了支持敏捷開發流程重要的一環，所以，選擇的依據同樣是以簡單上手為原則。畢竟，總不能期望用戶經過層層關卡才能將問題回饋給團隊吧！\n","dateCreated":"2013-10-29T09:16:00+08:00","dateModified":"2020-03-08T09:46:45+08:00","datePublished":"2013-10-29T09:16:00+08:00","description":"為了希望能夠儘早的得到潛在用戶的反饋，「影化身科技」一開始就打算設置客戶服務系統。這樣的系統，由於主要面向用戶，因此，不能全然以技術面向來考量。跟持續整合一樣，客戶服務系統提供敏捷開發流程重要的反饋，從而讓讓團隊可以不斷學習用戶真正需求以設計真正需要的產品。 本文屬於 「善用雲端服務，微型企業的自強之道」系列文章之一。","headline":"微型企業之雲端客服系統","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/10/cloud-customer-service-system/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2013/10/cloud-customer-service-system/","keywords":"Operations, Infrastructure"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"為了希望能夠儘早的得到潛在用戶的反饋，「影化身科技」一開始就打算設置客戶服務系統。這樣的系統，由於主要面向用戶，因此，不能全然以技術面向來考量。跟持續整合一樣，客戶服務系統提供敏捷開發流程重要的反饋，從而讓讓團隊可以不斷學習用戶真正需求以設計真正需要的產品。 本文屬於 「善用雲端服務，微型企業的自強之道」系列文章之一。\n\n需求說明\n底下是山姆鍋針對「影化身科技」需要的雲端客服系統歸納的主要需求：\n快速回饋 (Quick feedback)\n要有方法讓用戶可以快速簡單反饋，既然要快速簡單，所以要用戶離開頁面、需要登入等等不必要的動作都要避免。\n提供知識庫（Knowledge base）\n雲端客服系統需要能夠管理用戶常見的問題，並且方便用戶在提出重複問題前可以簡單找到之前的答案。\n支持討論區（Discussion Forums）\n討論區目前還是一種很有效的溝通管道，借由討論區，除了可以將過去的問答累積下來外，也提供用戶間互相協助的管道。最近幾年流行像是 StackOverflow 這樣 Q&amp;A 的界面設計，也是不錯的選擇。\n支援品牌客制功能\n既然是面對用戶，當然希望客服系統與企業其它系統的界面、Logo 越接近越好。為了達到這點，雲端客服系統的品牌客制功能通常提供修改界面色系、Logo、公司網址等機制。\n多語文支援 (Multi-lingual support)\n最基本的支援是界面可以更換成特定語系，例如：中文，這當然需要根據服務的對象而定。如果面向的全球用戶，可能會希望可以有多語文支援，亦即能夠根據用戶的瀏覽器預設或用戶偏好來動態決定界面使用的語系。\n要能夠與專案管理軟體整合\n藉由與專案管理軟體 (「影化身科技」採用 Pivotal Tracker) 的整合，可以達到研發、用戶與客服形成反饋循環，而這正是一開始要使用客服系統的主要目的。\n評估方案\n底下是山姆鍋評估過，適合微型企業使用的雲端客服系統。\nUserVoice\nUserVoice 提供不同的服務計劃，微型企業可以根據需要的特性選擇進階的套裝服務，但同時也提供免費的使用方案，在尚未有大量用戶之前，可以作為用戶快速反饋的機制。如果只是需要簡單的用戶反饋機制，那相信 UserVoice 已經很夠了。 跟其他廠商比起來，UserVoice 有個特點：就是可以直接與 Facebook Tab 整合，這樣用戶就可以從粉絲專頁直接反應意見。雖然沒有直接支援，但是 Zendesk 透過間接的方式也可以做到接近的效果。\nZendesk\n作為雲端客服系統，Zendesk 可以說功能相當完整，但如果要符合「影化身科技」期望的功能，每個月可就要花 59 美元以上才行。不過還好，可以等到真正需要用到時才升級，一開始可以先從經濟方案上手。 Zendesk 可以與 Pivotal Tracker 整合，對於客服人員無法解決的問題可以轉發給技術團隊處理。技術上，雖然 UserVoice 也可以做到，但 Pivotal Tracker 直接支援 Zendesk 的整合這點還是比較方便。\n除了比較貴之外，Zendesk 主要的缺點是後台管理界面操作需要比較久才能上手，但這點其實是見仁見智，這點對於前端用戶應該影響不大。\nDesk.com\n提供的功能與 Zendesk 類似，但管理 / 客服人員操作界面比 Zendesk 直覺。Desk.com 採用的計費模式與其他廠商有些不同，它基本上只分成兩種收費計劃：\n\n每個月 3 元美金，可以支援最多 3 位客服人員，但只能使用基本功能。\n每一位客服人員每個月需要 29 美元 (整年預付) 或 39 美元（按月付款），可以使用全部功能。\n\n對微型企業來說，這種收費模式其實比較有利，一方面希望可以使用更多或全部功能，一方面同時希望費用在可以接收的範圍內。像微型企業這種客服人員不多的情形，可以用差不多的價格就可以使用別的廠商進階的功能。Desk.com 的另一個特點是允許非全職的客服人員一樣可以使用服務，採彈性按小時收費。\n雖然覺得 Desk.com 對於微型企業應該是 C/P 值比較高的服務，但在試用過程中，山姆鍋遇到跟 Google Apps for Business 帳戶整合的問題。雖然 Desk.com 客服人員反應很快速，但因為一直無法解決這個問題而作罷。\n採行方案\n雲端客服系統的選擇，山姆鍋必須聲明一直沒有太確定哪個比較適合。由於尚無法決定使用哪個方案，「影化身科技」目前僅會先使用 Zendesk 的反饋標簽 (Feedback Tab)。您應該會在網頁右方看到哪個「反饋」標簽，有任何建議，請不吝提供！\n小結\n跟選擇雲端專案管理系統一樣，顧客服務系統同樣是為了支持敏捷開發流程重要的一環，所以，選擇的依據同樣是以簡單上手為原則。畢竟，總不能期望用戶經過層層關卡才能將問題回饋給團隊吧！\n","dateCreated":"2013-10-29T09:16:00+08:00","dateModified":"2020-03-08T09:46:45+08:00","datePublished":"2013-10-29T09:16:00+08:00","description":"為了希望能夠儘早的得到潛在用戶的反饋，「影化身科技」一開始就打算設置客戶服務系統。這樣的系統，由於主要面向用戶，因此，不能全然以技術面向來考量。跟持續整合一樣，客戶服務系統提供敏捷開發流程重要的反饋，從而讓讓團隊可以不斷學習用戶真正需求以設計真正需要的產品。 本文屬於 「善用雲端服務，微型企業的自強之道」系列文章之一。","headline":"微型企業之雲端客服系統","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/10/cloud-customer-service-system/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2013/10/cloud-customer-service-system/","keywords":"Operations, Infrastructure"}</script>
     <meta name="description" content="山姆鍋解釋「影化身科技」採用雲端客服系統的原因。">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="微型企業之雲端客服系統">
@@ -367,6 +367,10 @@
     
     <div class="post-content markdown">
         <div class="main-content-wrap">
+            <div class="alert info no-icon">
+                <a href="https://www.facebook.com/sampotkuo" target="_blank" rel="noopener">「我是山姆鍋」有臉書專頁</a>
+            </div>
+
             <p>為了希望能夠儘早的得到潛在用戶的反饋，「影化身科技」一開始就打算設置客戶服務系統。這樣的系統，由於主要面向用戶，因此，不能全然以技術面向來考量。跟持續整合一樣，客戶服務系統提供敏捷開發流程重要的反饋，從而讓讓團隊可以不斷學習用戶真正需求以設計真正需要的產品。 本文屬於 <a href="/post/2013/06/infrastructure-software-shop-with-cloud-services/">「善用雲端服務，微型企業的自強之道」</a>系列文章之一。</p>
 <a id="more"></a>
 <h3 id="需求說明">需求說明</h3>
@@ -379,10 +383,10 @@
 <p>討論區目前還是一種很有效的溝通管道，借由討論區，除了可以將過去的問答累積下來外，也提供用戶間互相協助的管道。最近幾年流行像是 StackOverflow 這樣 Q&amp;A 的界面設計，也是不錯的選擇。</p>
 <h4 id="支援品牌客制功能">支援品牌客制功能</h4>
 <p>既然是面對用戶，當然希望客服系統與企業其它系統的界面、Logo 越接近越好。為了達到這點，雲端客服系統的品牌客制功能通常提供修改界面色系、Logo、公司網址等機制。</p>
-<h4 id="多語文支援-Multi-lingual-support">多語文支援(Multi-lingual support)</h4>
+<h4 id="多語文支援-Multi-lingual-support">多語文支援 (Multi-lingual support)</h4>
 <p>最基本的支援是界面可以更換成特定語系，例如：中文，這當然需要根據服務的對象而定。如果面向的全球用戶，可能會希望可以有多語文支援，亦即能夠根據用戶的瀏覽器預設或用戶偏好來動態決定界面使用的語系。</p>
 <h4 id="要能夠與專案管理軟體整合">要能夠與專案管理軟體整合</h4>
-<p>藉由與專案管理軟體(「影化身科技」採用 Pivotal Tracker)的整合，可以達到研發、用戶與客服形成反饋循環，而這正是一開始要使用客服系統的主要目的。</p>
+<p>藉由與專案管理軟體 (「影化身科技」採用 Pivotal Tracker) 的整合，可以達到研發、用戶與客服形成反饋循環，而這正是一開始要使用客服系統的主要目的。</p>
 <h3 id="評估方案">評估方案</h3>
 <p>底下是山姆鍋評估過，適合微型企業使用的雲端客服系統。</p>
 <h4 id="UserVoice"><a href="https://www.uservoice.com/" target="_blank" rel="noopener">UserVoice</a></h4>
@@ -391,18 +395,21 @@
 <p>作為雲端客服系統，Zendesk 可以說功能相當完整，但如果要符合「影化身科技」期望的功能，每個月可就要花 59 美元以上才行。不過還好，可以等到真正需要用到時才升級，一開始可以先從經濟方案上手。 Zendesk 可以與 Pivotal Tracker 整合，對於客服人員無法解決的問題可以轉發給技術團隊處理。技術上，雖然 UserVoice 也可以做到，但 Pivotal Tracker 直接支援 Zendesk 的整合這點還是比較方便。</p>
 <p>除了比較貴之外，Zendesk 主要的缺點是後台管理界面操作需要比較久才能上手，但這點其實是見仁見智，這點對於前端用戶應該影響不大。</p>
 <h4 id="Desk-com"><a href="http://desk.com/" target="_blank" rel="noopener">Desk.com</a></h4>
-<p>提供的功能與 Zendesk 類似，但管理/客服人員操作界面比 Zendesk 直覺。<a href="http://Desk.com" target="_blank" rel="noopener">Desk.com</a> 採用的計費模式與其他廠商有些不同，它基本上只分成兩種收費計劃：</p>
+<p>提供的功能與 Zendesk 類似，但管理 / 客服人員操作界面比 Zendesk 直覺。<a href="http://Desk.com" target="_blank" rel="noopener">Desk.com</a> 採用的計費模式與其他廠商有些不同，它基本上只分成兩種收費計劃：</p>
 <ol>
 <li>每個月 3 元美金，可以支援最多 3 位客服人員，但只能使用基本功能。</li>
-<li>每一位客服人員每個月需要 29 美元(整年預付)或 39 美元（按月付款），可以使用全部功能。</li>
+<li>每一位客服人員每個月需要 29 美元 (整年預付) 或 39 美元（按月付款），可以使用全部功能。</li>
 </ol>
 <p>對微型企業來說，這種收費模式其實比較有利，一方面希望可以使用更多或全部功能，一方面同時希望費用在可以接收的範圍內。像微型企業這種客服人員不多的情形，可以用差不多的價格就可以使用別的廠商進階的功能。<a href="http://Desk.com" target="_blank" rel="noopener">Desk.com</a> 的另一個特點是允許非全職的客服人員一樣可以使用服務，採彈性按小時收費。</p>
 <p>雖然覺得 <a href="http://Desk.com" target="_blank" rel="noopener">Desk.com</a> 對於微型企業應該是 C/P 值比較高的服務，但在試用過程中，山姆鍋遇到跟 Google Apps for Business 帳戶整合的問題。雖然 <a href="http://Desk.com" target="_blank" rel="noopener">Desk.com</a> 客服人員反應很快速，但因為一直無法解決這個問題而作罷。</p>
 <h2 id="採行方案">採行方案</h2>
-<p>雲端客服系統的選擇，山姆鍋必須聲明一直沒有太確定哪個比較適合。由於尚無法決定使用哪個方案，「影化身科技」目前僅會先使用 Zendesk 的反饋標簽(Feedback Tab)。您應該會在網頁右方看到哪個「反饋」標簽，有任何建議，請不吝提供！</p>
+<p>雲端客服系統的選擇，山姆鍋必須聲明一直沒有太確定哪個比較適合。由於尚無法決定使用哪個方案，「影化身科技」目前僅會先使用 Zendesk 的反饋標簽 (Feedback Tab)。您應該會在網頁右方看到哪個「反饋」標簽，有任何建議，請不吝提供！</p>
 <h3 id="小結">小結</h3>
 <p>跟選擇雲端專案管理系統一樣，顧客服務系統同樣是為了支持敏捷開發流程重要的一環，所以，選擇的依據同樣是以簡單上手為原則。畢竟，總不能期望用戶經過層層關卡才能將問題回饋給團隊吧！</p>
 
+            <div class="alert info no-icon">
+                山姆鍋是<a href="https://developers.tw/@山姆鍋" target="_blank" rel="noopener">#呆丸開發者</a>成員
+            </div>
             
 
 
@@ -529,6 +536,14 @@
     <span class="copyrights">
         Copyrights &copy; 2020 Sampot (山姆鍋). All Rights Reserved.
     </span>
+    <br/>
+        <a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW"><img
+                alt="創用 CC 授權條款" style="border-width:0"
+                src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+        除另有標示，本著作係採用<a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW">創用 CC
+            姓名標示-非商業性-相同方式分享 4.0 國際 授權條款</a>授權。
 </footer>
 
             </div>
@@ -753,9 +768,9 @@
                         <a
                             class="link-unstyled"
                             href="https://samkuo.me/post/2012/04/use-pacemaker-two-node-ha-cluster/"
-                            aria-label=": 使用Pacemaker 建構雙節點叢集系統"
+                            aria-label=": 使用 Pacemaker 建構雙節點叢集系統"
                         >
-                            <h3 class="media-heading">使用Pacemaker 建構雙節點叢集系統</h3>
+                            <h3 class="media-heading">使用 Pacemaker 建構雙節點叢集系統</h3>
                         </a>
                         <span class="media-meta">
                             <span class="media-date text-small">
@@ -764,7 +779,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>想要達到系統高可用性(high availability)的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。</p></div>
+                        <div class="media-content hide-xs font-merryweather"><p>想要達到系統高可用性 (high availability) 的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。</p></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>
@@ -787,7 +802,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案(圖檔, CSS 等等)可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點(single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。</p></div>
+                        <div class="media-content hide-xs font-merryweather"><p>在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案 (圖檔，CSS 等等) 可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點 (single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。</p></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>

@@ -17,13 +17,13 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"面試工程師，除了一定要做的實際筆試之外，山姆鍋為了進一步了解候選人(candidate)的能力，會再口頭提問幾個問題。 這些問題對某些人來說，可能覺得不難，但山姆鍋的經驗發現，能夠正確回答出這些問題的比例比預想的少許多。 甚至可以說：會這些題目的工程師，能力已經在水準之上。\n\n山姆鍋面試的習慣之一是在對方筆試結束，如果認為 Candidate 筆試結果不錯，\n初步面談覺得會錄取時，會再問下列問題。\n面試題目\n\n一個樹狀結構，除了根節點沒有外，其餘節點都有且只有一個父節點；任一節點可以有不定個數的子節點，請定義類別(class) Node 及屬性 ( attribute)來表示這個樹節點。\n欲將題目 1 的類別對應到關連式資料庫表格，請設計這個表格的 schema。\n請修改題目 2 的 schema\n使得查詢任一節點的所有直接跟間接子節點只需要一個 SQL\n敘述(statement)。也就是回傳子節點，子節點的子節點，以此類推。\n\n參考答案\n底下是各個題目的參考解答：\n\n類別 Node 需有兩個屬性(attribute)/欄位(field)，分別表示它的父節點以及子結點。\n\n123456public class Node &#123;    Integer  id;        // 也可以使用 int    Node parent;    List&lt;Node&gt; children;    String name;        // 作為節點其它屬性的代表。&#125;\n\n將類別 Node 對應到一個關連式資料庫表格\n\n123456CREATE TABLE node (    id          INT NOT NULL,    parent_id   INT,    name        VARCHAR(255) NOT NULL,    PRIMARY KEY(id));\n給定一個節點 ID, nid, 可以使用下列 SQL 查詢其直接子節點：\n1SELECT * FROM node WHERE parent_id=nid;\n其中，nid 要置換成實際的值。\n\n這題基本上除非之前就看過，不然不會是很正常的。老實說，山姆鍋是先看到方法，才知道答案的。 這題其實真正的目的只是想看 candidate 如何解題以及遇到問題的處理態度。也就是說，根本就沒有預期 candidate 會答對！ 至於解答，Simon Asika 有一篇寫得很好的文章可以參考。 山姆鍋當初發現這個方法時，都還沒有一個正式稱呼。\n\n結語\n根據山姆鍋的經驗，只要會前兩題已經是水準之上，會第三題就算高手了。 山姆鍋是在確認對方已經適任時，才額外使用這些問題用來判斷對方程度到哪裏，希望大家不要弄錯先後順序。 還有順便分享一下：遇到不會的問題，最忌諱直接回答說不會，解決問題的過程遠比答案重要， 這也是為何這些問題採用口試的主因。\n因為這些題目的答案在網路上越來越普遍，已經無法達到當初使用的目的，山姆鍋未來也不會再用了。\n參考資料\n\nStoring Hierarchical Data in a Database, Part 2: http://www.sitepoint.com/hierarchical-data-database-2/\n山姆鍋最原始參考的資料應該是這篇文章。\n\n","dateCreated":"2015-09-21T20:12:00+08:00","dateModified":"2018-08-28T10:42:32+08:00","datePublished":"2015-09-21T20:12:00+08:00","description":"面試工程師，除了一定要做的實際筆試之外，山姆鍋為了進一步了解候選人(candidate)的能力，會再口頭提問幾個問題。 這些問題對某些人來說，可能覺得不難，但山姆鍋的經驗發現，能夠正確回答出這些問題的比例比預想的少許多。 甚至可以說：會這些題目的工程師，能力已經在水準之上。","headline":"山姆鍋過去常用的口試考題","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2015/09/interview-test-engineers/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2015/09/interview-test-engineers/","keywords":"interview, SQL, tree"}</script>
-    <meta name="description" content="面試工程師，除了一定要做的實際筆試之外，山姆鍋為了進一步了解候選人(candidate)的能力，會再口頭提問幾個問題。 這些問題對某些人來說，可能覺得不難，但山姆鍋的經驗發現，能夠正確回答出這些問題的比例比預想的少許多。 甚至可以說：會這些題目的工程師，能力已經在水準之上。">
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"面試工程師，除了一定要做的實際筆試之外，山姆鍋為了進一步了解候選人 (candidate) 的能力，會再口頭提問幾個問題。 這些問題對某些人來說，可能覺得不難，但山姆鍋的經驗發現，能夠正確回答出這些問題的比例比預想的少許多。 甚至可以說：會這些題目的工程師，能力已經在水準之上。\n\n山姆鍋面試的習慣之一是在對方筆試結束，如果認為 Candidate 筆試結果不錯，\n初步面談覺得會錄取時，會再問下列問題。\n面試題目\n\n一個樹狀結構，除了根節點沒有外，其餘節點都有且只有一個父節點；任一節點可以有不定個數的子節點，請定義類別 (class) Node 及屬性 ( attribute) 來表示這個樹節點。\n欲將題目 1 的類別對應到關連式資料庫表格，請設計這個表格的 schema。\n請修改題目 2 的 schema\n使得查詢任一節點的所有直接跟間接子節點只需要一個 SQL\n敘述 (statement)。也就是回傳子節點，子節點的子節點，以此類推。\n\n參考答案\n底下是各個題目的參考解答：\n\n類別 Node 需有兩個屬性 (attribute)/ 欄位 (field)，分別表示它的父節點以及子結點。\n\n123456public class Node {    Integer  id;        // 也可以使用 int    Node parent;    List&lt;Node&gt; children;    String name;        // 作為節點其它屬性的代表。}\n\n將類別 Node 對應到一個關連式資料庫表格 \n\n123456CREATE TABLE node (    id          INT NOT NULL,    parent_id   INT,    name        VARCHAR(255) NOT NULL,    PRIMARY KEY(id));\n給定一個節點 ID, nid, 可以使用下列 SQL 查詢其直接子節點：\n1SELECT * FROM node WHERE parent_id=nid;\n其中，nid 要置換成實際的值。\n\n這題基本上除非之前就看過，不然不會是很正常的。老實說，山姆鍋是先看到方法，才知道答案的。 這題其實真正的目的只是想看 candidate 如何解題以及遇到問題的處理態度。也就是說，根本就沒有預期 candidate 會答對！ 至於解答，Simon Asika 有一篇寫得很好的文章可以參考。 山姆鍋當初發現這個方法時，都還沒有一個正式稱呼。\n\n結語\n根據山姆鍋的經驗，只要會前兩題已經是水準之上，會第三題就算高手了。 山姆鍋是在確認對方已經適任時，才額外使用這些問題用來判斷對方程度到哪裏，希望大家不要弄錯先後順序。 還有順便分享一下：遇到不會的問題，最忌諱直接回答說不會，解決問題的過程遠比答案重要， 這也是為何這些問題採用口試的主因。\n因為這些題目的答案在網路上越來越普遍，已經無法達到當初使用的目的，山姆鍋未來也不會再用了。\n參考資料\n\nStoring Hierarchical Data in a Database, Part 2: http://www.sitepoint.com/hierarchical-data-database-2/\n 山姆鍋最原始參考的資料應該是這篇文章。\n\n","dateCreated":"2015-09-21T20:12:00+08:00","dateModified":"2018-08-28T10:42:32+08:00","datePublished":"2015-09-21T20:12:00+08:00","description":"面試工程師，除了一定要做的實際筆試之外，山姆鍋為了進一步了解候選人 (candidate) 的能力，會再口頭提問幾個問題。 這些問題對某些人來說，可能覺得不難，但山姆鍋的經驗發現，能夠正確回答出這些問題的比例比預想的少許多。 甚至可以說：會這些題目的工程師，能力已經在水準之上。","headline":"山姆鍋過去常用的口試考題","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2015/09/interview-test-engineers/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2015/09/interview-test-engineers/","keywords":"interview, SQL, tree"}</script>
+    <meta name="description" content="面試工程師，除了一定要做的實際筆試之外，山姆鍋為了進一步了解候選人 (candidate) 的能力，會再口頭提問幾個問題。 這些問題對某些人來說，可能覺得不難，但山姆鍋的經驗發現，能夠正確回答出這些問題的比例比預想的少許多。 甚至可以說：會這些題目的工程師，能力已經在水準之上。">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="山姆鍋過去常用的口試考題">
 <meta property="og:url" content="https://samkuo.me/post/2015/09/interview-test-engineers/">
 <meta property="og:site_name" content="我是山姆鍋">
-<meta property="og:description" content="面試工程師，除了一定要做的實際筆試之外，山姆鍋為了進一步了解候選人(candidate)的能力，會再口頭提問幾個問題。 這些問題對某些人來說，可能覺得不難，但山姆鍋的經驗發現，能夠正確回答出這些問題的比例比預想的少許多。 甚至可以說：會這些題目的工程師，能力已經在水準之上。">
+<meta property="og:description" content="面試工程師，除了一定要做的實際筆試之外，山姆鍋為了進一步了解候選人 (candidate) 的能力，會再口頭提問幾個問題。 這些問題對某些人來說，可能覺得不難，但山姆鍋的經驗發現，能夠正確回答出這些問題的比例比預想的少許多。 甚至可以說：會這些題目的工程師，能力已經在水準之上。">
 <meta property="og:locale" content="zh_TW">
 <meta property="article:published_time" content="2015-09-21T12:12:00.000Z">
 <meta property="article:modified_time" content="2018-08-28T02:42:32.246Z">
@@ -366,30 +366,34 @@
     
     <div class="post-content markdown">
         <div class="main-content-wrap">
-            <p>面試工程師，除了一定要做的實際筆試之外，山姆鍋為了進一步了解候選人(candidate)的能力，會再口頭提問幾個問題。 這些問題對某些人來說，可能覺得不難，但山姆鍋的經驗發現，能夠正確回答出這些問題的比例比預想的少許多。 甚至可以說：會這些題目的工程師，能力已經在水準之上。</p>
+            <div class="alert info no-icon">
+                <a href="https://www.facebook.com/sampotkuo" target="_blank" rel="noopener">「我是山姆鍋」有臉書專頁</a>
+            </div>
+
+            <p>面試工程師，除了一定要做的實際筆試之外，山姆鍋為了進一步了解候選人 (candidate) 的能力，會再口頭提問幾個問題。 這些問題對某些人來說，可能覺得不難，但山姆鍋的經驗發現，能夠正確回答出這些問題的比例比預想的少許多。 甚至可以說：會這些題目的工程師，能力已經在水準之上。</p>
 <a id="more"></a>
 <p>山姆鍋面試的習慣之一是在對方筆試結束，如果認為 Candidate 筆試結果不錯，<br>
 初步面談覺得會錄取時，會再問下列問題。</p>
 <h2 id="面試題目">面試題目</h2>
 <ol>
-<li>一個樹狀結構，除了根節點沒有外，其餘節點都有且只有一個父節點；任一節點可以有不定個數的子節點，請定義類別(class) Node 及屬性 ( attribute)來表示這個樹節點。</li>
+<li>一個樹狀結構，除了根節點沒有外，其餘節點都有且只有一個父節點；任一節點可以有不定個數的子節點，請定義類別 (class) Node 及屬性 ( attribute) 來表示這個樹節點。</li>
 <li>欲將題目 1 的類別對應到關連式資料庫表格，請設計這個表格的 schema。</li>
 <li>請修改題目 2 的 schema<br>
 使得查詢任一節點的所有直接跟間接子節點只需要一個 SQL<br>
-敘述(statement)。也就是回傳子節點，子節點的子節點，以此類推。</li>
+敘述 (statement)。也就是回傳子節點，子節點的子節點，以此類推。</li>
 </ol>
 <h2 id="參考答案">參考答案</h2>
 <p>底下是各個題目的參考解答：</p>
 <ol>
-<li>類別 Node 需有兩個屬性(attribute)/欄位(field)，分別表示它的父節點以及子結點。</li>
+<li>類別 Node 需有兩個屬性 (attribute)/ 欄位 (field)，分別表示它的父節點以及子結點。</li>
 </ol>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Node</span> </span>&#123;</span><br><span class="line">    Integer  id;        <span class="comment">// 也可以使用 int</span></span><br><span class="line">    Node parent;</span><br><span class="line">    List&lt;Node&gt; children;</span><br><span class="line">    String name;        <span class="comment">// 作為節點其它屬性的代表。</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Node</span> </span>{</span><br><span class="line">    Integer  id;        <span class="comment">// 也可以使用 int</span></span><br><span class="line">    Node parent;</span><br><span class="line">    List&lt;Node&gt; children;</span><br><span class="line">    String name;        <span class="comment">// 作為節點其它屬性的代表。</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
 <ol start="2">
-<li>將類別 Node 對應到一個關連式資料庫表格</li>
+<li>將類別 Node 對應到一個關連式資料庫表格 </li>
 </ol>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> node (</span><br><span class="line">    <span class="keyword">id</span>          <span class="built_in">INT</span> <span class="keyword">NOT</span> <span class="literal">NULL</span>,</span><br><span class="line">    parent_id   <span class="built_in">INT</span>,</span><br><span class="line">    <span class="keyword">name</span>        <span class="built_in">VARCHAR</span>(<span class="number">255</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span>,</span><br><span class="line">    PRIMARY <span class="keyword">KEY</span>(<span class="keyword">id</span>)</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<figure class="highlight sql"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> node (</span><br><span class="line">    <span class="keyword">id</span>          <span class="built_in">INT</span> <span class="keyword">NOT</span> <span class="literal">NULL</span>,</span><br><span class="line">    parent_id   <span class="built_in">INT</span>,</span><br><span class="line">    <span class="keyword">name</span>        <span class="built_in">VARCHAR</span>(<span class="number">255</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span>,</span><br><span class="line">    PRIMARY <span class="keyword">KEY</span>(<span class="keyword">id</span>)</span><br><span class="line">);</span><br></pre></td></tr></tbody></table></figure>
 <p>給定一個節點 ID, nid, 可以使用下列 SQL 查詢其直接子節點：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> node <span class="keyword">WHERE</span> parent_id=nid;</span><br></pre></td></tr></table></figure>
+<figure class="highlight sql"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> node <span class="keyword">WHERE</span> parent_id=nid;</span><br></pre></td></tr></tbody></table></figure>
 <p>其中，<code>nid</code> 要置換成實際的值。</p>
 <ol start="3">
 <li>這題基本上除非之前就看過，不然不會是很正常的。老實說，山姆鍋是先看到方法，才知道答案的。 這題其實真正的目的只是想看 candidate 如何解題以及遇到問題的處理態度。也就是說，根本就沒有預期 candidate 會答對！ 至於解答，<a href="http://asika.windspeaker.co/post/3488-nested-set-model" target="_blank" rel="noopener">Simon Asika</a> 有一篇寫得很好的文章可以參考。 山姆鍋當初發現這個方法時，都還沒有一個正式稱呼。</li>
@@ -400,9 +404,12 @@
 <h2 id="參考資料">參考資料</h2>
 <dl>
 <dt><em>Storing Hierarchical Data in a Database, Part 2</em>: <a href="http://www.sitepoint.com/hierarchical-data-database-2/" target="_blank" rel="noopener">http://www.sitepoint.com/hierarchical-data-database-2/</a></dt>
-<dd>山姆鍋最原始參考的資料應該是這篇文章。</dd>
+<dd> 山姆鍋最原始參考的資料應該是這篇文章。</dd>
 </dl>
 
+            <div class="alert info no-icon">
+                山姆鍋是<a href="https://developers.tw/@山姆鍋" target="_blank" rel="noopener">#呆丸開發者</a>成員
+            </div>
             
 
 
@@ -529,6 +536,14 @@
     <span class="copyrights">
         Copyrights &copy; 2020 Sampot (山姆鍋). All Rights Reserved.
     </span>
+    <br/>
+        <a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW"><img
+                alt="創用 CC 授權條款" style="border-width:0"
+                src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+        除另有標示，本著作係採用<a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW">創用 CC
+            姓名標示-非商業性-相同方式分享 4.0 國際 授權條款</a>授權。
 </footer>
 
             </div>
@@ -753,9 +768,9 @@
                         <a
                             class="link-unstyled"
                             href="https://samkuo.me/post/2012/04/use-pacemaker-two-node-ha-cluster/"
-                            aria-label=": 使用Pacemaker 建構雙節點叢集系統"
+                            aria-label=": 使用 Pacemaker 建構雙節點叢集系統"
                         >
-                            <h3 class="media-heading">使用Pacemaker 建構雙節點叢集系統</h3>
+                            <h3 class="media-heading">使用 Pacemaker 建構雙節點叢集系統</h3>
                         </a>
                         <span class="media-meta">
                             <span class="media-date text-small">
@@ -764,7 +779,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>想要達到系統高可用性(high availability)的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。</p></div>
+                        <div class="media-content hide-xs font-merryweather"><p>想要達到系統高可用性 (high availability) 的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。</p></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>
@@ -787,7 +802,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案(圖檔, CSS 等等)可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點(single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。</p></div>
+                        <div class="media-content hide-xs font-merryweather"><p>在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案 (圖檔，CSS 等等) 可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點 (single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。</p></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>

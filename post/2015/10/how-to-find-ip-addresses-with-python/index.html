@@ -17,13 +17,13 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"使用 Python 建立 Socket 物件並綁定(bind)到網卡後，該如何取得實際綁定的 IP 位址？這個問題多數人都會覺得簡單，但真的有這麼容易嗎?\n\n問題描述\n在 Python 網路服務器程式中，假設使用 UDP\n協定的話，通常可以看到類似下面程式片段用來綁定 socket：\n12self._socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)self._socket.bind( ('0.0.0.0', 1234) )\n這樣的程式碼稀鬆平常，但您知道該如何取得實際綁定的本地 IP 位址嗎？\n查了一下參考資料，您很快就會發現 Socket 物件有個 ‘getsockname’\n方法可以回傳位址跟 port。\n1ip, port = self._socket.getsockname()\n正當您覺得簡單完成任務的時候，卻發現 ‘ip’ 變數得到的是\n‘0.0.0.0’，跟當初綁定用的值相同！ 試了 ‘127.0.0.1’\n也都是同樣的情況，怎麼會這樣？顯然 ‘getsockname’\n的實作跟我們的期待完全不同。\n解決方案\n下面程式片段示範如何取的本地網卡所使用的 IP 位址跟埠號(port)：\n12345s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)s.connect(('8.8.8.8', 80))  # 1ip, _ = s.getsockname()s.close()return ip\n其中標記 1\n的地方是整個片段可以運作的關鍵。另外，上述程式片段有可能會丟出 IOError\n的例外，請記得要處理。\n這裡假設綁定 socket 的網卡跟用來實際通訊的網卡是同一張。\n結語\n雖然 StackOverflow\n網站可以輕鬆找到這種問題的解答，或者該說眾多的解答，例如這個：http://stackoverflow.com/questions/166506/finding-local-ip-addresses-using-pythons-stdlib\n。 但您看有多少個答案！排第一的答案還不適用山姆鍋遇到的情況。\n所以，簡單歸簡單，這個問題還是值得紀錄一下讓更多人容易找到答案。\n","dateCreated":"2015-10-03T17:12:00+08:00","dateModified":"2018-08-29T20:16:03+08:00","datePublished":"2015-10-03T17:12:00+08:00","description":"使用 Python 建立 Socket 物件並綁定(bind)到網卡後，該如何取得實際綁定的 IP 位址？這個問題多數人都會覺得簡單，但真的有這麼容易嗎?","headline":"Python 如何找到綁定的 IP 位址？","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2015/10/how-to-find-ip-addresses-with-python/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2015/10/how-to-find-ip-addresses-with-python/","keywords":"Python, IP, Address"}</script>
-    <meta name="description" content="使用 Python 建立 Socket 物件並綁定(bind)到網卡後，該如何取得實際綁定的 IP 位址？這個問題多數人都會覺得簡單，但真的有這麼容易嗎?">
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"使用 Python 建立 Socket 物件並綁定 (bind) 到網卡後，該如何取得實際綁定的 IP 位址？這個問題多數人都會覺得簡單，但真的有這麼容易嗎？\n\n問題描述\n在 Python 網路服務器程式中，假設使用 UDP\n協定的話，通常可以看到類似下面程式片段用來綁定 socket：\n12self._socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)self._socket.bind( ('0.0.0.0', 1234) )\n這樣的程式碼稀鬆平常，但您知道該如何取得實際綁定的本地 IP 位址嗎？\n查了一下參考資料，您很快就會發現 Socket 物件有個 ‘getsockname’\n方法可以回傳位址跟 port。\n1ip, port = self._socket.getsockname()\n正當您覺得簡單完成任務的時候，卻發現 ‘ip’ 變數得到的是\n‘0.0.0.0’，跟當初綁定用的值相同！ 試了 ‘127.0.0.1’\n也都是同樣的情況，怎麼會這樣？顯然 ‘getsockname’\n的實作跟我們的期待完全不同。\n解決方案\n下面程式片段示範如何取的本地網卡所使用的 IP 位址跟埠號 (port)：\n12345s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)s.connect(('8.8.8.8', 80))  # 1ip, _ = s.getsockname()s.close()return ip\n其中標記 1\n的地方是整個片段可以運作的關鍵。另外，上述程式片段有可能會丟出 IOError\n的例外，請記得要處理。\n這裡假設綁定 socket 的網卡跟用來實際通訊的網卡是同一張。\n結語\n雖然 StackOverflow\n網站可以輕鬆找到這種問題的解答，或者該說眾多的解答，例如這個：http://stackoverflow.com/questions/166506/finding-local-ip-addresses-using-pythons-stdlib\n。 但您看有多少個答案！排第一的答案還不適用山姆鍋遇到的情況。\n所以，簡單歸簡單，這個問題還是值得紀錄一下讓更多人容易找到答案。\n","dateCreated":"2015-10-03T17:12:00+08:00","dateModified":"2018-08-29T20:16:03+08:00","datePublished":"2015-10-03T17:12:00+08:00","description":"使用 Python 建立 Socket 物件並綁定 (bind) 到網卡後，該如何取得實際綁定的 IP 位址？這個問題多數人都會覺得簡單，但真的有這麼容易嗎？","headline":"Python 如何找到綁定的 IP 位址？","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2015/10/how-to-find-ip-addresses-with-python/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2015/10/how-to-find-ip-addresses-with-python/","keywords":"Python, IP, Address"}</script>
+    <meta name="description" content="使用 Python 建立 Socket 物件並綁定 (bind) 到網卡後，該如何取得實際綁定的 IP 位址？這個問題多數人都會覺得簡單，但真的有這麼容易嗎？">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="Python 如何找到綁定的 IP 位址？">
 <meta property="og:url" content="https://samkuo.me/post/2015/10/how-to-find-ip-addresses-with-python/">
 <meta property="og:site_name" content="我是山姆鍋">
-<meta property="og:description" content="使用 Python 建立 Socket 物件並綁定(bind)到網卡後，該如何取得實際綁定的 IP 位址？這個問題多數人都會覺得簡單，但真的有這麼容易嗎?">
+<meta property="og:description" content="使用 Python 建立 Socket 物件並綁定 (bind) 到網卡後，該如何取得實際綁定的 IP 位址？這個問題多數人都會覺得簡單，但真的有這麼容易嗎？">
 <meta property="og:locale" content="zh_TW">
 <meta property="article:published_time" content="2015-10-03T09:12:00.000Z">
 <meta property="article:modified_time" content="2018-08-29T12:16:03.548Z">
@@ -366,23 +366,27 @@
     
     <div class="post-content markdown">
         <div class="main-content-wrap">
-            <p>使用 Python 建立 Socket 物件並綁定(bind)到網卡後，該如何取得實際綁定的 IP 位址？這個問題多數人都會覺得簡單，但真的有這麼容易嗎?</p>
+            <div class="alert info no-icon">
+                <a href="https://www.facebook.com/sampotkuo" target="_blank" rel="noopener">「我是山姆鍋」有臉書專頁</a>
+            </div>
+
+            <p>使用 Python 建立 Socket 物件並綁定 (bind) 到網卡後，該如何取得實際綁定的 IP 位址？這個問題多數人都會覺得簡單，但真的有這麼容易嗎？</p>
 <a id="more"></a>
 <h2 id="問題描述">問題描述</h2>
 <p>在 Python 網路服務器程式中，假設使用 UDP<br>
 協定的話，通常可以看到類似下面程式片段用來綁定 socket：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">self._socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)</span><br><span class="line">self._socket.bind( (<span class="string">'0.0.0.0'</span>, <span class="number">1234</span>) )</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">self._socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)</span><br><span class="line">self._socket.bind( (<span class="string">'0.0.0.0'</span>, <span class="number">1234</span>) )</span><br></pre></td></tr></tbody></table></figure>
 <p>這樣的程式碼稀鬆平常，但您知道該如何取得實際綁定的本地 IP 位址嗎？<br>
 查了一下參考資料，您很快就會發現 Socket 物件有個 ‘getsockname’<br>
 方法可以回傳位址跟 port。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ip, port = self._socket.getsockname()</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ip, port = self._socket.getsockname()</span><br></pre></td></tr></tbody></table></figure>
 <p>正當您覺得簡單完成任務的時候，卻發現 ‘ip’ 變數得到的是<br>
 ‘0.0.0.0’，跟當初綁定用的值相同！ 試了 ‘127.0.0.1’<br>
 也都是同樣的情況，怎麼會這樣？顯然 ‘getsockname’<br>
 的實作跟我們的期待完全不同。</p>
 <h2 id="解決方案">解決方案</h2>
-<p>下面程式片段示範如何取的本地網卡所使用的 IP 位址跟埠號(port)：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)</span><br><span class="line">s.connect((<span class="string">'8.8.8.8'</span>, <span class="number">80</span>))  <span class="comment"># 1</span></span><br><span class="line">ip, _ = s.getsockname()</span><br><span class="line">s.close()</span><br><span class="line"><span class="keyword">return</span> ip</span><br></pre></td></tr></table></figure>
+<p>下面程式片段示範如何取的本地網卡所使用的 IP 位址跟埠號 (port)：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)</span><br><span class="line">s.connect((<span class="string">'8.8.8.8'</span>, <span class="number">80</span>))  <span class="comment"># 1</span></span><br><span class="line">ip, _ = s.getsockname()</span><br><span class="line">s.close()</span><br><span class="line"><span class="keyword">return</span> ip</span><br></pre></td></tr></tbody></table></figure>
 <p>其中標記 1<br>
 的地方是整個片段可以運作的關鍵。另外，上述程式片段有可能會丟出 IOError<br>
 的例外，請記得要處理。</p>
@@ -393,6 +397,9 @@
 。 但您看有多少個答案！排第一的答案還不適用山姆鍋遇到的情況。<br>
 所以，簡單歸簡單，這個問題還是值得紀錄一下讓更多人容易找到答案。</p>
 
+            <div class="alert info no-icon">
+                山姆鍋是<a href="https://developers.tw/@山姆鍋" target="_blank" rel="noopener">#呆丸開發者</a>成員
+            </div>
             
 
 
@@ -417,8 +424,8 @@
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
                     href="/post/2015/10/persistent-message-queues-with-lmdb/"
-                    data-tooltip="如何實作簡單的持久性訊息佇列?"
-                    aria-label="上一篇: 如何實作簡單的持久性訊息佇列?"
+                    data-tooltip="如何實作簡單的持久性訊息佇列？"
+                    aria-label="上一篇: 如何實作簡單的持久性訊息佇列？"
                 >
                     
                         <i class="fa fa-angle-left" aria-hidden="true"></i>
@@ -519,6 +526,14 @@
     <span class="copyrights">
         Copyrights &copy; 2020 Sampot (山姆鍋). All Rights Reserved.
     </span>
+    <br/>
+        <a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW"><img
+                alt="創用 CC 授權條款" style="border-width:0"
+                src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+        除另有標示，本著作係採用<a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW">創用 CC
+            姓名標示-非商業性-相同方式分享 4.0 國際 授權條款</a>授權。
 </footer>
 
             </div>
@@ -533,8 +548,8 @@
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
                     href="/post/2015/10/persistent-message-queues-with-lmdb/"
-                    data-tooltip="如何實作簡單的持久性訊息佇列?"
-                    aria-label="上一篇: 如何實作簡單的持久性訊息佇列?"
+                    data-tooltip="如何實作簡單的持久性訊息佇列？"
+                    aria-label="上一篇: 如何實作簡單的持久性訊息佇列？"
                 >
                     
                         <i class="fa fa-angle-left" aria-hidden="true"></i>
@@ -743,9 +758,9 @@
                         <a
                             class="link-unstyled"
                             href="https://samkuo.me/post/2012/04/use-pacemaker-two-node-ha-cluster/"
-                            aria-label=": 使用Pacemaker 建構雙節點叢集系統"
+                            aria-label=": 使用 Pacemaker 建構雙節點叢集系統"
                         >
-                            <h3 class="media-heading">使用Pacemaker 建構雙節點叢集系統</h3>
+                            <h3 class="media-heading">使用 Pacemaker 建構雙節點叢集系統</h3>
                         </a>
                         <span class="media-meta">
                             <span class="media-date text-small">
@@ -754,7 +769,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>想要達到系統高可用性(high availability)的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。</p></div>
+                        <div class="media-content hide-xs font-merryweather"><p>想要達到系統高可用性 (high availability) 的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。</p></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>
@@ -777,7 +792,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案(圖檔, CSS 等等)可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點(single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。</p></div>
+                        <div class="media-content hide-xs font-merryweather"><p>在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案 (圖檔，CSS 等等) 可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點 (single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。</p></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>

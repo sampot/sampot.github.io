@@ -17,13 +17,13 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"本文介紹一個開發中的代理人(agent)工具程式：“EAvatar ME”，中文名稱《我.影化身》，唸作我的影化身。 這個代理人程式設計來執行一些例行的工作(tasks)，由於每個人的例行的工作可能大相逕庭，這個代理人自然也要能夠根據不同情境執行不同腳本。\n\n雖然是代理人，請不要期待《我.影化身》會有什麼人工智慧。骨子裏，它就是一個軟體工具，\n設計來自動執行一些簡單的工作。什麼樣類型的工作適合《我.影化身》來執行？\n「事件-條件-動作」\n《我.影化身》適合事件驅動(event-driven)的工作類型，這類型的工作流程由下列三個主要元素組成：\n\n\n\n事件(Event)\n\n:   代表環境中發生的事情、狀態變動等可被偵測的改變，例如：「收到新的郵件」、「網頁內容變動」等等。\n\n\n\n\n條件(Condition)\n\n:   事件發生不一定會引發反應，需要符合特定條件才行。例如：就算收到新的郵件，\n    使用者可能想要根據目前的時間來決定要不要收到通知。\n\n\n\n\n動作(Action)\n\n:   動作就是代理人實際執行的工作內容。工作可以簡單也可以很複雜，簡單的工作如「通知使用者有新的郵件」，\n    複雜的工作則可能需要根據當下的狀態來決定採取不同的動作。\n\n所以，代理人的基本工作流程就是：\n\n偵測到特定事件發生\n檢查是否符合動作條件\n符合條件則執行預定的動作\n重複步驟 1 到 3\n\n雖然這三者個別來看不是挺複雜，但還是來看看實際可能的應用情境吧！\n應用情境(Scenarios)\n本節說明幾個《我.影化身》適合的應用情境：\n檢查電子郵件(Checking mails)\n檢查使用者電子信箱，有新的信件時，通知使用者。《我.影化身》的客戶端程式與系統通知整合，如下圖所示：\n\n檢查期貨即時報價\n剖析期貨即時報價網頁，擷取報價資訊，根據設定條件通知使用者。\n抓取網頁(Web scraping)\n《我.影化身》由於技術架構的關係，可以同時執行許多的 I/O 導向的工作，其中以網頁抓取作為主要代表。\n由於採用事件驅動，非阻斷式 I/O 程式庫，《我.影化身》很適合執行大量網頁存取的工作。\n使用概念\n使用《我.影化身》需要知道一些基本概念，了解這些概念才能知道為何《我.影化身》這樣被設計。\n基本上，使用者將要《我.影化身》完成的工作(job)以腳本(script)的形式交付給《我.影化身》執行。\n一個「工作」可能包含一個以上相關的任務(task)，「腳本」的用途便是將這些任務組織起來，\n確保任務按照正確的流程執行。\n「腳本」採用受限制的 Python 語法，也就是：腳本是個符合 Python\n語法的程式，但反過來不成立。\n因為「腳本」目的是作為工作流程控制，只能執行《我.影化身》預先定義好的任務。\n《我.影化身》中，「任務」代表執行一個「動作(action)」，每個「動作」可以接受不定個數的參數(arguments)，\n並可以回傳結果(result)。基於安全理由，《我.影化身》支援的動作是預先定義好，以避免腳本執行任意動作危害到系統。\n「動作」是由不同模組(modules)所提供，在啟動時模組會註冊所提供的動作。這裏的「模組」就是\nPython 的模組， 功能上完全相同。\n複雜的「模組」需要額外的套件(package)支援來實現「動作」所需的功能。基於這個需要，\n《我.影化身》支援以 Egg 發行包的形式安裝額外的 Python 套件，但僅限於純\nPython 程式碼。\n專為《我.影化身》開發的發行包可以同時包含提供「動作」的模組，如此可以簡化部署的工作。\n腳本範例\n為了有更具體的感覺，底下是一個《我.影化身》腳本，僅供參考，不保證在未來版本可以正確執行。\n12345678910ava.sleep(60)  # sleep for 1 minutemessages, unseen = ava.do('imap.check',                          server='imap.gmail.com',                          username='username@gmail.com',                          password='password').result()if unseen &gt; 0:    ava.do('user.notify',           message=\"Busy day, you have %d new messages.\" % unseen,           title=\"You got new mails from GMail\")\nava.do() 會以非同步方式執行指定的動作。\n結語\n《我.影化身》是個開發中的專案，完成的進度驗證上述概念的可行性，但尚有很大的發展空間。\n因為，山姆鍋一開始就沒有打算提供複雜的圖形使用者介面，《我.影化身》注定只適合進階用戶或開發人員。\n如果您對於《我.影化身》的發展有興趣，請持續關注本專案：https://github.com/eavatar/eavatar-me\n，更歡迎您提供任何改進意見。\n","dateCreated":"2015-10-22T14:59:00+08:00","dateModified":"2018-08-29T20:16:03+08:00","datePublished":"2015-10-22T14:59:00+08:00","description":"本文介紹一個開發中的代理人(agent)工具程式：“EAvatar ME”，中文名稱《我.影化身》，唸作我的影化身。 這個代理人程式設計來執行一些例行的工作(tasks)，由於每個人的例行的工作可能大相逕庭，這個代理人自然也要能夠根據不同情境執行不同腳本。","headline":"任務自動化的多功能代理人 - EAvatar ME","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2015/10/eavatar-a-versatile-agent-for-task-automation/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2015/10/eavatar-a-versatile-agent-for-task-automation/","keywords":"agent, task, automation, execution"}</script>
-    <meta name="description" content="本文介紹一個開發中的代理人(agent)工具程式：“EAvatar ME”，中文名稱《我.影化身》，唸作我的影化身。 這個代理人程式設計來執行一些例行的工作(tasks)，由於每個人的例行的工作可能大相逕庭，這個代理人自然也要能夠根據不同情境執行不同腳本。">
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"本文介紹一個開發中的代理人 (agent) 工具程式：“EAvatar ME”，中文名稱《我。影化身》，唸作我的影化身。 這個代理人程式設計來執行一些例行的工作 (tasks)，由於每個人的例行的工作可能大相逕庭，這個代理人自然也要能夠根據不同情境執行不同腳本。\n\n雖然是代理人，請不要期待《我。影化身》會有什麼人工智慧。骨子裏，它就是一個軟體工具，\n設計來自動執行一些簡單的工作。什麼樣類型的工作適合《我。影化身》來執行？\n「事件 - 條件 - 動作」\n《我。影化身》適合事件驅動 (event-driven) 的工作類型，這類型的工作流程由下列三個主要元素組成：\n\n\n\n事件(Event)\n\n:   代表環境中發生的事情、狀態變動等可被偵測的改變，例如：「收到新的郵件」、「網頁內容變動」等等。\n\n\n\n\n條件(Condition)\n\n:   事件發生不一定會引發反應，需要符合特定條件才行。例如：就算收到新的郵件，\n    使用者可能想要根據目前的時間來決定要不要收到通知。\n\n\n\n\n動作(Action)\n\n:   動作就是代理人實際執行的工作內容。工作可以簡單也可以很複雜，簡單的工作如「通知使用者有新的郵件」，\n    複雜的工作則可能需要根據當下的狀態來決定採取不同的動作。\n\n所以，代理人的基本工作流程就是：\n\n偵測到特定事件發生\n檢查是否符合動作條件\n符合條件則執行預定的動作\n重複步驟 1 到 3\n\n雖然這三者個別來看不是挺複雜，但還是來看看實際可能的應用情境吧！\n應用情境 (Scenarios)\n本節說明幾個《我。影化身》適合的應用情境：\n檢查電子郵件 (Checking mails)\n檢查使用者電子信箱，有新的信件時，通知使用者。《我。影化身》的客戶端程式與系統通知整合，如下圖所示：\n\n檢查期貨即時報價\n剖析期貨即時報價網頁，擷取報價資訊，根據設定條件通知使用者。\n抓取網頁 (Web scraping)\n《我。影化身》由於技術架構的關係，可以同時執行許多的 I/O 導向的工作，其中以網頁抓取作為主要代表。\n由於採用事件驅動，非阻斷式 I/O 程式庫，《我。影化身》很適合執行大量網頁存取的工作。\n使用概念\n使用《我。影化身》需要知道一些基本概念，了解這些概念才能知道為何《我。影化身》這樣被設計。\n基本上，使用者將要《我。影化身》完成的工作 (job) 以腳本 (script) 的形式交付給《我。影化身》執行。\n一個「工作」可能包含一個以上相關的任務 (task)，「腳本」的用途便是將這些任務組織起來，\n確保任務按照正確的流程執行。\n「腳本」採用受限制的 Python 語法，也就是：腳本是個符合 Python\n語法的程式，但反過來不成立。\n因為「腳本」目的是作為工作流程控制，只能執行《我。影化身》預先定義好的任務。\n《我。影化身》中，「任務」代表執行一個「動作 (action)」，每個「動作」可以接受不定個數的參數 (arguments)，\n並可以回傳結果 (result)。基於安全理由，《我。影化身》支援的動作是預先定義好，以避免腳本執行任意動作危害到系統。\n「動作」是由不同模組 (modules) 所提供，在啟動時模組會註冊所提供的動作。這裏的「模組」就是\nPython 的模組， 功能上完全相同。\n複雜的「模組」需要額外的套件 (package) 支援來實現「動作」所需的功能。基於這個需要，\n《我。影化身》支援以 Egg 發行包的形式安裝額外的 Python 套件，但僅限於純\nPython 程式碼。\n專為《我。影化身》開發的發行包可以同時包含提供「動作」的模組，如此可以簡化部署的工作。\n腳本範例\n為了有更具體的感覺，底下是一個《我。影化身》腳本，僅供參考，不保證在未來版本可以正確執行。\n12345678910ava.sleep(60)  # sleep for 1 minutemessages, unseen = ava.do('imap.check',                          server='imap.gmail.com',                          username='username@gmail.com',                          password='password').result()if unseen &gt; 0:    ava.do('user.notify',           message=\"Busy day, you have %d new messages.\" % unseen,           title=\"You got new mails from GMail\")\nava.do() 會以非同步方式執行指定的動作。\n結語\n《我。影化身》是個開發中的專案，完成的進度驗證上述概念的可行性，但尚有很大的發展空間。\n因為，山姆鍋一開始就沒有打算提供複雜的圖形使用者介面，《我。影化身》注定只適合進階用戶或開發人員。\n如果您對於《我。影化身》的發展有興趣，請持續關注本專案：https://github.com/eavatar/eavatar-me\n，更歡迎您提供任何改進意見。\n","dateCreated":"2015-10-22T14:59:00+08:00","dateModified":"2018-08-29T20:16:03+08:00","datePublished":"2015-10-22T14:59:00+08:00","description":"本文介紹一個開發中的代理人 (agent) 工具程式：“EAvatar ME”，中文名稱《我。影化身》，唸作我的影化身。 這個代理人程式設計來執行一些例行的工作 (tasks)，由於每個人的例行的工作可能大相逕庭，這個代理人自然也要能夠根據不同情境執行不同腳本。","headline":"任務自動化的多功能代理人 - EAvatar ME","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2015/10/eavatar-a-versatile-agent-for-task-automation/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2015/10/eavatar-a-versatile-agent-for-task-automation/","keywords":"agent, task, automation, execution"}</script>
+    <meta name="description" content="本文介紹一個開發中的代理人 (agent) 工具程式：“EAvatar ME”，中文名稱《我。影化身》，唸作我的影化身。 這個代理人程式設計來執行一些例行的工作 (tasks)，由於每個人的例行的工作可能大相逕庭，這個代理人自然也要能夠根據不同情境執行不同腳本。">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="任務自動化的多功能代理人 - EAvatar ME">
 <meta property="og:url" content="https://samkuo.me/post/2015/10/eavatar-a-versatile-agent-for-task-automation/">
 <meta property="og:site_name" content="我是山姆鍋">
-<meta property="og:description" content="本文介紹一個開發中的代理人(agent)工具程式：“EAvatar ME”，中文名稱《我.影化身》，唸作我的影化身。 這個代理人程式設計來執行一些例行的工作(tasks)，由於每個人的例行的工作可能大相逕庭，這個代理人自然也要能夠根據不同情境執行不同腳本。">
+<meta property="og:description" content="本文介紹一個開發中的代理人 (agent) 工具程式：“EAvatar ME”，中文名稱《我。影化身》，唸作我的影化身。 這個代理人程式設計來執行一些例行的工作 (tasks)，由於每個人的例行的工作可能大相逕庭，這個代理人自然也要能夠根據不同情境執行不同腳本。">
 <meta property="og:locale" content="zh_TW">
 <meta property="og:image" content="https://samkuo.me/media/2015/10/eavatar-screenshot1.png">
 <meta property="article:published_time" content="2015-10-22T06:59:00.000Z">
@@ -369,12 +369,16 @@
     
     <div class="post-content markdown">
         <div class="main-content-wrap">
-            <p>本文介紹一個開發中的代理人(agent)工具程式：“EAvatar ME”，中文名稱《我.影化身》，唸作我的影化身。 這個代理人程式設計來執行一些例行的工作(tasks)，由於每個人的例行的工作可能大相逕庭，這個代理人自然也要能夠根據不同情境執行不同腳本。</p>
+            <div class="alert info no-icon">
+                <a href="https://www.facebook.com/sampotkuo" target="_blank" rel="noopener">「我是山姆鍋」有臉書專頁</a>
+            </div>
+
+            <p>本文介紹一個開發中的代理人 (agent) 工具程式：“EAvatar ME”，中文名稱《我。影化身》，唸作我的影化身。 這個代理人程式設計來執行一些例行的工作 (tasks)，由於每個人的例行的工作可能大相逕庭，這個代理人自然也要能夠根據不同情境執行不同腳本。</p>
 <a id="more"></a>
-<p>雖然是代理人，請不要期待《我.影化身》會有什麼人工智慧。骨子裏，它就是一個軟體工具，<br>
-設計來自動執行一些簡單的工作。什麼樣類型的工作適合《我.影化身》來執行？</p>
-<h2 id="「事件-條件-動作」">「事件-條件-動作」</h2>
-<p>《我.影化身》適合事件驅動(event-driven)的工作類型，這類型的工作流程由下列三個主要元素組成：</p>
+<p>雖然是代理人，請不要期待《我。影化身》會有什麼人工智慧。骨子裏，它就是一個軟體工具，<br>
+設計來自動執行一些簡單的工作。什麼樣類型的工作適合《我。影化身》來執行？</p>
+<h2 id="「事件-條件-動作」">「事件 - 條件 - 動作」</h2>
+<p>《我。影化身》適合事件驅動 (event-driven) 的工作類型，這類型的工作流程由下列三個主要元素組成：</p>
 <ul>
 <li></li>
 </ul>
@@ -406,42 +410,45 @@
 <li>重複步驟 1 到 3</li>
 </ol>
 <p>雖然這三者個別來看不是挺複雜，但還是來看看實際可能的應用情境吧！</p>
-<h2 id="應用情境-Scenarios">應用情境(Scenarios)</h2>
-<p>本節說明幾個《我.影化身》適合的應用情境：</p>
-<h3 id="檢查電子郵件-Checking-mails">檢查電子郵件(Checking mails)</h3>
-<p>檢查使用者電子信箱，有新的信件時，通知使用者。《我.影化身》的客戶端程式與系統通知整合，如下圖所示：</p>
+<h2 id="應用情境-Scenarios">應用情境 (Scenarios)</h2>
+<p>本節說明幾個《我。影化身》適合的應用情境：</p>
+<h3 id="檢查電子郵件-Checking-mails">檢查電子郵件 (Checking mails)</h3>
+<p>檢查使用者電子信箱，有新的信件時，通知使用者。《我。影化身》的客戶端程式與系統通知整合，如下圖所示：</p>
 <p><img src="/media/2015/10/eavatar-screenshot1.png" alt="EAvatar notification"></p>
 <h3 id="檢查期貨即時報價">檢查期貨即時報價</h3>
 <p>剖析期貨即時報價網頁，擷取報價資訊，根據設定條件通知使用者。</p>
-<h3 id="抓取網頁-Web-scraping">抓取網頁(Web scraping)</h3>
-<p>《我.影化身》由於技術架構的關係，可以同時執行許多的 I/O 導向的工作，其中以網頁抓取作為主要代表。<br>
-由於採用事件驅動，非阻斷式 I/O 程式庫，《我.影化身》很適合執行大量網頁存取的工作。</p>
+<h3 id="抓取網頁-Web-scraping">抓取網頁 (Web scraping)</h3>
+<p>《我。影化身》由於技術架構的關係，可以同時執行許多的 I/O 導向的工作，其中以網頁抓取作為主要代表。<br>
+由於採用事件驅動，非阻斷式 I/O 程式庫，《我。影化身》很適合執行大量網頁存取的工作。</p>
 <h2 id="使用概念">使用概念</h2>
-<p>使用《我.影化身》需要知道一些基本概念，了解這些概念才能知道為何《我.影化身》這樣被設計。<br>
-基本上，使用者將要《我.影化身》完成的工作(job)以腳本(script)的形式交付給《我.影化身》執行。<br>
-一個「工作」可能包含一個以上相關的任務(task)，「腳本」的用途便是將這些任務組織起來，<br>
+<p>使用《我。影化身》需要知道一些基本概念，了解這些概念才能知道為何《我。影化身》這樣被設計。<br>
+基本上，使用者將要《我。影化身》完成的工作 (job) 以腳本 (script) 的形式交付給《我。影化身》執行。<br>
+一個「工作」可能包含一個以上相關的任務 (task)，「腳本」的用途便是將這些任務組織起來，<br>
 確保任務按照正確的流程執行。</p>
 <p>「腳本」採用受限制的 Python 語法，也就是：腳本是個符合 Python<br>
 語法的程式，但反過來不成立。<br>
-因為「腳本」目的是作為工作流程控制，只能執行《我.影化身》預先定義好的任務。</p>
-<p>《我.影化身》中，「任務」代表執行一個「動作(action)」，每個「動作」可以接受不定個數的參數(arguments)，<br>
-並可以回傳結果(result)。基於安全理由，《我.影化身》支援的動作是預先定義好，以避免腳本執行任意動作危害到系統。<br>
-「動作」是由不同模組(modules)所提供，在啟動時模組會註冊所提供的動作。這裏的「模組」就是<br>
+因為「腳本」目的是作為工作流程控制，只能執行《我。影化身》預先定義好的任務。</p>
+<p>《我。影化身》中，「任務」代表執行一個「動作 (action)」，每個「動作」可以接受不定個數的參數 (arguments)，<br>
+並可以回傳結果 (result)。基於安全理由，《我。影化身》支援的動作是預先定義好，以避免腳本執行任意動作危害到系統。<br>
+「動作」是由不同模組 (modules) 所提供，在啟動時模組會註冊所提供的動作。這裏的「模組」就是<br>
 Python 的模組， 功能上完全相同。</p>
-<p>複雜的「模組」需要額外的套件(package)支援來實現「動作」所需的功能。基於這個需要，<br>
-《我.影化身》支援以 Egg 發行包的形式安裝額外的 Python 套件，但僅限於純<br>
+<p>複雜的「模組」需要額外的套件 (package) 支援來實現「動作」所需的功能。基於這個需要，<br>
+《我。影化身》支援以 Egg 發行包的形式安裝額外的 Python 套件，但僅限於純<br>
 Python 程式碼。<br>
-專為《我.影化身》開發的發行包可以同時包含提供「動作」的模組，如此可以簡化部署的工作。</p>
+專為《我。影化身》開發的發行包可以同時包含提供「動作」的模組，如此可以簡化部署的工作。</p>
 <h2 id="腳本範例">腳本範例</h2>
-<p>為了有更具體的感覺，底下是一個《我.影化身》腳本，僅供參考，不保證在未來版本可以正確執行。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">ava.sleep(<span class="number">60</span>)  <span class="comment"># sleep for 1 minute</span></span><br><span class="line">messages, unseen = ava.do(<span class="string">'imap.check'</span>,</span><br><span class="line">                          server=<span class="string">'imap.gmail.com'</span>,</span><br><span class="line">                          username=<span class="string">'username@gmail.com'</span>,</span><br><span class="line">                          password=<span class="string">'password'</span>).result()</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> unseen &gt; <span class="number">0</span>:</span><br><span class="line">    ava.do(<span class="string">'user.notify'</span>,</span><br><span class="line">           message=<span class="string">"Busy day, you have %d new messages."</span> % unseen,</span><br><span class="line">           title=<span class="string">"You got new mails from GMail"</span>)</span><br></pre></td></tr></table></figure>
+<p>為了有更具體的感覺，底下是一個《我。影化身》腳本，僅供參考，不保證在未來版本可以正確執行。</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">ava.sleep(<span class="number">60</span>)  <span class="comment"># sleep for 1 minute</span></span><br><span class="line">messages, unseen = ava.do(<span class="string">'imap.check'</span>,</span><br><span class="line">                          server=<span class="string">'imap.gmail.com'</span>,</span><br><span class="line">                          username=<span class="string">'username@gmail.com'</span>,</span><br><span class="line">                          password=<span class="string">'password'</span>).result()</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> unseen &gt; <span class="number">0</span>:</span><br><span class="line">    ava.do(<span class="string">'user.notify'</span>,</span><br><span class="line">           message=<span class="string">"Busy day, you have %d new messages."</span> % unseen,</span><br><span class="line">           title=<span class="string">"You got new mails from GMail"</span>)</span><br></pre></td></tr></tbody></table></figure>
 <p><code>ava.do()</code> 會以非同步方式執行指定的動作。</p>
 <h2 id="結語">結語</h2>
-<p>《我.影化身》是個開發中的專案，完成的進度驗證上述概念的可行性，但尚有很大的發展空間。<br>
-因為，山姆鍋一開始就沒有打算提供複雜的圖形使用者介面，《我.影化身》注定只適合進階用戶或開發人員。<br>
-如果您對於《我.影化身》的發展有興趣，請持續關注本專案：<a href="https://github.com/eavatar/eavatar-me" target="_blank" rel="noopener">https://github.com/eavatar/eavatar-me</a><br>
+<p>《我。影化身》是個開發中的專案，完成的進度驗證上述概念的可行性，但尚有很大的發展空間。<br>
+因為，山姆鍋一開始就沒有打算提供複雜的圖形使用者介面，《我。影化身》注定只適合進階用戶或開發人員。<br>
+如果您對於《我。影化身》的發展有興趣，請持續關注本專案：<a href="https://github.com/eavatar/eavatar-me" target="_blank" rel="noopener">https://github.com/eavatar/eavatar-me</a><br>
 ，更歡迎您提供任何改進意見。</p>
 
+            <div class="alert info no-icon">
+                山姆鍋是<a href="https://developers.tw/@山姆鍋" target="_blank" rel="noopener">#呆丸開發者</a>成員
+            </div>
             
 
 
@@ -466,8 +473,8 @@ Python 程式碼。<br>
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
                     href="/post/2015/10/eavatar-circleci-continuous-integration/"
-                    data-tooltip="使用 CircleCI 作為《我.影化身》雲端持續整合方案"
-                    aria-label="上一篇: 使用 CircleCI 作為《我.影化身》雲端持續整合方案"
+                    data-tooltip="使用 CircleCI 作為《我。影化身》雲端持續整合方案"
+                    aria-label="上一篇: 使用 CircleCI 作為《我。影化身》雲端持續整合方案"
                 >
                     
                         <i class="fa fa-angle-left" aria-hidden="true"></i>
@@ -568,6 +575,14 @@ Python 程式碼。<br>
     <span class="copyrights">
         Copyrights &copy; 2020 Sampot (山姆鍋). All Rights Reserved.
     </span>
+    <br/>
+        <a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW"><img
+                alt="創用 CC 授權條款" style="border-width:0"
+                src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+        除另有標示，本著作係採用<a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW">創用 CC
+            姓名標示-非商業性-相同方式分享 4.0 國際 授權條款</a>授權。
 </footer>
 
             </div>
@@ -582,8 +597,8 @@ Python 程式碼。<br>
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
                     href="/post/2015/10/eavatar-circleci-continuous-integration/"
-                    data-tooltip="使用 CircleCI 作為《我.影化身》雲端持續整合方案"
-                    aria-label="上一篇: 使用 CircleCI 作為《我.影化身》雲端持續整合方案"
+                    data-tooltip="使用 CircleCI 作為《我。影化身》雲端持續整合方案"
+                    aria-label="上一篇: 使用 CircleCI 作為《我。影化身》雲端持續整合方案"
                 >
                     
                         <i class="fa fa-angle-left" aria-hidden="true"></i>
@@ -792,9 +807,9 @@ Python 程式碼。<br>
                         <a
                             class="link-unstyled"
                             href="https://samkuo.me/post/2012/04/use-pacemaker-two-node-ha-cluster/"
-                            aria-label=": 使用Pacemaker 建構雙節點叢集系統"
+                            aria-label=": 使用 Pacemaker 建構雙節點叢集系統"
                         >
-                            <h3 class="media-heading">使用Pacemaker 建構雙節點叢集系統</h3>
+                            <h3 class="media-heading">使用 Pacemaker 建構雙節點叢集系統</h3>
                         </a>
                         <span class="media-meta">
                             <span class="media-date text-small">
@@ -803,7 +818,7 @@ Python 程式碼。<br>
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>想要達到系統高可用性(high availability)的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。</p></div>
+                        <div class="media-content hide-xs font-merryweather"><p>想要達到系統高可用性 (high availability) 的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。</p></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>
@@ -826,7 +841,7 @@ Python 程式碼。<br>
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案(圖檔, CSS 等等)可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點(single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。</p></div>
+                        <div class="media-content hide-xs font-merryweather"><p>在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案 (圖檔，CSS 等等) 可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點 (single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。</p></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>

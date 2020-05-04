@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="我是山姆鍋">
-    <title>很酷的糾刪碼(erasure code)技術 - 我是山姆鍋</title>
+    <title>很酷的糾刪碼 (erasure code) 技術 - 我是山姆鍋</title>
     <meta name="author" content="Sampot (山姆鍋)">
     
     
@@ -17,13 +17,13 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"很早之前在寫 QR Code 解碼器的時候就接觸過「糾刪碼」(erasure code)這種技術， 因為 QR Code 有使用到 Reed–Solomon error correction 。雖然知道是數學的運算結果，但至今還是對它的功用感到很神奇！背後的編碼理論已經超過山姆鍋的理解範圍，但撇除背後的數學理論，身為工程師要如何理解糾刪碼，以及作何應用呢？\n\n糾刪碼(erasure code)簡介\n網路上介紹糾刪碼的文章總喜歡講解背後的數學原理，真要了解背後的數學理論才能知道如何應用的話，那只會讓人想打退堂鼓。 所以，山姆鍋在這裏只說明抽象概念 [1]。 簡單地說，糾刪碼是一種演算法，可以將 K 個相同大小的資料區塊(data block)，轉成 (K + M) 個編碼後的區塊，接收者可以從這 (K + M) 個區塊中， 任選 K 個區塊，便足以還原編碼前的 K 個資料區塊。也就是說，它允許最多 M 個資料區塊在傳輸或讀取過程中遺失或錯誤！ 進一步的介紹可以參考這篇：Dummies Guide to Erasure Coding\n糾刪碼的應用情境\n糾刪碼的幾種應用範例：\n\n像 QR Code 這種二維條碼，通常會運用糾刪碼來更正條碼透過光學鏡頭讀取所產生的變形錯誤。\n衛星通訊單向傳輸，由於接收方無法要求重送，使用糾刪碼在有封包遺失的情況下自動更正。\n資料儲存應用中，用來遮蔽(mask)儲存媒體故障造成的讀取錯誤。\n\n為什麼糾刪碼很酷?\n最近糾刪碼會再度引起關注，跟雲端儲存服務(cloud storage service)的崛起有很大的關係。背後的理由很簡單： 為了資料可靠性(reliability)與可用性(availability)，雲端儲存服務通常會儲存同組資料多個備份(通常是 3 份)在不同的裝置，機架，甚至不同的資料中心。 在這樣的組態下，服務允許最多 2 個資料來源發生故障而不遺失資料。在這樣的組態下， 其空間冗餘率是 200%。透過糾刪碼，在(6 + 4)的組態下，除了允許最多任意 4 個資料來源不可用外，其空間冗餘率只有 4/6 ~= 67%，節省的空間比例相當明顯 。\n允許 4 個資料來源不可得是怎樣的概念，對於資料可用性有什麼影響？假設一個資料來源任一時間點可用性為 90%，也就是不可用機率為 10% = 0.1。 對於資料中心的儲存裝置，這個假設可能有點低，但對於點對點的儲存服務，如 Symform，可能就有點高，這也是為何他們會要求參與者保證基本上線時間。 運用基本的機率公式，單一個資料來源不可用的機率既然是 0.1，2 個資料來源 同時 不可用的機率卻變成 0.1 x 0.1 = 0.01，以此類推。 當可以接受 4 個資料來源不可用時，資料不可用的機率只剩下 0.0001，也就是有 99.99%的可用性 [2]，這已經是Ａ級資料中心的要求等級。當然整體資料可用性有許多因素決定，例如：對外網路可用性如果只有 95%，最終資料可用性最高就不會超過 95%。\n既然糾刪碼這麼厲害，為什麼沒有廣泛地被應用在儲存方案中？山姆鍋想得到的原因：\n\n計算糾刪碼很耗 CPU 運算能力。\n當存儲媒體數量不大時， 現有 RAID 技術便足以應付。\n專利問題：除了少數演算法專利已經過期外，其餘都尚有專利存在。\n\n但隨著雲端儲存的流行，其背後龐大的存儲裝置數量驚人，透過糾刪碼技術能夠節省的裝置數量提供很大的經濟誘因。\n現有 Python 糾刪碼程式庫\n想要應用糾刪碼，除非您有非常深厚的編碼學基礎，不然使用別人開發好的程式庫在所難免。底下是幾個山姆鍋所知，可以透過 Python 使用的開源程式庫：\n\n\n\nPyECLib\n底層使用 C 實作; BSD\n授權。支援多種的原生(native)糾刪碼實作，但是相依套件顯然不支援\nWindows，在 Unix-like 的環境編譯也很困難。\n\n\n\n\nzfec\n底層使用 C 實作; GPL 授權。如果 GPL對您不是問題的話，可以考慮。\n\n\n\n\npy_ecc\n純 Python 實現; 不確定授權模式，應該類似 BSD。\n除非只是為了驗證概念，不然使用純 Python 實作無法實際應用。\n\n\n\n假如上述的程式庫，不合乎您的需要的話，請繼續看下一節。\n自行包裝糾刪碼程式庫\n山姆鍋發現一個在 GitHub 上的 Longhair 專案有提供所需的程式碼。 使用 C++ 開發，但提供 C 語言呼叫介面，New BSD 授權，剛好符合需要。 唯一的問題：它不支援 Python 支援！\n還好 Python 的特性之一便是容易整合原生(native)程式庫，這讓我興起自行整合的想法。因為不想學習 Python 完整的 C 擴充介面 [3]，於是山姆鍋選擇 Cython 來進行包裝工作。\n完成的相關程式碼在 GitHub 上。\n測試程式碼\n底下的測試碼示範如何使用 fec_encode 編碼，以及 fec_decode 解碼：\n123456789101112131415161718192021222324252627def test_fec_encode(self):    block_size = 8192    k = 10    m = 4    data = os.urandom(k * block_size)    parity = bytearray(m * block_size)    assert fec_encode(k, m, block_size, data, parity) == 0def test_fec_decode_without_sufficient_blocks(self):    block_size = 8192    k = 10    m = 4    data = os.urandom(k * block_size)    parity = bytearray(m * block_size)    assert parity == b'\\x00' * (m * block_size)    assert fec_encode(k, m, block_size, data, parity) == 0    blocks = []    for row in range(k-1):        offset = row * block_size        block_data = data[offset:offset + block_size]        blocks.append((row, block_data))    blocks.append((k, bytearray(parity[:block_size])))    assert fec_decode(k, m, block_size, blocks) == 0    offset = (k-1) * block_size    assert blocks[(k-1)][1] == data[offset:offset + block_size]\n解碼測試案例故意將最後一個(索引值 k-1)原始資料區塊，換成第一個同位檢查資料區塊來驗證解碼正確。\n結語\n數學對山姆鍋而言，通常是要敬而遠之的東西，但是糾刪碼實在很酷，讓我還是想寫寫關於它的應用。試想：將資料加密後，再使用糾刪碼切成 (K + M) 份， 分散到網路上 (K + M) 台主機。理論上，不僅沒有一台主機有完整資訊可以還原資料外，還可以容忍其中 M 台主機離線或故障。最重要的是： 只有自己擁有最終解碼所需的金鑰(secret key)，這才是雲端存儲的終極之道啊！關於雲端資料加密的作法，以後有機會再介紹。\n參考資料\nCython: http://cython.org/\nLonghair: https://github.com/catid/longhair\nSymform: http://www.symform.com/\nDummies Guide to Erasure Coding:\nhttp://smahesh.com/blog/2012/07/01/dummies-guide-to-erasure-coding/\n\n\n\n其實是山姆鍋也不了解背後艱深的數學原理。 ↩︎\n\n也就是俗稱 4 個 9 的可用性。 ↩︎\n\n如果您了解 Python 的 C 擴充介面，記得跟社群分享。 ↩︎\n\n\n\n","dateCreated":"2015-09-11T08:40:00+08:00","dateModified":"2018-08-29T23:10:13+08:00","datePublished":"2015-09-11T08:40:00+08:00","description":"很早之前在寫 QR Code 解碼器的時候就接觸過「糾刪碼」(erasure code)這種技術， 因為 QR Code 有使用到 Reed–Solomon error correction 。雖然知道是數學的運算結果，但至今還是對它的功用感到很神奇！背後的編碼理論已經超過山姆鍋的理解範圍，但撇除背後的數學理論，身為工程師要如何理解糾刪碼，以及作何應用呢？","headline":"很酷的糾刪碼(erasure code)技術","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2015/09/python-with-erasure-code/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2015/09/python-with-erasure-code/","keywords":"Python, Erasure code, RAID"}</script>
-    <meta name="description" content="很早之前在寫 QR Code 解碼器的時候就接觸過「糾刪碼」(erasure code)這種技術， 因為 QR Code 有使用到 Reed–Solomon error correction 。雖然知道是數學的運算結果，但至今還是對它的功用感到很神奇！背後的編碼理論已經超過山姆鍋的理解範圍，但撇除背後的數學理論，身為工程師要如何理解糾刪碼，以及作何應用呢？">
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"很早之前在寫 QR Code 解碼器的時候就接觸過「糾刪碼」(erasure code) 這種技術， 因為 QR Code 有使用到 Reed–Solomon error correction 。雖然知道是數學的運算結果，但至今還是對它的功用感到很神奇！背後的編碼理論已經超過山姆鍋的理解範圍，但撇除背後的數學理論，身為工程師要如何理解糾刪碼，以及作何應用呢？\n\n糾刪碼 (erasure code) 簡介\n網路上介紹糾刪碼的文章總喜歡講解背後的數學原理，真要了解背後的數學理論才能知道如何應用的話，那只會讓人想打退堂鼓。 所以，山姆鍋在這裏只說明抽象概念 [1]。 簡單地說，糾刪碼是一種演算法，可以將 K 個相同大小的資料區塊 (data block)，轉成 (K + M) 個編碼後的區塊，接收者可以從這 (K + M) 個區塊中， 任選 K 個區塊，便足以還原編碼前的 K 個資料區塊。也就是說，它允許最多 M 個資料區塊在傳輸或讀取過程中遺失或錯誤！ 進一步的介紹可以參考這篇：Dummies Guide to Erasure Coding\n糾刪碼的應用情境\n糾刪碼的幾種應用範例：\n\n像 QR Code 這種二維條碼，通常會運用糾刪碼來更正條碼透過光學鏡頭讀取所產生的變形錯誤。\n衛星通訊單向傳輸，由於接收方無法要求重送，使用糾刪碼在有封包遺失的情況下自動更正。\n資料儲存應用中，用來遮蔽 (mask) 儲存媒體故障造成的讀取錯誤。\n\n為什麼糾刪碼很酷？\n最近糾刪碼會再度引起關注，跟雲端儲存服務 (cloud storage service) 的崛起有很大的關係。背後的理由很簡單： 為了資料可靠性 (reliability) 與可用性 (availability)，雲端儲存服務通常會儲存同組資料多個備份 (通常是 3 份) 在不同的裝置，機架，甚至不同的資料中心。 在這樣的組態下，服務允許最多 2 個資料來源發生故障而不遺失資料。在這樣的組態下， 其空間冗餘率是 200%。透過糾刪碼，在 (6 + 4) 的組態下，除了允許最多任意 4 個資料來源不可用外，其空間冗餘率只有 4/6 ~= 67%，節省的空間比例相當明顯 。\n允許 4 個資料來源不可得是怎樣的概念，對於資料可用性有什麼影響？假設一個資料來源任一時間點可用性為 90%，也就是不可用機率為 10% = 0.1。 對於資料中心的儲存裝置，這個假設可能有點低，但對於點對點的儲存服務，如 Symform，可能就有點高，這也是為何他們會要求參與者保證基本上線時間。 運用基本的機率公式，單一個資料來源不可用的機率既然是 0.1，2 個資料來源 同時 不可用的機率卻變成 0.1 x 0.1 = 0.01，以此類推。 當可以接受 4 個資料來源不可用時，資料不可用的機率只剩下 0.0001，也就是有 99.99% 的可用性 [2]，這已經是Ａ級資料中心的要求等級。當然整體資料可用性有許多因素決定，例如：對外網路可用性如果只有 95%，最終資料可用性最高就不會超過 95%。\n既然糾刪碼這麼厲害，為什麼沒有廣泛地被應用在儲存方案中？山姆鍋想得到的原因：\n\n計算糾刪碼很耗 CPU 運算能力。\n當存儲媒體數量不大時， 現有 RAID 技術便足以應付。\n專利問題：除了少數演算法專利已經過期外，其餘都尚有專利存在。\n\n但隨著雲端儲存的流行，其背後龐大的存儲裝置數量驚人，透過糾刪碼技術能夠節省的裝置數量提供很大的經濟誘因。\n現有 Python 糾刪碼程式庫\n想要應用糾刪碼，除非您有非常深厚的編碼學基礎，不然使用別人開發好的程式庫在所難免。底下是幾個山姆鍋所知，可以透過 Python 使用的開源程式庫：\n\n\n\nPyECLib\n 底層使用 C 實作；BSD\n授權。支援多種的原生 (native) 糾刪碼實作，但是相依套件顯然不支援\nWindows，在 Unix-like 的環境編譯也很困難。\n\n\n\n\nzfec\n 底層使用 C 實作；GPL 授權。如果 GPL 對您不是問題的話，可以考慮。\n\n\n\n\npy_ecc\n 純 Python 實現；不確定授權模式，應該類似 BSD。\n除非只是為了驗證概念，不然使用純 Python 實作無法實際應用。\n\n\n\n假如上述的程式庫，不合乎您的需要的話，請繼續看下一節。\n自行包裝糾刪碼程式庫\n山姆鍋發現一個在 GitHub 上的 Longhair 專案有提供所需的程式碼。 使用 C++ 開發，但提供 C 語言呼叫介面，New BSD 授權，剛好符合需要。 唯一的問題：它不支援 Python 支援！\n還好 Python 的特性之一便是容易整合原生 (native) 程式庫，這讓我興起自行整合的想法。因為不想學習 Python 完整的 C 擴充介面 [3]，於是山姆鍋選擇 Cython 來進行包裝工作。\n完成的相關程式碼在 GitHub 上。\n測試程式碼\n底下的測試碼示範如何使用 fec_encode 編碼，以及 fec_decode 解碼：\n123456789101112131415161718192021222324252627def test_fec_encode(self):    block_size = 8192    k = 10    m = 4    data = os.urandom(k * block_size)    parity = bytearray(m * block_size)    assert fec_encode(k, m, block_size, data, parity) == 0def test_fec_decode_without_sufficient_blocks(self):    block_size = 8192    k = 10    m = 4    data = os.urandom(k * block_size)    parity = bytearray(m * block_size)    assert parity == b'\\x00' * (m * block_size)    assert fec_encode(k, m, block_size, data, parity) == 0    blocks = []    for row in range(k-1):        offset = row * block_size        block_data = data[offset:offset + block_size]        blocks.append((row, block_data))    blocks.append((k, bytearray(parity[:block_size])))    assert fec_decode(k, m, block_size, blocks) == 0    offset = (k-1) * block_size    assert blocks[(k-1)][1] == data[offset:offset + block_size]\n解碼測試案例故意將最後一個 (索引值 k-1) 原始資料區塊，換成第一個同位檢查資料區塊來驗證解碼正確。\n結語\n數學對山姆鍋而言，通常是要敬而遠之的東西，但是糾刪碼實在很酷，讓我還是想寫寫關於它的應用。試想：將資料加密後，再使用糾刪碼切成 (K + M) 份， 分散到網路上 (K + M) 台主機。理論上，不僅沒有一台主機有完整資訊可以還原資料外，還可以容忍其中 M 台主機離線或故障。最重要的是： 只有自己擁有最終解碼所需的金鑰 (secret key)，這才是雲端存儲的終極之道啊！關於雲端資料加密的作法，以後有機會再介紹。\n參考資料\nCython: http://cython.org/\nLonghair: https://github.com/catid/longhair\nSymform: http://www.symform.com/\nDummies Guide to Erasure Coding:\nhttp://smahesh.com/blog/2012/07/01/dummies-guide-to-erasure-coding/\n\n\n\n 其實是山姆鍋也不了解背後艱深的數學原理。 ↩︎\n\n也就是俗稱 4 個 9 的可用性。 ↩︎\n\n如果您了解 Python 的 C 擴充介面，記得跟社群分享。 ↩︎\n\n\n\n","dateCreated":"2015-09-11T08:40:00+08:00","dateModified":"2018-08-29T23:10:13+08:00","datePublished":"2015-09-11T08:40:00+08:00","description":"很早之前在寫 QR Code 解碼器的時候就接觸過「糾刪碼」(erasure code) 這種技術， 因為 QR Code 有使用到 Reed–Solomon error correction 。雖然知道是數學的運算結果，但至今還是對它的功用感到很神奇！背後的編碼理論已經超過山姆鍋的理解範圍，但撇除背後的數學理論，身為工程師要如何理解糾刪碼，以及作何應用呢？","headline":"很酷的糾刪碼 (erasure code) 技術","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2015/09/python-with-erasure-code/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2015/09/python-with-erasure-code/","keywords":"Python, Erasure code, RAID"}</script>
+    <meta name="description" content="很早之前在寫 QR Code 解碼器的時候就接觸過「糾刪碼」(erasure code) 這種技術， 因為 QR Code 有使用到 Reed–Solomon error correction 。雖然知道是數學的運算結果，但至今還是對它的功用感到很神奇！背後的編碼理論已經超過山姆鍋的理解範圍，但撇除背後的數學理論，身為工程師要如何理解糾刪碼，以及作何應用呢？">
 <meta property="og:type" content="blog">
-<meta property="og:title" content="很酷的糾刪碼(erasure code)技術">
+<meta property="og:title" content="很酷的糾刪碼 (erasure code) 技術">
 <meta property="og:url" content="https://samkuo.me/post/2015/09/python-with-erasure-code/">
 <meta property="og:site_name" content="我是山姆鍋">
-<meta property="og:description" content="很早之前在寫 QR Code 解碼器的時候就接觸過「糾刪碼」(erasure code)這種技術， 因為 QR Code 有使用到 Reed–Solomon error correction 。雖然知道是數學的運算結果，但至今還是對它的功用感到很神奇！背後的編碼理論已經超過山姆鍋的理解範圍，但撇除背後的數學理論，身為工程師要如何理解糾刪碼，以及作何應用呢？">
+<meta property="og:description" content="很早之前在寫 QR Code 解碼器的時候就接觸過「糾刪碼」(erasure code) 這種技術， 因為 QR Code 有使用到 Reed–Solomon error correction 。雖然知道是數學的運算結果，但至今還是對它的功用感到很神奇！背後的編碼理論已經超過山姆鍋的理解範圍，但撇除背後的數學理論，身為工程師要如何理解糾刪碼，以及作何應用呢？">
 <meta property="og:locale" content="zh_TW">
 <meta property="article:published_time" content="2015-09-11T00:40:00.000Z">
 <meta property="article:modified_time" content="2018-08-29T15:10:13.461Z">
@@ -341,7 +341,7 @@
         <div class="post-header main-content-wrap text-left">
     
         <h1 class="post-title">
-            很酷的糾刪碼(erasure code)技術
+            很酷的糾刪碼 (erasure code) 技術
         </h1>
     
     
@@ -366,20 +366,24 @@
     
     <div class="post-content markdown">
         <div class="main-content-wrap">
-            <p>很早之前在寫 QR Code 解碼器的時候就接觸過「糾刪碼」(erasure code)這種技術， 因為 QR Code 有使用到 <a href="https://en.wikipedia.org/wiki/Reed%E2%80%93Solomon_error_correction" target="_blank" rel="noopener">Reed–Solomon error correction</a> 。雖然知道是數學的運算結果，但至今還是對它的功用感到很神奇！背後的編碼理論已經超過山姆鍋的理解範圍，但撇除背後的數學理論，身為工程師要如何理解糾刪碼，以及作何應用呢？</p>
+            <div class="alert info no-icon">
+                <a href="https://www.facebook.com/sampotkuo" target="_blank" rel="noopener">「我是山姆鍋」有臉書專頁</a>
+            </div>
+
+            <p>很早之前在寫 QR Code 解碼器的時候就接觸過「糾刪碼」(erasure code) 這種技術， 因為 QR Code 有使用到 <a href="https://en.wikipedia.org/wiki/Reed%E2%80%93Solomon_error_correction" target="_blank" rel="noopener">Reed–Solomon error correction</a> 。雖然知道是數學的運算結果，但至今還是對它的功用感到很神奇！背後的編碼理論已經超過山姆鍋的理解範圍，但撇除背後的數學理論，身為工程師要如何理解糾刪碼，以及作何應用呢？</p>
 <a id="more"></a>
-<h2 id="糾刪碼-erasure-code-簡介">糾刪碼(erasure code)簡介</h2>
-<p>網路上介紹糾刪碼的文章總喜歡講解背後的數學原理，真要了解背後的數學理論才能知道如何應用的話，那只會讓人想打退堂鼓。 所以，山姆鍋在這裏只說明抽象概念 <sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup>。 簡單地說，糾刪碼是一種演算法，可以將 K 個相同大小的資料區塊(data block)，轉成 (K + M) 個編碼後的區塊，接收者可以從這 (K + M) 個區塊中， 任選 K 個區塊，便足以還原編碼前的 K 個資料區塊。也就是說，它允許最多 M 個資料區塊在傳輸或讀取過程中遺失或錯誤！ 進一步的介紹可以參考這篇：<a href="#dummy_guide">Dummies Guide to Erasure Coding</a></p>
+<h2 id="糾刪碼-erasure-code-簡介">糾刪碼 (erasure code) 簡介</h2>
+<p>網路上介紹糾刪碼的文章總喜歡講解背後的數學原理，真要了解背後的數學理論才能知道如何應用的話，那只會讓人想打退堂鼓。 所以，山姆鍋在這裏只說明抽象概念 <sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup>。 簡單地說，糾刪碼是一種演算法，可以將 K 個相同大小的資料區塊 (data block)，轉成 (K + M) 個編碼後的區塊，接收者可以從這 (K + M) 個區塊中， 任選 K 個區塊，便足以還原編碼前的 K 個資料區塊。也就是說，它允許最多 M 個資料區塊在傳輸或讀取過程中遺失或錯誤！ 進一步的介紹可以參考這篇：<a href="#dummy_guide">Dummies Guide to Erasure Coding</a></p>
 <h2 id="糾刪碼的應用情境">糾刪碼的應用情境</h2>
 <p>糾刪碼的幾種應用範例：</p>
 <ul>
 <li>像 QR Code 這種二維條碼，通常會運用糾刪碼來更正條碼透過光學鏡頭讀取所產生的變形錯誤。</li>
 <li>衛星通訊單向傳輸，由於接收方無法要求重送，使用糾刪碼在有封包遺失的情況下自動更正。</li>
-<li>資料儲存應用中，用來遮蔽(mask)儲存媒體故障造成的讀取錯誤。</li>
+<li>資料儲存應用中，用來遮蔽 (mask) 儲存媒體故障造成的讀取錯誤。</li>
 </ul>
-<h2 id="為什麼糾刪碼很酷">為什麼糾刪碼很酷?</h2>
-<p>最近糾刪碼會再度引起關注，跟雲端儲存服務(cloud storage service)的崛起有很大的關係。背後的理由很簡單： 為了資料可靠性(reliability)與可用性(availability)，雲端儲存服務通常會儲存同組資料多個備份(通常是 3 份)在不同的裝置，機架，甚至不同的資料中心。 在這樣的組態下，服務允許最多 2 個資料來源發生故障而不遺失資料。在這樣的組態下， 其空間冗餘率是 200%。透過糾刪碼，在(6 + 4)的組態下，除了允許最多任意 4 個資料來源不可用外，其空間冗餘率只有 4/6 ~= 67%，節省的空間比例相當明顯 。</p>
-<p>允許 4 個資料來源不可得是怎樣的概念，對於資料可用性有什麼影響？假設一個資料來源任一時間點可用性為 90%，也就是不可用機率為 10% = 0.1。 對於資料中心的儲存裝置，這個假設可能有點低，但對於點對點的儲存服務，如 <a href="#symform">Symform</a>，可能就有點高，這也是為何他們會要求參與者保證基本上線時間。 運用基本的機率公式，單一個資料來源不可用的機率既然是 0.1，2 個資料來源 <em>同時</em> 不可用的機率卻變成 0.1 x 0.1 = 0.01，以此類推。 當可以接受 4 個資料來源不可用時，資料不可用的機率只剩下 0.0001，也就是有 99.99%的可用性 <sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup>，這已經是Ａ級資料中心的要求等級。當然整體資料可用性有許多因素決定，例如：對外網路可用性如果只有 95%，最終資料可用性最高就不會超過 95%。</p>
+<h2 id="為什麼糾刪碼很酷">為什麼糾刪碼很酷？</h2>
+<p>最近糾刪碼會再度引起關注，跟雲端儲存服務 (cloud storage service) 的崛起有很大的關係。背後的理由很簡單： 為了資料可靠性 (reliability) 與可用性 (availability)，雲端儲存服務通常會儲存同組資料多個備份 (通常是 3 份) 在不同的裝置，機架，甚至不同的資料中心。 在這樣的組態下，服務允許最多 2 個資料來源發生故障而不遺失資料。在這樣的組態下， 其空間冗餘率是 200%。透過糾刪碼，在 (6 + 4) 的組態下，除了允許最多任意 4 個資料來源不可用外，其空間冗餘率只有 4/6 ~= 67%，節省的空間比例相當明顯 。</p>
+<p>允許 4 個資料來源不可得是怎樣的概念，對於資料可用性有什麼影響？假設一個資料來源任一時間點可用性為 90%，也就是不可用機率為 10% = 0.1。 對於資料中心的儲存裝置，這個假設可能有點低，但對於點對點的儲存服務，如 <a href="#symform">Symform</a>，可能就有點高，這也是為何他們會要求參與者保證基本上線時間。 運用基本的機率公式，單一個資料來源不可用的機率既然是 0.1，2 個資料來源 <em>同時</em> 不可用的機率卻變成 0.1 x 0.1 = 0.01，以此類推。 當可以接受 4 個資料來源不可用時，資料不可用的機率只剩下 0.0001，也就是有 99.99% 的可用性 <sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup>，這已經是Ａ級資料中心的要求等級。當然整體資料可用性有許多因素決定，例如：對外網路可用性如果只有 95%，最終資料可用性最高就不會超過 95%。</p>
 <p>既然糾刪碼這麼厲害，為什麼沒有廣泛地被應用在儲存方案中？山姆鍋想得到的原因：</p>
 <ol>
 <li>計算糾刪碼很耗 CPU 運算能力。</li>
@@ -393,21 +397,21 @@
 <li>
 <dl>
 <dt><a href="https://pypi.python.org/pypi/PyECLib" target="_blank" rel="noopener">PyECLib</a></dt>
-<dd>底層使用 C 實作; BSD<br>
-授權。支援多種的原生(native)糾刪碼實作，但是相依套件顯然不支援<br>
+<dd> 底層使用 C 實作；BSD<br>
+授權。支援多種的原生 (native) 糾刪碼實作，但是相依套件顯然不支援<br>
 Windows，在 Unix-like 的環境編譯也很困難。</dd>
 </dl>
 </li>
 <li>
 <dl>
 <dt><a href="https://pypi.python.org/pypi/zfec" target="_blank" rel="noopener">zfec</a></dt>
-<dd>底層使用 C 實作; GPL 授權。如果 GPL對您不是問題的話，可以考慮。</dd>
+<dd> 底層使用 C 實作；GPL 授權。如果 GPL 對您不是問題的話，可以考慮。</dd>
 </dl>
 </li>
 <li>
 <dl>
 <dt><a href="http://web.mit.edu/~emin/www.old/source_code/py_ecc/" target="_blank" rel="noopener">py_ecc</a></dt>
-<dd>純 Python 實現; 不確定授權模式，應該類似 BSD。<br>
+<dd> 純 Python 實現；不確定授權模式，應該類似 BSD。<br>
 除非只是為了驗證概念，不然使用純 Python 實作無法實際應用。</dd>
 </dl>
 </li>
@@ -415,14 +419,14 @@ Windows，在 Unix-like 的環境編譯也很困難。</dd>
 <p>假如上述的程式庫，不合乎您的需要的話，請繼續看下一節。</p>
 <h2 id="自行包裝糾刪碼程式庫">自行包裝糾刪碼程式庫</h2>
 <p>山姆鍋發現一個在 GitHub 上的 <a href="#longhair">Longhair</a> 專案有提供所需的程式碼。 使用 C++ 開發，但提供 C 語言呼叫介面，New BSD 授權，剛好符合需要。 唯一的問題：它不支援 Python 支援！</p>
-<p>還好 Python 的特性之一便是容易整合原生(native)程式庫，這讓我興起自行整合的想法。因為不想學習 Python 完整的 C 擴充介面 <sup class="footnote-ref"><a href="#fn3" id="fnref3">[3]</a></sup>，於是山姆鍋選擇 <a href="#cython">Cython</a> 來進行包裝工作。</p>
+<p>還好 Python 的特性之一便是容易整合原生 (native) 程式庫，這讓我興起自行整合的想法。因為不想學習 Python 完整的 C 擴充介面 <sup class="footnote-ref"><a href="#fn3" id="fnref3">[3]</a></sup>，於是山姆鍋選擇 <a href="#cython">Cython</a> 來進行包裝工作。</p>
 <p>完成的相關程式碼在 <a href="https://github.com/sampot/pylonghair" target="_blank" rel="noopener">GitHub</a> 上。</p>
 <h2 id="測試程式碼">測試程式碼</h2>
 <p>底下的測試碼示範如何使用 fec_encode 編碼，以及 fec_decode 解碼：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">test_fec_encode</span><span class="params">(self)</span>:</span></span><br><span class="line">    block_size = <span class="number">8192</span></span><br><span class="line">    k = <span class="number">10</span></span><br><span class="line">    m = <span class="number">4</span></span><br><span class="line">    data = os.urandom(k * block_size)</span><br><span class="line">    parity = bytearray(m * block_size)</span><br><span class="line">    <span class="keyword">assert</span> fec_encode(k, m, block_size, data, parity) == <span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">test_fec_decode_without_sufficient_blocks</span><span class="params">(self)</span>:</span></span><br><span class="line">    block_size = <span class="number">8192</span></span><br><span class="line">    k = <span class="number">10</span></span><br><span class="line">    m = <span class="number">4</span></span><br><span class="line">    data = os.urandom(k * block_size)</span><br><span class="line">    parity = bytearray(m * block_size)</span><br><span class="line">    <span class="keyword">assert</span> parity == <span class="string">b'\x00'</span> * (m * block_size)</span><br><span class="line">    <span class="keyword">assert</span> fec_encode(k, m, block_size, data, parity) == <span class="number">0</span></span><br><span class="line"></span><br><span class="line">    blocks = []</span><br><span class="line">    <span class="keyword">for</span> row <span class="keyword">in</span> range(k<span class="number">-1</span>):</span><br><span class="line">        offset = row * block_size</span><br><span class="line">        block_data = data[offset:offset + block_size]</span><br><span class="line">        blocks.append((row, block_data))</span><br><span class="line"></span><br><span class="line">    blocks.append((k, bytearray(parity[:block_size])))</span><br><span class="line">    <span class="keyword">assert</span> fec_decode(k, m, block_size, blocks) == <span class="number">0</span></span><br><span class="line">    offset = (k<span class="number">-1</span>) * block_size</span><br><span class="line">    <span class="keyword">assert</span> blocks[(k<span class="number">-1</span>)][<span class="number">1</span>] == data[offset:offset + block_size]</span><br></pre></td></tr></table></figure>
-<p>解碼測試案例故意將最後一個(索引值 k-1)原始資料區塊，換成第一個同位檢查資料區塊來驗證解碼正確。</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">test_fec_encode</span><span class="params">(self)</span>:</span></span><br><span class="line">    block_size = <span class="number">8192</span></span><br><span class="line">    k = <span class="number">10</span></span><br><span class="line">    m = <span class="number">4</span></span><br><span class="line">    data = os.urandom(k * block_size)</span><br><span class="line">    parity = bytearray(m * block_size)</span><br><span class="line">    <span class="keyword">assert</span> fec_encode(k, m, block_size, data, parity) == <span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">test_fec_decode_without_sufficient_blocks</span><span class="params">(self)</span>:</span></span><br><span class="line">    block_size = <span class="number">8192</span></span><br><span class="line">    k = <span class="number">10</span></span><br><span class="line">    m = <span class="number">4</span></span><br><span class="line">    data = os.urandom(k * block_size)</span><br><span class="line">    parity = bytearray(m * block_size)</span><br><span class="line">    <span class="keyword">assert</span> parity == <span class="string">b'\x00'</span> * (m * block_size)</span><br><span class="line">    <span class="keyword">assert</span> fec_encode(k, m, block_size, data, parity) == <span class="number">0</span></span><br><span class="line"></span><br><span class="line">    blocks = []</span><br><span class="line">    <span class="keyword">for</span> row <span class="keyword">in</span> range(k<span class="number">-1</span>):</span><br><span class="line">        offset = row * block_size</span><br><span class="line">        block_data = data[offset:offset + block_size]</span><br><span class="line">        blocks.append((row, block_data))</span><br><span class="line"></span><br><span class="line">    blocks.append((k, bytearray(parity[:block_size])))</span><br><span class="line">    <span class="keyword">assert</span> fec_decode(k, m, block_size, blocks) == <span class="number">0</span></span><br><span class="line">    offset = (k<span class="number">-1</span>) * block_size</span><br><span class="line">    <span class="keyword">assert</span> blocks[(k<span class="number">-1</span>)][<span class="number">1</span>] == data[offset:offset + block_size]</span><br></pre></td></tr></tbody></table></figure>
+<p>解碼測試案例故意將最後一個 (索引值 k-1) 原始資料區塊，換成第一個同位檢查資料區塊來驗證解碼正確。</p>
 <h2 id="結語">結語</h2>
-<p>數學對山姆鍋而言，通常是要敬而遠之的東西，但是糾刪碼實在很酷，讓我還是想寫寫關於它的應用。試想：將資料加密後，再使用糾刪碼切成 (K + M) 份， 分散到網路上 (K + M) 台主機。理論上，不僅沒有一台主機有完整資訊可以還原資料外，還可以容忍其中 M 台主機離線或故障。最重要的是： 只有自己擁有最終解碼所需的金鑰(secret key)，這才是雲端存儲的終極之道啊！關於雲端資料加密的作法，以後有機會再介紹。</p>
+<p>數學對山姆鍋而言，通常是要敬而遠之的東西，但是糾刪碼實在很酷，讓我還是想寫寫關於它的應用。試想：將資料加密後，再使用糾刪碼切成 (K + M) 份， 分散到網路上 (K + M) 台主機。理論上，不僅沒有一台主機有完整資訊可以還原資料外，還可以容忍其中 M 台主機離線或故障。最重要的是： 只有自己擁有最終解碼所需的金鑰 (secret key)，這才是雲端存儲的終極之道啊！關於雲端資料加密的作法，以後有機會再介紹。</p>
 <h2 id="參考資料">參考資料</h2>
 <p><a name="cython"></a><em>Cython</em>: <a href="http://cython.org/" target="_blank" rel="noopener">http://cython.org/</a></p>
 <p><a name="longhair"></a><em>Longhair</em>: <a href="https://github.com/catid/longhair" target="_blank" rel="noopener">https://github.com/catid/longhair</a></p>
@@ -432,7 +436,7 @@ Windows，在 Unix-like 的環境編譯也很困難。</dd>
 <hr class="footnotes-sep">
 <section class="footnotes">
 <ol class="footnotes-list">
-<li id="fn1" class="footnote-item"><p>其實是山姆鍋也不了解背後艱深的數學原理。 <a href="#fnref1" class="footnote-backref">↩︎</a></p>
+<li id="fn1" class="footnote-item"><p> 其實是山姆鍋也不了解背後艱深的數學原理。 <a href="#fnref1" class="footnote-backref">↩︎</a></p>
 </li>
 <li id="fn2" class="footnote-item"><p>也就是俗稱 4 個 9 的可用性。 <a href="#fnref2" class="footnote-backref">↩︎</a></p>
 </li>
@@ -441,6 +445,9 @@ Windows，在 Unix-like 的環境編譯也很困難。</dd>
 </ol>
 </section>
 
+            <div class="alert info no-icon">
+                山姆鍋是<a href="https://developers.tw/@山姆鍋" target="_blank" rel="noopener">#呆丸開發者</a>成員
+            </div>
             
 
 
@@ -567,6 +574,14 @@ Windows，在 Unix-like 的環境編譯也很困難。</dd>
     <span class="copyrights">
         Copyrights &copy; 2020 Sampot (山姆鍋). All Rights Reserved.
     </span>
+    <br/>
+        <a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW"><img
+                alt="創用 CC 授權條款" style="border-width:0"
+                src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+        除另有標示，本著作係採用<a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW">創用 CC
+            姓名標示-非商業性-相同方式分享 4.0 國際 授權條款</a>授權。
 </footer>
 
             </div>
@@ -791,9 +806,9 @@ Windows，在 Unix-like 的環境編譯也很困難。</dd>
                         <a
                             class="link-unstyled"
                             href="https://samkuo.me/post/2012/04/use-pacemaker-two-node-ha-cluster/"
-                            aria-label=": 使用Pacemaker 建構雙節點叢集系統"
+                            aria-label=": 使用 Pacemaker 建構雙節點叢集系統"
                         >
-                            <h3 class="media-heading">使用Pacemaker 建構雙節點叢集系統</h3>
+                            <h3 class="media-heading">使用 Pacemaker 建構雙節點叢集系統</h3>
                         </a>
                         <span class="media-meta">
                             <span class="media-date text-small">
@@ -802,7 +817,7 @@ Windows，在 Unix-like 的環境編譯也很困難。</dd>
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>想要達到系統高可用性(high availability)的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。</p></div>
+                        <div class="media-content hide-xs font-merryweather"><p>想要達到系統高可用性 (high availability) 的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。</p></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>
@@ -825,7 +840,7 @@ Windows，在 Unix-like 的環境編譯也很困難。</dd>
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案(圖檔, CSS 等等)可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點(single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。</p></div>
+                        <div class="media-content hide-xs font-merryweather"><p>在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案 (圖檔，CSS 等等) 可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點 (single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。</p></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>

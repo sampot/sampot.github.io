@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="我是山姆鍋">
-    <title>使用 CircleCI 作為《我.影化身》雲端持續整合方案 - 我是山姆鍋</title>
+    <title>使用 CircleCI 作為《我。影化身》雲端持續整合方案 - 我是山姆鍋</title>
     <meta name="author" content="Sampot (山姆鍋)">
     
     
@@ -17,13 +17,13 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"CircleCI 是山姆鍋到目前為止認為最好用的雲端持續整合方案。《我.影化身》開發自然也需要利用持續整合來自動執行軟體測試與建置工作。本文便以《我.影化身》作為應用實例，說明如何簡單完成與 CircleCI 的設定。\n\n山姆鍋假設您已經有 GitHub 以及 CircleCI\n關聯的帳戶，且有可以使用的開源專案。 如果沒有，您也可以直接 Fork\n《我.影化身》開源專案：https://github.com/eavatar/eavatar-me\n設定目標\n山姆鍋希望每次有程式碼簽入(check-in)時，便會啟動整個建置流程完成下列工作：\n\n執行單元測試\n執行功能測試\n製作應用發行包(distribution package)\n\n未來目標之一是能夠建置 Docker\n映像(image)，但本文並沒有相關說明。想了解如何使用 CircleCI 建置 Docker\n映像， 可以參考 Amo Wu 的\nDevOps：持續整合＆持續交付（Docker、CircleCI、AWS）\n。\n建置環境需求\n自動跟手動建置軟體對於環境的需求基本上是類似的，對於《我.影化身》建置環境的基本需求，請參考專案文件：\nhttp://docs.eavatar.me/en/latest/development.html\n準備描述檔 circle.yml\n要讓專案可以在 CircleCI 建置，基本上只需要一個描述檔,\ncircle.yml。透過這個描述檔， CircleCI\n便可以了解專案所需要的執行環境，以及根據描述安裝相依套件、執行測試、建置與部署工作。\n12345678910111213141516171819202122general:    artifacts:        - \"dist/avame-0.1.0+$&#123;CIRCLE_BUILD_NUM&#125;.tgz\"dependencies:    override:        - sudo mkdir -p /usr/local/lib        - sudo pip install -U pip        - sudo easy_install -U setuptools        - pip install -r requirements.txt        - pip install seleniumtest:    override:        - sudo cp plat.libs/libsodium.so.13.1.0 /usr/local/lib/        - sudo ln -s /usr/local/lib/libsodium.so.13.1.0 /usr/local/lib/libsodium.so.13        - sudo ln -s /usr/local/lib/libsodium.so.13.1.0 /usr/local/lib/libsodium.so        - PYTHONPATH=\".:./src\" py.test -vvv tests/unit/        - PYTHONPATH=\".:./src\" py.test -vvv tests/functional/test_home_page.py        - PYTHONPATH=\".:./src\" pyinstaller pack/avame.spec --clean -y    post:        - cd dist &amp;&amp; tar zcvf avame-0.1.0+$&#123;CIRCLE_BUILD_NUM&#125;.tgz avame/\n其中，\n\n\n\ngeneral:\n\n:   描述建置完成後要保留的產出物(artifacts)，這裏山姆鍋指定建置出來的應用發行包。\n\n\n\n\ndependencies:\n\n:   安裝編譯、測試過程會用的系統與應用套件。這裏也升級\n    `pip` 以及 `setuptools` 套件，\n    這是從之前的專案移植過來，已經不確定需不需要了。 安裝\n    `selenium` 是為了網頁介面的功能測試，CircleCI\n    已經有安裝測試時需要的 Firefox 瀏覽器。\n\n\n\n\ntest/override:\n\n:   把 Ubuntu 環境需要使用的 `libsodium`\n    動態連結檔複製到正確的位置。 《我.影化身》使用它來支援非對稱式\n    加解密功能。如果沒有這個步驟，相關測試會出現找不到程式庫的問題。\n    本文範例只使用一個簡單的功能測試案例，這部分內容會根據專案進展而更動。\n\n\n\n\ntest/post:\n\n:   如果單元以及功能測試都完成，打包發行套件所需的檔案。這裏檔名中\\${CIRCLE\\_BUILD\\_NUM}部分，\n    會根據環境變數 `CIRCLE_BUILD_NUM`\n    來決定，代表目前建置工作的順序編號。 CircleCI\n    在建置時會提供一些環境變數，可以參考這篇文件:\n    &lt;https://circleci.com/docs/environment-variables&gt;\n\n開始持續集成工作\n要讓 CircleCI 開始為專案工作，需要完成下列步驟：\n\n登入 CircleCI, 從選單(應該在左邊)選擇 “Add Projects”\n選擇要使用的 GitHub 用戶或組織帳戶\n選擇要建置的專案，點擊 “Build project”\n\n以上步驟是根據撰寫本文時的使用介面流程，如果跟您看到的不同，請自行斟酌調整。由於已經授權過\nCircleCI 自動設定 GitHub 上的開源專案，CircleCI\n會幫我們把相關的設定完成。之後只要有程式碼 check-in,\n便會自動執行建置工作。其它有更多的設定可以運用，請自行參考 CircleCI\n文件 。\n結語\n雖然文章沒有提到，但 CircleCI 對於 Docker\n映像(image)建置的支援也很完整。\n不過這是根據山姆鍋之前的經驗，現在其它雲端持續整合方案應該也有 Docker\n支援才對。\n因為《我.影化身》有圖形用戶介面，需要針對不同桌面環境做建置工作， 採用\nCircleCI 主要是做持續整合測試與 Docker 映像的建置與發佈工作。\n","dateCreated":"2015-10-30T09:40:00+08:00","dateModified":"2018-08-29T20:19:08+08:00","datePublished":"2015-10-30T09:40:00+08:00","description":"CircleCI 是山姆鍋到目前為止認為最好用的雲端持續整合方案。《我.影化身》開發自然也需要利用持續整合來自動執行軟體測試與建置工作。本文便以《我.影化身》作為應用實例，說明如何簡單完成與 CircleCI 的設定。","headline":"使用 CircleCI 作為《我.影化身》雲端持續整合方案","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2015/10/eavatar-circleci-continuous-integration/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2015/10/eavatar-circleci-continuous-integration/","keywords":"continuous integration, CircleCI, software, build, test"}</script>
-    <meta name="description" content="CircleCI 是山姆鍋到目前為止認為最好用的雲端持續整合方案。《我.影化身》開發自然也需要利用持續整合來自動執行軟體測試與建置工作。本文便以《我.影化身》作為應用實例，說明如何簡單完成與 CircleCI 的設定。">
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"CircleCI 是山姆鍋到目前為止認為最好用的雲端持續整合方案。《我。影化身》開發自然也需要利用持續整合來自動執行軟體測試與建置工作。本文便以《我。影化身》作為應用實例，說明如何簡單完成與 CircleCI 的設定。\n\n山姆鍋假設您已經有 GitHub 以及 CircleCI\n關聯的帳戶，且有可以使用的開源專案。 如果沒有，您也可以直接 Fork\n《我。影化身》開源專案：https://github.com/eavatar/eavatar-me\n設定目標\n山姆鍋希望每次有程式碼簽入 (check-in) 時，便會啟動整個建置流程完成下列工作：\n\n執行單元測試\n執行功能測試\n製作應用發行包 (distribution package)\n\n未來目標之一是能夠建置 Docker\n映像 (image)，但本文並沒有相關說明。想了解如何使用 CircleCI 建置 Docker\n映像， 可以參考 Amo Wu 的\nDevOps：持續整合＆持續交付（Docker、CircleCI、AWS）\n。\n建置環境需求\n自動跟手動建置軟體對於環境的需求基本上是類似的，對於《我。影化身》建置環境的基本需求，請參考專案文件：\nhttp://docs.eavatar.me/en/latest/development.html\n準備描述檔 circle.yml\n要讓專案可以在 CircleCI 建置，基本上只需要一個描述檔，\ncircle.yml。透過這個描述檔， CircleCI\n便可以了解專案所需要的執行環境，以及根據描述安裝相依套件、執行測試、建置與部署工作。\n12345678910111213141516171819202122general:    artifacts:        - \"dist/avame-0.1.0+${CIRCLE_BUILD_NUM}.tgz\"dependencies:    override:        - sudo mkdir -p /usr/local/lib        - sudo pip install -U pip        - sudo easy_install -U setuptools        - pip install -r requirements.txt        - pip install seleniumtest:    override:        - sudo cp plat.libs/libsodium.so.13.1.0 /usr/local/lib/        - sudo ln -s /usr/local/lib/libsodium.so.13.1.0 /usr/local/lib/libsodium.so.13        - sudo ln -s /usr/local/lib/libsodium.so.13.1.0 /usr/local/lib/libsodium.so        - PYTHONPATH=\".:./src\" py.test -vvv tests/unit/        - PYTHONPATH=\".:./src\" py.test -vvv tests/functional/test_home_page.py        - PYTHONPATH=\".:./src\" pyinstaller pack/avame.spec --clean -y    post:        - cd dist &amp;&amp; tar zcvf avame-0.1.0+${CIRCLE_BUILD_NUM}.tgz avame/\n其中，\n\n\n\ngeneral:\n\n:   描述建置完成後要保留的產出物(artifacts)，這裏山姆鍋指定建置出來的應用發行包。\n\n\n\n\ndependencies:\n\n:   安裝編譯、測試過程會用的系統與應用套件。這裏也升級\n    `pip` 以及 `setuptools` 套件，\n    這是從之前的專案移植過來，已經不確定需不需要了。 安裝\n    `selenium` 是為了網頁介面的功能測試，CircleCI\n    已經有安裝測試時需要的 Firefox 瀏覽器。\n\n\n\n\ntest/override:\n\n:   把 Ubuntu 環境需要使用的 `libsodium`\n    動態連結檔複製到正確的位置。 《我.影化身》使用它來支援非對稱式\n    加解密功能。如果沒有這個步驟，相關測試會出現找不到程式庫的問題。\n    本文範例只使用一個簡單的功能測試案例，這部分內容會根據專案進展而更動。\n\n\n\n\ntest/post:\n\n:   如果單元以及功能測試都完成，打包發行套件所需的檔案。這裏檔名中\\${CIRCLE\\_BUILD\\_NUM}部分，\n    會根據環境變數 `CIRCLE_BUILD_NUM`\n    來決定，代表目前建置工作的順序編號。 CircleCI\n    在建置時會提供一些環境變數，可以參考這篇文件:\n    &lt;https://circleci.com/docs/environment-variables&gt;\n\n開始持續集成工作\n要讓 CircleCI 開始為專案工作，需要完成下列步驟：\n\n登入 CircleCI, 從選單 (應該在左邊) 選擇 “Add Projects”\n 選擇要使用的 GitHub 用戶或組織帳戶\n選擇要建置的專案，點擊 “Build project”\n\n以上步驟是根據撰寫本文時的使用介面流程，如果跟您看到的不同，請自行斟酌調整。由於已經授權過\nCircleCI 自動設定 GitHub 上的開源專案，CircleCI\n會幫我們把相關的設定完成。之後只要有程式碼 check-in,\n便會自動執行建置工作。其它有更多的設定可以運用，請自行參考 CircleCI\n文件 。\n結語\n雖然文章沒有提到，但 CircleCI 對於 Docker\n映像 (image) 建置的支援也很完整。\n不過這是根據山姆鍋之前的經驗，現在其它雲端持續整合方案應該也有 Docker\n支援才對。\n因為《我。影化身》有圖形用戶介面，需要針對不同桌面環境做建置工作， 採用\nCircleCI 主要是做持續整合測試與 Docker 映像的建置與發佈工作。\n","dateCreated":"2015-10-30T09:40:00+08:00","dateModified":"2018-08-29T20:19:08+08:00","datePublished":"2015-10-30T09:40:00+08:00","description":"CircleCI 是山姆鍋到目前為止認為最好用的雲端持續整合方案。《我。影化身》開發自然也需要利用持續整合來自動執行軟體測試與建置工作。本文便以《我。影化身》作為應用實例，說明如何簡單完成與 CircleCI 的設定。","headline":"使用 CircleCI 作為《我。影化身》雲端持續整合方案","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2015/10/eavatar-circleci-continuous-integration/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2015/10/eavatar-circleci-continuous-integration/","keywords":"continuous integration, CircleCI, software, build, test"}</script>
+    <meta name="description" content="CircleCI 是山姆鍋到目前為止認為最好用的雲端持續整合方案。《我。影化身》開發自然也需要利用持續整合來自動執行軟體測試與建置工作。本文便以《我。影化身》作為應用實例，說明如何簡單完成與 CircleCI 的設定。">
 <meta property="og:type" content="blog">
-<meta property="og:title" content="使用 CircleCI 作為《我.影化身》雲端持續整合方案">
+<meta property="og:title" content="使用 CircleCI 作為《我。影化身》雲端持續整合方案">
 <meta property="og:url" content="https://samkuo.me/post/2015/10/eavatar-circleci-continuous-integration/">
 <meta property="og:site_name" content="我是山姆鍋">
-<meta property="og:description" content="CircleCI 是山姆鍋到目前為止認為最好用的雲端持續整合方案。《我.影化身》開發自然也需要利用持續整合來自動執行軟體測試與建置工作。本文便以《我.影化身》作為應用實例，說明如何簡單完成與 CircleCI 的設定。">
+<meta property="og:description" content="CircleCI 是山姆鍋到目前為止認為最好用的雲端持續整合方案。《我。影化身》開發自然也需要利用持續整合來自動執行軟體測試與建置工作。本文便以《我。影化身》作為應用實例，說明如何簡單完成與 CircleCI 的設定。">
 <meta property="og:locale" content="zh_TW">
 <meta property="article:published_time" content="2015-10-30T01:40:00.000Z">
 <meta property="article:modified_time" content="2018-08-29T12:19:08.058Z">
@@ -343,7 +343,7 @@
         <div class="post-header main-content-wrap text-left">
     
         <h1 class="post-title">
-            使用 CircleCI 作為《我.影化身》雲端持續整合方案
+            使用 CircleCI 作為《我。影化身》雲端持續整合方案
         </h1>
     
     
@@ -368,31 +368,35 @@
     
     <div class="post-content markdown">
         <div class="main-content-wrap">
-            <p>CircleCI 是山姆鍋到目前為止認為最好用的雲端持續整合方案。《我.影化身》開發自然也需要利用持續整合來自動執行軟體測試與建置工作。本文便以《我.影化身》作為應用實例，說明如何簡單完成與 CircleCI 的設定。</p>
+            <div class="alert info no-icon">
+                <a href="https://www.facebook.com/sampotkuo" target="_blank" rel="noopener">「我是山姆鍋」有臉書專頁</a>
+            </div>
+
+            <p>CircleCI 是山姆鍋到目前為止認為最好用的雲端持續整合方案。《我。影化身》開發自然也需要利用持續整合來自動執行軟體測試與建置工作。本文便以《我。影化身》作為應用實例，說明如何簡單完成與 CircleCI 的設定。</p>
 <a id="more"></a>
 <p>山姆鍋假設您已經有 GitHub 以及 CircleCI<br>
 關聯的帳戶，且有可以使用的開源專案。 如果沒有，您也可以直接 Fork<br>
-《我.影化身》開源專案：<a href="https://github.com/eavatar/eavatar-me" target="_blank" rel="noopener">https://github.com/eavatar/eavatar-me</a></p>
+《我。影化身》開源專案：<a href="https://github.com/eavatar/eavatar-me" target="_blank" rel="noopener">https://github.com/eavatar/eavatar-me</a></p>
 <h2 id="設定目標">設定目標</h2>
-<p>山姆鍋希望每次有程式碼簽入(check-in)時，便會啟動整個建置流程完成下列工作：</p>
+<p>山姆鍋希望每次有程式碼簽入 (check-in) 時，便會啟動整個建置流程完成下列工作：</p>
 <ul>
 <li>執行單元測試</li>
 <li>執行功能測試</li>
-<li>製作應用發行包(distribution package)</li>
+<li>製作應用發行包 (distribution package)</li>
 </ul>
 <p>未來目標之一是能夠建置 Docker<br>
-映像(image)，但本文並沒有相關說明。想了解如何使用 CircleCI 建置 Docker<br>
+映像 (image)，但本文並沒有相關說明。想了解如何使用 CircleCI 建置 Docker<br>
 映像， 可以參考 Amo Wu 的<br>
 <a href="http://blog.amowu.com/2015/04/devops-continuous-integration-delivery-docker-circleci-aws-beanstalk.html" target="_blank" rel="noopener">DevOps：持續整合＆持續交付（Docker、CircleCI、AWS）</a><br>
 。</p>
 <h2 id="建置環境需求">建置環境需求</h2>
-<p>自動跟手動建置軟體對於環境的需求基本上是類似的，對於《我.影化身》建置環境的基本需求，請參考專案文件：<br>
+<p>自動跟手動建置軟體對於環境的需求基本上是類似的，對於《我。影化身》建置環境的基本需求，請參考專案文件：<br>
 <a href="http://docs.eavatar.me/en/latest/development.html" target="_blank" rel="noopener">http://docs.eavatar.me/en/latest/development.html</a></p>
 <h2 id="準備描述檔-circle-yml">準備描述檔 circle.yml</h2>
-<p>要讓專案可以在 CircleCI 建置，基本上只需要一個描述檔,<br>
+<p>要讓專案可以在 CircleCI 建置，基本上只需要一個描述檔，<br>
 circle.yml。透過這個描述檔， CircleCI<br>
 便可以了解專案所需要的執行環境，以及根據描述安裝相依套件、執行測試、建置與部署工作。</p>
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">general:</span></span><br><span class="line">    <span class="attr">artifacts:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">"dist/avame-0.1.0+$&#123;CIRCLE_BUILD_NUM&#125;.tgz"</span></span><br><span class="line"></span><br><span class="line"><span class="attr">dependencies:</span></span><br><span class="line">    <span class="attr">override:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">sudo</span> <span class="string">mkdir</span> <span class="string">-p</span> <span class="string">/usr/local/lib</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">sudo</span> <span class="string">pip</span> <span class="string">install</span> <span class="string">-U</span> <span class="string">pip</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">sudo</span> <span class="string">easy_install</span> <span class="string">-U</span> <span class="string">setuptools</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">pip</span> <span class="string">install</span> <span class="string">-r</span> <span class="string">requirements.txt</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">pip</span> <span class="string">install</span> <span class="string">selenium</span></span><br><span class="line"></span><br><span class="line"><span class="attr">test:</span></span><br><span class="line">    <span class="attr">override:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">sudo</span> <span class="string">cp</span> <span class="string">plat.libs/libsodium.so.13.1.0</span> <span class="string">/usr/local/lib/</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">sudo</span> <span class="string">ln</span> <span class="string">-s</span> <span class="string">/usr/local/lib/libsodium.so.13.1.0</span> <span class="string">/usr/local/lib/libsodium.so.13</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">sudo</span> <span class="string">ln</span> <span class="string">-s</span> <span class="string">/usr/local/lib/libsodium.so.13.1.0</span> <span class="string">/usr/local/lib/libsodium.so</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">PYTHONPATH=".:./src"</span> <span class="string">py.test</span> <span class="string">-vvv</span> <span class="string">tests/unit/</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">PYTHONPATH=".:./src"</span> <span class="string">py.test</span> <span class="string">-vvv</span> <span class="string">tests/functional/test_home_page.py</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">PYTHONPATH=".:./src"</span> <span class="string">pyinstaller</span> <span class="string">pack/avame.spec</span> <span class="string">--clean</span> <span class="string">-y</span></span><br><span class="line">    <span class="attr">post:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">cd</span> <span class="string">dist</span> <span class="string">&amp;&amp;</span> <span class="string">tar</span> <span class="string">zcvf</span> <span class="string">avame-0.1.0+$&#123;CIRCLE_BUILD_NUM&#125;.tgz</span> <span class="string">avame/</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight yaml"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">general:</span></span><br><span class="line">    <span class="attr">artifacts:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">"dist/avame-0.1.0+${CIRCLE_BUILD_NUM}.tgz"</span></span><br><span class="line"></span><br><span class="line"><span class="attr">dependencies:</span></span><br><span class="line">    <span class="attr">override:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">sudo</span> <span class="string">mkdir</span> <span class="string">-p</span> <span class="string">/usr/local/lib</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">sudo</span> <span class="string">pip</span> <span class="string">install</span> <span class="string">-U</span> <span class="string">pip</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">sudo</span> <span class="string">easy_install</span> <span class="string">-U</span> <span class="string">setuptools</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">pip</span> <span class="string">install</span> <span class="string">-r</span> <span class="string">requirements.txt</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">pip</span> <span class="string">install</span> <span class="string">selenium</span></span><br><span class="line"></span><br><span class="line"><span class="attr">test:</span></span><br><span class="line">    <span class="attr">override:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">sudo</span> <span class="string">cp</span> <span class="string">plat.libs/libsodium.so.13.1.0</span> <span class="string">/usr/local/lib/</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">sudo</span> <span class="string">ln</span> <span class="string">-s</span> <span class="string">/usr/local/lib/libsodium.so.13.1.0</span> <span class="string">/usr/local/lib/libsodium.so.13</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">sudo</span> <span class="string">ln</span> <span class="string">-s</span> <span class="string">/usr/local/lib/libsodium.so.13.1.0</span> <span class="string">/usr/local/lib/libsodium.so</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">PYTHONPATH=".:./src"</span> <span class="string">py.test</span> <span class="string">-vvv</span> <span class="string">tests/unit/</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">PYTHONPATH=".:./src"</span> <span class="string">py.test</span> <span class="string">-vvv</span> <span class="string">tests/functional/test_home_page.py</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">PYTHONPATH=".:./src"</span> <span class="string">pyinstaller</span> <span class="string">pack/avame.spec</span> <span class="string">--clean</span> <span class="string">-y</span></span><br><span class="line">    <span class="attr">post:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">cd</span> <span class="string">dist</span> <span class="string">&amp;&amp;</span> <span class="string">tar</span> <span class="string">zcvf</span> <span class="string">avame-0.1.0+${CIRCLE_BUILD_NUM}.tgz</span> <span class="string">avame/</span></span><br></pre></td></tr></tbody></table></figure>
 <p>其中，</p>
 <ul>
 <li></li>
@@ -436,8 +440,8 @@ circle.yml。透過這個描述檔， CircleCI<br>
 <h2 id="開始持續集成工作">開始持續集成工作</h2>
 <p>要讓 CircleCI 開始為專案工作，需要完成下列步驟：</p>
 <ol>
-<li>登入 CircleCI, 從選單(應該在左邊)選擇 “Add Projects”</li>
-<li>選擇要使用的 GitHub 用戶或組織帳戶</li>
+<li>登入 CircleCI, 從選單 (應該在左邊) 選擇 “Add Projects”</li>
+<li> 選擇要使用的 GitHub 用戶或組織帳戶</li>
 <li>選擇要建置的專案，點擊 “Build project”</li>
 </ol>
 <p>以上步驟是根據撰寫本文時的使用介面流程，如果跟您看到的不同，請自行斟酌調整。由於已經授權過<br>
@@ -447,12 +451,15 @@ CircleCI 自動設定 GitHub 上的開源專案，CircleCI<br>
 文件</a> 。</p>
 <h2 id="結語">結語</h2>
 <p>雖然文章沒有提到，但 CircleCI 對於 Docker<br>
-映像(image)建置的支援也很完整。<br>
+映像 (image) 建置的支援也很完整。<br>
 不過這是根據山姆鍋之前的經驗，現在其它雲端持續整合方案應該也有 Docker<br>
 支援才對。<br>
-因為《我.影化身》有圖形用戶介面，需要針對不同桌面環境做建置工作， 採用<br>
+因為《我。影化身》有圖形用戶介面，需要針對不同桌面環境做建置工作， 採用<br>
 CircleCI 主要是做持續整合測試與 Docker 映像的建置與發佈工作。</p>
 
+            <div class="alert info no-icon">
+                山姆鍋是<a href="https://developers.tw/@山姆鍋" target="_blank" rel="noopener">#呆丸開發者</a>成員
+            </div>
             
 
 
@@ -579,6 +586,14 @@ CircleCI 主要是做持續整合測試與 Docker 映像的建置與發佈工作
     <span class="copyrights">
         Copyrights &copy; 2020 Sampot (山姆鍋). All Rights Reserved.
     </span>
+    <br/>
+        <a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW"><img
+                alt="創用 CC 授權條款" style="border-width:0"
+                src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+        除另有標示，本著作係採用<a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW">創用 CC
+            姓名標示-非商業性-相同方式分享 4.0 國際 授權條款</a>授權。
 </footer>
 
             </div>
@@ -803,9 +818,9 @@ CircleCI 主要是做持續整合測試與 Docker 映像的建置與發佈工作
                         <a
                             class="link-unstyled"
                             href="https://samkuo.me/post/2012/04/use-pacemaker-two-node-ha-cluster/"
-                            aria-label=": 使用Pacemaker 建構雙節點叢集系統"
+                            aria-label=": 使用 Pacemaker 建構雙節點叢集系統"
                         >
-                            <h3 class="media-heading">使用Pacemaker 建構雙節點叢集系統</h3>
+                            <h3 class="media-heading">使用 Pacemaker 建構雙節點叢集系統</h3>
                         </a>
                         <span class="media-meta">
                             <span class="media-date text-small">
@@ -814,7 +829,7 @@ CircleCI 主要是做持續整合測試與 Docker 映像的建置與發佈工作
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>想要達到系統高可用性(high availability)的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。</p></div>
+                        <div class="media-content hide-xs font-merryweather"><p>想要達到系統高可用性 (high availability) 的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。</p></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>
@@ -837,7 +852,7 @@ CircleCI 主要是做持續整合測試與 Docker 映像的建置與發佈工作
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案(圖檔, CSS 等等)可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點(single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。</p></div>
+                        <div class="media-content hide-xs font-merryweather"><p>在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案 (圖檔，CSS 等等) 可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點 (single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。</p></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>

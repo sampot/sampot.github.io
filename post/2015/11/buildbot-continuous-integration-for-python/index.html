@@ -368,6 +368,10 @@
     
     <div class="post-content markdown">
         <div class="main-content-wrap">
+            <div class="alert info no-icon">
+                <a href="https://www.facebook.com/sampotkuo" target="_blank" rel="noopener">「我是山姆鍋」有臉書專頁</a>
+            </div>
+
             <p>由於專案需要在幾個桌面環境建構發行包 (distribution packages)，不久也想在 Raspberry Pi 上面進行，需要一個可以在不同平台環境上自動執行建置工作的軟體。 基於過去比較與使用的經驗， 山姆鍋選擇了 Buildbot 來進行這項工作。</p>
 <a id="more"></a>
 <div class="figure " style="width:;"><a class="fancybox" href="/media/shared/software-417880_640.jpg" title="" data-caption="" data-fancybox="default"><img class="fig-img" src="/media/shared/software-417880_640.jpg" alt=""></a></div>
@@ -510,6 +514,9 @@ Buildbot master 放在公開的主機上， 或透過<br>
 <h2 id="結語">結語</h2>
 <p>誠然，有更好用的 CI 軟體或服務，但對於需要在各種不同用戶平台上進行編譯、測試與打包工作的專案， Buildbot 也很適合。例如：需要支援多種作業系統的 Chromium 瀏覽器便利用 Buildbot 的這個特性在不同平台建置。另外， Buildbot 的架構設計讓專案參與者可以方便貢獻自己的電腦或裝置 來作為 Slaves。 要說 Buildbot 的主要缺點的話，那應該就是：設定檔對一般使用者不是那麼友善，需要了解不少概念。</p>
 
+            <div class="alert info no-icon">
+                山姆鍋是<a href="https://developers.tw/@山姆鍋" target="_blank" rel="noopener">#呆丸開發者</a>成員
+            </div>
             
 
 
@@ -636,6 +643,14 @@ Buildbot master 放在公開的主機上， 或透過<br>
     <span class="copyrights">
         Copyrights &copy; 2020 Sampot (山姆鍋). All Rights Reserved.
     </span>
+    <br/>
+        <a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW"><img
+                alt="創用 CC 授權條款" style="border-width:0"
+                src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+        除另有標示，本著作係採用<a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW">創用 CC
+            姓名標示-非商業性-相同方式分享 4.0 國際 授權條款</a>授權。
 </footer>
 
             </div>
@@ -860,9 +875,9 @@ Buildbot master 放在公開的主機上， 或透過<br>
                         <a
                             class="link-unstyled"
                             href="https://samkuo.me/post/2012/04/use-pacemaker-two-node-ha-cluster/"
-                            aria-label=": 使用Pacemaker 建構雙節點叢集系統"
+                            aria-label=": 使用 Pacemaker 建構雙節點叢集系統"
                         >
-                            <h3 class="media-heading">使用Pacemaker 建構雙節點叢集系統</h3>
+                            <h3 class="media-heading">使用 Pacemaker 建構雙節點叢集系統</h3>
                         </a>
                         <span class="media-meta">
                             <span class="media-date text-small">
@@ -871,7 +886,7 @@ Buildbot master 放在公開的主機上， 或透過<br>
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>想要達到系統高可用性(high availability)的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。</p></div>
+                        <div class="media-content hide-xs font-merryweather"><p>想要達到系統高可用性 (high availability) 的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。</p></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>
@@ -894,7 +909,7 @@ Buildbot master 放在公開的主機上， 或透過<br>
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案(圖檔, CSS 等等)可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點(single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。</p></div>
+                        <div class="media-content hide-xs font-merryweather"><p>在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案 (圖檔，CSS 等等) 可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點 (single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。</p></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>

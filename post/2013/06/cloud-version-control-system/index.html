@@ -19,7 +19,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"就一家軟體公司，版本控制系統幾乎是必備的工具，就算不是軟體公司，一般也建議採用這樣的工具來協調團隊合作。版本控制系統協調團隊文件、程式碼的修改工作，避免互相覆蓋而造成成果的流失。事實上，就算是一個人進行開發，版本管理系統依然提供許多好處。本文屬於 「善用雲端服務，微型企業的自強之道」系列文章之一。\n\n在軟體越來越複雜的時代，如果有一家軟體公司可以不用版本管理系統，那真的算得上是奇葩！山姆鍋從一開始工作，公司都有採用這樣的系統，也瞭解這樣的工具的必要性。然而，隨著技術與趨勢的變遷，採用的工具是會變動的。本文，山姆鍋就說明「影化身科技」所採用的方案以及背後主要決定的因素。\n需求考量\n雖然山姆鍋已經習慣 Subversion, VCS 這種集中式版本控制系統。事實上，過去幾家服務的公司，都是由我決定採用 Subversion。但來到雲端計算時代，我們有其他更好的選擇？就版本控制系統，除了基本功能外，我覺得下列是幾個「影化身科技」考量的需求：\n\n須有雲端服務供應商。\n需要支援集中式權限管理。\n方便分散式開發。\n\n在山姆鍋的評估過程中，其實只考慮採用下列系統之一：\n\nSubversion\nGit\nMercurial\n\n「影化身科技」最終採用的是 Git，底下讓山姆鍋來說明為什麼。 Subversion 雖然是我最熟悉的系統，但是從過去的經驗，在做 branch-and-merge 的操作上，效率明顯是不太理想。要連線才能進行 branch 這點，也影響開發效能。由於知道其他分散式版本控制系統可以改善這點，山姆鍋決定捨棄 Subversion。\n既然不使用 Subversion，那只剩下 Git 或 Mercurial 了。下列是我在選擇這兩者時使用的優劣比較：\nGit\n優點\n\n採用 C 開發，理論上，執行效率較高。\n支援度以及社群比較大。\n\n缺點\n\n沒有 Windows 原生支援，造成效率跟使用不便。\n中文檔名支援不完善。\n\nMercurial\n優點\n\n使用 Python 開發，較容易擴充。\n對 Windows 平台支援較好。\n較接近 Subversion 使用的語法。\n\n缺點\n\n第三方服務支援較少。\n中文檔名支援不完善。\n\n這兩者從功能、效率來講，其實差異不大。老實說，山姆鍋一開始是選擇 Mercurial 的，那為什麼最終會決定採用 Git 呢?最大的原因在於第三方服務的支援。首先，雲端原始碼代管服務，不外乎: GitHub 跟 Ｂ itBucket。由於有些第三方服務只支援 GitHub，但「影化身科技」私有的原始碼是放在 BitBucket，為了避免同時採用兩種工具，只好選擇兩者都支援的 Git。現在，「影化身科技」開放原始碼的專案會放置在 GitHub。\n小結\n本文只是針對預先選定的三種技術來考量，並不是全面性的比較。由於山姆鍋現在的主要開發環境已經轉到 Mac OS X，所以，Git 對 Windows 平台沒有原生的支援這點已經比較無所謂。\n","dateCreated":"2013-06-24T10:27:00+08:00","dateModified":"2020-03-08T10:06:51+08:00","datePublished":"2013-06-24T10:27:00+08:00","description":"就一家軟體公司，版本控制系統幾乎是必備的工具，就算不是軟體公司，一般也建議採用這樣的工具來協調團隊合作。版本控制系統協調團隊文件、程式碼的修改工作，避免互相覆蓋而造成成果的流失。事實上，就算是一個人進行開發，版本管理系統依然提供許多好處。本文屬於 「善用雲端服務，微型企業的自強之道」系列文章之一。","headline":"微型企業之雲端版本控制系統","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/06/cloud-version-control-system/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2013/06/cloud-version-control-system/","keywords":"Subversion, Git, Mercurial, Infrastructure"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"就一家軟體公司，版本控制系統幾乎是必備的工具，就算不是軟體公司，一般也建議採用這樣的工具來協調團隊合作。版本控制系統協調團隊文件、程式碼的修改工作，避免互相覆蓋而造成成果的流失。事實上，就算是一個人進行開發，版本管理系統依然提供許多好處。本文屬於 「善用雲端服務，微型企業的自強之道」系列文章之一。\n\n在軟體越來越複雜的時代，如果有一家軟體公司可以不用版本管理系統，那真的算得上是奇葩！山姆鍋從一開始工作，公司都有採用這樣的系統，也瞭解這樣的工具的必要性。然而，隨著技術與趨勢的變遷，採用的工具是會變動的。本文，山姆鍋就說明「影化身科技」所採用的方案以及背後主要決定的因素。\n需求考量\n雖然山姆鍋已經習慣 Subversion, VCS 這種集中式版本控制系統。事實上，過去幾家服務的公司，都是由我決定採用 Subversion。但來到雲端計算時代，我們有其他更好的選擇？就版本控制系統，除了基本功能外，我覺得下列是幾個「影化身科技」考量的需求：\n\n須有雲端服務供應商。\n需要支援集中式權限管理。\n方便分散式開發。\n\n在山姆鍋的評估過程中，其實只考慮採用下列系統之一：\n\nSubversion\nGit\nMercurial\n\n「影化身科技」最終採用的是 Git，底下讓山姆鍋來說明為什麼。 Subversion 雖然是我最熟悉的系統，但是從過去的經驗，在做 branch-and-merge 的操作上，效率明顯是不太理想。要連線才能進行 branch 這點，也影響開發效能。由於知道其他分散式版本控制系統可以改善這點，山姆鍋決定捨棄 Subversion。\n既然不使用 Subversion，那只剩下 Git 或 Mercurial 了。下列是我在選擇這兩者時使用的優劣比較：\nGit\n優點\n\n採用 C 開發，理論上，執行效率較高。\n支援度以及社群比較大。\n\n缺點\n\n沒有 Windows 原生支援，造成效率跟使用不便。\n中文檔名支援不完善。\n\nMercurial\n優點\n\n使用 Python 開發，較容易擴充。\n對 Windows 平台支援較好。\n較接近 Subversion 使用的語法。\n\n缺點\n\n第三方服務支援較少。\n中文檔名支援不完善。\n\n這兩者從功能、效率來講，其實差異不大。老實說，山姆鍋一開始是選擇 Mercurial 的，那為什麼最終會決定採用 Git 呢？最大的原因在於第三方服務的支援。首先，雲端原始碼代管服務，不外乎: GitHub 跟 Ｂ itBucket。由於有些第三方服務只支援 GitHub，但「影化身科技」私有的原始碼是放在 BitBucket，為了避免同時採用兩種工具，只好選擇兩者都支援的 Git。現在，「影化身科技」開放原始碼的專案會放置在 GitHub。\n小結\n本文只是針對預先選定的三種技術來考量，並不是全面性的比較。由於山姆鍋現在的主要開發環境已經轉到 Mac OS X，所以，Git 對 Windows 平台沒有原生的支援這點已經比較無所謂。\n","dateCreated":"2013-06-24T10:27:00+08:00","dateModified":"2020-03-08T10:06:51+08:00","datePublished":"2013-06-24T10:27:00+08:00","description":"就一家軟體公司，版本控制系統幾乎是必備的工具，就算不是軟體公司，一般也建議採用這樣的工具來協調團隊合作。版本控制系統協調團隊文件、程式碼的修改工作，避免互相覆蓋而造成成果的流失。事實上，就算是一個人進行開發，版本管理系統依然提供許多好處。本文屬於 「善用雲端服務，微型企業的自強之道」系列文章之一。","headline":"微型企業之雲端版本控制系統","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/06/cloud-version-control-system/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2013/06/cloud-version-control-system/","keywords":"Infrastructure, Subversion, Git, Mercurial"}</script>
     <meta name="description" content="就一家軟體公司，版本控制系統幾乎是必備的工具。事實上，就算不是軟體公司，一般也建議採用這樣的工具來協調團隊合作。">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="微型企業之雲端版本控制系統">
@@ -369,6 +369,10 @@
     
     <div class="post-content markdown">
         <div class="main-content-wrap">
+            <div class="alert info no-icon">
+                <a href="https://www.facebook.com/sampotkuo" target="_blank" rel="noopener">「我是山姆鍋」有臉書專頁</a>
+            </div>
+
             <p>就一家軟體公司，版本控制系統幾乎是必備的工具，就算不是軟體公司，一般也建議採用這樣的工具來協調團隊合作。版本控制系統協調團隊文件、程式碼的修改工作，避免互相覆蓋而造成成果的流失。事實上，就算是一個人進行開發，版本管理系統依然提供許多好處。本文屬於 <a href="/post/2013/06/infrastructure-software-shop-with-cloud-services/">「善用雲端服務，微型企業的自強之道」</a>系列文章之一。</p>
 <a id="more"></a>
 <p>在軟體越來越複雜的時代，如果有一家軟體公司可以不用版本管理系統，那真的算得上是奇葩！山姆鍋從一開始工作，公司都有採用這樣的系統，也瞭解這樣的工具的必要性。然而，隨著技術與趨勢的變遷，採用的工具是會變動的。本文，山姆鍋就說明「影化身科技」所採用的方案以及背後主要決定的因素。</p>
@@ -410,10 +414,13 @@
 <li>第三方服務支援較少。</li>
 <li>中文檔名支援不完善。</li>
 </ul>
-<p>這兩者從功能、效率來講，其實差異不大。老實說，山姆鍋一開始是選擇 Mercurial 的，那為什麼最終會決定採用 Git 呢?最大的原因在於第三方服務的支援。首先，雲端原始碼代管服務，不外乎: GitHub 跟 Ｂ itBucket。由於有些第三方服務只支援 GitHub，但「影化身科技」私有的原始碼是放在 BitBucket，為了避免同時採用兩種工具，只好選擇兩者都支援的 Git。現在，「影化身科技」開放原始碼的專案會放置在 GitHub。</p>
+<p>這兩者從功能、效率來講，其實差異不大。老實說，山姆鍋一開始是選擇 Mercurial 的，那為什麼最終會決定採用 Git 呢？最大的原因在於第三方服務的支援。首先，雲端原始碼代管服務，不外乎: GitHub 跟 Ｂ itBucket。由於有些第三方服務只支援 GitHub，但「影化身科技」私有的原始碼是放在 BitBucket，為了避免同時採用兩種工具，只好選擇兩者都支援的 Git。現在，「影化身科技」開放原始碼的專案會放置在 GitHub。</p>
 <h3 id="小結">小結</h3>
 <p>本文只是針對預先選定的三種技術來考量，並不是全面性的比較。由於山姆鍋現在的主要開發環境已經轉到 Mac OS X，所以，Git 對 Windows 平台沒有原生的支援這點已經比較無所謂。</p>
 
+            <div class="alert info no-icon">
+                山姆鍋是<a href="https://developers.tw/@山姆鍋" target="_blank" rel="noopener">#呆丸開發者</a>成員
+            </div>
             
 
 
@@ -540,6 +547,14 @@
     <span class="copyrights">
         Copyrights &copy; 2020 Sampot (山姆鍋). All Rights Reserved.
     </span>
+    <br/>
+        <a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW"><img
+                alt="創用 CC 授權條款" style="border-width:0"
+                src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+        除另有標示，本著作係採用<a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW">創用 CC
+            姓名標示-非商業性-相同方式分享 4.0 國際 授權條款</a>授權。
 </footer>
 
             </div>
@@ -764,9 +779,9 @@
                         <a
                             class="link-unstyled"
                             href="https://samkuo.me/post/2012/04/use-pacemaker-two-node-ha-cluster/"
-                            aria-label=": 使用Pacemaker 建構雙節點叢集系統"
+                            aria-label=": 使用 Pacemaker 建構雙節點叢集系統"
                         >
-                            <h3 class="media-heading">使用Pacemaker 建構雙節點叢集系統</h3>
+                            <h3 class="media-heading">使用 Pacemaker 建構雙節點叢集系統</h3>
                         </a>
                         <span class="media-meta">
                             <span class="media-date text-small">
@@ -775,7 +790,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>想要達到系統高可用性(high availability)的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。</p></div>
+                        <div class="media-content hide-xs font-merryweather"><p>想要達到系統高可用性 (high availability) 的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。</p></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>
@@ -798,7 +813,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案(圖檔, CSS 等等)可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點(single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。</p></div>
+                        <div class="media-content hide-xs font-merryweather"><p>在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案 (圖檔，CSS 等等) 可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點 (single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。</p></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>

@@ -331,7 +331,7 @@
     <section class="postShorten-group main-content-wrap">
     
     
-    <article class="postShorten postShorten--thumbnailimg-right">
+    <article class="postShorten postShorten--thumbnailimg-bottom">
         <div class="postShorten-wrap">
             
             <div class="postShorten-header">
@@ -340,9 +340,9 @@
                         <a
                             class="link-unstyled"
                             href="/post/2015/10/persistent-message-queues-with-lmdb/"
-                            aria-label=": 如何實作簡單的持久性訊息佇列?"
+                            aria-label=": 如何實作簡單的持久性訊息佇列？"
                         >
-                            如何實作簡單的持久性訊息佇列?
+                            如何實作簡單的持久性訊息佇列？
                         </a>
                     
                 </h1>
@@ -365,17 +365,17 @@
             
                 <div class="postShorten-excerpt">
                     <p>有時候在需要訊息傳遞的應用場景，因為需求簡單不想使用到像 RabbitMQ<br>
-這種企業級的訊息中介軟體(middleware)， 使用 Redis<br>
-雖然夠簡單但畢竟還是需要執行另一個進程(process)，總還是有殺雞用牛刀的感覺。<br>
-但是另一方面又有訊息不能遺失的需求，自己處理訊息持久性(persistence)實在麻煩， 畢竟訊息儲存還是要支援 <a href="https://zh.wikipedia.org/wiki/ACID" target="_blank" rel="noopener">ACID</a><br>
+這種企業級的訊息中介軟體 (middleware)， 使用 Redis<br>
+雖然夠簡單但畢竟還是需要執行另一個進程 (process)，總還是有殺雞用牛刀的感覺。<br>
+但是另一方面又有訊息不能遺失的需求，自己處理訊息持久性 (persistence) 實在麻煩， 畢竟訊息儲存還是要支援 <a href="https://zh.wikipedia.org/wiki/ACID" target="_blank" rel="noopener">ACID</a><br>
 特性才能號稱做到不遺失。</p>
                     
                         <a
                             href="/post/2015/10/persistent-message-queues-with-lmdb/"
                             class="postShorten-excerpt_link link"
-                            aria-label=": 如何實作簡單的持久性訊息佇列?"
+                            aria-label=": 如何實作簡單的持久性訊息佇列？"
                         >
-                            繼續閱讀
+                            閱讀全文
                         </a>
                         
                     
@@ -386,7 +386,7 @@
     </article>
     
     
-    <article class="postShorten postShorten--thumbnailimg-right">
+    <article class="postShorten postShorten--thumbnailimg-bottom">
         <div class="postShorten-wrap">
             
             <div class="postShorten-header">
@@ -419,14 +419,14 @@
             </div>
             
                 <div class="postShorten-excerpt">
-                    <p>使用 Python 建立 Socket 物件並綁定(bind)到網卡後，該如何取得實際綁定的 IP 位址？這個問題多數人都會覺得簡單，但真的有這麼容易嗎?</p>
+                    <p>使用 Python 建立 Socket 物件並綁定 (bind) 到網卡後，該如何取得實際綁定的 IP 位址？這個問題多數人都會覺得簡單，但真的有這麼容易嗎？</p>
                     
                         <a
                             href="/post/2015/10/how-to-find-ip-addresses-with-python/"
                             class="postShorten-excerpt_link link"
                             aria-label=": Python 如何找到綁定的 IP 位址？"
                         >
-                            繼續閱讀
+                            閱讀全文
                         </a>
                         
                     
@@ -437,7 +437,7 @@
     </article>
     
     
-    <article class="postShorten postShorten--thumbnailimg-right">
+    <article class="postShorten postShorten--thumbnailimg-bottom">
         <div class="postShorten-wrap">
             
             <div class="postShorten-header">
@@ -470,14 +470,14 @@
             </div>
             
                 <div class="postShorten-excerpt">
-                    <p>在 <a href="/post/2015/09/architecture-requirements-of-highly-scalable-task-execution/">高可擴展的任務執行架構需求</a> 一文中，山姆鍋提到基於 Python 的超輕量級沙盒(sandbox)。沙盒是一個有限制的執行環境， 用來執行不受信任的程式碼/腳本(script)。本文山姆鍋基於需要，實驗一個 Python 沙盒的開源專案。</p>
+                    <p>在 <a href="/post/2015/09/architecture-requirements-of-highly-scalable-task-execution/">高可擴展的任務執行架構需求</a> 一文中，山姆鍋提到基於 Python 的超輕量級沙盒 (sandbox)。沙盒是一個有限制的執行環境， 用來執行不受信任的程式碼 / 腳本 (script)。本文山姆鍋基於需要，實驗一個 Python 沙盒的開源專案。</p>
                     
                         <a
                             href="/post/2015/09/experiment-with-python-sandbox/"
                             class="postShorten-excerpt_link link"
                             aria-label=": Python 的沙盒實驗"
                         >
-                            繼續閱讀
+                            閱讀全文
                         </a>
                         
                     
@@ -488,7 +488,7 @@
     </article>
     
     
-    <article class="postShorten postShorten--thumbnailimg-right">
+    <article class="postShorten postShorten--thumbnailimg-bottom">
         <div class="postShorten-wrap">
             
             <div class="postShorten-header">
@@ -523,14 +523,14 @@
                 <div class="postShorten-excerpt">
                     <p>什麼是 UUID? 相信多數參與軟體開發的人應該都知道。知道什麼是 UUID， 暸解<br>
 TimeUUID 也是輕而易舉的事情。雖然 TimeUUID 感覺無足輕重，<br>
-但在特定的使用案例(use case)，又是這麼方便，山姆鍋覺得值得為它介紹一番。</p>
+但在特定的使用案例 (use case)，又是這麼方便，山姆鍋覺得值得為它介紹一番。</p>
                     
                         <a
                             href="/post/2015/09/why-time-uuid/"
                             class="postShorten-excerpt_link link"
                             aria-label=": 什麼時候適合用 TimeUUID?"
                         >
-                            繼續閱讀
+                            閱讀全文
                         </a>
                         
                     
@@ -541,7 +541,7 @@ TimeUUID 也是輕而易舉的事情。雖然 TimeUUID 感覺無足輕重，<br>
     </article>
     
     
-    <article class="postShorten postShorten--thumbnailimg-right">
+    <article class="postShorten postShorten--thumbnailimg-bottom">
         <div class="postShorten-wrap">
             
             <div class="postShorten-header">
@@ -574,14 +574,14 @@ TimeUUID 也是輕而易舉的事情。雖然 TimeUUID 感覺無足輕重，<br>
             </div>
             
                 <div class="postShorten-excerpt">
-                    <p>山姆鍋平常喜歡搜尋一些有趣的開放源碼專案，尤其是有提供設計文件的。有天不知道怎麼地逛到了 Cockroach DB 這個專案，它的設計文件有許多有趣的地方，但我特別注意到其中一篇論文，關於使用邏輯與實體時鐘來實現一個分散式時間郵戳(timestamp)的演算法。</p>
+                    <p>山姆鍋平常喜歡搜尋一些有趣的開放源碼專案，尤其是有提供設計文件的。有天不知道怎麼地逛到了 Cockroach DB 這個專案，它的設計文件有許多有趣的地方，但我特別注意到其中一篇論文，關於使用邏輯與實體時鐘來實現一個分散式時間郵戳 (timestamp) 的演算法。</p>
                     
                         <a
                             href="/post/2015/09/hybrid-logical-clock-for-python/"
                             class="postShorten-excerpt_link link"
                             aria-label=": 用 Python 實作混合式邏輯時鐘"
                         >
-                            繼續閱讀
+                            閱讀全文
                         </a>
                         
                     
@@ -592,7 +592,7 @@ TimeUUID 也是輕而易舉的事情。雖然 TimeUUID 感覺無足輕重，<br>
     </article>
     
     
-    <article class="postShorten postShorten--thumbnailimg-right">
+    <article class="postShorten postShorten--thumbnailimg-bottom">
         <div class="postShorten-wrap">
             
             <div class="postShorten-header">
@@ -625,14 +625,14 @@ TimeUUID 也是輕而易舉的事情。雖然 TimeUUID 感覺無足輕重，<br>
             </div>
             
                 <div class="postShorten-excerpt">
-                    <p>山姆鍋期望雲端存儲與備份服務，可以做到保護使用者的資料安全與隱私。針對要達到這樣目標， 已經說明了其中需要的兩個關鍵技術：「資訊擴散演算法」以及「Convergent Encryption」。 本文山姆鍋說明另外一片重要拼圖：「去中心化身份驗證(decentralized authentication)」。</p>
+                    <p>山姆鍋期望雲端存儲與備份服務，可以做到保護使用者的資料安全與隱私。針對要達到這樣目標， 已經說明了其中需要的兩個關鍵技術：「資訊擴散演算法」以及「Convergent Encryption」。 本文山姆鍋說明另外一片重要拼圖：「去中心化身份驗證 (decentralized authentication)」。</p>
                     
                         <a
                             href="/post/2015/09/decentralzed-authenticationg-messaging-system/"
                             class="postShorten-excerpt_link link"
                             aria-label=": 去中心化身份驗證與訊息傳遞"
                         >
-                            繼續閱讀
+                            閱讀全文
                         </a>
                         
                     
@@ -643,7 +643,7 @@ TimeUUID 也是輕而易舉的事情。雖然 TimeUUID 感覺無足輕重，<br>
     </article>
     
     
-    <article class="postShorten postShorten--thumbnailimg-right">
+    <article class="postShorten postShorten--thumbnailimg-bottom">
         <div class="postShorten-wrap">
             
             <div class="postShorten-header">
@@ -676,8 +676,8 @@ TimeUUID 也是輕而易舉的事情。雖然 TimeUUID 感覺無足輕重，<br>
             </div>
             
                 <div class="postShorten-excerpt">
-                    <p>版本控制與檔案同步軟體其中一個重要功能：讓來源(source)檔案的內容跟目標(target)檔案內容相同。<br>
-直覺來說，最簡單的方式：將來源檔案複製(copy)到目標檔案。<br>
+                    <p>版本控制與檔案同步軟體其中一個重要功能：讓來源 (source) 檔案的內容跟目標 (target) 檔案內容相同。<br>
+直覺來說，最簡單的方式：將來源檔案複製 (copy) 到目標檔案。<br>
 不過這種做法，對於像是同一個檔案的不同版本的同步，會耗用太多不必要的頻寬與儲存空間之外，<br>
 時間往往也是個造成這種方式不實際的因素之一。那有沒有更有效的作法呢？</p>
                     
@@ -686,7 +686,7 @@ TimeUUID 也是輕而易舉的事情。雖然 TimeUUID 感覺無足輕重，<br>
                             class="postShorten-excerpt_link link"
                             aria-label=": 一個有創意的檔案切割演算法"
                         >
-                            繼續閱讀
+                            閱讀全文
                         </a>
                         
                     
@@ -697,7 +697,7 @@ TimeUUID 也是輕而易舉的事情。雖然 TimeUUID 感覺無足輕重，<br>
     </article>
     
     
-    <article class="postShorten postShorten--thumbnailimg-right">
+    <article class="postShorten postShorten--thumbnailimg-bottom">
         <div class="postShorten-wrap">
             
             <div class="postShorten-header">
@@ -737,7 +737,7 @@ TimeUUID 也是輕而易舉的事情。雖然 TimeUUID 感覺無足輕重，<br>
                             class="postShorten-excerpt_link link"
                             aria-label=": Python 的 SHA-256 以及 AES-256 CBC 程式範例"
                         >
-                            繼續閱讀
+                            閱讀全文
                         </a>
                         
                     
@@ -748,7 +748,7 @@ TimeUUID 也是輕而易舉的事情。雖然 TimeUUID 感覺無足輕重，<br>
     </article>
     
     
-    <article class="postShorten postShorten--thumbnailimg-right">
+    <article class="postShorten postShorten--thumbnailimg-bottom">
         <div class="postShorten-wrap">
             
             <div class="postShorten-header">
@@ -788,7 +788,7 @@ TimeUUID 也是輕而易舉的事情。雖然 TimeUUID 感覺無足輕重，<br>
                             class="postShorten-excerpt_link link"
                             aria-label=": Dropbox 做到資料加密又避免重複儲存的秘密"
                         >
-                            繼續閱讀
+                            閱讀全文
                         </a>
                         
                     
@@ -799,7 +799,7 @@ TimeUUID 也是輕而易舉的事情。雖然 TimeUUID 感覺無足輕重，<br>
     </article>
     
     
-    <article class="postShorten postShorten--thumbnailimg-right">
+    <article class="postShorten postShorten--thumbnailimg-bottom">
         <div class="postShorten-wrap">
             
             <div class="postShorten-header">
@@ -808,9 +808,9 @@ TimeUUID 也是輕而易舉的事情。雖然 TimeUUID 感覺無足輕重，<br>
                         <a
                             class="link-unstyled"
                             href="/post/2015/09/python-with-erasure-code/"
-                            aria-label=": 很酷的糾刪碼(erasure code)技術"
+                            aria-label=": 很酷的糾刪碼 (erasure code) 技術"
                         >
-                            很酷的糾刪碼(erasure code)技術
+                            很酷的糾刪碼 (erasure code) 技術
                         </a>
                     
                 </h1>
@@ -832,14 +832,14 @@ TimeUUID 也是輕而易舉的事情。雖然 TimeUUID 感覺無足輕重，<br>
             </div>
             
                 <div class="postShorten-excerpt">
-                    <p>很早之前在寫 QR Code 解碼器的時候就接觸過「糾刪碼」(erasure code)這種技術， 因為 QR Code 有使用到 <a href="https://en.wikipedia.org/wiki/Reed%E2%80%93Solomon_error_correction" target="_blank" rel="noopener">Reed–Solomon error correction</a> 。雖然知道是數學的運算結果，但至今還是對它的功用感到很神奇！背後的編碼理論已經超過山姆鍋的理解範圍，但撇除背後的數學理論，身為工程師要如何理解糾刪碼，以及作何應用呢？</p>
+                    <p>很早之前在寫 QR Code 解碼器的時候就接觸過「糾刪碼」(erasure code) 這種技術， 因為 QR Code 有使用到 <a href="https://en.wikipedia.org/wiki/Reed%E2%80%93Solomon_error_correction" target="_blank" rel="noopener">Reed–Solomon error correction</a> 。雖然知道是數學的運算結果，但至今還是對它的功用感到很神奇！背後的編碼理論已經超過山姆鍋的理解範圍，但撇除背後的數學理論，身為工程師要如何理解糾刪碼，以及作何應用呢？</p>
                     
                         <a
                             href="/post/2015/09/python-with-erasure-code/"
                             class="postShorten-excerpt_link link"
-                            aria-label=": 很酷的糾刪碼(erasure code)技術"
+                            aria-label=": 很酷的糾刪碼 (erasure code) 技術"
                         >
-                            繼續閱讀
+                            閱讀全文
                         </a>
                         
                     
@@ -887,6 +887,14 @@ TimeUUID 也是輕而易舉的事情。雖然 TimeUUID 感覺無足輕重，<br>
     <span class="copyrights">
         Copyrights &copy; 2020 Sampot (山姆鍋). All Rights Reserved.
     </span>
+    <br/>
+        <a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW"><img
+                alt="創用 CC 授權條款" style="border-width:0"
+                src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+        除另有標示，本著作係採用<a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW">創用 CC
+            姓名標示-非商業性-相同方式分享 4.0 國際 授權條款</a>授權。
 </footer>
 
             </div>
@@ -979,9 +987,9 @@ TimeUUID 也是輕而易舉的事情。雖然 TimeUUID 感覺無足輕重，<br>
                         <a
                             class="link-unstyled"
                             href="https://samkuo.me/post/2012/04/use-pacemaker-two-node-ha-cluster/"
-                            aria-label=": 使用Pacemaker 建構雙節點叢集系統"
+                            aria-label=": 使用 Pacemaker 建構雙節點叢集系統"
                         >
-                            <h3 class="media-heading">使用Pacemaker 建構雙節點叢集系統</h3>
+                            <h3 class="media-heading">使用 Pacemaker 建構雙節點叢集系統</h3>
                         </a>
                         <span class="media-meta">
                             <span class="media-date text-small">
@@ -990,7 +998,7 @@ TimeUUID 也是輕而易舉的事情。雖然 TimeUUID 感覺無足輕重，<br>
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>想要達到系統高可用性(high availability)的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。</p></div>
+                        <div class="media-content hide-xs font-merryweather"><p>想要達到系統高可用性 (high availability) 的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。</p></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>
@@ -1013,7 +1021,7 @@ TimeUUID 也是輕而易舉的事情。雖然 TimeUUID 感覺無足輕重，<br>
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案(圖檔, CSS 等等)可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點(single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。</p></div>
+                        <div class="media-content hide-xs font-merryweather"><p>在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案 (圖檔，CSS 等等) 可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點 (single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。</p></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>
