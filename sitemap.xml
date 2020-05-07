@@ -2,6 +2,20 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://samkuo.me/post/2020/05/generic-web-software-architecture/</loc>
+    
+    <lastmod>2020-05-07T05:17:19.232Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://samkuo.me/post/2020/05/wsl-switch-to-docker-ce-in-linux/</loc>
+    
+    <lastmod>2020-05-04T08:27:29.543Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://samkuo.me/post/2020/05/launch-windows-default-browser-from-inside-wsl/</loc>
     
     <lastmod>2020-05-04T02:11:41.945Z</lastmod>
@@ -96,13 +110,6 @@
     <loc>https://samkuo.me/post/2020/03/why-i-work-for-startups/</loc>
     
     <lastmod>2020-05-03T21:38:22.958Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://samkuo.me/post/2020/05/wsl-switch-to-docker-ce-in-linux/</loc>
-    
-    <lastmod>2020-05-03T10:41:19.490Z</lastmod>
     
   </url>
   
