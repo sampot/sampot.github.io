@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://samkuo.me/"/>
-  <updated>2020-05-07T23:29:56.900Z</updated>
+  <updated>2020-05-11T23:49:47.878Z</updated>
   <id>https://samkuo.me/</id>
   
   <author>
@@ -15,6 +15,33 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>設定 Windows Terminal 作為 WSL 操作介面</title>
+    <link href="https://samkuo.me/post/2020/05/windows-terminal-default-wsl-ubuntu-shell/"/>
+    <id>https://samkuo.me/post/2020/05/windows-terminal-default-wsl-ubuntu-shell/</id>
+    <published>2020-05-11T23:49:01.000Z</published>
+    <updated>2020-05-11T23:49:47.878Z</updated>
+    
+    <content type="html"><![CDATA[<!-- excerpt --><div class="figure " style="width:;"><a class="fancybox" href="windows-terminal-ubuntu.png" title="" data-caption="" data-fancybox="default"><img class="fig-img" src="windows-terminal-ubuntu.png" alt=""></a></div><h2 id="前言">前言</h2><hr><p>山姆鍋在使用 Surface Pro 的 Windows 系統時幾乎確定一定會開啟 Ubuntu 環境的 Shell。為了方便操作，自然希望 Windows Terminal 一開始就是進入 Ubuntu 環境。由於也會使用 Zsh + Oh My Zsh 作為操作介面，也需要安裝設定 Nerd fonts for power line。</p><h2 id="操作環境">操作環境</h2><table><thead><tr><th></th><th></th></tr></thead><tbody><tr><td>電腦</td><td> Surface Pro 4</td></tr><tr><td> 作業系統</td><td> Windows 10 Pro 繁中版 64 bit</td></tr><tr><td>Windows Terminal 版本</td><td> 0.11.1191.0</td></tr><tr><td>WSL 發行版本</td><td> Ubuntu 18.04</td></tr></tbody></table><h2 id="將-Ubuntu-18-04-設為預設開啟環境">將 Ubuntu 18.04 設為預設開啟環境</h2><p>這個設定其實很簡單，從 Windows Terminal 選單選擇<code>設定</code> (settings)，將其中的 “defaultProfile” 欄位的值改成跟 <code>Ubuntu 18.04</code>(假設這是 WSL 發行版本名稱) 相同的 GUID。也就是:</p><figure class="highlight yaml"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">'defaultProfile':</span> <span class="string">'{c6eaf9f4-32a7-5fdc-b5cf-066e8a4b1e40}'</span></span><br></pre></td></tr></tbody></table></figure><p>要跟 Ubuntu 18.04 Profile 中的 GUID 相同:</p><figure class="highlight yaml"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">'guid':</span> <span class="string">'{c6eaf9f4-32a7-5fdc-b5cf-066e8a4b1e40}'</span></span><br></pre></td></tr></tbody></table></figure><p>這樣設定後，之後開啟 Windows Terminal 就會預設開啟 <code>Ubuntu 18.04</code> 這個 Profile。</p><blockquote><p>提醒：您的設定檔中的 GUID 應該跟上述的不同。</p></blockquote><h2 id="設定開啟時的當前目錄">設定開啟時的當前目錄</h2><p>Windows Terminal 開啟 Ubuntu 18.04 環境後，預設的當前目錄是<br><code>/mnt/c/Users/&lt;使用者名稱&gt;</code>，也就是使用者在 Windows 的個人目錄在 WSL 中的掛載點。但是使用 Linux 的個人目錄習慣的應該是 <code>/home/&lt;使用者名稱&gt;</code>，要改成符合 Linux 的家 (home) 路徑，在 Windows Terminal 設定檔中，<code>Ubuntu 18.04</code> 對應的 Profile 加入 <code>commandline</code> 設定如下:</p><figure class="highlight yaml"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"commandline"</span><span class="string">:"wsl.exe</span> <span class="string">~"</span></span><br></pre></td></tr></tbody></table></figure><p>如果要使用的 WSL 發行版本不是預設，可以改為：</p><figure class="highlight yaml"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"commandline"</span><span class="string">:"wsl.exe</span> <span class="string">~</span> <span class="string">-d</span> <span class="string">'Ubuntu 20.04'</span><span class="string">"</span></span><br></pre></td></tr></tbody></table></figure><p>假設 ‘Ubuntu 20.04’ 是要預設開啟 shell 的發行版本名稱。</p><h2 id="設定配色">設定配色</h2><p>山姆鍋使用 iTerm 時習慣使用 <code>Solarized Dark</code> 做配色，在 Windows Terminal 則可以透過 <code>colorScheme</code> 來修改。Windows Terminal 剛好有支援 Solarized Dark 配色，設定如下:</p><figure class="highlight yaml"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">'colorScheme':</span> <span class="string">'Solarized Dark'</span></span><br></pre></td></tr></tbody></table></figure><h2 id="設定字型">設定字型</h2><p>在 Ubuntu 的終端操作介面，山姆鍋改使用 Zsh + On My Zsh 來提供多功能的命令提示，而為了讓提示訊息可以顯示特殊圖示需要安裝支援。到 Nerd fonts 官網的字型 <a href="https://www.nerdfonts.com/font-downloads" target="_blank" rel="noopener">下載頁面</a>，這裡山姆鍋選擇的是 <code>Hack Nerd Font</code>。</p><p>下載並安裝字型後，修改 Windows Terminal 設定，將 <code>fontFace</code> 加入 <code>defaults</code> 或者 <code>Ubuntu 18.04</code> 的 profile 中。 <code>Hack Nerd Font</code> 的設定值為:</p><figure class="highlight yaml"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">'fontFace':</span> <span class="string">'Hack NF'</span></span><br></pre></td></tr></tbody></table></figure><p>如果您選用其它字型則請更改為對應的名稱。</p><h2 id="其它設定">其它設定</h2><p>下圖總結個人主要的設定:</p><div class="figure " style="width:;"><a class="fancybox" href="terminal-settings.png" title="" data-caption="" data-fancybox="default"><img class="fig-img" src="terminal-settings.png" alt=""></a></div><p>其它設定請自行參考 Windows Termal 的 <a href="https://github.com/microsoft/terminal/blob/master/doc/cascadia/SettingsSchema.md" target="_blank" rel="noopener">Settings schema</a>。</p><h2 id="小結">小結</h2><p>其實山姆鍋對於 Windows Terminal 的客製化需求不高，終端機操作介面的客製化較高的部分是 Zsh + Oh My Zsh，tmux 以及 vim。也因為這樣，才容易把相同的操作習慣盡可能地帶到不同的電腦。</p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;在設定 Surface Pro 作為備用開發環境的過程中，選用 Windows Termainl 作為終端機模擬器。雖然不像 Cmder 那般強大，但作為終端機模擬器，其畫面操作效果還是令人滿意的。由於主要是以 Linux 環境為主，本文山姆鍋說明如何設定 Windows Terminal，讓它一啟動就執行 Ubuntu 文字操作介面。&lt;/p&gt;
+    
+    </summary>
+    
+    
+    
+      <category term="WSL" scheme="https://samkuo.me/tag/wsl/"/>
+    
+      <category term="Ubuntu" scheme="https://samkuo.me/tag/ubuntu/"/>
+    
+      <category term="Windwos Terminal" scheme="https://samkuo.me/tag/windwos-terminal/"/>
+    
+      <category term="shell" scheme="https://samkuo.me/tag/shell/"/>
+    
+  </entry>
   
   <entry>
     <title>一個通用 Web 應用架構</title>
@@ -521,39 +548,6 @@
       <category term="Buildbot" scheme="https://samkuo.me/tag/buildbot/"/>
     
       <category term="Continuous Integration" scheme="https://samkuo.me/tag/continuous-integration/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>簡單好用！JQM 跟 Backbone 做 Web 用戶介面</title>
-    <link href="https://samkuo.me/post/2015/11/jquery-mobile-and-backbone-framework/"/>
-    <id>https://samkuo.me/post/2015/11/jquery-mobile-and-backbone-framework/</id>
-    <published>2015-11-10T01:34:00.000Z</published>
-    <updated>2020-03-02T10:20:45.802Z</updated>
-    
-    <content type="html"><![CDATA[<p>山姆鍋對 JavaScript 大多數框架都不算熟悉，但因為《我。影化身》專案需要提供 Web 介面， 不得已也要選擇符合自己需要的框架來運用一下。幸好，我的目標只是一個相對簡單的使用者介面， 讓這個過程縮短不少時間，最後決定使用 JQuery Mobile + Backbone 這樣的框架組合。</p><a id="more"></a><h2 id="為什麼選擇使用-Web-用戶介面">為什麼選擇使用 Web 用戶介面？</h2><p>《我。影化身》專案有桌面環境用戶介面的需求，也嘗試過使用 Qt<br>這種跨平台的程式庫。 但山姆鍋對於產生的發行包因為這樣就要多將近<br>20MB 的大小一直覺得耿耿於懷，雖然這只是個人偏好問題，<br>還是希望有一個較輕量的跨平台用戶介面。</p><p>另外一個做法就是使用各個平台的特有程式庫來開發 UI，對於 Python<br>程式，這表示：</p><ul><li>在 Windows 使用 PyWin32</li><li> 在 OS X 使用 PyObjC</li><li> 在 Linux 使用 PyGObject</li></ul><p>理論上是可行，但要同時使用不同 API 在不同平台開發 UI, 只要 UI<br>稍微複雜點，<br>開發的困難度就會需要每個平台一個專職工程師了。《我。影化身》的確有使用上述<br>程式庫來整合桌面環境的訊息通知機制以及選單，但要開發完整<br>UI，即使像是《我。影化身》這種設定不需要複雜 UI<br>的程式，難度還是太高了。其它如 Toga, PyGUI 等等特殊的跨平台 UI<br>程式庫都因為缺乏專案所需的功能而無法採用。</p><p>不管原因為何，最後決定使用 Web 技術來提供跨平台 UI,<br>似乎也是很合理的方案。</p><h2 id="為什麼選擇-JQuery-Mobile-Backbone">為什麼選擇 JQuery Mobile + Backbone?</h2><p>由於專業上需要，一直以來山姆鍋都有持續在關注 JavaScript 應用框架的發展，<br>也常常對於如雨後春筍般出現的新框架感到無所適從，所以之前都僅止於了解，並沒有太多實際運用的經驗。<br>如今要選擇專案所使用的框架，自然要先說說專案的需求：</p><ol><li></li></ol><pre><code>提供一個類似應用程式(App)的用戶介面:   因為這個專案就是個應用程式。</code></pre><ol start="2"><li></li></ol><pre><code>不用太多 HTML5, CSS3 設計:   作為工程師，山姆鍋對於設計的美感真的不在行。</code></pre><ol start="3"><li></li></ol><pre><code>使用現有的用戶介面元件:   希望開發的方式可以使用元件概念撰寫，也就是有明確的 Button, List,    Table 這樣的概念。</code></pre><ol start="4"><li></li></ol><pre><code>同時支援桌面、平板以及手機裝置:   沒有太多時間使用不同的框架。</code></pre><p>應該也有其它方案符合需求，像是 Sencha Touch 等，但個人偏好 JQuery<br>Mobile。 作為 UI 框架，JQuery Mobile<br>基本功能完整，但要開發應用總還是希望程式要有更好的結構，<br>這就需要考慮採用其它應用框架來輔助，目前跟 JQuery Mobile<br>搭配最好的看來是 Backbone。</p><p>雖然網路上有許多關於 JQuery Mobile + Backbone 的教學文章，JQuery Mobile<br>官網甚至有提供示範案例，但這些例子大多假設專案需求龐大，硬是要使用<br>RequireJS 來提供模組化開發機制。 對於《我。影化身》這樣的專案來說，使用<br>RequireJS 總有點太過了 <sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup> 。 雖然網路上也找得到關於只使用 JQuery Mobile</p><ul><li>Backbone 的範例，但事情如果順利的話， 就不會有這篇文章了！</li></ul><h2 id="問題出在哪">問題出在哪？</h2><p>老實說，山姆鍋對 JavaScript 相關框架真的不熟，只是一邊開發一邊學習。<br>對於網路找到的 JQuery Mobile + Backbone<br>範例為何不能正常運作也沒有時間深入了解，<br>也許是單純版本問題，或者只是山姆鍋眼睛脫窗哪裏沒有設定好！不管怎樣，本來認為一件簡單的事情，<br>卡了一段時間後終於試出來一個可以運作的組合。</p><p>除了 JQuery，JQM<br>本身並不依賴其它程式庫，雖說是完整的框架，但因為它缺少其它 MV*<br>應用框架的功能， 讓它其實更像 Twitter Bootstrap 這種 UI<br>框架。為了開發完整的應用，通常還是搭配 Backbone 這樣的應用框架。</p><p>但因為 JQM 有自己的頁面路由 (page<br>routing) 的機制，所以需要設定讓它不處理這部分功能，而由 Backbone<br>全權處理。JQM 相關的設定在 <code>/js/jqm-config.js</code> 這個檔案：</p><figure class="highlight javascript"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// JQM config</span></span><br><span class="line">$(<span class="built_in">document</span>).on(<span class="string">"mobileinit"</span>, <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>{</span><br><span class="line">    $.mobile.ajaxEnabled = <span class="literal">false</span>;</span><br><span class="line">    $.mobile.linkBindingEnabled = <span class="literal">false</span>;</span><br><span class="line">    $.mobile.hashListeningEnabled = <span class="literal">false</span>;</span><br><span class="line">    $.mobile.pushStateEnabled = <span class="literal">false</span>;</span><br><span class="line">    $.mobile.defaultPageTransition = <span class="string">"fade"</span>;</span><br><span class="line">    $.mobile.autoInitializePage = <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">    $(<span class="string">"div[data-role='page']"</span>).on(<span class="string">"pagehide"</span>, <span class="function"><span class="keyword">function</span> (<span class="params">event, ui</span>) </span>{</span><br><span class="line">        $(event.currentTarget).remove();</span><br><span class="line">    });</span><br><span class="line">});</span><br></pre></td></tr></tbody></table></figure><ul><li></li></ul><pre><code>\'mobileinit\' 事件:   在 JQM 完成初始化前會呼叫此事件，所以在此設定 JQM。</code></pre><ul><li></li></ul><pre><code>ajaxEnabled, linkBindingEnabled, pushStateEnabled 都設為 false:   分別讓 JQM 不使用 Ajax 方式動態載入頁面, 不處理超連結點選事件,    以及瀏覽器的導航歷史管理(navigation history)，這些都會干擾    Backbone 的運作。</code></pre><ul><li></li></ul><pre><code>hashListeningEnabled 設為 false:   告訴 JQM 不要處理瀏覽器 URL hash 更動事件。 URL    hash就是瀏覽器網址中 \'\#\' 那個部分，    這個部分按照規範是不會傳給後端伺服器，只能在網頁中存取。JQM 跟    Backbone 就是利用這個 hash 來決定要使用的頁面。</code></pre><ul><li></li></ul><pre><code>由於 JQM 不再負責頁面導航管理，需要由我們自己完成舊的頁面資料從 DOM 中移除的工作:   `pagehide` 事件處理便是用來完成這個工作。</code></pre><p>有了這樣的設定，基本上就可以使用 Backbone<br>來處理前端頁面導航以及其它功能。</p><h2 id="其它注意事項">其它注意事項</h2><p>有幾個在實際開發中遇到的問題：</p><ol><li></li></ol><pre><code>動態產生 JQM 頁面內容時，可能會發現網頁呈現不太正常:   這點在專案樣板中沒有實例。這是因為 JQM    沒有機會套用樣式到新增的網頁元素，需要特別通知 JQM:    <figure class="highlight javascript"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$(<span class="keyword">this</span>.el).trigger(<span class="string">"create"</span>);</span><br></pre></td></tr></tbody></table></figure>    如果您有其它更好的方式，請不吝指教。</code></pre><ol start="2"><li></li></ol><pre><code>新版本的更換頁面方式:   新版本的 JQM 管理頁面的方式有更動，改為下列方式：    <figure class="highlight javascript"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$(<span class="string">":mobile-pagecontainer"</span>).pagecontainer( <span class="string">"change"</span>, $(page.el), { <span class="attr">changeHash</span>: <span class="literal">false</span>});</span><br></pre></td></tr></tbody></table></figure>    網路上找到的文章大多使用舊的方法，也就是：    <figure class="highlight javascript"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$.mobile.changePage($(page.el), {<span class="attr">changeHash</span>:<span class="literal">false</span>});</span><br></pre></td></tr></tbody></table></figure></code></pre><ol start="3"><li></li></ol><pre><code>jqm-config.js 的引入順序:   `/js/jqm-config.js` 是用來設定 JQM, 它必須在 JQuery    之後， JQM 之前在網頁中引入，如:</code></pre><figure class="highlight html"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"/js/jquery.min.js"</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"/js/jqm-config.js"</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"/js/jquery.mobile.min.js"</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure><h2 id="JQM-Backbone-專案樣板">JQM + Backbone 專案樣板</h2><p>為了方便未來使用，山姆鍋在 GitHub<br>上整理了一個專案樣板：<a href="https://github.com/sampot/jqm-backbone-template" target="_blank" rel="noopener">https://github.com/sampot/jqm-backbone-template</a></p><p>想要更實際的例子？那就請直接參考《我。影化身》的前端用戶介面實作 (webfront)：<a href="https://github.com/eavatar/eavatar-me" target="_blank" rel="noopener">https://github.com/eavatar/eavatar-me</a><br>。</p><h2 id="結語">結語</h2><p>山姆鍋其實很喜歡 AngularJS<br>這個應用框架，但對於它的運作方式不是很了解，所以不在這個專案採用。<br>在實際使用後，發現 JQM + Backbone<br>這樣的組合還蠻不錯的：夠簡單、運作流程容易理解。 對於只需要簡單 Web UI<br>的應用專案，這是個不錯的選擇。</p><h2 id="參考資料">參考資料</h2><ul><li><dl><dt>Using Backbone.js with jQuery Mobile</dt><dd><a href="http://coenraets.org/blog/2012/03/using-backbone-js-with-jquery-mobile/" target="_blank" rel="noopener">http://coenraets.org/blog/2012/03/using-backbone-js-with-jquery-mobile/</a></dd></dl></li></ul><hr><hr class="footnotes-sep"><section class="footnotes"><ol class="footnotes-list"><li id="fn1" class="footnote-item"><p> 如果預期專案需要多人一起開發或者功能較複雜，建議考慮使用 RequireJS。 <a href="#fnref1" class="footnote-backref">↩︎</a></p></li></ol></section>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;山姆鍋對 JavaScript 大多數框架都不算熟悉，但因為《我。影化身》專案需要提供 Web 介面， 不得已也要選擇符合自己需要的框架來運用一下。幸好，我的目標只是一個相對簡單的使用者介面， 讓這個過程縮短不少時間，最後決定使用 JQuery Mobile + Backbone 這樣的框架組合。&lt;/p&gt;
-    
-    </summary>
-    
-    
-      <category term="Software Development" scheme="https://samkuo.me/category/software-development/"/>
-    
-    
-      <category term="Mobile" scheme="https://samkuo.me/tag/mobile/"/>
-    
-      <category term="JQuery" scheme="https://samkuo.me/tag/jquery/"/>
-    
-      <category term="JQM" scheme="https://samkuo.me/tag/jqm/"/>
-    
-      <category term="Backbone" scheme="https://samkuo.me/tag/backbone/"/>
-    
-      <category term="Framework" scheme="https://samkuo.me/tag/framework/"/>
-    
-      <category term="JavaScript" scheme="https://samkuo.me/tag/javascript/"/>
     
   </entry>
   
