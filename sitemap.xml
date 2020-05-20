@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://samkuo.me/post/2020/05/vagrant-virtualbox-devops-tool/</loc>
+    
+    <lastmod>2020-05-20T06:52:00.890Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://samkuo.me/post/2020/05/windows-terminal-default-wsl-ubuntu-shell/</loc>
     
     <lastmod>2020-05-11T23:49:47.878Z</lastmod>
