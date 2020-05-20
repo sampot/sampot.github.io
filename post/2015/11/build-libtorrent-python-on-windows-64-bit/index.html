@@ -1,0 +1,1151 @@
+
+<!DOCTYPE html>
+<html lang="zh-tw">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="我是山姆鍋">
+    <title>在 Windows 64 位元電腦上編譯 Libtorrent-python - 我是山姆鍋</title>
+    <meta name="author" content="Sampot (山姆鍋)">
+    
+    
+        <link rel="icon" href="https://samkuo.me/images/favicon.png">
+    
+    
+        
+            <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
+        
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"最近需要使用 BitTorrent 來實驗點對點資料傳輸功能，所以想說來玩玩 libtorrent 這個程式庫 (C++)，為了方便實驗，也需要它的 Python 綁定。經過三天的爬文與奮戰，終於在 Windows, OSX 以及 Ubuntu 上成功編譯或安裝，本文山姆鍋就來分享在 Windows 64 位元電腦上編譯的方法之一。\n\n會特別選擇 Windows 環境來說明，主要也是因為在這個平台上編譯是其中最麻煩的，加上又是要給 64 位元架構的電腦執行，更是雪上加霜。雖然說條條道路通羅馬， 但本文所說明的是山姆鍋目前唯一成功的方法，如果您有其它更簡潔的作法，請分享。\n編譯環境\n從程式碼編譯成功與否跟實際編譯時的環境有很大的關聯，底下是山姆鍋使用的環境 (實際上是虛擬機)：\n\n\n\n作業系統：Windows X86 64 Bit\n 本文使用的是正體中文環境，不過應該沒有差別。\n\n\n\n\nC/C++ 編譯器: VC for Python\n 可以在這裡下載：http://www.microsoft.com/en-us/download/details.aspx?id=44266 ，本文假設您使用預設路徑自行安裝完成。\n\n\n\n\nPython 執行環境\n本文使用 2.7.10 64 位元版本，可到此下載並安裝，本文假設安裝路徑為：C:\\\\Python\\。\n\n\n\n\nDependency Walker\n 這個工具是為了找出動態連結檔相依性問題，可以在此下載 ，不一定需要，但在 Python 發生無法 import 的問題時可以幫助找出問題。\n\n\n\n準備作業\n在正式編譯前，編譯環境需要做些修改： 找到這個檔案，\n%USERPROFILE%\\\\AppData\\\\Local\\\\Programs\\\\Common\\\\Microsoft\\\\Visual C++ for Python\\\\9.0\\\\vcvarsall.bat\\ , 其中 % USERFILE% 是 Windows 使用者個人目錄，如：C:\\\\Users\\\\Sam Kuo。\n將此檔案中的 if \"%1\" == \"\" goto x86 改為 if \"%1\" == \"\" goto amd64 , 這個目的是讓編譯器預設使用 64 位元模式，如果您之後需要改編譯 32 位元，請自行改回去。\n開啟「命令提示字元 (Command Prompt)」視窗，並執行下列指令設定編譯器的環境變數：\n1\"%USERPROFILE%\\AppData\\Local\\Programs\\Common\\Microsoft\\Visual C++ for Python\\9.0\\vcvarsall.bat\"\n底下小節皆假設在同一個命令視窗執行。\n編譯與安裝 Boost\n下載\nlibtorrent 使用到 Boost 這個程式庫， 本文使用的版本是 1.59.0，可到這裡下載，下載到 C 槽並解壓縮後，原始檔的路徑為： c:\\\\boost_1_59_0 。\n將目前目錄更換到 c:\\\\boost_1_59_0\\ ，執行下列指令編譯 Boost 需要的建構工具 b2.exe。\n1bootstrap.bat\n編譯並安裝 Boost\n1b2 --with-system --with-date_time --with-python address-model=64 install\n上述指令會將需要的檔案複製到 C:\\\\Boost 這個目錄，其中會有 include 跟 lib 這兩個子目錄。\nlib 子目錄中有兩個檔案需要改名，將:\n\nboost_python-vc90-mt-1_59.lib 複製並改名為 boost_python.lib\nboost_system-vc90-mt-1_59.lib 複製並改名為 boost_system.lib\n\n沒有改名，在編譯 libtorrent 時會出現找不到程式庫錯誤。\n編譯 libtorrent\n本文使用的版本是 1.0.7，可到此下載 , 假設下載後解壓縮到目錄: C:\\\\libtorrent-1_0_7 ，\n設定 BOOST_ROOT 環境變數：\n1set BOOST_ROOT=c:\\boost_1_59_0\n更換目前路徑到 C:\\\\libtorrent-1_0_7\\\\bindings\\\\python ，執行：\n1c:\\boost_1_59_0\\b2.exe boost=source boost-link=static link=static  release optimization=space address-model=64  \"include=c:\\Boost\\include\\boost-1_59\" \"library-path=c:\\Boost\\lib\"\n請注意，上述指令並沒有換行。\n經過不少時間的編譯，如果沒有出問題，會產生所需的 Python 模組以及 libtorrent 本身的動態連結檔， 分別在：\n\n\n\nPython 模組\n‘C:\\libtorrent-1_0_7\\bindings\\python\\bin\\msvc-9.0\\release\\address-model-64\\boost-source\\link-static\\optimization-space\\libtorrent.pyd’\n\n\n\n\nlibtorrent 程式庫\n‘C:\\libtorrent-1_0_7\\bin\\msvc-9.0\\release\\address-model-64\\boost-link-shared\\boost-source\\optimization-space\\threading-multi\\torrent.dll’\n\n\n\n是的，我知道，路徑就是這麼長！\n設定 libtorrent-python 模組\n\n將 libtorrent 程式庫的 DLL 檔複製到 ‘C:\\Python’\n將 Python 模組，libtorrent.pyd 複製到\n‘C:\\Python\\Lib\\site-packages\\’\n\n如果您在這個階段使用 Python 試圖 import libtorrent，會出現無法 import 的錯誤資訊， 這是因為 libtorrent.pyd 還相依於 Boost 的 system 模組。要解決這個問題，可以將 ‘C:\\Boost\\lib\\boost_system-vc90-mt-1_59.dll’ 複製到 Windows 系統目錄， 或者像山姆鍋一樣複製到 ‘C:\\Python\\’ 目錄中。\n驗證模組安裝完成\n啟動 Python 進入互動模式，輸入：\n12import libtorrentlibtorrent.version\n如果正常 import 並顯示版本號碼，模組應該有安裝成功。如果沒有，請使用 Dependency Walker 查看 libtorrent.pyd 的相依連結是否完整？例如缺少 msvcr90.dll 或 msvcp90.dll 這兩個檔案，則需要安裝 Visual Studio\nRedistributable 2008 套件。\nOS X 跟 Ubuntu?\n這兩個平台按照 Storjtorrent 提供的步驟便能運作，本文就不重複。\n小技巧\n在過程中，山姆鍋學到一些有用的小技巧或知識，在這裏順便提供：\n\n\n\n如何觀看動態連結檔 (DLL) 或共享物件檔 (.so) 的相依性？\n熟悉 Linux 系統的會知道有個 ldd 程式可以方便檢視 .so\n相依於哪些其它 .so 檔； 在 OSX 系統，使用 otool -L\n可以達到類似功能；Windows 系統則可以用 Dependency Walker\n來查看。\n\n\n\n\n在 Windows 上如何分辨執行檔 (.exe) 或動態連結檔 (.dll) 是 32 還是 64 位元？\nVisual Studio 有個 dumpbin.exe 工具程式可以用來分辨，指令用法：\n\n  1dumpbin /headers &lt;檔案名稱&gt;\n從顯示的訊息，如果有看到 x64 表示是 64 位元， x86 則是 32 位元，如下面片段：\n  12FILE HEADER VALUES        8664 machine (x64)\n\n\n結語\n雖說山姆鍋最終希望只需要一個 libtorrent.pyd 檔案便能夠使用，也就是說：libtorrent 跟 Boost 都以靜態連結的方式到那個模組檔中，只可惜還沒有試出來。現階段只做到編譯跟安裝， 編譯出來的程式庫是否功能完全正常，這點還沒有進一步驗證；另外，很明顯 libtorrent 的一些選用的功能是不支援的，例如：OpenSSL encryption。不管怎樣，希望對於也想透過 Python 玩玩 libtorrent 的人有所幫助。\n","dateCreated":"2015-11-19T10:03:00+08:00","dateModified":"2020-05-04T06:43:31+08:00","datePublished":"2015-11-19T10:03:00+08:00","description":"最近需要使用 BitTorrent 來實驗點對點資料傳輸功能，所以想說來玩玩 libtorrent 這個程式庫 (C++)，為了方便實驗，也需要它的 Python 綁定。經過三天的爬文與奮戰，終於在 Windows, OSX 以及 Ubuntu 上成功編譯或安裝，本文山姆鍋就來分享在 Windows 64 位元電腦上編譯的方法之一。","headline":"在 Windows 64 位元電腦上編譯 Libtorrent-python","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2015/11/build-libtorrent-python-on-windows-64-bit/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2015/11/build-libtorrent-python-on-windows-64-bit/","keywords":"Python, Libtorrent, BitTorrent, Windows"}</script>
+    <meta name="description" content="最近需要使用 BitTorrent 來實驗點對點資料傳輸功能，所以想說來玩玩 libtorrent 這個程式庫 (C++)，為了方便實驗，也需要它的 Python 綁定。經過三天的爬文與奮戰，終於在 Windows, OSX 以及 Ubuntu 上成功編譯或安裝，本文山姆鍋就來分享在 Windows 64 位元電腦上編譯的方法之一。">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="在 Windows 64 位元電腦上編譯 Libtorrent-python">
+<meta property="og:url" content="https://samkuo.me/post/2015/11/build-libtorrent-python-on-windows-64-bit/">
+<meta property="og:site_name" content="我是山姆鍋">
+<meta property="og:description" content="最近需要使用 BitTorrent 來實驗點對點資料傳輸功能，所以想說來玩玩 libtorrent 這個程式庫 (C++)，為了方便實驗，也需要它的 Python 綁定。經過三天的爬文與奮戰，終於在 Windows, OSX 以及 Ubuntu 上成功編譯或安裝，本文山姆鍋就來分享在 Windows 64 位元電腦上編譯的方法之一。">
+<meta property="og:locale" content="zh_TW">
+<meta property="article:published_time" content="2015-11-19T02:03:00.000Z">
+<meta property="article:modified_time" content="2020-05-03T22:43:31.314Z">
+<meta property="article:author" content="Sampot (山姆鍋)">
+<meta property="article:tag" content="Python">
+<meta property="article:tag" content="Libtorrent">
+<meta property="article:tag" content="BitTorrent">
+<meta property="article:tag" content="Windows">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:creator" content="@sampotkuo">
+<meta property="fb:app_id" content="109832189371155">
+    
+    
+        
+    
+    <meta property="og:image" content="https://samkuo.me/images/featured_image.jpg"/>
+    
+    
+    
+    <!--STYLES-->
+    
+<link rel="stylesheet" href="/assets/css/style-qlm634aeqqh4pedhidwvikqi59e0o7qckfid1geequyx9cyxw5rqjplgvt1t.min.css">
+
+    <!--STYLES END-->
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-41152700-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-41152700-1');
+    </script>
+
+
+    
+
+    
+        
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+<header id="header" data-behavior="4">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a
+            class="header-title-link"
+            href="/"
+            aria-label=""
+        >
+        <img class="header-avatar-picture" src="/images/logo32.png" alt="作者的圖片" />
+            我是山姆鍋
+        </a>
+    </div>
+    
+        
+            <a
+                class="header-right-icon open-algolia-search"
+                href="#search"
+                aria-label="打開鏈接: /#search"
+            >
+        
+        
+            <i class="fa fa-search fa-lg"></i>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="4">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a
+                    href="/#about"
+                    aria-label="閱讀有關作者的更多信息"
+                >
+                    <img class="sidebar-profile-picture" src="/images/logo.png" alt="作者的圖片"/>
+                </a>
+                <h4 class="sidebar-profile-name">Sampot (山姆鍋)</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>個人部落格， 記錄與分享一些軟體開發與運維相關資訊， 偶爾也會碎念一下</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/"
+                            
+                            rel="noopener"
+                            title="首頁"
+                        >
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">首頁</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-categories"
+                            
+                            rel="noopener"
+                            title="分類"
+                        >
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">分類</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-tags"
+                            
+                            rel="noopener"
+                            title="標籤"
+                        >
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">標籤</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-archives"
+                            
+                            rel="noopener"
+                            title="所有文章"
+                        >
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">所有文章</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link open-algolia-search"
+                            href="#search"
+                            
+                            rel="noopener"
+                            title="搜尋"
+                        >
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">搜尋</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/about/"
+                            
+                            rel="noopener"
+                            title="關於"
+                        >
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">關於</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://github.com/sampot"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="GitHub"
+                        >
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://twitter.com/sampotkuo"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Twitter"
+                        >
+                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Twitter</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://facebook.com/sampotkuo"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Facebook"
+                        >
+                        <i class="sidebar-button-icon fab fa-facebook" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Facebook</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://tw.linkedin.com/in/sampot"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="LinkedIn"
+                        >
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://developers.tw/@山姆鍋"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="聯絡"
+                        >
+                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">聯絡</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/sitemap/"
+                            
+                            rel="noopener"
+                            title="網站導覽"
+                        >
+                        <i class="sidebar-button-icon fa fa-sitemap" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">網站導覽</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/atom.xml"
+                            
+                            rel="noopener"
+                            title="Atom"
+                        >
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Atom</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="4"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            在 Windows 64 位元電腦上編譯 Libtorrent-python
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2015-11-19T10:03:00+08:00">
+	
+		    11月 19, 2015
+    	
+    </time>
+    
+        <span>分類 </span>
+        
+    <a class="category-link" href="/category/software-development/">Software Development</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <div class="alert info no-icon">
+                <a href="https://www.facebook.com/sampotkuo" target="_blank" rel="noopener">「我是山姆鍋」有臉書專頁</a>
+            </div>
+
+            <p>最近需要使用 BitTorrent 來實驗點對點資料傳輸功能，所以想說來玩玩 libtorrent 這個程式庫 (C++)，為了方便實驗，也需要它的 Python 綁定。經過三天的爬文與奮戰，終於在 Windows, OSX 以及 Ubuntu 上成功編譯或安裝，本文山姆鍋就來分享在 Windows 64 位元電腦上編譯的方法之一。</p>
+<a id="more"></a>
+<p>會特別選擇 Windows 環境來說明，主要也是因為在這個平台上編譯是其中最麻煩的，加上又是要給 64 位元架構的電腦執行，更是雪上加霜。雖然說條條道路通羅馬， 但本文所說明的是山姆鍋目前唯一成功的方法，如果您有其它更簡潔的作法，請分享。</p>
+<h2 id="編譯環境">編譯環境</h2>
+<p>從程式碼編譯成功與否跟實際編譯時的環境有很大的關聯，底下是山姆鍋使用的環境 (實際上是虛擬機)：</p>
+<ul>
+<li>
+<dl>
+<dt>作業系統：Windows X86 64 Bit</dt>
+<dd> 本文使用的是正體中文環境，不過應該沒有差別。</dd>
+</dl>
+</li>
+<li>
+<dl>
+<dt>C/C++ 編譯器: VC for Python</dt>
+<dd> 可以在這裡下載：<a href="http://www.microsoft.com/en-us/download/details.aspx?id=44266" target="_blank" rel="noopener">http://www.microsoft.com/en-us/download/details.aspx?id=44266</a> ，本文假設您使用預設路徑自行安裝完成。</dd>
+</dl>
+</li>
+<li>
+<dl>
+<dt>Python 執行環境</dt>
+<dd>本文使用 2.7.10 64 位元版本，可到此<a href="https://www.python.org/ftp/python/2.7.10/python-2.7.10.amd64.msi" target="_blank" rel="noopener">下載</a>並安裝，本文假設安裝路徑為：<code>C:\\Python\</code>。</dd>
+</dl>
+</li>
+<li>
+<dl>
+<dt>Dependency Walker</dt>
+<dd> 這個工具是為了找出動態連結檔相依性問題，可以在此<a href="http://www.dependencywalker.com" target="_blank" rel="noopener">下載</a> ，不一定需要，但在 Python 發生無法 import 的問題時可以幫助找出問題。</dd>
+</dl>
+</li>
+</ul>
+<h2 id="準備作業">準備作業</h2>
+<p>在正式編譯前，編譯環境需要做些修改： 找到這個檔案，</p>
+<p><code>%USERPROFILE%\\AppData\\Local\\Programs\\Common\\Microsoft\\Visual C++ for Python\\9.0\\vcvarsall.bat\</code> , 其中 % USERFILE% 是 Windows 使用者個人目錄，如：<code>C:\\Users\\Sam Kuo</code>。</p>
+<p>將此檔案中的 <code>if "%1" == "" goto x86</code> 改為 <code>if "%1" == "" goto amd64</code> , 這個目的是讓編譯器預設使用 64 位元模式，如果您之後需要改編譯 32 位元，請自行改回去。</p>
+<p>開啟「命令提示字元 (Command Prompt)」視窗，並執行下列指令設定編譯器的環境變數：</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"%USERPROFILE%\AppData\Local\Programs\Common\Microsoft\Visual C++ for Python\9.0\vcvarsall.bat"</span></span><br></pre></td></tr></tbody></table></figure>
+<p>底下小節皆假設在同一個命令視窗執行。</p>
+<h2 id="編譯與安裝-Boost">編譯與安裝 Boost</h2>
+<h3 id="下載">下載</h3>
+<p>libtorrent 使用到 <a href="http://www.boost.org/" target="_blank" rel="noopener">Boost</a> 這個程式庫， 本文使用的版本是 1.59.0，可到這裡<a href="http://sourceforge.net/projects/boost/files/boost/1.59.0" target="_blank" rel="noopener">下載</a>，下載到 C 槽並解壓縮後，原始檔的路徑為： <code>c:\\boost_1_59_0</code> 。</p>
+<p>將目前目錄更換到 <code>c:\\boost_1_59_0\</code> ，執行下列指令編譯 Boost 需要的建構工具 b2.exe。</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bootstrap.bat</span><br></pre></td></tr></tbody></table></figure>
+<p>編譯並安裝 Boost</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">b2 --with-system --with-date_time --with-python address-model=64 install</span><br></pre></td></tr></tbody></table></figure>
+<p>上述指令會將需要的檔案複製到 <code>C:\\Boost</code> 這個目錄，其中會有 <code>include</code> 跟 <code>lib</code> 這兩個子目錄。</p>
+<p><code>lib</code> 子目錄中有兩個檔案需要改名，將:</p>
+<ol>
+<li>boost_python-vc90-mt-1_59.lib 複製並改名為 boost_python.lib</li>
+<li>boost_system-vc90-mt-1_59.lib 複製並改名為 boost_system.lib</li>
+</ol>
+<p>沒有改名，在編譯 libtorrent 時會出現找不到程式庫錯誤。</p>
+<h2 id="編譯-libtorrent">編譯 libtorrent</h2>
+<p>本文使用的版本是 1.0.7，可到此<a href="https://github.com/arvidn/libtorrent/releases" target="_blank" rel="noopener">下載</a> , 假設下載後解壓縮到目錄: <code>C:\\libtorrent-1_0_7</code> ，</p>
+<p>設定 <code>BOOST_ROOT</code> 環境變數：</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">set</span> BOOST_ROOT=c:\boost_1_59_0</span><br></pre></td></tr></tbody></table></figure>
+<p>更換目前路徑到 <code>C:\\libtorrent-1_0_7\\bindings\\python</code> ，執行：</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">c:\boost_1_59_0\b2.exe boost=<span class="built_in">source</span> boost-link=static link=static  release optimization=space address-model=64  <span class="string">"include=c:\Boost\include\boost-1_59"</span> <span class="string">"library-path=c:\Boost\lib"</span></span><br></pre></td></tr></tbody></table></figure>
+<p>請注意，上述指令並沒有換行。</p>
+<p>經過不少時間的編譯，如果沒有出問題，會產生所需的 Python 模組以及 libtorrent 本身的動態連結檔， 分別在：</p>
+<ul>
+<li>
+<dl>
+<dt>Python 模組</dt>
+<dd>‘C:\libtorrent-1_0_7\bindings\python\bin\msvc-9.0\release\address-model-64\boost-source\link-static\optimization-space\libtorrent.pyd’</dd>
+</dl>
+</li>
+<li>
+<dl>
+<dt>libtorrent 程式庫</dt>
+<dd>‘C:\libtorrent-1_0_7\bin\msvc-9.0\release\address-model-64\boost-link-shared\boost-source\optimization-space\threading-multi\torrent.dll’</dd>
+</dl>
+</li>
+</ul>
+<p>是的，我知道，路徑就是這麼長！</p>
+<h2 id="設定-libtorrent-python-模組">設定 libtorrent-python 模組</h2>
+<ol>
+<li>將 libtorrent 程式庫的 DLL 檔複製到 ‘C:\Python’</li>
+<li>將 Python 模組，libtorrent.pyd 複製到<br>
+‘C:\Python\Lib\site-packages\’</li>
+</ol>
+<p>如果您在這個階段使用 Python 試圖 import libtorrent，會出現無法 import 的錯誤資訊， 這是因為 libtorrent.pyd 還相依於 Boost 的 system 模組。要解決這個問題，可以將 ‘C:\Boost\lib\boost_system-vc90-mt-1_59.dll’ 複製到 Windows 系統目錄， 或者像山姆鍋一樣複製到 ‘C:\Python\’ 目錄中。</p>
+<h3 id="驗證模組安裝完成">驗證模組安裝完成</h3>
+<p>啟動 Python 進入互動模式，輸入：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> libtorrent</span><br><span class="line">libtorrent.version</span><br></pre></td></tr></tbody></table></figure>
+<p>如果正常 import 並顯示版本號碼，模組應該有安裝成功。如果沒有，請使用 Dependency Walker 查看 <code>libtorrent.pyd</code> 的相依連結是否完整？例如缺少 <code>msvcr90.dll</code> 或 <code>msvcp90.dll</code> 這兩個檔案，則需要安裝 Visual Studio<br>
+Redistributable 2008 套件。</p>
+<h2 id="OS-X-跟-Ubuntu">OS X 跟 Ubuntu?</h2>
+<p>這兩個平台按照 <a href="https://github.com/Storj/storjtorrent" target="_blank" rel="noopener">Storjtorrent</a> 提供的步驟便能運作，本文就不重複。</p>
+<h2 id="小技巧">小技巧</h2>
+<p>在過程中，山姆鍋學到一些有用的小技巧或知識，在這裏順便提供：</p>
+<ul>
+<li>
+<dl>
+<dt>如何觀看動態連結檔 (DLL) 或共享物件檔 (.so) 的相依性？</dt>
+<dd>熟悉 Linux 系統的會知道有個 ldd 程式可以方便檢視 .so<br>
+相依於哪些其它 .so 檔； 在 OSX 系統，使用 <code>otool -L</code><br>
+可以達到類似功能；Windows 系統則可以用 Dependency Walker<br>
+來查看。</dd>
+</dl>
+</li>
+<li>
+<dl>
+<dt>在 Windows 上如何分辨執行檔 (.exe) 或動態連結檔 (.dll) 是 32 還是 64 位元？</dt>
+<dd>Visual Studio 有個 dumpbin.exe 工具程式可以用來分辨，指令用法：</dd>
+</dl>
+  <figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dumpbin /headers &lt;檔案名稱&gt;</span><br></pre></td></tr></tbody></table></figure>
+<p>從顯示的訊息，如果有看到 <code>x64</code> 表示是 64 位元， <code>x86</code> 則是 32 位元，如下面片段：</p>
+  <figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">FILE HEADER VALUES</span><br><span class="line">        8664 machine (x64)</span><br></pre></td></tr></tbody></table></figure>
+</li>
+</ul>
+<h2 id="結語">結語</h2>
+<p>雖說山姆鍋最終希望只需要一個 <code>libtorrent.pyd</code> 檔案便能夠使用，也就是說：libtorrent 跟 Boost 都以靜態連結的方式到那個模組檔中，只可惜還沒有試出來。現階段只做到編譯跟安裝， 編譯出來的程式庫是否功能完全正常，這點還沒有進一步驗證；另外，很明顯 libtorrent 的一些選用的功能是不支援的，例如：OpenSSL encryption。不管怎樣，希望對於也想透過 Python 玩玩 libtorrent 的人有所幫助。</p>
+
+            <div class="alert info no-icon">
+                有 DevOps 技術問題？歡迎到 <a href="https://developers.tw/@山姆鍋" target="_blank" rel="noopener">#呆丸開發者</a> 跟山姆鍋討論
+            </div>
+            
+
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">標籤</span><br/>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tag/bittorrent/" rel="tag">BitTorrent</a> <a class="tag tag--primary tag--small t-link" href="/tag/libtorrent/" rel="tag">Libtorrent</a> <a class="tag tag--primary tag--small t-link" href="/tag/python/" rel="tag">Python</a> <a class="tag tag--primary tag--small t-link" href="/tag/windows/" rel="tag">Windows</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/post/2015/12/http-live-streaming-on-osx-camera-with-python/"
+                    data-tooltip="在 MacBook 上使用 Python 作實況視訊串流"
+                    aria-label="上一篇: 在 MacBook 上使用 Python 作實況視訊串流"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/post/2015/11/buildbot-continuous-integration-for-python/"
+                    data-tooltip="使用 Buildbot 進行持續整合與軟體打包工作"
+                    aria-label="下一篇: 使用 Buildbot 進行持續整合與軟體打包工作"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Diesen Beitrag teilen"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://samkuo.me/post/2015/11/build-libtorrent-python-on-windows-64-bit/"
+                    title="分享到 Facebook"
+                    aria-label="分享到 Facebook"
+                >
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://twitter.com/intent/tweet?text=https://samkuo.me/post/2015/11/build-libtorrent-python-on-windows-64-bit/"
+                    title="分享到 Twitter"
+                    aria-label="分享到 Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https://samkuo.me/post/2015/11/build-libtorrent-python-on-windows-64-bit/"
+                    title="global.share_on_linkedin"
+                    aria-label="global.share_on_linkedin"
+                >
+                    <i class="fab fa-linkedin" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#disqus_thread"
+                        aria-label="Kommentieren"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript" target="_blank" rel="noopener">comments powered by Disqus.</a></noscript>
+</div>
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2020 Sampot (山姆鍋). All Rights Reserved.
+    </span>
+    <br/>
+        <a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW"><img
+                alt="創用 CC 授權條款" style="border-width:0"
+                src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+        除另有標示，本著作係採用<a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW">創用 CC
+            姓名標示-非商業性-相同方式分享 4.0 國際 授權條款</a>授權。
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/post/2015/12/http-live-streaming-on-osx-camera-with-python/"
+                    data-tooltip="在 MacBook 上使用 Python 作實況視訊串流"
+                    aria-label="上一篇: 在 MacBook 上使用 Python 作實況視訊串流"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/post/2015/11/buildbot-continuous-integration-for-python/"
+                    data-tooltip="使用 Buildbot 進行持續整合與軟體打包工作"
+                    aria-label="下一篇: 使用 Buildbot 進行持續整合與軟體打包工作"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Diesen Beitrag teilen"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://samkuo.me/post/2015/11/build-libtorrent-python-on-windows-64-bit/"
+                    title="分享到 Facebook"
+                    aria-label="分享到 Facebook"
+                >
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://twitter.com/intent/tweet?text=https://samkuo.me/post/2015/11/build-libtorrent-python-on-windows-64-bit/"
+                    title="分享到 Twitter"
+                    aria-label="分享到 Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https://samkuo.me/post/2015/11/build-libtorrent-python-on-windows-64-bit/"
+                    title="global.share_on_linkedin"
+                    aria-label="global.share_on_linkedin"
+                >
+                    <i class="fab fa-linkedin" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#disqus_thread"
+                        aria-label="Kommentieren"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://www.facebook.com/sharer/sharer.php?u=https://samkuo.me/post/2015/11/build-libtorrent-python-on-windows-64-bit/"
+                        aria-label="分享到 Facebook"
+                    >
+                        <i class="fab fa-facebook" aria-hidden="true"></i><span>分享到 Facebook</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://twitter.com/intent/tweet?text=https://samkuo.me/post/2015/11/build-libtorrent-python-on-windows-64-bit/"
+                        aria-label="分享到 Twitter"
+                    >
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>分享到 Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https://samkuo.me/post/2015/11/build-libtorrent-python-on-windows-64-bit/"
+                        aria-label="global.share_on_linkedin"
+                    >
+                        <i class="fab fa-linkedin" aria-hidden="true"></i><span>global.share_on_linkedin</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/images/logo.png" alt="作者的圖片"/>
+        
+            <h4 id="about-card-name">Sampot (山姆鍋)</h4>
+        
+            <div id="about-card-bio"><p>個人部落格， 記錄與分享一些軟體開發與運維相關資訊， 偶爾也會碎念一下</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>IT 自由工作者</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                台灣/台北
+            </div>
+        
+    </div>
+</div>
+
+        
+            <div id="algolia-search-modal" class="modal-container">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="close-button"><i class="fa fa-times"></i></span>
+            <a href="https://algolia.com" target="_blank" rel="noopener" class="searchby-algolia text-color-light link-unstyled">
+                <span class="searchby-algolia-text text-color-light text-small">by</span>
+                <img class="searchby-algolia-logo" src="/assets/images/logo-algolia-nebula-blue-full.svg">
+            </a>
+            <i class="search-icon fa fa-search"></i>
+            <form id="algolia-search-form">
+                <input type="text" id="algolia-search-input" name="search"
+                    class="form-control input--large search-input" placeholder="Search "
+                    />
+            </form>
+        </div>
+        <div class="modal-body">
+            <div class="no-result text-color-light text-center">沒有找到文章</div>
+            <div class="results">
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2012/03/set-up-mysql-master-master-replication/"
+                            aria-label=": 設定 MySQL Master-Master 複製"
+                        >
+                            <h3 class="media-heading">設定 MySQL Master-Master 複製</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2012年3月3日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>本文簡單說明如何設定兩台 MySQL server，讓它們彼此互相備份資料 (Master-master 模式)。雖然這樣的設定通常是支援高可用性 (high availability) 平台的一部分，但本文不包含如何完成其他 HA 的工作。設定兩台 MySQL 伺服器互相備份，主要目的就是要確認資料的安全性；同時也提高可用性。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2012/04/use-pacemaker-two-node-ha-cluster/"
+                            aria-label=": 使用 Pacemaker 建構雙節點叢集系統"
+                        >
+                            <h3 class="media-heading">使用 Pacemaker 建構雙節點叢集系統</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2012年4月6日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>想要達到系統高可用性 (high availability) 的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2012/04/build-cluster-filesystem-with-glusterfs-ubuntu/"
+                            aria-label=": 使用 GlusterFS 在 Ubuntu 上建構雙節點叢集檔案系統"
+                        >
+                            <h3 class="media-heading">使用 GlusterFS 在 Ubuntu 上建構雙節點叢集檔案系統</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2012年4月23日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案 (圖檔，CSS 等等) 可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點 (single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2012/04/scale-wordpress-with-hyperdb/"
+                            aria-label=": 使用 HyperDB 加強 WordPress 網站的資料庫擴充性"
+                        >
+                            <h3 class="media-heading">使用 HyperDB 加強 WordPress 網站的資料庫擴充性</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2012年4月23日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>對於流量高的 Wordpress 網站來說，資料庫往往是第一個出現的瓶頸。針對資料庫擴充性的問題，本文介紹 HyperDB 這個解決方案。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2012/04/create-lnmp-environment-with-nginx/"
+                            aria-label=": 在 Linode 上使用 Nginx 架設 LNMP 環境"
+                        >
+                            <h3 class="media-heading">在 Linode 上使用 Nginx 架設 LNMP 環境</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2012年4月30日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>Apache HTTPd 是很好的網站伺服器，但是對於 CPU 跟記憶體的要求較高，對於架設在 VPS 上面網站來說， 需要一個更輕量級的解決方案。越來越多人選擇使用 Nginx 架設網站，主要考量便是它的快速、穩定以及輕量的特性。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2012/05/support-sending-mail-php-linux-vps-exim/"
+                            aria-label=": Linux VPS PHP 網站可以發送信件"
+                        >
+                            <h3 class="media-heading">Linux VPS PHP 網站可以發送信件</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2012年5月8日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>PHP 架站軟體通常需要用到寄信功能，例如：通知站長有新的迴響需要審核。使用虛擬主機來架站的讀者一定會納悶：<br>
+不管是 WordPress，Drupal 或者其他 PHP<br>
+架站軟體不是都不用另外設定就可以寄信？為什麼需要特地提到這件事情。<br>
+話說山姆鍋的主機採用的是 Linode VPS，很多事情都需要自己來，唉！<br>
+如果您的網站主機跟山姆鍋一樣是 VPS 或者專屬伺服器，那這篇文章也許對您有幫助。<br>
+由於不是要做為公司的郵件伺服器，山姆鍋希望除了讓 PHP 架站軟體送信外，不再作其它用途。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2013/04/start-up/"
+                            aria-label=": 影化身科技有限公司成立"
+                        >
+                            <h3 class="media-heading">影化身科技有限公司成立</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2013年4月24日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>2013 年 4 月 24 日，影化身科技有限公司登記成立，致力於提供雲端服務平台。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2013/05/shi-yong-octopresszuo-wei-bo-ke-ping-tai/"
+                            aria-label=": 使用 Octopress 作為部落格平台"
+                        >
+                            <h3 class="media-heading">使用 Octopress 作為部落格平台</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2013年5月23日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>由於沒有需要太多動態功能，所以，嘗試使用靜態部落格平台 Octopress 來寫文章。「艾米部落」<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup> 一路從 Joomla, Drupal, WordPress 到現在的 Octopress，也算是換了不少平台。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2013/05/use-static-site-generator-for-company-site/"
+                            aria-label=": 使用靜態網頁產生器來管理公司網站"
+                        >
+                            <h3 class="media-heading">使用靜態網頁產生器來管理公司網站</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2013年5月28日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>對於不需要動態功能的網站而言，使用像是 Drupal、WordPress 之類的架站軟體，感覺有點大材小用。對於可以接受不使用「所見即所得」編輯器的人，靜態網站產生器應該是個可以接受的方案。 雖說是靜態網站，缺少很多功能，但像是公司或者行銷網站往往也不需要這些。況且， 靜態網站有諸多動態網站所沒有的功能，如：</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2013/05/exchange-name-card-with-eavatar-me/"
+                            aria-label=": 如何利用「我．影化身」服務交換名片"
+                        >
+                            <h3 class="media-heading">如何利用「我．影化身」服務交換名片</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2013年5月29日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>今天從 MR JAMIE 上讀到一篇文章：「從今天開始，請 email 你的名片給我吧！」這讓我想到，與其使用 Email，使用「我．影化身」來代替，不是也很適當？</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+            </div>
+        </div>
+        <div class="modal-footer">
+            <p class="results-count text-medium"
+                data-message-zero="沒有找到文章"
+                data-message-one="找到 1 篇文章"
+                data-message-other="找到 {n} 篇文章">
+                找到 126 篇文章
+            </p>
+        </div>
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+
+<script src="/assets/js/script-kkzt2vzfxsb5bych7gew3tzpzddvyjfn0sutkf3vixujdxhpjr4ifnekp3si.min.js"></script>
+
+<!--SCRIPTS END-->
+
+
+    
+        <script>
+          var disqus_config = function() {
+            this.page.url = 'https://samkuo.me/post/2015/11/build-libtorrent-python-on-windows-64-bit/';
+              
+            this.page.identifier = 'post/2015/11/build-libtorrent-python-on-windows-64-bit/';
+              
+          };
+          (function() {
+            var d = document, s = d.createElement('script');
+            var disqus_shortname = 'sampotkuo';
+            s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+          })();
+        </script>
+    
+
+
+
+    
+<script src="/assets/js/moment-with-locales.js"></script>
+
+    
+<script src="/assets/js/algoliasearch.js"></script>
+
+    <script>
+      var algoliaClient = algoliasearch('OIWK4CBFS4', 'f676051199368fe5f161c9012b7edaf6');
+      var algoliaIndex = algoliaClient.initIndex('MyBlogIndex');
+    </script>
+
+
+    </body>
+</html>
