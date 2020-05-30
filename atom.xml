@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://samkuo.me/"/>
-  <updated>2020-05-20T12:14:15.333Z</updated>
+  <updated>2020-05-30T11:58:09.840Z</updated>
   <id>https://samkuo.me/</id>
   
   <author>
@@ -15,6 +15,35 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>我的 K8S DevOps 實驗環境 - 基礎篇</title>
+    <link href="https://samkuo.me/post/2020/05/my-k8s-devops-lab-env/"/>
+    <id>https://samkuo.me/post/2020/05/my-k8s-devops-lab-env/</id>
+    <published>2020-05-30T11:58:09.000Z</published>
+    <updated>2020-05-30T11:58:09.840Z</updated>
+    
+    <summary type="html">
+    
+      &lt;p&gt;雖然 Minikube、K3D 或者 Docker for Desktop 都提供 Kubernetes 測試環境可以方便開發雲原生應用軟體。但從運維角度來說，這些工具並不適合用來測試與驗證需要多節點的方案，例如: 高可用的 etcd；K8S 的儲存方案如 &lt;a href=&quot;https://openebs.io/&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;OpenEBS&lt;/a&gt;, &lt;a href=&quot;https://rook.io/&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;ROOK&lt;/a&gt; 等需要額外的儲存媒體(e.g. 硬碟)來實現;又或者有在主機系統額外安裝套件的需求。本文山姆鍋利用 Vagrant 跟 VirtualBox 虛擬技術作為快速拆建的實驗環境。&lt;/p&gt;
+    
+    </summary>
+    
+    
+    
+      <category term="Vagrant" scheme="https://samkuo.me/tag/vagrant/"/>
+    
+      <category term="DevOps" scheme="https://samkuo.me/tag/devops/"/>
+    
+      <category term="Kubernetes" scheme="https://samkuo.me/tag/kubernetes/"/>
+    
+      <category term="VirtualBox" scheme="https://samkuo.me/tag/virtualbox/"/>
+    
+      <category term="HAProxy" scheme="https://samkuo.me/tag/haproxy/"/>
+    
+      <category term="Keepalived" scheme="https://samkuo.me/tag/keepalived/"/>
+    
+  </entry>
   
   <entry>
     <title>Vagrant+VirtualBox 跨平台虛擬環境</title>
@@ -487,33 +516,6 @@
       <category term="HLS" scheme="https://samkuo.me/tag/hls/"/>
     
       <category term="HTTP" scheme="https://samkuo.me/tag/http/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>在 Windows 64 位元電腦上編譯 Libtorrent-python</title>
-    <link href="https://samkuo.me/post/2015/11/build-libtorrent-python-on-windows-64-bit/"/>
-    <id>https://samkuo.me/post/2015/11/build-libtorrent-python-on-windows-64-bit/</id>
-    <published>2015-11-19T02:03:00.000Z</published>
-    <updated>2020-05-03T22:43:31.314Z</updated>
-    
-    <summary type="html">
-    
-      &lt;p&gt;最近需要使用 BitTorrent 來實驗點對點資料傳輸功能，所以想說來玩玩 libtorrent 這個程式庫 (C++)，為了方便實驗，也需要它的 Python 綁定。經過三天的爬文與奮戰，終於在 Windows, OSX 以及 Ubuntu 上成功編譯或安裝，本文山姆鍋就來分享在 Windows 64 位元電腦上編譯的方法之一。&lt;/p&gt;
-    
-    </summary>
-    
-    
-      <category term="Software Development" scheme="https://samkuo.me/category/software-development/"/>
-    
-    
-      <category term="Python" scheme="https://samkuo.me/tag/python/"/>
-    
-      <category term="Libtorrent" scheme="https://samkuo.me/tag/libtorrent/"/>
-    
-      <category term="BitTorrent" scheme="https://samkuo.me/tag/bittorrent/"/>
-    
-      <category term="Windows" scheme="https://samkuo.me/tag/windows/"/>
     
   </entry>
   
