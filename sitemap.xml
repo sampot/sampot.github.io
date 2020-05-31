@@ -2,9 +2,16 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://samkuo.me/post/2020/05/generic-web-software-architecture/</loc>
+    
+    <lastmod>2020-05-31T09:19:47.838Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://samkuo.me/post/2020/05/my-k8s-devops-lab-env/</loc>
     
-    <lastmod>2020-05-30T12:09:24.839Z</lastmod>
+    <lastmod>2020-05-31T01:53:33.284Z</lastmod>
     
   </url>
   
@@ -19,13 +26,6 @@
     <loc>https://samkuo.me/post/2020/05/windows-terminal-default-wsl-ubuntu-shell/</loc>
     
     <lastmod>2020-05-11T23:49:47.878Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://samkuo.me/post/2020/05/generic-web-software-architecture/</loc>
-    
-    <lastmod>2020-05-07T23:29:56.900Z</lastmod>
     
   </url>
   

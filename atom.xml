@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://samkuo.me/"/>
-  <updated>2020-05-30T12:09:24.839Z</updated>
+  <updated>2020-05-31T01:53:33.284Z</updated>
   <id>https://samkuo.me/</id>
   
   <author>
@@ -21,11 +21,11 @@
     <link href="https://samkuo.me/post/2020/05/my-k8s-devops-lab-env/"/>
     <id>https://samkuo.me/post/2020/05/my-k8s-devops-lab-env/</id>
     <published>2020-05-30T11:58:09.840Z</published>
-    <updated>2020-05-30T12:09:24.839Z</updated>
+    <updated>2020-05-31T01:53:33.284Z</updated>
     
     <summary type="html">
     
-      &lt;p&gt;雖然 Minikube、K3D 或者 Docker for Desktop 都提供 Kubernetes 測試環境可以方便開發雲原生應用軟體。但從運維角度來說，這些工具並不適合用來測試與驗證需要多節點的方案，例如: 高可用的 etcd；K8S 的儲存方案如 &lt;a href=&quot;https://openebs.io/&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;OpenEBS&lt;/a&gt;, &lt;a href=&quot;https://rook.io/&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;ROOK&lt;/a&gt; 等需要額外的儲存媒體(e.g. 硬碟)來實現;又或者有在主機系統額外安裝套件的需求。本文山姆鍋利用 Vagrant 跟 VirtualBox 虛擬技術作為快速拆建的實驗環境。&lt;/p&gt;
+      &lt;p&gt;雖然 Minikube、K3D 或者 Docker for Desktop 都提供 Kubernetes 測試環境可以方便開發雲原生應用軟體。但從運維角度來說，這些工具並不適合用來測試與驗證需要多節點的方案，例如：高可用的 etcd；K8S 的儲存方案如 &lt;a href=&quot;https://openebs.io/&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;OpenEBS&lt;/a&gt;, &lt;a href=&quot;https://rook.io/&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;ROOK&lt;/a&gt; 等需要額外的儲存媒體 (e.g. 硬碟) 來實現；又或者有在主機系統額外安裝套件的需求。本文山姆鍋利用 Vagrant 跟 VirtualBox 虛擬技術作為快速拆建的實驗環境。&lt;/p&gt;
     
     </summary>
     
@@ -42,6 +42,8 @@
       <category term="HAProxy" scheme="https://samkuo.me/tag/haproxy/"/>
     
       <category term="Keepalived" scheme="https://samkuo.me/tag/keepalived/"/>
+    
+      <category term="SPK Cluster" scheme="https://samkuo.me/tag/spk-cluster/"/>
     
   </entry>
   
@@ -106,7 +108,7 @@
     <link href="https://samkuo.me/post/2020/05/generic-web-software-architecture/"/>
     <id>https://samkuo.me/post/2020/05/generic-web-software-architecture/</id>
     <published>2020-05-07T02:57:52.000Z</published>
-    <updated>2020-05-07T23:29:56.900Z</updated>
+    <updated>2020-05-31T09:19:47.838Z</updated>
     
     <summary type="html">
     
