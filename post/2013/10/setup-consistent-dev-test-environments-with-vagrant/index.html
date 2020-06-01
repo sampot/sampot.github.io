@@ -68,6 +68,9 @@
 </head>
 
     <body>
+        <div id="fb-root"></div>
+        <script async defer crossorigin="anonymous"
+            src="https://connect.facebook.net/zh_TW/sdk.js#xfbml=1&version=v7.0&appId=1538037013031361&autoLogAppEvents=1"></script>
         <div id="blog">
             <!-- Define author's picture -->
 
@@ -369,7 +372,7 @@
     <div class="post-content markdown">
         <div class="main-content-wrap">
             <div class="alert info no-icon">
-                <a href="https://www.facebook.com/sampotkuo" target="_blank" rel="noopener">「我是山姆鍋」有臉書專頁</a>
+                我是山姆鍋 <div class="fb-like" data-href="https://www.facebook.com/sampotkuo" data-width="" data-layout="standard" data-action="like" data-size="large" data-share="false"></div>
             </div>
 
             <p>作為軟體開發人員，山姆鍋也很常跟 QA 團隊說過類似這樣的話：「這個版本，在我的電腦上可以正常執行」。我們都知道開發人員的執行環境跟其他成員通常有很大的差異，所以，說這句話往往只是浪費時間，對於解決問題並沒有太多實際幫助。那有沒有方法可以讓開發以及測試人員有一致的環境來確認問題根源呢？藉由虛擬化技術以及 <a href="http://www.vagrantup.com/" target="_blank" rel="noopener">Vagrant</a> 這樣的工具，現在我們有更好的方法。</p>
@@ -387,9 +390,6 @@
 <h3 id="小結">小結</h3>
 <p>山姆鍋曾經考慮過讓團隊成員的開發環境都以虛擬機方式來部署，這樣新成員就可以很快上手。不過，深入想了之後，就會知道這個想法不實際，因為工程師最終還是會在原生作業系統上安裝開發工具，而只會使用虛擬機來做最後測試。雖然如此，作為開發測試的一致環境建置工具，Vagrant 肯定是軟體服務公司值得導入的工具。</p>
 
-            <div class="alert info no-icon">
-                有 DevOps 技術問題？歡迎到 <a href="https://developers.tw/@山姆鍋" target="_blank" rel="noopener">#呆丸開發者</a> 跟山姆鍋討論
-            </div>
             
 
 

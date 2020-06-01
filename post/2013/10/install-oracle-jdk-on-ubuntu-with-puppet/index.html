@@ -72,6 +72,9 @@
 </head>
 
     <body>
+        <div id="fb-root"></div>
+        <script async defer crossorigin="anonymous"
+            src="https://connect.facebook.net/zh_TW/sdk.js#xfbml=1&version=v7.0&appId=1538037013031361&autoLogAppEvents=1"></script>
         <div id="blog">
             <!-- Define author's picture -->
 
@@ -373,7 +376,7 @@
     <div class="post-content markdown">
         <div class="main-content-wrap">
             <div class="alert info no-icon">
-                <a href="https://www.facebook.com/sampotkuo" target="_blank" rel="noopener">「我是山姆鍋」有臉書專頁</a>
+                我是山姆鍋 <div class="fb-like" data-href="https://www.facebook.com/sampotkuo" data-width="" data-layout="standard" data-action="like" data-size="large" data-share="false"></div>
             </div>
 
             <p>” <a href="/post/2013/10/how-to-install-oracle-jdk-on-ubuntu-12-04/">在 Ubuntu 系統上，使用 Deb 套件安裝 Oracle JDK</a>” 這篇文章中，山姆鍋分享如何手動安裝 Oracle JDK。雖然比每次都要從 Oracle 官網下載方便許多，但如果能夠加以自動化，自然是更加符合敏捷與精實的精神。本文山姆鍋就提供 Puppet 的腳本，讓未來有需要的話可以加快在不同機器上安裝的動作。</p>
@@ -401,9 +404,6 @@
 <h3 id="小結">小結</h3>
 <p>在開發、測試或部署的環境，套件都會使用特定的版本以確保整個環境組態盡可能相同。另位請注意：本文提供的腳本還有不少改進的空間，請自行斟酌使用。</p>
 
-            <div class="alert info no-icon">
-                有 DevOps 技術問題？歡迎到 <a href="https://developers.tw/@山姆鍋" target="_blank" rel="noopener">#呆丸開發者</a> 跟山姆鍋討論
-            </div>
             
 
 

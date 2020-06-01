@@ -66,6 +66,9 @@
 </head>
 
     <body>
+        <div id="fb-root"></div>
+        <script async defer crossorigin="anonymous"
+            src="https://connect.facebook.net/zh_TW/sdk.js#xfbml=1&version=v7.0&appId=1538037013031361&autoLogAppEvents=1"></script>
         <div id="blog">
             <!-- Define author's picture -->
 
@@ -367,7 +370,7 @@
     <div class="post-content markdown">
         <div class="main-content-wrap">
             <div class="alert info no-icon">
-                <a href="https://www.facebook.com/sampotkuo" target="_blank" rel="noopener">「我是山姆鍋」有臉書專頁</a>
+                我是山姆鍋 <div class="fb-like" data-href="https://www.facebook.com/sampotkuo" data-width="" data-layout="standard" data-action="like" data-size="large" data-share="false"></div>
             </div>
 
             <p>不久前，山姆鍋開始學習 <a href="">Django</a> 這套 Web 應用框架，在不跳脫它既有有框架的情況下，運用它可以快速建構應用程式原型。差不多同一時間，也找到 <a href="">Test-driven Development with Python</a> 這本好書，書名雖然好像跟 Django 無關，但書中的範例程式是以 Django 為基礎。 可惜，本文不是要示範如何使用 Django 做功能測試，這個主題網路有許多文章可以參考。山姆鍋在使用 Django 的 LiveServerTestCase 時 發現資料庫的資料在第一個測試案例 (test case) 之後就會被清除，導致後續的測試無法正常運作。</p>
@@ -423,9 +426,6 @@
 <p>_`原始的 LiveServerTestCase 實作`:<br>
 <a href="https://github.com/wearespindle/ghostrunner/blob/master/ghost/test/testcases.py" target="_blank" rel="noopener">https://github.com/wearespindle/ghostrunner/blob/master/ghost/test/testcases.py</a></p>
 
-            <div class="alert info no-icon">
-                有 DevOps 技術問題？歡迎到 <a href="https://developers.tw/@山姆鍋" target="_blank" rel="noopener">#呆丸開發者</a> 跟山姆鍋討論
-            </div>
             
 
 

@@ -66,6 +66,9 @@
 </head>
 
     <body>
+        <div id="fb-root"></div>
+        <script async defer crossorigin="anonymous"
+            src="https://connect.facebook.net/zh_TW/sdk.js#xfbml=1&version=v7.0&appId=1538037013031361&autoLogAppEvents=1"></script>
         <div id="blog">
             <!-- Define author's picture -->
 
@@ -367,7 +370,7 @@
     <div class="post-content markdown">
         <div class="main-content-wrap">
             <div class="alert info no-icon">
-                <a href="https://www.facebook.com/sampotkuo" target="_blank" rel="noopener">「我是山姆鍋」有臉書專頁</a>
+                我是山姆鍋 <div class="fb-like" data-href="https://www.facebook.com/sampotkuo" data-width="" data-layout="standard" data-action="like" data-size="large" data-share="false"></div>
             </div>
 
             <p>雖然這個部落格主要語言是正體中文，但偶爾會需要將英文轉成中文來顯示。例如：將導覽路徑 (breadcrumb) 轉成中文，但在網址路徑中維持使用英文。 要達到這個目的，使用 <a href="http://jinja.pocoo.org/docs/2.10/" target="_blank" rel="noopener">Jinja 2</a> 模板的過濾器 (filter) 應該是個簡單方案。本文山姆鍋說明如何增加一個客製化過濾器， 來將模板中部分的英文字串對應到中文。</p>
@@ -396,9 +399,6 @@
 </li>
 </ol>
 
-            <div class="alert info no-icon">
-                有 DevOps 技術問題？歡迎到 <a href="https://developers.tw/@山姆鍋" target="_blank" rel="noopener">#呆丸開發者</a> 跟山姆鍋討論
-            </div>
             
 
 

@@ -71,6 +71,9 @@
 </head>
 
     <body>
+        <div id="fb-root"></div>
+        <script async defer crossorigin="anonymous"
+            src="https://connect.facebook.net/zh_TW/sdk.js#xfbml=1&version=v7.0&appId=1538037013031361&autoLogAppEvents=1"></script>
         <div id="blog">
             <!-- Define author's picture -->
 
@@ -372,7 +375,7 @@
     <div class="post-content markdown">
         <div class="main-content-wrap">
             <div class="alert info no-icon">
-                <a href="https://www.facebook.com/sampotkuo" target="_blank" rel="noopener">「我是山姆鍋」有臉書專頁</a>
+                我是山姆鍋 <div class="fb-like" data-href="https://www.facebook.com/sampotkuo" data-width="" data-layout="standard" data-action="like" data-size="large" data-share="false"></div>
             </div>
 
             <p>對於在 Java 平台上，部署過後台服務器的人來說，讓 Java 程式以 Windows/Linux 服務 (daemon) 形式執行，是一個常見的問題，這裡的以 “服務方式” 是指該程式會隨系統啓動而自動執行，甚至更好的話，該程式如果異常結束會被重新執行。過去，山姆鍋跟多數的人一樣，選擇 <a href="http://wrapper.tanukisoftware.com/doc/english/download.jsp" target="_blank" rel="noopener">Java Service Wrapper</a>，不過自從它在 3.2.3 版本以後改了授權，雖然仍可以繼續使用 3.2.3 版本，但相信很多人也跟我一樣想尋找其他替代方案。</p>
@@ -427,9 +430,6 @@
 <h3 id="小結">小結</h3>
 <p>在目前階段，對於要讓 Java 程式以服務形式執行又不想使用 Java service wrapper 的人，如果看了上面的介紹還是不清楚哪個方案適合您，山姆鍋統一推薦方案 3: YAJSW。但請注意：「影化身科技」採用的是方案 2，也就是 Shell script + Monit！因為，本文一開始就強調：「影化身科技」只需要在 Linux 系統上部署 Java 服務。</p>
 
-            <div class="alert info no-icon">
-                有 DevOps 技術問題？歡迎到 <a href="https://developers.tw/@山姆鍋" target="_blank" rel="noopener">#呆丸開發者</a> 跟山姆鍋討論
-            </div>
             
 
 

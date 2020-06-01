@@ -68,6 +68,9 @@
 </head>
 
     <body>
+        <div id="fb-root"></div>
+        <script async defer crossorigin="anonymous"
+            src="https://connect.facebook.net/zh_TW/sdk.js#xfbml=1&version=v7.0&appId=1538037013031361&autoLogAppEvents=1"></script>
         <div id="blog">
             <!-- Define author's picture -->
 
@@ -369,7 +372,7 @@
     <div class="post-content markdown">
         <div class="main-content-wrap">
             <div class="alert info no-icon">
-                <a href="https://www.facebook.com/sampotkuo" target="_blank" rel="noopener">「我是山姆鍋」有臉書專頁</a>
+                我是山姆鍋 <div class="fb-like" data-href="https://www.facebook.com/sampotkuo" data-width="" data-layout="standard" data-action="like" data-size="large" data-share="false"></div>
             </div>
 
             <p>之前的這篇 <a href="/post/2013/10/maven-repository-amazon-s3">「使用 Amazon S3 作為 Maven 套件倉儲」</a>文章中，山姆鍋提到使用 Amazon S3 作為套件倉儲的構想與好處，但那篇文章只適用于採用 Maven 作為建構工具的專案。山姆鍋已採用 Gradle 作為「影化身科技」的正式建構工具，所以，需要針對 Gradle 找到適合的方案。</p>
@@ -395,9 +398,6 @@
 <h3 id="小結">小結</h3>
 <p>雖然有些不理想，但相信日後 Gradle 對於 Maven 現有專案的支援更完整後，這些問題應該可以解決，限制 IP 位址的作法則是目前可以接收的折衷方案。</p>
 
-            <div class="alert info no-icon">
-                有 DevOps 技術問題？歡迎到 <a href="https://developers.tw/@山姆鍋" target="_blank" rel="noopener">#呆丸開發者</a> 跟山姆鍋討論
-            </div>
             
 
 

@@ -68,6 +68,9 @@
 </head>
 
     <body>
+        <div id="fb-root"></div>
+        <script async defer crossorigin="anonymous"
+            src="https://connect.facebook.net/zh_TW/sdk.js#xfbml=1&version=v7.0&appId=1538037013031361&autoLogAppEvents=1"></script>
         <div id="blog">
             <!-- Define author's picture -->
 
@@ -369,7 +372,7 @@
     <div class="post-content markdown">
         <div class="main-content-wrap">
             <div class="alert info no-icon">
-                <a href="https://www.facebook.com/sampotkuo" target="_blank" rel="noopener">「我是山姆鍋」有臉書專頁</a>
+                我是山姆鍋 <div class="fb-like" data-href="https://www.facebook.com/sampotkuo" data-width="" data-layout="standard" data-action="like" data-size="large" data-share="false"></div>
             </div>
 
             <p>Apache HTTPd 是很好的網站伺服器，但是對於 CPU 跟記憶體的要求較高，對於架設在 VPS 上面網站來說， 需要一個更輕量級的解決方案。越來越多人選擇使用 Nginx 架設網站，主要考量便是它的快速、穩定以及輕量的特性。</p>
@@ -406,9 +409,6 @@
 <h2 id="結語">結語</h2>
 <p>按照這樣的安裝步驟，應該就可以有個基本的 LNMP 執行環境。但這樣一個設定方式其實還欠缺其他東西，如防火牆設定，這些就請讀者參考本站或者網路其他文章了。</p>
 
-            <div class="alert info no-icon">
-                有 DevOps 技術問題？歡迎到 <a href="https://developers.tw/@山姆鍋" target="_blank" rel="noopener">#呆丸開發者</a> 跟山姆鍋討論
-            </div>
             
 
 

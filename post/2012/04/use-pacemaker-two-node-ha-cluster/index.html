@@ -66,6 +66,9 @@
 </head>
 
     <body>
+        <div id="fb-root"></div>
+        <script async defer crossorigin="anonymous"
+            src="https://connect.facebook.net/zh_TW/sdk.js#xfbml=1&version=v7.0&appId=1538037013031361&autoLogAppEvents=1"></script>
         <div id="blog">
             <!-- Define author's picture -->
 
@@ -367,7 +370,7 @@
     <div class="post-content markdown">
         <div class="main-content-wrap">
             <div class="alert info no-icon">
-                <a href="https://www.facebook.com/sampotkuo" target="_blank" rel="noopener">「我是山姆鍋」有臉書專頁</a>
+                我是山姆鍋 <div class="fb-like" data-href="https://www.facebook.com/sampotkuo" data-width="" data-layout="standard" data-action="like" data-size="large" data-share="false"></div>
             </div>
 
             <p>想要達到系統高可用性 (high availability) 的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。</p>
@@ -423,9 +426,6 @@
 <p>由於沒有使用 stonith 裝置，不建議使用在需要同時修改資料的服務， 如資料庫。<br>
 只有兩個節點，當兩個節點因為網路問題，彼此無法通訊的話，有可能出現同一個服務在兩個節點都被執行。</p>
 
-            <div class="alert info no-icon">
-                有 DevOps 技術問題？歡迎到 <a href="https://developers.tw/@山姆鍋" target="_blank" rel="noopener">#呆丸開發者</a> 跟山姆鍋討論
-            </div>
             
 
 

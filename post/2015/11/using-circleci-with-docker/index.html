@@ -67,6 +67,9 @@
 </head>
 
     <body>
+        <div id="fb-root"></div>
+        <script async defer crossorigin="anonymous"
+            src="https://connect.facebook.net/zh_TW/sdk.js#xfbml=1&version=v7.0&appId=1538037013031361&autoLogAppEvents=1"></script>
         <div id="blog">
             <!-- Define author's picture -->
 
@@ -368,7 +371,7 @@
     <div class="post-content markdown">
         <div class="main-content-wrap">
             <div class="alert info no-icon">
-                <a href="https://www.facebook.com/sampotkuo" target="_blank" rel="noopener">「我是山姆鍋」有臉書專頁</a>
+                我是山姆鍋 <div class="fb-like" data-href="https://www.facebook.com/sampotkuo" data-width="" data-layout="standard" data-action="like" data-size="large" data-share="false"></div>
             </div>
 
             <p>上篇文章說明 <a href="/post/2015/10/eavatar-circleci-continuous-integration/">使用 CircleCI 作為《我。影化身》雲端持續整合方案</a>， 其中提到 CircleCI 對於 Docker 的支援是很完整的，本文進一步來看看如何在 CircleCI 上使用 Docker 在每次代碼提交時自動建構應用程式的映像。</p>
@@ -460,9 +463,6 @@ JQuery Mobile + Backbone 這樣的框架組合做 Web UI，有機會再來分享
 </ol>
 </section>
 
-            <div class="alert info no-icon">
-                有 DevOps 技術問題？歡迎到 <a href="https://developers.tw/@山姆鍋" target="_blank" rel="noopener">#呆丸開發者</a> 跟山姆鍋討論
-            </div>
             
 
 

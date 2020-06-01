@@ -69,6 +69,9 @@
 </head>
 
     <body>
+        <div id="fb-root"></div>
+        <script async defer crossorigin="anonymous"
+            src="https://connect.facebook.net/zh_TW/sdk.js#xfbml=1&version=v7.0&appId=1538037013031361&autoLogAppEvents=1"></script>
         <div id="blog">
             <!-- Define author's picture -->
 
@@ -370,7 +373,7 @@
     <div class="post-content markdown">
         <div class="main-content-wrap">
             <div class="alert info no-icon">
-                <a href="https://www.facebook.com/sampotkuo" target="_blank" rel="noopener">「我是山姆鍋」有臉書專頁</a>
+                我是山姆鍋 <div class="fb-like" data-href="https://www.facebook.com/sampotkuo" data-width="" data-layout="standard" data-action="like" data-size="large" data-share="false"></div>
             </div>
 
             <!-- excerpt -->
@@ -474,9 +477,6 @@
 <p>山姆鍋希望基礎設施可以類似 AWS CloudFormation 一樣可以自動建立，但又不想被綁定在 CloudFormation。 評估過 Ansible, SaltStack 這類組態管理工具後，發現 Terraform 比較適合這個工作，目前正在研究中。</p>
 <h2 id="小結">小結</h2>
 <p>本文所提的流程是山姆鍋所屬團隊所採用，但仍在建置中的方案，目前主要是「自動部署機器人」跟「應用部署平台」 有技術上的瓶頸。要特別說明的是：本文假設採用微服務架構 (Microservices)， 每個應用容器都是可以獨立部署的單元，不管該容器是用來部署一個應用、微服務或者批次工作 (batch job)。</p>
-            <div class="alert info no-icon">
-                有 DevOps 技術問題？歡迎到 <a href="https://developers.tw/@山姆鍋" target="_blank" rel="noopener">#呆丸開發者</a> 跟山姆鍋討論
-            </div>
             
 
 

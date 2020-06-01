@@ -67,6 +67,9 @@
 </head>
 
     <body>
+        <div id="fb-root"></div>
+        <script async defer crossorigin="anonymous"
+            src="https://connect.facebook.net/zh_TW/sdk.js#xfbml=1&version=v7.0&appId=1538037013031361&autoLogAppEvents=1"></script>
         <div id="blog">
             <!-- Define author's picture -->
 
@@ -368,7 +371,7 @@
     <div class="post-content markdown">
         <div class="main-content-wrap">
             <div class="alert info no-icon">
-                <a href="https://www.facebook.com/sampotkuo" target="_blank" rel="noopener">「我是山姆鍋」有臉書專頁</a>
+                我是山姆鍋 <div class="fb-like" data-href="https://www.facebook.com/sampotkuo" data-width="" data-layout="standard" data-action="like" data-size="large" data-share="false"></div>
             </div>
 
             <p>本文是山姆鍋在學習實況視訊串流 (live video streaming) 過程，用來驗證概念 (proof of concept) 的紀錄。透過 MacBook 內建的鏡頭作為視訊源，並藉由 HTTP Live Streaming (HLS) 協定作實況串流。 雖說是實況，但因為採用 HLS 協定，先天上就會有延遲的。實驗的結果不算太成功，本來只能使用桌面環境的 Safari 瀏覽器來觀看視訊，經過高手指正後，現在手機版的也可以了。</p>
@@ -546,9 +549,6 @@ ffmpeg 就有支援，幸運的是 PyAV 也有提供相關範例：</p>
 </ol>
 </section>
 
-            <div class="alert info no-icon">
-                有 DevOps 技術問題？歡迎到 <a href="https://developers.tw/@山姆鍋" target="_blank" rel="noopener">#呆丸開發者</a> 跟山姆鍋討論
-            </div>
             
 
 

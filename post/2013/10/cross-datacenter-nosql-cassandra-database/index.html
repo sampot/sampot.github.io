@@ -68,6 +68,9 @@
 </head>
 
     <body>
+        <div id="fb-root"></div>
+        <script async defer crossorigin="anonymous"
+            src="https://connect.facebook.net/zh_TW/sdk.js#xfbml=1&version=v7.0&appId=1538037013031361&autoLogAppEvents=1"></script>
         <div id="blog">
             <!-- Define author's picture -->
 
@@ -369,7 +372,7 @@
     <div class="post-content markdown">
         <div class="main-content-wrap">
             <div class="alert info no-icon">
-                <a href="https://www.facebook.com/sampotkuo" target="_blank" rel="noopener">「我是山姆鍋」有臉書專頁</a>
+                我是山姆鍋 <div class="fb-like" data-href="https://www.facebook.com/sampotkuo" data-width="" data-layout="standard" data-action="like" data-size="large" data-share="false"></div>
             </div>
 
             <p>「影化身平台」的設計目標之一是高可用性 (high availability)，而為了達到這個目的，基本上就表示系統的所有元件都要有冗余 (redundancy) 容錯 (fault-tolerancy) 的特性，以避免成為單一失敗點 (SPOF)。「高可用性」是個很大的課題，本文山姆鍋只先針對資料本身的可用性來說明「影化身平台」採取的解決方案以及使用的理由。</p>
@@ -400,9 +403,6 @@
 <p>資料的可用性是整體系統可用性的一環，也往往是最難處理的部分。這也是為何在高可用性的系統常常鼓吹要採「無狀態 (stateless)」的設計方式。「影化身平台」採用 Cassandra 作為主要的資料庫 (是的，在這個 Polyglot 年代，應該不會是唯一一種)，但您需要評估它是否符合您的需要，畢竟它也有所限制：像是不支援「交易 (transaction)」，不建議存放高頻率修改的資料等等。</p>
 <p>在過去，因為 Cassandra 資料「最終一致性」的特性會面臨這樣的問題：如何確保不會有使用者註冊相同名稱的帳戶？這在其他資料庫是很簡單的事情，但對 Cassandra 來說卻是一個照門。通常要嗎忽略這個問題，要嗎使用外部系統來避免，不管哪一個都不是很理想。幸好，Cassandra 2.0 之後加入 <a href="http://www.datastax.com/dev/blog/lightweight-transactions-in-cassandra-2-0" target="_blank" rel="noopener">「輕量交易 (lightweight transaction)」</a>的支持，可以解決這個問題了。</p>
 
-            <div class="alert info no-icon">
-                有 DevOps 技術問題？歡迎到 <a href="https://developers.tw/@山姆鍋" target="_blank" rel="noopener">#呆丸開發者</a> 跟山姆鍋討論
-            </div>
             
 
 

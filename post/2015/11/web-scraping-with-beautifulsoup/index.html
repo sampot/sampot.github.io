@@ -66,6 +66,9 @@
 </head>
 
     <body>
+        <div id="fb-root"></div>
+        <script async defer crossorigin="anonymous"
+            src="https://connect.facebook.net/zh_TW/sdk.js#xfbml=1&version=v7.0&appId=1538037013031361&autoLogAppEvents=1"></script>
         <div id="blog">
             <!-- Define author's picture -->
 
@@ -367,7 +370,7 @@
     <div class="post-content markdown">
         <div class="main-content-wrap">
             <div class="alert info no-icon">
-                <a href="https://www.facebook.com/sampotkuo" target="_blank" rel="noopener">「我是山姆鍋」有臉書專頁</a>
+                我是山姆鍋 <div class="fb-like" data-href="https://www.facebook.com/sampotkuo" data-width="" data-layout="standard" data-action="like" data-size="large" data-share="false"></div>
             </div>
 
             <p>原本只是為了作為 <a href="https://github.com/eavatar/eavatar-me" target="_blank" rel="noopener">《我。影化身》</a> 的範例， 嚐試使用 BeautifulSoup 來擷取「台灣期貨交易所」提供的報價網頁內容， 在過程中，覺得 Python 使用在網頁擷取 (web scraping) 真的是一大亮點！</p>
@@ -384,9 +387,6 @@
 <h2 id="結語">結語</h2>
 <p>有了一個能夠自動即時監控期貨報價的程式腳本，當有符合條件的情形發生時要怎麼辦？撇開自動交易這種專業訴求不談， 通知使用者應該是最基本的功能了。需要一個可以在背景幫您做客製化即時監控，可以通知重要事件的軟體？ 這剛好是山姆鍋開發 <a href="https://github.com/eavatar/eavatar-me" target="_blank" rel="noopener">《我。影化身》</a> 這個開源專案的主要動機。</p>
 
-            <div class="alert info no-icon">
-                有 DevOps 技術問題？歡迎到 <a href="https://developers.tw/@山姆鍋" target="_blank" rel="noopener">#呆丸開發者</a> 跟山姆鍋討論
-            </div>
             
 
 

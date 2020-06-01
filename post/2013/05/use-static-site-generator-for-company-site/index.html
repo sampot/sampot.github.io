@@ -70,6 +70,9 @@
 </head>
 
     <body>
+        <div id="fb-root"></div>
+        <script async defer crossorigin="anonymous"
+            src="https://connect.facebook.net/zh_TW/sdk.js#xfbml=1&version=v7.0&appId=1538037013031361&autoLogAppEvents=1"></script>
         <div id="blog">
             <!-- Define author's picture -->
 
@@ -371,7 +374,7 @@
     <div class="post-content markdown">
         <div class="main-content-wrap">
             <div class="alert info no-icon">
-                <a href="https://www.facebook.com/sampotkuo" target="_blank" rel="noopener">「我是山姆鍋」有臉書專頁</a>
+                我是山姆鍋 <div class="fb-like" data-href="https://www.facebook.com/sampotkuo" data-width="" data-layout="standard" data-action="like" data-size="large" data-share="false"></div>
             </div>
 
             <p>對於不需要動態功能的網站而言，使用像是 Drupal、WordPress 之類的架站軟體，感覺有點大材小用。對於可以接受不使用「所見即所得」編輯器的人，靜態網站產生器應該是個可以接受的方案。 雖說是靜態網站，缺少很多功能，但像是公司或者行銷網站往往也不需要這些。況且， 靜態網站有諸多動態網站所沒有的功能，如：</p>
@@ -387,9 +390,6 @@ GitHub 跟 Amazon S3 都是不錯的選擇。</li>
 </ol>
 <p>除此外，對於面向全球的公司或服務，免不了需要使用內容派送網路 (CDN) 來加速網頁的存取。 使用 Amazon S3 + CloudFront 絕對是讓你不用擔心網站存取速度太慢的有效選擇。 本站採用 Octopress 在本地編輯與產生網站內容，然後部署到 Amazon S3， 然後使用 CloudFront 來確保網站內容在全球範圍可以快速存取。</p>
 
-            <div class="alert info no-icon">
-                有 DevOps 技術問題？歡迎到 <a href="https://developers.tw/@山姆鍋" target="_blank" rel="noopener">#呆丸開發者</a> 跟山姆鍋討論
-            </div>
             
 
 

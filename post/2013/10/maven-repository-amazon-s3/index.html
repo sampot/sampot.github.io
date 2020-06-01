@@ -71,6 +71,9 @@
 </head>
 
     <body>
+        <div id="fb-root"></div>
+        <script async defer crossorigin="anonymous"
+            src="https://connect.facebook.net/zh_TW/sdk.js#xfbml=1&version=v7.0&appId=1538037013031361&autoLogAppEvents=1"></script>
         <div id="blog">
             <!-- Define author's picture -->
 
@@ -372,7 +375,7 @@
     <div class="post-content markdown">
         <div class="main-content-wrap">
             <div class="alert info no-icon">
-                <a href="https://www.facebook.com/sampotkuo" target="_blank" rel="noopener">「我是山姆鍋」有臉書專頁</a>
+                我是山姆鍋 <div class="fb-like" data-href="https://www.facebook.com/sampotkuo" data-width="" data-layout="standard" data-action="like" data-size="large" data-share="false"></div>
             </div>
 
             <p>使用 Maven 或 Gradle 等軟體建構工具 (build tool) 常常會需要使用 Maven 套件倉儲 (artifacts repository) 來作為套件存放的地方。過去山姆鍋習慣使用 <a href="http://www.sonatype.org/nexus/" target="_blank" rel="noopener">Nexus Repository Manager</a> 來作為這樣的套件倉儲服務器， <a href="http://www.jfrog.com/home/v_artifactory_opensource_overview" target="_blank" rel="noopener">Artifactory</a> 雖然沒用過，看起來也很不錯。本來不加思索打算按照習慣用 Nexus 安裝個套件倉儲，或者使用 Artifactory 看看也很新鮮，但突發奇想：可不可以使用 Amazon S3 來作為 Maven repository？有什麼問題跟限制？</p>
@@ -402,9 +405,6 @@ Kudos to Mr. Berwanger.</p>
 <h3 id="小結">小結</h3>
 <p>利用 Amazon S3 作為 Maven 套件倉儲便可以運用 S3 所俱備的高可用、高擴充的儲存能力，再加上 CloudFront CDN 服務，不管在哪個地方都可以方便開發與部署。如果讓建構服務器 (build server) 跟 S3 位於同一個 Availability zone 還可以免除頻寬的費用。</p>
 
-            <div class="alert info no-icon">
-                有 DevOps 技術問題？歡迎到 <a href="https://developers.tw/@山姆鍋" target="_blank" rel="noopener">#呆丸開發者</a> 跟山姆鍋討論
-            </div>
             
 
 

@@ -73,6 +73,9 @@
 </head>
 
     <body>
+        <div id="fb-root"></div>
+        <script async defer crossorigin="anonymous"
+            src="https://connect.facebook.net/zh_TW/sdk.js#xfbml=1&version=v7.0&appId=1538037013031361&autoLogAppEvents=1"></script>
         <div id="blog">
             <!-- Define author's picture -->
 
@@ -368,7 +371,7 @@
     <div class="post-content markdown">
         <div class="main-content-wrap">
             <div class="alert info no-icon">
-                <a href="https://www.facebook.com/sampotkuo" target="_blank" rel="noopener">「我是山姆鍋」有臉書專頁</a>
+                我是山姆鍋 <div class="fb-like" data-href="https://www.facebook.com/sampotkuo" data-width="" data-layout="standard" data-action="like" data-size="large" data-share="false"></div>
             </div>
 
             <p>雖然 Minikube、K3D 或者 Docker for Desktop 都提供 Kubernetes 測試環境可以方便開發雲原生應用軟體。但從運維角度來說，這些工具並不適合用來測試與驗證需要多節點的方案，例如：高可用的 etcd；K8S 的儲存方案如 <a href="https://openebs.io/" target="_blank" rel="noopener">OpenEBS</a>, <a href="https://rook.io/" target="_blank" rel="noopener">ROOK</a> 等需要額外的儲存媒體 (e.g. 硬碟) 來實現；又或者有在主機系統額外安裝套件的需求。本文山姆鍋利用 Vagrant 跟 VirtualBox 虛擬技術作為快速拆建的實驗環境。</p>
@@ -483,9 +486,6 @@
 <li><a href="https://medium.com/kuberverse/how-to-build-a-full-kubernetes-cluster-in-your-home-lab-using-an-automated-easy-and-fancy-way-e5853ae4e08" target="_blank" rel="noopener">How to build a full kubernetes cluster in your home lab using an automated, easy and fancy way!</a></li>
 </ul>
 
-            <div class="alert info no-icon">
-                有 DevOps 技術問題？歡迎到 <a href="https://developers.tw/@山姆鍋" target="_blank" rel="noopener">#呆丸開發者</a> 跟山姆鍋討論
-            </div>
             
 
 

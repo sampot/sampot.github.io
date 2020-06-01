@@ -72,6 +72,9 @@
 </head>
 
     <body>
+        <div id="fb-root"></div>
+        <script async defer crossorigin="anonymous"
+            src="https://connect.facebook.net/zh_TW/sdk.js#xfbml=1&version=v7.0&appId=1538037013031361&autoLogAppEvents=1"></script>
         <div id="blog">
             <!-- Define author's picture -->
 
@@ -373,7 +376,7 @@
     <div class="post-content markdown">
         <div class="main-content-wrap">
             <div class="alert info no-icon">
-                <a href="https://www.facebook.com/sampotkuo" target="_blank" rel="noopener">「我是山姆鍋」有臉書專頁</a>
+                我是山姆鍋 <div class="fb-like" data-href="https://www.facebook.com/sampotkuo" data-width="" data-layout="standard" data-action="like" data-size="large" data-share="false"></div>
             </div>
 
             <!-- excerpt -->
@@ -430,9 +433,6 @@
 </ol>
 <h3 id="小結">小結</h3>
 <p>利用 Vagrant 來整備 (provision) 需要的服務器，再運用 Puppet (或您偏好的配置管理系統) 來自動安裝跟部署需要的軟體套件，這樣的組合真的是很有力的工具。透過這個工具，山姆鍋提供一個方案來建置一個適合生產環境使用的持續整合系統。雖然，使用這樣的方式不代表說您就可以不需要了解背後的運作原理，但至少在急需的時候，有機會可以如法炮製。</p>
-            <div class="alert info no-icon">
-                有 DevOps 技術問題？歡迎到 <a href="https://developers.tw/@山姆鍋" target="_blank" rel="noopener">#呆丸開發者</a> 跟山姆鍋討論
-            </div>
             
 
 

@@ -65,6 +65,9 @@
 </head>
 
     <body>
+        <div id="fb-root"></div>
+        <script async defer crossorigin="anonymous"
+            src="https://connect.facebook.net/zh_TW/sdk.js#xfbml=1&version=v7.0&appId=1538037013031361&autoLogAppEvents=1"></script>
         <div id="blog">
             <!-- Define author's picture -->
 
@@ -360,7 +363,7 @@
     <div class="post-content markdown">
         <div class="main-content-wrap">
             <div class="alert info no-icon">
-                <a href="https://www.facebook.com/sampotkuo" target="_blank" rel="noopener">「我是山姆鍋」有臉書專頁</a>
+                我是山姆鍋 <div class="fb-like" data-href="https://www.facebook.com/sampotkuo" data-width="" data-layout="standard" data-action="like" data-size="large" data-share="false"></div>
             </div>
 
             <p>在使用 Hexo 撰寫部落格文章或者開發 Web 應用時常常會需要開啟瀏覽器來檢視結果。Hexo 或者 Web 應用開發工具除了支援啟動後端服務外也支援自動啟動系統預設的瀏覽器，但由於在 WSL 環境預設並沒有圖形桌面環境，自然無法開啟瀏覽器。本文山姆鍋將說明如何讓 WSL 中的程式可以自動開啟 Windows 系統預設的瀏覽器。</p>
@@ -380,9 +383,6 @@
 <h2 id="小結">小結</h2>
 <p>山姆鍋原先並沒有預期這樣的作法可以在 WSL 環境中正常運作，純粹只是抱著實驗看看的想法。至於可以運作的原因，由於 WSL 本身就支援從 Ｌinux 環境直接啟動 Windows 原生程式，個人猜測 Ubuntu WSL 發行版本可能對於 ‘xdg-open’ 剛好有特別支援。不管如何，WSL 作為開發環境的可行性又更高了一點。</p>
 
-            <div class="alert info no-icon">
-                有 DevOps 技術問題？歡迎到 <a href="https://developers.tw/@山姆鍋" target="_blank" rel="noopener">#呆丸開發者</a> 跟山姆鍋討論
-            </div>
             
 
 

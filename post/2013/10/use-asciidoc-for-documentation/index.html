@@ -70,6 +70,9 @@
 </head>
 
     <body>
+        <div id="fb-root"></div>
+        <script async defer crossorigin="anonymous"
+            src="https://connect.facebook.net/zh_TW/sdk.js#xfbml=1&version=v7.0&appId=1538037013031361&autoLogAppEvents=1"></script>
         <div id="blog">
             <!-- Define author's picture -->
 
@@ -371,7 +374,7 @@
     <div class="post-content markdown">
         <div class="main-content-wrap">
             <div class="alert info no-icon">
-                <a href="https://www.facebook.com/sampotkuo" target="_blank" rel="noopener">「我是山姆鍋」有臉書專頁</a>
+                我是山姆鍋 <div class="fb-like" data-href="https://www.facebook.com/sampotkuo" data-width="" data-layout="standard" data-action="like" data-size="large" data-share="false"></div>
             </div>
 
             <p>作為軟體開發人員，山姆鍋跟大多數人一樣不太喜歡寫文件，但文件 (尤其是 API 等技術文件) 其實就跟原始碼一樣需要即時的更新與維護。「影化身科技」的網站已經採用 Markdown 這種輕量級文件格式且所有內容都跟程式碼一樣進行版本控制，對於技術文件，自然希望採取相同的流程。本文說明山姆鍋選擇 AsciiDoc 作為文件格式的主要原因。</p>
@@ -410,9 +413,6 @@
 <h3 id="小結">小結</h3>
 <p>從精實生產 (lean production) 的觀點，要盡可能將生產過程中的一切步驟自動化，作為開發流程的一環，文件的產出自然也不能例外。使用 AsciiDoc 這種文字型的文件格式讓文件就跟原始程式碼一樣，可以經過後製來得到最終格式化後的產物，從而讓開發者 / 撰寫者可以專注在產出內容上。</p>
 
-            <div class="alert info no-icon">
-                有 DevOps 技術問題？歡迎到 <a href="https://developers.tw/@山姆鍋" target="_blank" rel="noopener">#呆丸開發者</a> 跟山姆鍋討論
-            </div>
             
 
 

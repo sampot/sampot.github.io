@@ -66,6 +66,9 @@
 </head>
 
     <body>
+        <div id="fb-root"></div>
+        <script async defer crossorigin="anonymous"
+            src="https://connect.facebook.net/zh_TW/sdk.js#xfbml=1&version=v7.0&appId=1538037013031361&autoLogAppEvents=1"></script>
         <div id="blog">
             <!-- Define author's picture -->
 
@@ -367,7 +370,7 @@
     <div class="post-content markdown">
         <div class="main-content-wrap">
             <div class="alert info no-icon">
-                <a href="https://www.facebook.com/sampotkuo" target="_blank" rel="noopener">「我是山姆鍋」有臉書專頁</a>
+                我是山姆鍋 <div class="fb-like" data-href="https://www.facebook.com/sampotkuo" data-width="" data-layout="standard" data-action="like" data-size="large" data-share="false"></div>
             </div>
 
             <p>稍微瞭解 Docker 容器技術的人，應該都知道它提供一種可攜帶的 (portable) 的方式讓應用可以在不同環境部署。 應用所需的程式庫、系統套件都完整封裝在容器內避免了傳統部署所遇到的相依性的問題。 但許多的應用包裝成容器後，動則幾百到上千 MB 的大小，在山姆鍋的觀念裡，這可算不上 "可攜帶"！</p>
@@ -432,9 +435,6 @@ Golang 程式平均來說還是慢點， 但應該可以預期這個差距會越
 </ol>
 </section>
 
-            <div class="alert info no-icon">
-                有 DevOps 技術問題？歡迎到 <a href="https://developers.tw/@山姆鍋" target="_blank" rel="noopener">#呆丸開發者</a> 跟山姆鍋討論
-            </div>
             
 
 

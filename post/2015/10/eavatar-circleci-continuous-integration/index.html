@@ -68,6 +68,9 @@
 </head>
 
     <body>
+        <div id="fb-root"></div>
+        <script async defer crossorigin="anonymous"
+            src="https://connect.facebook.net/zh_TW/sdk.js#xfbml=1&version=v7.0&appId=1538037013031361&autoLogAppEvents=1"></script>
         <div id="blog">
             <!-- Define author's picture -->
 
@@ -369,7 +372,7 @@
     <div class="post-content markdown">
         <div class="main-content-wrap">
             <div class="alert info no-icon">
-                <a href="https://www.facebook.com/sampotkuo" target="_blank" rel="noopener">「我是山姆鍋」有臉書專頁</a>
+                我是山姆鍋 <div class="fb-like" data-href="https://www.facebook.com/sampotkuo" data-width="" data-layout="standard" data-action="like" data-size="large" data-share="false"></div>
             </div>
 
             <p>CircleCI 是山姆鍋到目前為止認為最好用的雲端持續整合方案。《我。影化身》開發自然也需要利用持續整合來自動執行軟體測試與建置工作。本文便以《我。影化身》作為應用實例，說明如何簡單完成與 CircleCI 的設定。</p>
@@ -457,9 +460,6 @@ CircleCI 自動設定 GitHub 上的開源專案，CircleCI<br>
 因為《我。影化身》有圖形用戶介面，需要針對不同桌面環境做建置工作， 採用<br>
 CircleCI 主要是做持續整合測試與 Docker 映像的建置與發佈工作。</p>
 
-            <div class="alert info no-icon">
-                有 DevOps 技術問題？歡迎到 <a href="https://developers.tw/@山姆鍋" target="_blank" rel="noopener">#呆丸開發者</a> 跟山姆鍋討論
-            </div>
             
 
 

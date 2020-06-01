@@ -68,6 +68,9 @@
 </head>
 
     <body>
+        <div id="fb-root"></div>
+        <script async defer crossorigin="anonymous"
+            src="https://connect.facebook.net/zh_TW/sdk.js#xfbml=1&version=v7.0&appId=1538037013031361&autoLogAppEvents=1"></script>
         <div id="blog">
             <!-- Define author's picture -->
 
@@ -369,7 +372,7 @@
     <div class="post-content markdown">
         <div class="main-content-wrap">
             <div class="alert info no-icon">
-                <a href="https://www.facebook.com/sampotkuo" target="_blank" rel="noopener">「我是山姆鍋」有臉書專頁</a>
+                我是山姆鍋 <div class="fb-like" data-href="https://www.facebook.com/sampotkuo" data-width="" data-layout="standard" data-action="like" data-size="large" data-share="false"></div>
             </div>
 
             <p>由於專案需要在幾個桌面環境建構發行包 (distribution packages)，不久也想在 Raspberry Pi 上面進行，需要一個可以在不同平台環境上自動執行建置工作的軟體。 基於過去比較與使用的經驗， 山姆鍋選擇了 Buildbot 來進行這項工作。</p>
@@ -514,9 +517,6 @@ Buildbot master 放在公開的主機上， 或透過<br>
 <h2 id="結語">結語</h2>
 <p>誠然，有更好用的 CI 軟體或服務，但對於需要在各種不同用戶平台上進行編譯、測試與打包工作的專案， Buildbot 也很適合。例如：需要支援多種作業系統的 Chromium 瀏覽器便利用 Buildbot 的這個特性在不同平台建置。另外， Buildbot 的架構設計讓專案參與者可以方便貢獻自己的電腦或裝置 來作為 Slaves。 要說 Buildbot 的主要缺點的話，那應該就是：設定檔對一般使用者不是那麼友善，需要了解不少概念。</p>
 
-            <div class="alert info no-icon">
-                有 DevOps 技術問題？歡迎到 <a href="https://developers.tw/@山姆鍋" target="_blank" rel="noopener">#呆丸開發者</a> 跟山姆鍋討論
-            </div>
             
 
 

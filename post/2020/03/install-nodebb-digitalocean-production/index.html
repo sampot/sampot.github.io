@@ -72,6 +72,9 @@
 </head>
 
     <body>
+        <div id="fb-root"></div>
+        <script async defer crossorigin="anonymous"
+            src="https://connect.facebook.net/zh_TW/sdk.js#xfbml=1&version=v7.0&appId=1538037013031361&autoLogAppEvents=1"></script>
         <div id="blog">
             <!-- Define author's picture -->
 
@@ -367,7 +370,7 @@
     <div class="post-content markdown">
         <div class="main-content-wrap">
             <div class="alert info no-icon">
-                <a href="https://www.facebook.com/sampotkuo" target="_blank" rel="noopener">「我是山姆鍋」有臉書專頁</a>
+                我是山姆鍋 <div class="fb-like" data-href="https://www.facebook.com/sampotkuo" data-width="" data-layout="standard" data-action="like" data-size="large" data-share="false"></div>
             </div>
 
             <p>本文山姆鍋分享如何安裝與設定一個 NodeBB 論壇的正式生產環境 (production environment)。由於整個環境不只包含 NodeBB 本身，會從主機系統的開始設定開始到 Nginx web 服務。安裝過程參考了多篇文章，對於特定元件的安裝細節會直接連結到對應的教學文章，本文盡量只做重點說明。</p>
@@ -578,9 +581,6 @@
 <h2 id="小結">小結</h2>
 <p>經過冗長的來來回回步驟後，終於有個可以上線的部署環境。但有了基本部署環境，NodeBB 還要根據需要進行設定與客製化，這個才是重中之重。NodeBB 的設定可以參考 <a href="https://docs.nodebb.org/" target="_blank" rel="noopener">官方的文件</a>，而 NodeBB 的進階功能，不少需要額外申請雲端服務 (如 Facebook SSO) 或者安裝軟體 (如 Solr 等)，讀者可視目的來決定是否有需要。</p>
 
-            <div class="alert info no-icon">
-                有 DevOps 技術問題？歡迎到 <a href="https://developers.tw/@山姆鍋" target="_blank" rel="noopener">#呆丸開發者</a> 跟山姆鍋討論
-            </div>
             
 
 

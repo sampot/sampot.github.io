@@ -66,6 +66,9 @@
 </head>
 
     <body>
+        <div id="fb-root"></div>
+        <script async defer crossorigin="anonymous"
+            src="https://connect.facebook.net/zh_TW/sdk.js#xfbml=1&version=v7.0&appId=1538037013031361&autoLogAppEvents=1"></script>
         <div id="blog">
             <!-- Define author's picture -->
 
@@ -367,7 +370,7 @@
     <div class="post-content markdown">
         <div class="main-content-wrap">
             <div class="alert info no-icon">
-                <a href="https://www.facebook.com/sampotkuo" target="_blank" rel="noopener">「我是山姆鍋」有臉書專頁</a>
+                我是山姆鍋 <div class="fb-like" data-href="https://www.facebook.com/sampotkuo" data-width="" data-layout="standard" data-action="like" data-size="large" data-share="false"></div>
             </div>
 
             <p>本文簡單說明如何設定兩台 MySQL server，讓它們彼此互相備份資料 (Master-master 模式)。雖然這樣的設定通常是支援高可用性 (high availability) 平台的一部分，但本文不包含如何完成其他 HA 的工作。設定兩台 MySQL 伺服器互相備份，主要目的就是要確認資料的安全性；同時也提高可用性。</p>
@@ -408,9 +411,6 @@
 <h2 id="結語">結語</h2>
 <p>在線的生產環境 (production environment)，如果使用 MySQL 作為資料庫的服務軟體的話，常常會設定雙主 (master-master) 備援。同時會設置不定數量的 slave 伺服器作為像是遠端備份或者分析資料庫的目的。</p>
 
-            <div class="alert info no-icon">
-                有 DevOps 技術問題？歡迎到 <a href="https://developers.tw/@山姆鍋" target="_blank" rel="noopener">#呆丸開發者</a> 跟山姆鍋討論
-            </div>
             
 
 

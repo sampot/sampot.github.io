@@ -70,6 +70,9 @@
 </head>
 
     <body>
+        <div id="fb-root"></div>
+        <script async defer crossorigin="anonymous"
+            src="https://connect.facebook.net/zh_TW/sdk.js#xfbml=1&version=v7.0&appId=1538037013031361&autoLogAppEvents=1"></script>
         <div id="blog">
             <!-- Define author's picture -->
 
@@ -371,7 +374,7 @@
     <div class="post-content markdown">
         <div class="main-content-wrap">
             <div class="alert info no-icon">
-                <a href="https://www.facebook.com/sampotkuo" target="_blank" rel="noopener">「我是山姆鍋」有臉書專頁</a>
+                我是山姆鍋 <div class="fb-like" data-href="https://www.facebook.com/sampotkuo" data-width="" data-layout="standard" data-action="like" data-size="large" data-share="false"></div>
             </div>
 
             <p>有了<a href="/post/2013/06/purchase-rapidssl-certificate-from-cheapssls/">服務器憑證</a>後，自然就是使用它了。在影化身的應用中，我們使用 HTTPS 來確保客戶端的 JavaScript 程式不會再傳輸過程中被修改，本文會說明如何設定 Heroku 來支援 HTTPS 傳輸協定。</p>
@@ -394,9 +397,6 @@
 只要設定好一個 CNAME 來把 ‘<a href="http://www.example.com" target="_blank" rel="noopener">www.example.com</a>’ 對應到 ‘<a href="http://tokyo-2121.herokussl.com" target="_blank" rel="noopener">tokyo-2121.herokussl.com</a>’，等一段時間後應該就可以使用。本文假設憑證所指定的域名是: ‘<a href="http://www.example.com" target="_blank" rel="noopener">www.example.com</a>’; 而 Heroku 配置給你的 SSL 域名是’<a href="http://tokyo-2121.herokussl.com" target="_blank" rel="noopener">tokyo-2121.herokussl.com</a>’。這兩個都要根據你自己的實際值來修改。</p>
 <p>看到瀏覽器位址列出現一把關閉的鎖就表示它能夠正確驗證服務器憑證。</p>
 
-            <div class="alert info no-icon">
-                有 DevOps 技術問題？歡迎到 <a href="https://developers.tw/@山姆鍋" target="_blank" rel="noopener">#呆丸開發者</a> 跟山姆鍋討論
-            </div>
             
 
 

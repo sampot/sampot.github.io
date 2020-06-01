@@ -65,6 +65,9 @@
 </head>
 
     <body>
+        <div id="fb-root"></div>
+        <script async defer crossorigin="anonymous"
+            src="https://connect.facebook.net/zh_TW/sdk.js#xfbml=1&version=v7.0&appId=1538037013031361&autoLogAppEvents=1"></script>
         <div id="blog">
             <!-- Define author's picture -->
 
@@ -366,7 +369,7 @@
     <div class="post-content markdown">
         <div class="main-content-wrap">
             <div class="alert info no-icon">
-                <a href="https://www.facebook.com/sampotkuo" target="_blank" rel="noopener">「我是山姆鍋」有臉書專頁</a>
+                我是山姆鍋 <div class="fb-like" data-href="https://www.facebook.com/sampotkuo" data-width="" data-layout="standard" data-action="like" data-size="large" data-share="false"></div>
             </div>
 
             <p>對於流量高的 Wordpress 網站來說，資料庫往往是第一個出現的瓶頸。針對資料庫擴充性的問題，本文介紹 HyperDB 這個解決方案。</p>
@@ -398,9 +401,6 @@ db-config.php 的檔案，底下為其內容：</p>
 <p>修改 wp-config.php 檔案，在最後加上下列敘述:</p>
 <figure class="highlight plain"><figcaption><span>.php}</span></figcaption><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">require_once(ABSPATH . 'db-config.php');</span><br></pre></td></tr></tbody></table></figure>
 
-            <div class="alert info no-icon">
-                有 DevOps 技術問題？歡迎到 <a href="https://developers.tw/@山姆鍋" target="_blank" rel="noopener">#呆丸開發者</a> 跟山姆鍋討論
-            </div>
             
 
 

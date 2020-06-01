@@ -67,6 +67,9 @@
 </head>
 
     <body>
+        <div id="fb-root"></div>
+        <script async defer crossorigin="anonymous"
+            src="https://connect.facebook.net/zh_TW/sdk.js#xfbml=1&version=v7.0&appId=1538037013031361&autoLogAppEvents=1"></script>
         <div id="blog">
             <!-- Define author's picture -->
 
@@ -368,7 +371,7 @@
     <div class="post-content markdown">
         <div class="main-content-wrap">
             <div class="alert info no-icon">
-                <a href="https://www.facebook.com/sampotkuo" target="_blank" rel="noopener">「我是山姆鍋」有臉書專頁</a>
+                我是山姆鍋 <div class="fb-like" data-href="https://www.facebook.com/sampotkuo" data-width="" data-layout="standard" data-action="like" data-size="large" data-share="false"></div>
             </div>
 
             <p>在<a href="/post/2013/10/real-time-web-with-vert-dot-x/">使用 Vert.x 作為即時網頁應用平台</a>這篇文章，山姆鍋提到「影化身平台」利用 Vert.x 作為即時 Web 應用的服務框架，看中的是它對網路服務的執行效率。除了方便網路服務開發外，Vert.x 的模組 (module) 支援，對於寫大型網路服務來說是個很重要。</p>
@@ -391,9 +394,6 @@
 <h3 id="小結">小結</h3>
 <p>雖然 Vert.x 不像 Tomcat/Jetty 是符合標準規範的應用服務軟體，但作為即時 Web 應用服務容器，它也支援了最基本的應用部署功能。雖然它模組的設計有點陽春，但對於模組分離 (isolation) 要求不高的應用情境，簡單反而是一個優勢。</p>
 
-            <div class="alert info no-icon">
-                有 DevOps 技術問題？歡迎到 <a href="https://developers.tw/@山姆鍋" target="_blank" rel="noopener">#呆丸開發者</a> 跟山姆鍋討論
-            </div>
             
 
 

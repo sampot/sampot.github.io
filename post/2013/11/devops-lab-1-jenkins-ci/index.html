@@ -70,6 +70,9 @@
 </head>
 
     <body>
+        <div id="fb-root"></div>
+        <script async defer crossorigin="anonymous"
+            src="https://connect.facebook.net/zh_TW/sdk.js#xfbml=1&version=v7.0&appId=1538037013031361&autoLogAppEvents=1"></script>
         <div id="blog">
             <!-- Define author's picture -->
 
@@ -372,7 +375,7 @@
     <div class="post-content markdown">
         <div class="main-content-wrap">
             <div class="alert info no-icon">
-                <a href="https://www.facebook.com/sampotkuo" target="_blank" rel="noopener">「我是山姆鍋」有臉書專頁</a>
+                我是山姆鍋 <div class="fb-like" data-href="https://www.facebook.com/sampotkuo" data-width="" data-layout="standard" data-action="like" data-size="large" data-share="false"></div>
             </div>
 
             <p>山姆鍋最近需要安裝 Jenkins 這個持續整合軟體，但不打算採用過去手動的安裝模式，而是嘗試運用 Vagrant, Puppet 跟 Virtualbox 來做自動部署。持續整合軟體一般建議不要在 Master 上執行建構工作， 所以，本次的實驗就以安裝一台 Master 與一台 Slave 主機為目標。</p>
@@ -418,9 +421,6 @@
 <h2 id="結語">結語</h2>
 <p>希望這個配方 (recipe) 對您有些幫助，但就像醫師的配方一樣，不同人的配方或多或少不同， 可不能隨便服用。同樣地，本文提供的配方，主要目的是了解如何以 Vagrant, Puppet 來進行自動部署， 使用 Jenkins 只是希望有個比較實際的例子。</p>
 
-            <div class="alert info no-icon">
-                有 DevOps 技術問題？歡迎到 <a href="https://developers.tw/@山姆鍋" target="_blank" rel="noopener">#呆丸開發者</a> 跟山姆鍋討論
-            </div>
             
 
 

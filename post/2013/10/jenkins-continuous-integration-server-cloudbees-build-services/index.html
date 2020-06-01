@@ -69,6 +69,9 @@
 </head>
 
     <body>
+        <div id="fb-root"></div>
+        <script async defer crossorigin="anonymous"
+            src="https://connect.facebook.net/zh_TW/sdk.js#xfbml=1&version=v7.0&appId=1538037013031361&autoLogAppEvents=1"></script>
         <div id="blog">
             <!-- Define author's picture -->
 
@@ -370,7 +373,7 @@
     <div class="post-content markdown">
         <div class="main-content-wrap">
             <div class="alert info no-icon">
-                <a href="https://www.facebook.com/sampotkuo" target="_blank" rel="noopener">「我是山姆鍋」有臉書專頁</a>
+                我是山姆鍋 <div class="fb-like" data-href="https://www.facebook.com/sampotkuo" data-width="" data-layout="standard" data-action="like" data-size="large" data-share="false"></div>
             </div>
 
             <p>作為一家認同「精實生產」理念的雲端軟體服務公司，「影化身科技」同樣擁抱「持續整合」的敏捷開發模式，為了達到持續整合的要求自然需要有持續整合系統的支持。本文山姆鍋收集一些提供雲端持續整合的服務，並提供「影化身科技」採用的方案作為參考。本文屬於 <a href="/post/2013/06/infrastructure-software-shop-with-cloud-services/">「善用雲端服務，微型企業的自強之道」</a>系列文章之一。</p>
@@ -393,9 +396,6 @@
 <h3 id="小結">小結</h3>
 <p>是否使用雲端持續整合服務的一個重要因素在於您專案建構所需要的相依環境跟套件。如果專案比較單純，像是建構時需要的相依套件都可以從 Maven 套件倉儲下載，則使用雲端持續整合服務將比較容易達成。但像「影化身科技」對於建構環境有諸多要求，那就需要考慮自行安裝管理是否比較實際。</p>
 
-            <div class="alert info no-icon">
-                有 DevOps 技術問題？歡迎到 <a href="https://developers.tw/@山姆鍋" target="_blank" rel="noopener">#呆丸開發者</a> 跟山姆鍋討論
-            </div>
             
 
 
