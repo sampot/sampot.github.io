@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://samkuo.me/"/>
-  <updated>2020-05-31T01:53:33.284Z</updated>
+  <updated>2020-06-05T09:49:25.311Z</updated>
   <id>https://samkuo.me/</id>
   
   <author>
@@ -15,6 +15,33 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>我的 K8S DevOps 實驗環境 - 控制平面端點</title>
+    <link href="https://samkuo.me/post/2020/06/my-k8s-devops-lab-control-plane-endpoint/"/>
+    <id>https://samkuo.me/post/2020/06/my-k8s-devops-lab-control-plane-endpoint/</id>
+    <published>2020-06-05T09:49:25.000Z</published>
+    <updated>2020-06-05T09:49:25.311Z</updated>
+    
+    <summary type="html">
+    
+      &lt;p&gt;本文延續「&lt;a href=&quot;/post/2020/05/my-k8s-devops-lab-env/&quot; title=&quot;我的 K8S DevOps 實驗環境 - 基礎篇&quot;&gt;我的 K8S DevOps 實驗環境 - 基礎篇&lt;/a&gt;」，針對其中的控制平面端點 (control-plane endpoint) 加以說明。作為高可用 K8S 叢集的必要元件，控制平面端點需要負責提供 API 服務的負載均衡 (load balancing) 以及錯誤轉移 (failover) 機制，山姆鍋藉由 HAProxy 以及 Keepalived 來實現控制平面端點。&lt;/p&gt;
+    
+    </summary>
+    
+    
+    
+      <category term="DevOps" scheme="https://samkuo.me/tag/devops/"/>
+    
+      <category term="Kubernetes" scheme="https://samkuo.me/tag/kubernetes/"/>
+    
+      <category term="SPK Cluster" scheme="https://samkuo.me/tag/spk-cluster/"/>
+    
+      <category term="High Availability" scheme="https://samkuo.me/tag/high-availability/"/>
+    
+      <category term="Linux HA" scheme="https://samkuo.me/tag/linux-ha/"/>
+    
+  </entry>
   
   <entry>
     <title>我的 K8S DevOps 實驗環境 - 基礎篇</title>
@@ -489,35 +516,6 @@
       <category term="軟體工程師" scheme="https://samkuo.me/tag/%E8%BB%9F%E9%AB%94%E5%B7%A5%E7%A8%8B%E5%B8%AB/"/>
     
       <category term="實習生" scheme="https://samkuo.me/tag/%E5%AF%A6%E7%BF%92%E7%94%9F/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>在 MacBook 上使用 Python 作實況視訊串流</title>
-    <link href="https://samkuo.me/post/2015/12/http-live-streaming-on-osx-camera-with-python/"/>
-    <id>https://samkuo.me/post/2015/12/http-live-streaming-on-osx-camera-with-python/</id>
-    <published>2015-12-03T02:04:00.000Z</published>
-    <updated>2020-03-02T10:17:11.787Z</updated>
-    
-    <summary type="html">
-    
-      &lt;p&gt;本文是山姆鍋在學習實況視訊串流 (live video streaming) 過程，用來驗證概念 (proof of concept) 的紀錄。透過 MacBook 內建的鏡頭作為視訊源，並藉由 HTTP Live Streaming (HLS) 協定作實況串流。 雖說是實況，但因為採用 HLS 協定，先天上就會有延遲的。實驗的結果不算太成功，本來只能使用桌面環境的 Safari 瀏覽器來觀看視訊，經過高手指正後，現在手機版的也可以了。&lt;/p&gt;
-    
-    </summary>
-    
-    <content src="https://samkuo.me/shared/camera-813747_640.jpg" type="image" />
-    
-    
-      <category term="Software Development" scheme="https://samkuo.me/category/software-development/"/>
-    
-    
-      <category term="Live video" scheme="https://samkuo.me/tag/live-video/"/>
-    
-      <category term="Streaming" scheme="https://samkuo.me/tag/streaming/"/>
-    
-      <category term="HLS" scheme="https://samkuo.me/tag/hls/"/>
-    
-      <category term="HTTP" scheme="https://samkuo.me/tag/http/"/>
     
   </entry>
   
