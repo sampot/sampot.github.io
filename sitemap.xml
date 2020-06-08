@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://samkuo.me/post/2020/06/my-k8s-devops-lab-node-installation/</loc>
+    
+    <lastmod>2020-06-08T03:20:50.407Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://samkuo.me/post/2020/06/my-k8s-devops-lab-control-plane-endpoint/</loc>
     
     <lastmod>2020-06-07T01:35:01.042Z</lastmod>
