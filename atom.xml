@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://samkuo.me/"/>
-  <updated>2020-06-08T03:20:50.407Z</updated>
+  <updated>2020-06-10T05:42:44.176Z</updated>
   <id>https://samkuo.me/</id>
   
   <author>
@@ -15,6 +15,31 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>建構精簡版的 Deno 容器</title>
+    <link href="https://samkuo.me/post/2020/06/create-slimmed-deno-container/"/>
+    <id>https://samkuo.me/post/2020/06/create-slimmed-deno-container/</id>
+    <published>2020-06-10T05:34:09.000Z</published>
+    <updated>2020-06-10T05:42:44.176Z</updated>
+    
+    <summary type="html">
+    
+      &lt;p&gt;很多年前「&lt;a href=&quot;/post/2015/09/tiny-docker-image-with-ubuntu-bash/&quot; title=&quot;建構一個與 Ubuntu 相容的小型 Docker 映像&quot;&gt;建構一個與 Ubuntu 相容的小型 Docker 映像&lt;/a&gt;」這篇文章中，山姆鍋提出為什麼偏好小型的容器映像檔，如今這個偏好依然存在。最近一時興起使用 Docker multi-stage 重新弄了一個 &lt;code&gt;Basebox&lt;/code&gt; 容器，並以 Deno 作為示範。&lt;/p&gt;
+    
+    </summary>
+    
+    
+    
+      <category term="Kubernetes" scheme="https://samkuo.me/tag/kubernetes/"/>
+    
+      <category term="Ubuntu" scheme="https://samkuo.me/tag/ubuntu/"/>
+    
+      <category term="Docker" scheme="https://samkuo.me/tag/docker/"/>
+    
+      <category term="Deno" scheme="https://samkuo.me/tag/deno/"/>
+    
+  </entry>
   
   <entry>
     <title>我的 K8S DevOps 實驗環境 - 節點安裝</title>
@@ -493,31 +518,6 @@
       <category term="Docker Compose" scheme="https://samkuo.me/tag/docker-compose/"/>
     
       <category term="CI" scheme="https://samkuo.me/tag/ci/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Docker + Golang = Awesome</title>
-    <link href="https://samkuo.me/post/2016/04/docker-golang-awesome/"/>
-    <id>https://samkuo.me/post/2016/04/docker-golang-awesome/</id>
-    <published>2016-04-16T01:33:00.000Z</published>
-    <updated>2018-08-29T11:38:00.751Z</updated>
-    
-    <summary type="html">
-    
-      &lt;p&gt;稍微瞭解 Docker 容器技術的人，應該都知道它提供一種可攜帶的 (portable) 的方式讓應用可以在不同環境部署。 應用所需的程式庫、系統套件都完整封裝在容器內避免了傳統部署所遇到的相依性的問題。 但許多的應用包裝成容器後，動則幾百到上千 MB 的大小，在山姆鍋的觀念裡，這可算不上 &quot;可攜帶&quot;！&lt;/p&gt;
-    
-    </summary>
-    
-    
-      <category term="Service Operations" scheme="https://samkuo.me/category/service-operations/"/>
-    
-    
-      <category term="container" scheme="https://samkuo.me/tag/container/"/>
-    
-      <category term="Docker" scheme="https://samkuo.me/tag/docker/"/>
-    
-      <category term="golang" scheme="https://samkuo.me/tag/golang/"/>
     
   </entry>
   
