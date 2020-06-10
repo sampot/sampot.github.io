@@ -17,7 +17,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"使用 Hexo 寫部落格文章時，雖然 VS Code 有 Markdown 的預覽延伸套件，但因為預覽並不支援主題所使用的 image 標籤，在發布前還是需要在瀏覽器看實際呈現的結果。雖然知道 Hexo 有 hexo-browsersync 以及 hexo-livereload 插建可以利用，但按照說明一直無法設定成功。\n\n\n直到昨天再次嘗試找問題時，發現 hexo server 回傳的網頁內容不完整。所以，當初無法正常刷新頁面的原因似乎跟 Hexo 在文章長度太長時沒有正確傳回完整 HTML 內容，導致 Browser sync 插入的 JavaScript 腳本沒有被執行，自然就無法刷新頁面。因為在預覽文章內容時呈現的結果是正確的，就沒有想到 HTML 原始碼被截斷的可能。幸好，知道了可能原因就來動手解決吧！\n解法其實也很簡單：在 Hexo 的 _config.yml 檔案中，server 區段加入 compress: true 如下所示：\n12server:  compress: true\n雖然不知道是否根本解決，但到目前為止瀏覽器都能自動刷新了。\n參考資料\n\nhexo 中文文章渲染错误的 bug 解决\n\n","dateCreated":"2020-05-01T11:07:46+08:00","dateModified":"2020-05-02T10:45:32+08:00","datePublished":"2020-05-01T11:07:46+08:00","description":"使用 Hexo 寫部落格文章時，雖然 VS Code 有 Markdown 的預覽延伸套件，但因為預覽並不支援主題所使用的 image 標籤，在發布前還是需要在瀏覽器看實際呈現的結果。雖然知道 Hexo 有 hexo-browsersync 以及 hexo-livereload 插建可以利用，但按照說明一直無法設定成功。","headline":"使用 hexo-browsersync 自動刷新瀏覽器頁面","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2020/05/hexo-browsersync-fix/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2020/05/hexo-browsersync-fix/","keywords":"hexo, blog"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","/contact","/sitemap"],"image":"logo.png"},"articleBody":"使用 Hexo 寫部落格文章時，雖然 VS Code 有 Markdown 的預覽延伸套件，但因為預覽並不支援主題所使用的 image 標籤，在發布前還是需要在瀏覽器看實際呈現的結果。雖然知道 Hexo 有 hexo-browsersync 以及 hexo-livereload 插建可以利用，但按照說明一直無法設定成功。\n\n\n直到昨天再次嘗試找問題時，發現 hexo server 回傳的網頁內容不完整。所以，當初無法正常刷新頁面的原因似乎跟 Hexo 在文章長度太長時沒有正確傳回完整 HTML 內容，導致 Browser sync 插入的 JavaScript 腳本沒有被執行，自然就無法刷新頁面。因為在預覽文章內容時呈現的結果是正確的，就沒有想到 HTML 原始碼被截斷的可能。幸好，知道了可能原因就來動手解決吧！\n解法其實也很簡單：在 Hexo 的 _config.yml 檔案中，server 區段加入 compress: true 如下所示：\n12server:  compress: true\n雖然不知道是否根本解決，但到目前為止瀏覽器都能自動刷新了。\n參考資料\n\nhexo 中文文章渲染错误的 bug 解决\n\n","dateCreated":"2020-05-01T11:07:46+08:00","dateModified":"2020-05-02T10:45:32+08:00","datePublished":"2020-05-01T11:07:46+08:00","description":"使用 Hexo 寫部落格文章時，雖然 VS Code 有 Markdown 的預覽延伸套件，但因為預覽並不支援主題所使用的 image 標籤，在發布前還是需要在瀏覽器看實際呈現的結果。雖然知道 Hexo 有 hexo-browsersync 以及 hexo-livereload 插建可以利用，但按照說明一直無法設定成功。","headline":"使用 hexo-browsersync 自動刷新瀏覽器頁面","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2020/05/hexo-browsersync-fix/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","/contact","/sitemap"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2020/05/hexo-browsersync-fix/","keywords":"hexo, blog"}</script>
     <meta name="description" content="使用 Hexo 寫部落格文章時，雖然 VS Code 有 Markdown 的預覽延伸套件，但因為預覽並不支援主題所使用的 image 標籤，在發布前還是需要在瀏覽器看實際呈現的結果。雖然知道 Hexo 有 hexo-browsersync 以及 hexo-livereload 插建可以利用，但按照說明一直無法設定成功。">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="使用 hexo-browsersync 自動刷新瀏覽器頁面">
@@ -202,7 +202,7 @@
                     
                         <a
                             class="sidebar-button-link "
-                            href="/about/"
+                            href="/about"
                             
                             rel="noopener"
                             title="關於"
@@ -284,9 +284,7 @@
                     
                         <a
                             class="sidebar-button-link "
-                            href="https://developers.tw/@山姆鍋"
-                            
-                                target="_blank"
+                            href="/contact"
                             
                             rel="noopener"
                             title="聯絡"
@@ -300,7 +298,7 @@
                     
                         <a
                             class="sidebar-button-link "
-                            href="/sitemap/"
+                            href="/sitemap"
                             
                             rel="noopener"
                             title="網站導覽"

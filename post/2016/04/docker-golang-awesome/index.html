@@ -17,7 +17,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"稍微瞭解 Docker 容器技術的人，應該都知道它提供一種可攜帶的 (portable) 的方式讓應用可以在不同環境部署。 應用所需的程式庫、系統套件都完整封裝在容器內避免了傳統部署所遇到的相依性的問題。 但許多的應用包裝成容器後，動則幾百到上千 MB 的大小，在山姆鍋的觀念裡，這可算不上 \"可攜帶\"！\n\n為什麼要在意容器大小？\n山姆鍋在 「建構一個與 Ubuntu 相容的小型 Docker 映像」 這篇文章中，有提到一些想法，這裡再補充說明。雖然 Docker 的階層式 (layered) 映像檔可以讓我們只需要更新增加的檔案， 也就是說：使用相同基礎映像的容器可以共用大部分的資料，但我們也知道這個前提映像必須已經在本地的快取 (cache) 中，這個說法才成立。以下兩種情況，容器大小仍舊是有關係的：\n\n\n\n準備新的開發機\n對於使用容器作為應用部署技術的團隊，每個新進人員開發用的工作機都需要下載一次。\n\n\n\n\n部署新的雲端虛擬機\n在這個強調伺服器可以根據需要彈性部署的時代，隨時會有舊的虛擬機除役，新的虛擬機參與的情況。\n\n\n\n由於決定使用雲端作為應用部署基礎架構，第二點可以說關係到新伺服器上線到可以提供服務時間延遲的多寡， 先不管這個時間延遲是多久，改善這個延遲便是本文的重點。\nGolang 能幫上什麼？\nGolang 是目前山姆鍋開發後端服務的首選程式語言，但針對容器大小，跟 Golang 有什麼太大的關聯？ 雖說 Docker 理論上可以支援大部分 (假如不是全部) 的程式語言環境，但有些事情是要講天份的 (無誤。 Golang 的幾個特性，讓它能夠有效減少容器大小：\n\n\n\nGolang 程式能編譯成一個靜態執行檔\n在微服務 (microservcies) 架構下，複雜點的程式了不起 10 幾 MB，簡單的 5MB 以內搞定。\n但這不是最重要的，重要的是這個執行檔除了作業系統核心 (kernel) 外不相依於其它程式庫，\n所以可以使用 scratch 作為基礎映像 [1] 。\n\n\n\n\nGolang 自備完整網路服務的程式庫\n對於大部分的網路服務而言，Golang 提供足夠的程式庫支援可以完成。\n雖然不像其它語言如 Java, NodeJS, Python 一樣多，Golang\n也有許多第三方的程式庫可以選擇。\n\n\n\n\nGolang 的執行效能夠高\n因為 Golang\n執行檔本身執行效率就夠高，通常的情況下就不會再搭配其它像是 Nginx\n這樣的 web server。 但這裡特別說明，跟 C/C++, Java 比起來，目前\nGolang 程式平均來說還是慢點， 但應該可以預期這個差距會越來越小。\n\n\n\n為什麼 Golang 需要 Docker?\n雖然 Golang 的幾個特性已經讓它很容易部署，但還是有幾個地方是它不太方便的地方。其中， 就以程式所需的靜態資源檔 (static resources) 的存取比較麻煩。靜態資源檔泛指程式除了程式碼外，\n需要連同程式一起部署的設定檔、資料檔、HTML, 等等不一而足。雖然有方法可以將一些靜態檔案內嵌到執行檔中， 但在開發流程上總有些不方便，所以，除非必要，山姆鍋是不會想用這個方法的。幸好，目前 Golang 只使用在後端服務開發，部署上也要求一定要使用 Docker，把程式需要的資源檔一起放置在容器內的檔案系統， 只是小菜一碟。\n小結\n微服務架構隨著 Docker 容器化技術的成熟，相信會有越來越多的公司採用。而 Golang 先天上的優勢， 使得它非常適合撰寫高併發的網路服務，這兩者的結合可以說是一種絕配，但青菜蘿蔔各有所好， 語言的選擇從來就不是一件簡單的事情！\n\n\n\n\n對於不熟 Docker 的人，可以把 scratch 想成是一個沒有任何資料的容器映像。 ↩︎\n\n\n\n","dateCreated":"2016-04-16T09:33:00+08:00","dateModified":"2018-08-29T19:38:00+08:00","datePublished":"2016-04-16T09:33:00+08:00","description":"稍微瞭解 Docker 容器技術的人，應該都知道它提供一種可攜帶的 (portable) 的方式讓應用可以在不同環境部署。 應用所需的程式庫、系統套件都完整封裝在容器內避免了傳統部署所遇到的相依性的問題。 但許多的應用包裝成容器後，動則幾百到上千 MB 的大小，在山姆鍋的觀念裡，這可算不上 \"可攜帶\"！","headline":"Docker + Golang = Awesome","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2016/04/docker-golang-awesome/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2016/04/docker-golang-awesome/","keywords":"container, Docker, golang"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","/contact","/sitemap"],"image":"logo.png"},"articleBody":"稍微瞭解 Docker 容器技術的人，應該都知道它提供一種可攜帶的 (portable) 的方式讓應用可以在不同環境部署。 應用所需的程式庫、系統套件都完整封裝在容器內避免了傳統部署所遇到的相依性的問題。 但許多的應用包裝成容器後，動則幾百到上千 MB 的大小，在山姆鍋的觀念裡，這可算不上 \"可攜帶\"！\n\n為什麼要在意容器大小？\n山姆鍋在 「建構一個與 Ubuntu 相容的小型 Docker 映像」 這篇文章中，有提到一些想法，這裡再補充說明。雖然 Docker 的階層式 (layered) 映像檔可以讓我們只需要更新增加的檔案， 也就是說：使用相同基礎映像的容器可以共用大部分的資料，但我們也知道這個前提映像必須已經在本地的快取 (cache) 中，這個說法才成立。以下兩種情況，容器大小仍舊是有關係的：\n\n\n\n準備新的開發機\n對於使用容器作為應用部署技術的團隊，每個新進人員開發用的工作機都需要下載一次。\n\n\n\n\n部署新的雲端虛擬機\n在這個強調伺服器可以根據需要彈性部署的時代，隨時會有舊的虛擬機除役，新的虛擬機參與的情況。\n\n\n\n由於決定使用雲端作為應用部署基礎架構，第二點可以說關係到新伺服器上線到可以提供服務時間延遲的多寡， 先不管這個時間延遲是多久，改善這個延遲便是本文的重點。\nGolang 能幫上什麼？\nGolang 是目前山姆鍋開發後端服務的首選程式語言，但針對容器大小，跟 Golang 有什麼太大的關聯？ 雖說 Docker 理論上可以支援大部分 (假如不是全部) 的程式語言環境，但有些事情是要講天份的 (無誤。 Golang 的幾個特性，讓它能夠有效減少容器大小：\n\n\n\nGolang 程式能編譯成一個靜態執行檔\n在微服務 (microservcies) 架構下，複雜點的程式了不起 10 幾 MB，簡單的 5MB 以內搞定。\n但這不是最重要的，重要的是這個執行檔除了作業系統核心 (kernel) 外不相依於其它程式庫，\n所以可以使用 scratch 作為基礎映像 [1] 。\n\n\n\n\nGolang 自備完整網路服務的程式庫\n對於大部分的網路服務而言，Golang 提供足夠的程式庫支援可以完成。\n雖然不像其它語言如 Java, NodeJS, Python 一樣多，Golang\n也有許多第三方的程式庫可以選擇。\n\n\n\n\nGolang 的執行效能夠高\n因為 Golang\n執行檔本身執行效率就夠高，通常的情況下就不會再搭配其它像是 Nginx\n這樣的 web server。 但這裡特別說明，跟 C/C++, Java 比起來，目前\nGolang 程式平均來說還是慢點， 但應該可以預期這個差距會越來越小。\n\n\n\n為什麼 Golang 需要 Docker?\n雖然 Golang 的幾個特性已經讓它很容易部署，但還是有幾個地方是它不太方便的地方。其中， 就以程式所需的靜態資源檔 (static resources) 的存取比較麻煩。靜態資源檔泛指程式除了程式碼外，\n需要連同程式一起部署的設定檔、資料檔、HTML, 等等不一而足。雖然有方法可以將一些靜態檔案內嵌到執行檔中， 但在開發流程上總有些不方便，所以，除非必要，山姆鍋是不會想用這個方法的。幸好，目前 Golang 只使用在後端服務開發，部署上也要求一定要使用 Docker，把程式需要的資源檔一起放置在容器內的檔案系統， 只是小菜一碟。\n小結\n微服務架構隨著 Docker 容器化技術的成熟，相信會有越來越多的公司採用。而 Golang 先天上的優勢， 使得它非常適合撰寫高併發的網路服務，這兩者的結合可以說是一種絕配，但青菜蘿蔔各有所好， 語言的選擇從來就不是一件簡單的事情！\n\n\n\n\n對於不熟 Docker 的人，可以把 scratch 想成是一個沒有任何資料的容器映像。 ↩︎\n\n\n\n","dateCreated":"2016-04-16T09:33:00+08:00","dateModified":"2018-08-29T19:38:00+08:00","datePublished":"2016-04-16T09:33:00+08:00","description":"稍微瞭解 Docker 容器技術的人，應該都知道它提供一種可攜帶的 (portable) 的方式讓應用可以在不同環境部署。 應用所需的程式庫、系統套件都完整封裝在容器內避免了傳統部署所遇到的相依性的問題。 但許多的應用包裝成容器後，動則幾百到上千 MB 的大小，在山姆鍋的觀念裡，這可算不上 \"可攜帶\"！","headline":"Docker + Golang = Awesome","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2016/04/docker-golang-awesome/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","/contact","/sitemap"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2016/04/docker-golang-awesome/","keywords":"container, Docker, golang"}</script>
     <meta name="description" content="稍微瞭解 Docker 容器技術的人，應該都知道它提供一種可攜帶的 (portable) 的方式讓應用可以在不同環境部署。 應用所需的程式庫、系統套件都完整封裝在容器內避免了傳統部署所遇到的相依性的問題。 但許多的應用包裝成容器後，動則幾百到上千 MB 的大小，在山姆鍋的觀念裡，這可算不上 &quot;可攜帶&quot;！">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="Docker + Golang &#x3D; Awesome">
@@ -201,7 +201,7 @@
                     
                         <a
                             class="sidebar-button-link "
-                            href="/about/"
+                            href="/about"
                             
                             rel="noopener"
                             title="關於"
@@ -283,9 +283,7 @@
                     
                         <a
                             class="sidebar-button-link "
-                            href="https://developers.tw/@山姆鍋"
-                            
-                                target="_blank"
+                            href="/contact"
                             
                             rel="noopener"
                             title="聯絡"
@@ -299,7 +297,7 @@
                     
                         <a
                             class="sidebar-button-link "
-                            href="/sitemap/"
+                            href="/sitemap"
                             
                             rel="noopener"
                             title="網站導覽"

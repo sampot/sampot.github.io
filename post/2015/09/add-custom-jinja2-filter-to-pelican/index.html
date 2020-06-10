@@ -17,7 +17,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"雖然這個部落格主要語言是正體中文，但偶爾會需要將英文轉成中文來顯示。例如：將導覽路徑 (breadcrumb) 轉成中文，但在網址路徑中維持使用英文。 要達到這個目的，使用 Jinja 2 模板的過濾器 (filter) 應該是個簡單方案。本文山姆鍋說明如何增加一個客製化過濾器， 來將模板中部分的英文字串對應到中文。\n\nJinja 過濾器簡介\nJinja 2 的過濾器可以用來修改主題模板中的變數，過濾器以管道符號 ( |) 分隔，多個過濾器可以串連在一起，例如： {{name|striptags|title}} 。實作上，過濾器只是單純的 Python 函式，用來轉換參數。\n客製化過濾器\n山姆鍋定義了 customer_filters.py 作為所有客製化過濾器的模組，其中定義一個過濾器 mytrans , 負責將英文對應到中文字串。\n1234567891011121314_trans = {    'categories': '文章分類',    'software-development': '軟體開發',    'service-operations': '服務運營',    'customer-support': '客戶服務',    'teamwork': '團隊合作',    'others': '其他文章',}def mytrans(s):    \"\"\" Translates the given string to its translation, or return it if no mapping is found.  \"\"\"    global _trans    r = _trans.get(s)    return r if r else s\n設定 Pelican 加入過濾器\nPelican 設定檔中的 JINJA_FILTERS 可以用來新增客製化的過濾器，不過需要引入 (import) custom_filters.py 模組先。為了讓 Pelicanconf.py 可以引入該模組，我們同時需要將目前路徑加入系統的引入路徑中 (sys.path)。\n下面是片段展示 pelicanconf.py 的部分內容：\n1234567import osimport syssys.path.append(os.curdir)import custom_filtersJINJA_FILTERS = {'mytrans': custom_filters.mytrans, }\n在主題樣板中套用過濾器\n要在主題樣板中套用我們開發的過濾器，只需要按照 Jinja 2 [^1] 的語法即可。如下面範例：\n1&lt;li class=\"active\"&gt;{{ category|mytrans }}&lt;/li&gt;\n結語\n本來山姆鍋以為需要使用 Jinja 2 的 i18n 擴充功能，不過後來稍微研究一下，因為部落格使用正體中文作為預設語言，使用 i18n 擴充功能並無法用來翻譯英文成中文，反過來倒是可以。最後，山姆鍋選擇撰寫一個過濾器來達到目的。\n參考資料\n\n\nJinja 2: http://jinja2.readthedocs.org/en/latest/intro.html\n\n\nHow to add a custom Jinja filter to Pelican: http://linkpeek.com/blog/how-to-add-a-custom-jinja-filter-to-pelican.html\n\n\n","dateCreated":"2015-09-08T08:40:00+08:00","dateModified":"2018-08-29T19:12:01+08:00","datePublished":"2015-09-08T08:40:00+08:00","description":"雖然這個部落格主要語言是正體中文，但偶爾會需要將英文轉成中文來顯示。例如：將導覽路徑 (breadcrumb) 轉成中文，但在網址路徑中維持使用英文。 要達到這個目的，使用 Jinja 2 模板的過濾器 (filter) 應該是個簡單方案。本文山姆鍋說明如何增加一個客製化過濾器， 來將模板中部分的英文字串對應到中文。","headline":"如何給 Pelican 增加 Jinja2 過濾器","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2015/09/add-custom-jinja2-filter-to-pelican/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2015/09/add-custom-jinja2-filter-to-pelican/","keywords":"Pelican, Jinja2, Python"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","/contact","/sitemap"],"image":"logo.png"},"articleBody":"雖然這個部落格主要語言是正體中文，但偶爾會需要將英文轉成中文來顯示。例如：將導覽路徑 (breadcrumb) 轉成中文，但在網址路徑中維持使用英文。 要達到這個目的，使用 Jinja 2 模板的過濾器 (filter) 應該是個簡單方案。本文山姆鍋說明如何增加一個客製化過濾器， 來將模板中部分的英文字串對應到中文。\n\nJinja 過濾器簡介\nJinja 2 的過濾器可以用來修改主題模板中的變數，過濾器以管道符號 ( |) 分隔，多個過濾器可以串連在一起，例如： {{name|striptags|title}} 。實作上，過濾器只是單純的 Python 函式，用來轉換參數。\n客製化過濾器\n山姆鍋定義了 customer_filters.py 作為所有客製化過濾器的模組，其中定義一個過濾器 mytrans , 負責將英文對應到中文字串。\n1234567891011121314_trans = {    'categories': '文章分類',    'software-development': '軟體開發',    'service-operations': '服務運營',    'customer-support': '客戶服務',    'teamwork': '團隊合作',    'others': '其他文章',}def mytrans(s):    \"\"\" Translates the given string to its translation, or return it if no mapping is found.  \"\"\"    global _trans    r = _trans.get(s)    return r if r else s\n設定 Pelican 加入過濾器\nPelican 設定檔中的 JINJA_FILTERS 可以用來新增客製化的過濾器，不過需要引入 (import) custom_filters.py 模組先。為了讓 Pelicanconf.py 可以引入該模組，我們同時需要將目前路徑加入系統的引入路徑中 (sys.path)。\n下面是片段展示 pelicanconf.py 的部分內容：\n1234567import osimport syssys.path.append(os.curdir)import custom_filtersJINJA_FILTERS = {'mytrans': custom_filters.mytrans, }\n在主題樣板中套用過濾器\n要在主題樣板中套用我們開發的過濾器，只需要按照 Jinja 2 [^1] 的語法即可。如下面範例：\n1&lt;li class=\"active\"&gt;{{ category|mytrans }}&lt;/li&gt;\n結語\n本來山姆鍋以為需要使用 Jinja 2 的 i18n 擴充功能，不過後來稍微研究一下，因為部落格使用正體中文作為預設語言，使用 i18n 擴充功能並無法用來翻譯英文成中文，反過來倒是可以。最後，山姆鍋選擇撰寫一個過濾器來達到目的。\n參考資料\n\n\nJinja 2: http://jinja2.readthedocs.org/en/latest/intro.html\n\n\nHow to add a custom Jinja filter to Pelican: http://linkpeek.com/blog/how-to-add-a-custom-jinja-filter-to-pelican.html\n\n\n","dateCreated":"2015-09-08T08:40:00+08:00","dateModified":"2018-08-29T19:12:01+08:00","datePublished":"2015-09-08T08:40:00+08:00","description":"雖然這個部落格主要語言是正體中文，但偶爾會需要將英文轉成中文來顯示。例如：將導覽路徑 (breadcrumb) 轉成中文，但在網址路徑中維持使用英文。 要達到這個目的，使用 Jinja 2 模板的過濾器 (filter) 應該是個簡單方案。本文山姆鍋說明如何增加一個客製化過濾器， 來將模板中部分的英文字串對應到中文。","headline":"如何給 Pelican 增加 Jinja2 過濾器","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2015/09/add-custom-jinja2-filter-to-pelican/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","/contact","/sitemap"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2015/09/add-custom-jinja2-filter-to-pelican/","keywords":"Pelican, Jinja2, Python"}</script>
     <meta name="description" content="雖然這個部落格主要語言是正體中文，但偶爾會需要將英文轉成中文來顯示。例如：將導覽路徑 (breadcrumb) 轉成中文，但在網址路徑中維持使用英文。 要達到這個目的，使用 Jinja 2 模板的過濾器 (filter) 應該是個簡單方案。本文山姆鍋說明如何增加一個客製化過濾器， 來將模板中部分的英文字串對應到中文。">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="如何給 Pelican 增加 Jinja2 過濾器">
@@ -201,7 +201,7 @@
                     
                         <a
                             class="sidebar-button-link "
-                            href="/about/"
+                            href="/about"
                             
                             rel="noopener"
                             title="關於"
@@ -283,9 +283,7 @@
                     
                         <a
                             class="sidebar-button-link "
-                            href="https://developers.tw/@山姆鍋"
-                            
-                                target="_blank"
+                            href="/contact"
                             
                             rel="noopener"
                             title="聯絡"
@@ -299,7 +297,7 @@
                     
                         <a
                             class="sidebar-button-link "
-                            href="/sitemap/"
+                            href="/sitemap"
                             
                             rel="noopener"
                             title="網站導覽"

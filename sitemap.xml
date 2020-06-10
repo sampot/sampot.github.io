@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://samkuo.me/sitemap/</loc>
+    
+    <lastmod>2020-06-10T01:41:51.261Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://samkuo.me/post/2020/06/my-k8s-devops-lab-node-installation/</loc>
     
     <lastmod>2020-06-08T03:20:50.407Z</lastmod>
@@ -390,13 +397,6 @@
     <loc>https://samkuo.me/recruiting/</loc>
     
     <lastmod>2020-03-05T01:55:35.640Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://samkuo.me/sitemap/</loc>
-    
-    <lastmod>2020-03-05T01:23:20.375Z</lastmod>
     
   </url>
   

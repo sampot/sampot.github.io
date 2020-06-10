@@ -17,7 +17,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"\n\n折騰了將近 2 週將「我是山姆鍋」這個部落格改用 Hexo 來編輯，雖然還是有不少文章格式有問題，大致上該有的都有了。\n為什麼要換成 Hexo?\n最近好不容易動了更新部落格的想法，但對於原先使用的 Pelican 已經變得不太熟悉，在重新學習 Pelican 與新的工具之間，山姆鍋自然是喜新厭舊地選擇另一套工具啦！(不過可不希望以後再來一次，中間曾一度想放棄)。\n轉換文章格式\nHexo 本身已經大致可以符合山姆鍋撰寫部落格的需要，再加上有相當豐富的插件做靠山，其它的需求自然沒什麼問題。山姆鍋的文章多數是以 reStructuredText 格式撰寫，使用 Pandoc 這個工具轉換成 Markdown 格式後，文字的排列上都出現問題，整個轉換過程大部分的時間其實都是在調整亂掉的文章。\n站內文章搜索功能\n再來是原先使用 Tipue 的站內文章搜尋的功能，Hexo 上已經有人提供方案。基本上就是使用 hexo-generator-tipue-search-json 這個插件產生 Tipue 所需的搜尋索引檔案，設定好 搜尋頁面 就可以了。中間遇到 JQuery 跟 Tipue 版本相容性的問題，不過 Google 一下也不難找到解決辦法。\n更換 markdown-it 作為渲染 (render) 引擎\n由於常需要使用頁尾標記 (footnotes)，將 Hexo 內建的 Markdown 渲染引擎改為 markdown-it。\n除了 markdown-it 本身，下列是額外安裝的插件：\n\nmarkdown-it-abbr\nmarkdown-it-checkbox\nmarkdown-it-container\nmarkdown-it-deflist\nmarkdown-it-footnote\nmarkdown-it-imsize\nmarkdown-it-ins\nmarkdown-it-mark\nmarkdown-it-regexp\nmarkdown-it-sub\nmarkdown-it-sup\n\n更換主題樣板\n山姆鍋覺得原先的樣板沒有什麼不好，只是懶得自己轉換。選擇了 Tranquilpeak 這個主題也只是因為最接近自己的偏好。\n英文跟中文中間留白\n山姆鍋習慣中文與英文字中間有間隔，但有懶得自己手動加入空白字元，再加上也常常忘記，最好還是在產生網頁時能夠自動調整。不知道為何 Hexo 的 auto_spacing 設定沒有作用，或者很有可能是山姆鍋沒有正確設定。不管怎樣，後來是使用 Pangu 這個程式庫寫一個過濾器 (filter) 解決。 下面是該過濾器的程式碼：\n123456var pangu = require('pangu')hexo.extend.filter.register('after_post_render', function(data) {  data.title = pangu.spacing(data.title)  data.content = pangu.spacing(data.content)})\n小結\n如果說轉換過程中，山姆鍋有學到什麼的話，那就是：沒事別換工具處理已經解決的問題，那只是在做苦工啊！","dateCreated":"2018-08-30T23:29:50+08:00","dateModified":"2020-03-05T10:46:32+08:00","datePublished":"2018-08-30T23:29:50+08:00","description":"折騰了將近 2 週將「我是山姆鍋」這個部落格改用 Hexo 來編輯，雖然還是有不少文章格式有問題，大致上該有的都有了。","headline":"改用 Hexo 寫部落格文章","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2018/08/use-hexo-for-blog/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2018/08/use-hexo-for-blog/","keywords":"hexo, pelican"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","/contact","/sitemap"],"image":"logo.png"},"articleBody":"\n\n折騰了將近 2 週將「我是山姆鍋」這個部落格改用 Hexo 來編輯，雖然還是有不少文章格式有問題，大致上該有的都有了。\n為什麼要換成 Hexo?\n最近好不容易動了更新部落格的想法，但對於原先使用的 Pelican 已經變得不太熟悉，在重新學習 Pelican 與新的工具之間，山姆鍋自然是喜新厭舊地選擇另一套工具啦！(不過可不希望以後再來一次，中間曾一度想放棄)。\n轉換文章格式\nHexo 本身已經大致可以符合山姆鍋撰寫部落格的需要，再加上有相當豐富的插件做靠山，其它的需求自然沒什麼問題。山姆鍋的文章多數是以 reStructuredText 格式撰寫，使用 Pandoc 這個工具轉換成 Markdown 格式後，文字的排列上都出現問題，整個轉換過程大部分的時間其實都是在調整亂掉的文章。\n站內文章搜索功能\n再來是原先使用 Tipue 的站內文章搜尋的功能，Hexo 上已經有人提供方案。基本上就是使用 hexo-generator-tipue-search-json 這個插件產生 Tipue 所需的搜尋索引檔案，設定好 搜尋頁面 就可以了。中間遇到 JQuery 跟 Tipue 版本相容性的問題，不過 Google 一下也不難找到解決辦法。\n更換 markdown-it 作為渲染 (render) 引擎\n由於常需要使用頁尾標記 (footnotes)，將 Hexo 內建的 Markdown 渲染引擎改為 markdown-it。\n除了 markdown-it 本身，下列是額外安裝的插件：\n\nmarkdown-it-abbr\nmarkdown-it-checkbox\nmarkdown-it-container\nmarkdown-it-deflist\nmarkdown-it-footnote\nmarkdown-it-imsize\nmarkdown-it-ins\nmarkdown-it-mark\nmarkdown-it-regexp\nmarkdown-it-sub\nmarkdown-it-sup\n\n更換主題樣板\n山姆鍋覺得原先的樣板沒有什麼不好，只是懶得自己轉換。選擇了 Tranquilpeak 這個主題也只是因為最接近自己的偏好。\n英文跟中文中間留白\n山姆鍋習慣中文與英文字中間有間隔，但有懶得自己手動加入空白字元，再加上也常常忘記，最好還是在產生網頁時能夠自動調整。不知道為何 Hexo 的 auto_spacing 設定沒有作用，或者很有可能是山姆鍋沒有正確設定。不管怎樣，後來是使用 Pangu 這個程式庫寫一個過濾器 (filter) 解決。 下面是該過濾器的程式碼：\n123456var pangu = require('pangu')hexo.extend.filter.register('after_post_render', function(data) {  data.title = pangu.spacing(data.title)  data.content = pangu.spacing(data.content)})\n小結\n如果說轉換過程中，山姆鍋有學到什麼的話，那就是：沒事別換工具處理已經解決的問題，那只是在做苦工啊！","dateCreated":"2018-08-30T23:29:50+08:00","dateModified":"2020-03-05T10:46:32+08:00","datePublished":"2018-08-30T23:29:50+08:00","description":"折騰了將近 2 週將「我是山姆鍋」這個部落格改用 Hexo 來編輯，雖然還是有不少文章格式有問題，大致上該有的都有了。","headline":"改用 Hexo 寫部落格文章","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2018/08/use-hexo-for-blog/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","/contact","/sitemap"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2018/08/use-hexo-for-blog/","keywords":"hexo, pelican"}</script>
     <meta name="description" content="折騰了將近 2 週將「我是山姆鍋」這個部落格改用 Hexo 來編輯，雖然還是有不少文章格式有問題，大致上該有的都有了。">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="改用 Hexo 寫部落格文章">
@@ -202,7 +202,7 @@
                     
                         <a
                             class="sidebar-button-link "
-                            href="/about/"
+                            href="/about"
                             
                             rel="noopener"
                             title="關於"
@@ -284,9 +284,7 @@
                     
                         <a
                             class="sidebar-button-link "
-                            href="https://developers.tw/@山姆鍋"
-                            
-                                target="_blank"
+                            href="/contact"
                             
                             rel="noopener"
                             title="聯絡"
@@ -300,7 +298,7 @@
                     
                         <a
                             class="sidebar-button-link "
-                            href="/sitemap/"
+                            href="/sitemap"
                             
                             rel="noopener"
                             title="網站導覽"

@@ -17,7 +17,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png"},"articleBody":"山姆鍋喜歡文章至少有張圖檔，沒有特別相關的主題的話，也希望可以顯示一張預設的圖。為了設定這個圖檔，文章的標頭資料 (metadata) 中， 我使用 ‘image’\n這個標頭來表示圖檔相對路徑。在樣板主題 (theme) 中，如果有這個標頭就插入該圖檔，否則就使用預設圖檔。 如果在每個樣板需要插入這個圖檔的樣板或者 RSS 中，都需要做這樣的判斷，就有點麻煩。本文山姆鍋介紹使用簡單的插件，來插入這個預設標頭， 確保所有文章都會有這個標頭存在。\n\n山姆鍋假設讀者已經知道 Pelican 基本的插件運作原理，如果沒有的話，可以參考\nPelican 插件文件 。\n插件的程式碼\n此程式碼路徑爲 /plugins/default-image/default_image.py。\n12345678910111213141516171819# -*- coding: utf-8 -*-from __future__ import absolute_import, print_function, unicode_literalsfrom pelican import signalsfrom pelican.contents import Articledef insert_image(instance):    \"\"\"    Inserts an image meta if not already existent.    \"\"\"    if isinstance(instance, Article):  # 1        default_image = instance.settings['DEFAULT_IMAGE'] # 2        if not hasattr(instance, 'image'): # 3            instance.image = default_image        return instancedef register():    signals.content_object_init.connect(insert_image)\n其中，標示 1 的敘述目的在過濾掉非文章的項目， 標示\n2 是為了讀取 DEFAULT_IMAGE\n這個設定值，也就是預設圖檔的路徑。 3\n則是為了判斷文章是否已經所需的標頭資料，如果有則跳過。\n詳細程式碼與設定，請參考 本部落格的源始碼。\n參考資料\nPelican 插件文件:\nhttp://docs.getpelican.com/en/stable/plugins.html\n_`本部落格的源始碼`: https://github.com/sampot/sampot.github.io\n小結\n利用一個簡單的插件，山姆鍋示範如何在產生網頁內容時插入需要的標頭資料，透過同樣的技巧，讀者也可以增加所需的內容。\n","dateCreated":"2015-09-04T09:20:00+08:00","dateModified":"2018-08-29T20:16:03+08:00","datePublished":"2015-09-04T09:20:00+08:00","description":"山姆鍋喜歡文章至少有張圖檔，沒有特別相關的主題的話，也希望可以顯示一張預設的圖。為了設定這個圖檔，文章的標頭資料 (metadata) 中， 我使用 ‘image’\n這個標頭來表示圖檔相對路徑。在樣板主題 (theme) 中，如果有這個標頭就插入該圖檔，否則就使用預設圖檔。 如果在每個樣板需要插入這個圖檔的樣板或者 RSS 中，都需要做這樣的判斷，就有點麻煩。本文山姆鍋介紹使用簡單的插件，來插入這個預設標頭， 確保所有文章都會有這個標頭存在。","headline":"如何使用插件自動在 Pelican 插入預設圖檔","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2015/09/insert-default-image-pelican-post/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","https://developers.tw/@山姆鍋","/sitemap/"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2015/09/insert-default-image-pelican-post/","keywords":"Pelican, Python"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","/contact","/sitemap"],"image":"logo.png"},"articleBody":"山姆鍋喜歡文章至少有張圖檔，沒有特別相關的主題的話，也希望可以顯示一張預設的圖。為了設定這個圖檔，文章的標頭資料 (metadata) 中， 我使用 ‘image’\n這個標頭來表示圖檔相對路徑。在樣板主題 (theme) 中，如果有這個標頭就插入該圖檔，否則就使用預設圖檔。 如果在每個樣板需要插入這個圖檔的樣板或者 RSS 中，都需要做這樣的判斷，就有點麻煩。本文山姆鍋介紹使用簡單的插件，來插入這個預設標頭， 確保所有文章都會有這個標頭存在。\n\n山姆鍋假設讀者已經知道 Pelican 基本的插件運作原理，如果沒有的話，可以參考\nPelican 插件文件 。\n插件的程式碼\n此程式碼路徑爲 /plugins/default-image/default_image.py。\n12345678910111213141516171819# -*- coding: utf-8 -*-from __future__ import absolute_import, print_function, unicode_literalsfrom pelican import signalsfrom pelican.contents import Articledef insert_image(instance):    \"\"\"    Inserts an image meta if not already existent.    \"\"\"    if isinstance(instance, Article):  # 1        default_image = instance.settings['DEFAULT_IMAGE'] # 2        if not hasattr(instance, 'image'): # 3            instance.image = default_image        return instancedef register():    signals.content_object_init.connect(insert_image)\n其中，標示 1 的敘述目的在過濾掉非文章的項目， 標示\n2 是為了讀取 DEFAULT_IMAGE\n這個設定值，也就是預設圖檔的路徑。 3\n則是為了判斷文章是否已經所需的標頭資料，如果有則跳過。\n詳細程式碼與設定，請參考 本部落格的源始碼。\n參考資料\nPelican 插件文件:\nhttp://docs.getpelican.com/en/stable/plugins.html\n_`本部落格的源始碼`: https://github.com/sampot/sampot.github.io\n小結\n利用一個簡單的插件，山姆鍋示範如何在產生網頁內容時插入需要的標頭資料，透過同樣的技巧，讀者也可以增加所需的內容。\n","dateCreated":"2015-09-04T09:20:00+08:00","dateModified":"2018-08-29T20:16:03+08:00","datePublished":"2015-09-04T09:20:00+08:00","description":"山姆鍋喜歡文章至少有張圖檔，沒有特別相關的主題的話，也希望可以顯示一張預設的圖。為了設定這個圖檔，文章的標頭資料 (metadata) 中， 我使用 ‘image’\n這個標頭來表示圖檔相對路徑。在樣板主題 (theme) 中，如果有這個標頭就插入該圖檔，否則就使用預設圖檔。 如果在每個樣板需要插入這個圖檔的樣板或者 RSS 中，都需要做這樣的判斷，就有點麻煩。本文山姆鍋介紹使用簡單的插件，來插入這個預設標頭， 確保所有文章都會有這個標頭存在。","headline":"如何使用插件自動在 Pelican 插入預設圖檔","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2015/09/insert-default-image-pelican-post/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","/contact","/sitemap"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2015/09/insert-default-image-pelican-post/","keywords":"Pelican, Python"}</script>
     <meta name="description" content="山姆鍋喜歡文章至少有張圖檔，沒有特別相關的主題的話，也希望可以顯示一張預設的圖。為了設定這個圖檔，文章的標頭資料 (metadata) 中， 我使用 ‘image’ 這個標頭來表示圖檔相對路徑。在樣板主題 (theme) 中，如果有這個標頭就插入該圖檔，否則就使用預設圖檔。 如果在每個樣板需要插入這個圖檔的樣板或者 RSS 中，都需要做這樣的判斷，就有點麻煩。本文山姆鍋介紹使用簡單的插件，來插入這">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="如何使用插件自動在 Pelican 插入預設圖檔">
@@ -200,7 +200,7 @@
                     
                         <a
                             class="sidebar-button-link "
-                            href="/about/"
+                            href="/about"
                             
                             rel="noopener"
                             title="關於"
@@ -282,9 +282,7 @@
                     
                         <a
                             class="sidebar-button-link "
-                            href="https://developers.tw/@山姆鍋"
-                            
-                                target="_blank"
+                            href="/contact"
                             
                             rel="noopener"
                             title="聯絡"
@@ -298,7 +296,7 @@
                     
                         <a
                             class="sidebar-button-link "
-                            href="/sitemap/"
+                            href="/sitemap"
                             
                             rel="noopener"
                             title="網站導覽"
