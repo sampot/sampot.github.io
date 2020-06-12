@@ -17,7 +17,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","/contact","/sitemap"],"image":"logo.png"},"articleBody":"\n\n\nPhoto Credit : freddie boy via Compfight cc\n\n有了建構持續整合系統後，那要如何管理軟體建構工作 (build jobs)？ 大部份的人可能都習慣使用 Jenkins 提供的使用者界面， 但既然我們透過 Puppet 來管理 Jenkins 系統，沒道理不能用它來管理建構工作。本文山姆鍋以使用 Puppet 配置 Jenkins 工作來總結 \"建構自己的雲端持續整合系統\" 這一系列文章。\n原理說明\nJenkins 安裝在 /var/lib/jenkins 這個目錄，相關的建構工作放在 /var/lib/jenkins/jobs/${job_name}。每個工作都在自己的子目錄，跟該工作相關的資料也都存在該目錄中。因為這樣的設計，其實管理 Jenkins 的建構工作，說穿了，就是建立相關的目錄以及設定檔。\n山姆鍋提供的 Jenkins 這個模組，其中定義了 jenkins::job 這種資源讓您可以使用 Puppet 來定義工作，這個資源定義是由 pgr0ss 提供。所有的工作定義都是由這個資源來提供，也就是說：如果您在 Puppet 的配置檔中刪除其中一個工作定義，對應的 Jenkins 工作也會被刪除。同樣的，當工作定義有變動時，Jenkins 服務也會被重新啟動以讓變動生效。\n配置範例\n底下是原作者提供的兩個工作定義範例：\n1234567891011121314jenkins::job { \"app1_master\":    git_repo =&gt; \"https://github.com/user/app1\",    git_branch =&gt; \"master\",    command =&gt; \"./ci.sh\",    triggers =&gt; [\"app1_master_integration\"]}jenkins::job { \"app1_master_integration\":    git_repo =&gt; \"https://github.com/user/app1\",    git_branch =&gt; \"master\",    command =&gt; \"./ci.sh integration\",    poll =&gt; false,    build_schedule =&gt; \"H H * * *\"}\n限制\n雖說是限制，其實是故意這樣設計。由於假設 Jenkins 持續整合系統是隨時可以建構或銷毀，因此，設計上就不假設會有長久性的資料放置在上面。也就是說，對於後續要用到的資料或檔案要放到別的服務器。例如：將產生的安裝套件上載到 Maven 套件庫。\n結語\n這個方案在寫這篇文章的時候，山姆鍋還沒有開始實際使用，後續會再根據實際使用狀況來調整。","dateCreated":"2013-11-18T10:40:04+08:00","dateModified":"2020-05-04T06:46:35+08:00","datePublished":"2013-11-18T10:40:04+08:00","description":"有了建構持續整合系統後，那要如何管理軟體建構工作 (build jobs)？ 大部份的人可能都習慣使用 Jenkins 提供的使用者界面， 但既然我們透過 Puppet 來管理 Jenkins 系統，沒道理不能用它來管理建構工作。本文山姆鍋以使用 Puppet 配置 Jenkins 工作來總結 \"建構自己的雲端持續整合系統\" 這一系列文章。","headline":"建構自己的雲端持續整合系統 (下)","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/11/build-own-cloud-continuous-integration-system-p3/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","/contact","/sitemap"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2013/11/build-own-cloud-continuous-integration-system-p3/","keywords":"Jenkins, Vagrant, Puppet"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","/contact","/sitemap"],"image":"logo.png"},"articleBody":"\n\n\nPhoto Credit : freddie boy via Compfight cc\n\n有了建構持續整合系統後，那要如何管理軟體建構工作 (build jobs)？ 大部份的人可能都習慣使用 Jenkins 提供的使用者界面， 但既然我們透過 Puppet 來管理 Jenkins 系統，沒道理不能用它來管理建構工作。本文山姆鍋以使用 Puppet 配置 Jenkins 工作來總結 \"建構自己的雲端持續整合系統\" 這一系列文章。\n原理說明\nJenkins 安裝在 /var/lib/jenkins 這個目錄，相關的建構工作放在 /var/lib/jenkins/jobs/${job_name}。每個工作都在自己的子目錄，跟該工作相關的資料也都存在該目錄中。因為這樣的設計，其實管理 Jenkins 的建構工作，說穿了，就是建立相關的目錄以及設定檔。\n山姆鍋提供的 Jenkins 這個模組，其中定義了 jenkins::job 這種資源讓您可以使用 Puppet 來定義工作，這個資源定義是由 pgr0ss 提供。所有的工作定義都是由這個資源來提供，也就是說：如果您在 Puppet 的配置檔中刪除其中一個工作定義，對應的 Jenkins 工作也會被刪除。同樣的，當工作定義有變動時，Jenkins 服務也會被重新啟動以讓變動生效。\n配置範例\n底下是原作者提供的兩個工作定義範例：\n1234567891011121314jenkins::job { \"app1_master\":    git_repo =&gt; \"https://github.com/user/app1\",    git_branch =&gt; \"master\",    command =&gt; \"./ci.sh\",    triggers =&gt; [\"app1_master_integration\"]}jenkins::job { \"app1_master_integration\":    git_repo =&gt; \"https://github.com/user/app1\",    git_branch =&gt; \"master\",    command =&gt; \"./ci.sh integration\",    poll =&gt; false,    build_schedule =&gt; \"H H * * *\"}\n限制\n雖說是限制，其實是故意這樣設計。由於假設 Jenkins 持續整合系統是隨時可以建構或銷毀，因此，設計上就不假設會有長久性的資料放置在上面。也就是說，對於後續要用到的資料或檔案要放到別的服務器。例如：將產生的安裝套件上載到 Maven 套件庫。\n結語\n這個方案在寫這篇文章的時候，山姆鍋還沒有開始實際使用，後續會再根據實際使用狀況來調整。","dateCreated":"2013-11-18T10:40:04+08:00","dateModified":"2020-05-04T06:46:35+08:00","datePublished":"2013-11-18T10:40:04+08:00","description":"有了建構持續整合系統後，那要如何管理軟體建構工作 (build jobs)？ 大部份的人可能都習慣使用 Jenkins 提供的使用者界面， 但既然我們透過 Puppet 來管理 Jenkins 系統，沒道理不能用它來管理建構工作。本文山姆鍋以使用 Puppet 配置 Jenkins 工作來總結 \"建構自己的雲端持續整合系統\" 這一系列文章。","headline":"建構自己的雲端持續整合系統 (下)","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/11/build-own-cloud-continuous-integration-system-p3/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","/contact","/sitemap"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2013/11/build-own-cloud-continuous-integration-system-p3/","keywords":"Jenkins, Vagrant, Puppet"}</script>
     <meta name="description" content="山姆鍋分享如何使用 Jenkins 快速建構一個雲端持續整合系統。">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="建構自己的雲端持續整合系統 (下)">
@@ -262,22 +262,6 @@
                         >
                         <i class="sidebar-button-icon fab fa-facebook" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Facebook</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a
-                            class="sidebar-button-link "
-                            href="https://tw.linkedin.com/in/sampot"
-                            
-                                target="_blank"
-                            
-                            rel="noopener"
-                            title="LinkedIn"
-                        >
-                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">LinkedIn</span>
                     </a>
             </li>
             

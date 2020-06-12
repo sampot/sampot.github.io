@@ -19,7 +19,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","/contact","/sitemap"],"image":"logo.png"},"articleBody":"「影化身科技」主站的網頁資料放置在 Amazon S3 東京機房，同樣利用 Octopress 產生靜態網頁。雖然從台灣測試，ping 值大約在 80 毫秒左右，算是相當不錯；但為了台灣以外的其他用戶，還是需要使用 CDN 來將網站內容部署到不同節點。\n\n相關步驟說明如下：\n取得網站的 Bucket 的網站 Endpoint\n雖然在建立 CloudFront 的 distribution 時會自動提示可以用的 S3 bucket 名稱，但好像目前給的名稱並不正確。需要到 S3 console 按照下列步驟取得正確的網站 Endpoint URL。\n\n選擇網站的 bucket，影化身用的是’eavatar.com’。\n選擇 'Properties’標籤。\n展開 'Static Website Hosting’段落就可以看到需要的 Endpoint URL。\n\n建立新的 CloudFront distribution\n有了正確的網站 Endpoint URL\n到 CloudFront console, 選擇 'Create distribution’來開始建立。\n\n因為是網站內容，選擇’Download’作為遞送方法 (delivery method)。\n\n在’Original Domain Name’欄位，輸入網站的實際 Endpoint URL。\n\n在 ‘Alternate Domain Names (CNAMEs) 欄位輸入’eavartar.com’。\n\n\n注意，‘Default Root Object’ 不要填，不然存取網頁子目錄時會出錯。\n設定 DNS CNAME 紀錄，指向 CloudFront 的 distribution 名稱\n正確產生 CloudFront 的 distribution 後，應該就有了它給定的域名（domain name)。最後，需要設定 DNS 服務來讓 eavatar.com 指向這個域名。\n","dateCreated":"2013-06-06T12:02:00+08:00","dateModified":"2018-08-28T10:45:35+08:00","datePublished":"2013-06-06T12:02:00+08:00","description":"「影化身科技」主站的網頁資料放置在 Amazon S3 東京機房，同樣利用 Octopress 產生靜態網頁。雖然從台灣測試，ping 值大約在 80 毫秒左右，算是相當不錯；但為了台灣以外的其他用戶，還是需要使用 CDN 來將網站內容部署到不同節點。","headline":"使用 CloudFront 來加速網頁存取","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/06/use-cloudfront-speed-up-eavatar-home/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","/contact","/sitemap"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2013/06/use-cloudfront-speed-up-eavatar-home/","keywords":"Cloud service, CloudFront, CDN"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","/contact","/sitemap"],"image":"logo.png"},"articleBody":"「影化身科技」主站的網頁資料放置在 Amazon S3 東京機房，同樣利用 Octopress 產生靜態網頁。雖然從台灣測試，ping 值大約在 80 毫秒左右，算是相當不錯；但為了台灣以外的其他用戶，還是需要使用 CDN 來將網站內容部署到不同節點。\n\n相關步驟說明如下：\n取得網站的 Bucket 的網站 Endpoint\n雖然在建立 CloudFront 的 distribution 時會自動提示可以用的 S3 bucket 名稱，但好像目前給的名稱並不正確。需要到 S3 console 按照下列步驟取得正確的網站 Endpoint URL。\n\n選擇網站的 bucket，影化身用的是’eavatar.com’。\n選擇 'Properties’標籤。\n展開 'Static Website Hosting’段落就可以看到需要的 Endpoint URL。\n\n建立新的 CloudFront distribution\n有了正確的網站 Endpoint URL\n到 CloudFront console, 選擇 'Create distribution’來開始建立。\n\n因為是網站內容，選擇’Download’作為遞送方法 (delivery method)。\n\n在’Original Domain Name’欄位，輸入網站的實際 Endpoint URL。\n\n在 ‘Alternate Domain Names (CNAMEs) 欄位輸入’eavartar.com’。\n\n\n注意，‘Default Root Object’ 不要填，不然存取網頁子目錄時會出錯。\n設定 DNS CNAME 紀錄，指向 CloudFront 的 distribution 名稱\n正確產生 CloudFront 的 distribution 後，應該就有了它給定的域名（domain name)。最後，需要設定 DNS 服務來讓 eavatar.com 指向這個域名。\n","dateCreated":"2013-06-06T12:02:00+08:00","dateModified":"2018-08-28T10:45:35+08:00","datePublished":"2013-06-06T12:02:00+08:00","description":"「影化身科技」主站的網頁資料放置在 Amazon S3 東京機房，同樣利用 Octopress 產生靜態網頁。雖然從台灣測試，ping 值大約在 80 毫秒左右，算是相當不錯；但為了台灣以外的其他用戶，還是需要使用 CDN 來將網站內容部署到不同節點。","headline":"使用 CloudFront 來加速網頁存取","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/06/use-cloudfront-speed-up-eavatar-home/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","/contact","/sitemap"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2013/06/use-cloudfront-speed-up-eavatar-home/","keywords":"Cloud service, CloudFront, CDN"}</script>
     <meta name="description" content="如何使用 Amazon CloudFront CDN服務來加速影化身網站的存取速度。">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="使用 CloudFront 來加速網頁存取">
@@ -265,22 +265,6 @@
                         >
                         <i class="sidebar-button-icon fab fa-facebook" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Facebook</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a
-                            class="sidebar-button-link "
-                            href="https://tw.linkedin.com/in/sampot"
-                            
-                                target="_blank"
-                            
-                            rel="noopener"
-                            title="LinkedIn"
-                        >
-                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">LinkedIn</span>
                     </a>
             </li>
             

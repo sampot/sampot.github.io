@@ -19,7 +19,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","/contact","/sitemap"],"image":"logo.png"},"articleBody":"作為軟體開發人員，山姆鍋也很常跟 QA 團隊說過類似這樣的話：「這個版本，在我的電腦上可以正常執行」。我們都知道開發人員的執行環境跟其他成員通常有很大的差異，所以，說這句話往往只是浪費時間，對於解決問題並沒有太多實際幫助。那有沒有方法可以讓開發以及測試人員有一致的環境來確認問題根源呢？藉由虛擬化技術以及 Vagrant 這樣的工具，現在我們有更好的方法。\n\nVagrant 是一個讓您可以利用虛擬機 (virtual machines) 來準備開發測試環境的工具。最大特點就是它讓準備開發測試環境的過程可以「自動化 (automation)」與「規格化 (specification)」。「自動化」可以簡單的指令快速建立需要的環境；「規格化」讓建立環境的資訊可以進行版本控制而隨著軟體的修改而調整。\n基本上，Vagrant 讓您可以從一個虛擬機映像 (VM image) 來開始建構開發測試環境，Vagrant 把這樣的虛擬機映像稱為「 box」。建構一個環境是很複雜的工作，Vagrant 無法自動安裝作業系統，所以，需要一個個已經安裝基本作業系統以及支援套件的 box 來作為基礎。有了 box, 我們只要告訴 Vagrant 我們的測試環境需要哪一個 box 做基礎就可以快速建立所需的虛擬機。\n假如團隊成員都使用 Vagrant 的話，由於只需要將如何建構虛擬機的 “規格” 告訴其他成員，可以減少拷貝虛擬機映像的時間跟儲存空間。當然，如果 Vagrant 只是減少拷貝虛擬機映像的時間，好像也不值得山姆鍋特別介紹。Vagrant 搭配 Puppet/Chef 這種系統組管理工具，就可以將所需的系統與應用軟體的套件安裝在虛擬機中。順便讓您知道：「影化身科技」採用 Puppet 作為系統組態管理工具。\n有上述的功能聽起來很棒，但要適用現在的軟體開發環境，它還需要具備：\n跨平台執行能力\n現代開發人員的電腦使用的作業系統林林總總，但主要的有：Windows, Linux 以及 Mac OS X。Vagrant 可以支援在這三種環境執行的能力，且其背後預設的虛擬機技術 (Virtualbox) 也同樣支援。\n可更換虛擬機技術\nVirtualbox 很好，但不是每一家公司都採用，Vagrant 新的版本也可以支援 VMWare 等其它廠商的虛擬機技術，讓它可以適用更多的公司環境。\n支援分散環境的建置能力\n如果只能準備一台虛擬機，那麼對於像「影化身科技」這種開發分散式網路服務的公司來說，用處就很有限。當然，Vagrant 會這麼受到關注，在這點的支援上自然也沒有讓山姆鍋失望。\n小結\n山姆鍋曾經考慮過讓團隊成員的開發環境都以虛擬機方式來部署，這樣新成員就可以很快上手。不過，深入想了之後，就會知道這個想法不實際，因為工程師最終還是會在原生作業系統上安裝開發工具，而只會使用虛擬機來做最後測試。雖然如此，作為開發測試的一致環境建置工具，Vagrant 肯定是軟體服務公司值得導入的工具。\n","dateCreated":"2013-10-31T09:12:00+08:00","dateModified":"2020-03-08T09:45:55+08:00","datePublished":"2013-10-31T09:12:00+08:00","description":"作為軟體開發人員，山姆鍋也很常跟 QA 團隊說過類似這樣的話：「這個版本，在我的電腦上可以正常執行」。我們都知道開發人員的執行環境跟其他成員通常有很大的差異，所以，說這句話往往只是浪費時間，對於解決問題並沒有太多實際幫助。那有沒有方法可以讓開發以及測試人員有一致的環境來確認問題根源呢？藉由虛擬化技術以及 Vagrant 這樣的工具，現在我們有更好的方法。","headline":"運用 Vagrant 準備一致的開發與測試環境","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/10/setup-consistent-dev-test-environments-with-vagrant/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","/contact","/sitemap"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2013/10/setup-consistent-dev-test-environments-with-vagrant/","keywords":"Development, Vagrant"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","/contact","/sitemap"],"image":"logo.png"},"articleBody":"作為軟體開發人員，山姆鍋也很常跟 QA 團隊說過類似這樣的話：「這個版本，在我的電腦上可以正常執行」。我們都知道開發人員的執行環境跟其他成員通常有很大的差異，所以，說這句話往往只是浪費時間，對於解決問題並沒有太多實際幫助。那有沒有方法可以讓開發以及測試人員有一致的環境來確認問題根源呢？藉由虛擬化技術以及 Vagrant 這樣的工具，現在我們有更好的方法。\n\nVagrant 是一個讓您可以利用虛擬機 (virtual machines) 來準備開發測試環境的工具。最大特點就是它讓準備開發測試環境的過程可以「自動化 (automation)」與「規格化 (specification)」。「自動化」可以簡單的指令快速建立需要的環境；「規格化」讓建立環境的資訊可以進行版本控制而隨著軟體的修改而調整。\n基本上，Vagrant 讓您可以從一個虛擬機映像 (VM image) 來開始建構開發測試環境，Vagrant 把這樣的虛擬機映像稱為「 box」。建構一個環境是很複雜的工作，Vagrant 無法自動安裝作業系統，所以，需要一個個已經安裝基本作業系統以及支援套件的 box 來作為基礎。有了 box, 我們只要告訴 Vagrant 我們的測試環境需要哪一個 box 做基礎就可以快速建立所需的虛擬機。\n假如團隊成員都使用 Vagrant 的話，由於只需要將如何建構虛擬機的 “規格” 告訴其他成員，可以減少拷貝虛擬機映像的時間跟儲存空間。當然，如果 Vagrant 只是減少拷貝虛擬機映像的時間，好像也不值得山姆鍋特別介紹。Vagrant 搭配 Puppet/Chef 這種系統組管理工具，就可以將所需的系統與應用軟體的套件安裝在虛擬機中。順便讓您知道：「影化身科技」採用 Puppet 作為系統組態管理工具。\n有上述的功能聽起來很棒，但要適用現在的軟體開發環境，它還需要具備：\n跨平台執行能力\n現代開發人員的電腦使用的作業系統林林總總，但主要的有：Windows, Linux 以及 Mac OS X。Vagrant 可以支援在這三種環境執行的能力，且其背後預設的虛擬機技術 (Virtualbox) 也同樣支援。\n可更換虛擬機技術\nVirtualbox 很好，但不是每一家公司都採用，Vagrant 新的版本也可以支援 VMWare 等其它廠商的虛擬機技術，讓它可以適用更多的公司環境。\n支援分散環境的建置能力\n如果只能準備一台虛擬機，那麼對於像「影化身科技」這種開發分散式網路服務的公司來說，用處就很有限。當然，Vagrant 會這麼受到關注，在這點的支援上自然也沒有讓山姆鍋失望。\n小結\n山姆鍋曾經考慮過讓團隊成員的開發環境都以虛擬機方式來部署，這樣新成員就可以很快上手。不過，深入想了之後，就會知道這個想法不實際，因為工程師最終還是會在原生作業系統上安裝開發工具，而只會使用虛擬機來做最後測試。雖然如此，作為開發測試的一致環境建置工具，Vagrant 肯定是軟體服務公司值得導入的工具。\n","dateCreated":"2013-10-31T09:12:00+08:00","dateModified":"2020-03-08T09:45:55+08:00","datePublished":"2013-10-31T09:12:00+08:00","description":"作為軟體開發人員，山姆鍋也很常跟 QA 團隊說過類似這樣的話：「這個版本，在我的電腦上可以正常執行」。我們都知道開發人員的執行環境跟其他成員通常有很大的差異，所以，說這句話往往只是浪費時間，對於解決問題並沒有太多實際幫助。那有沒有方法可以讓開發以及測試人員有一致的環境來確認問題根源呢？藉由虛擬化技術以及 Vagrant 這樣的工具，現在我們有更好的方法。","headline":"運用 Vagrant 準備一致的開發與測試環境","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/10/setup-consistent-dev-test-environments-with-vagrant/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","/contact","/sitemap"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2013/10/setup-consistent-dev-test-environments-with-vagrant/","keywords":"Development, Vagrant"}</script>
     <meta name="description" content="山姆鍋介紹 Vagrant 這個可以確保開發與測試人員有一致測試環境的工具。">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="運用 Vagrant 準備一致的開發與測試環境">
@@ -262,22 +262,6 @@
                         >
                         <i class="sidebar-button-icon fab fa-facebook" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Facebook</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a
-                            class="sidebar-button-link "
-                            href="https://tw.linkedin.com/in/sampot"
-                            
-                                target="_blank"
-                            
-                            rel="noopener"
-                            title="LinkedIn"
-                        >
-                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">LinkedIn</span>
                     </a>
             </li>
             

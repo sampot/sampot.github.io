@@ -17,7 +17,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","/contact","/sitemap"],"image":"logo.png"},"articleBody":"在使用 Hexo 撰寫部落格文章或者開發 Web 應用時常常會需要開啟瀏覽器來檢視結果。Hexo 或者 Web 應用開發工具除了支援啟動後端服務外也支援自動啟動系統預設的瀏覽器，但由於在 WSL 環境預設並沒有圖形桌面環境，自然無法開啟瀏覽器。本文山姆鍋將說明如何讓 WSL 中的程式可以自動開啟 Windows 系統預設的瀏覽器。\n\n要讓程式自動開啟瀏覽器通常會有特別的參數設定。例如：Hexo 可執行下列指令啟動本地網頁服務並開啟預設的瀏覽器來連到網址 “http://127.0.0.1:4000”。\n1hexo server --open\n但由於上述原因並不能如預期運作。所以，往往需要手動開啟 Windows 上的瀏覽器並輸入網址來開啟網頁，雖然不算大問題，但是也太不方便。\n探索\n稍微研究一下 Linux 上程式如何開啟預設瀏覽器的問題，可以了解像是上述 hexo server --open 指令內部其實通常是透過 ‘xdg-open’ 這個程式來開啟桌面環境預設的應用程式。例如： xdg-open https://google.com 試圖開啟瀏覽器連結到 ‘https://google.com’ 這個網址。‘xdg-open’ 則會根據環境盡可能達成開啟應用的目的。\n實現\n在 WSL Ubuntu 環境中，‘xdg-open’ 包含在’xdg-utils’ 這個套件中。執行下列指令安裝 ‘xdg-utils’ 套件：\n1$ sudo apt install xdg-utils\n在命令列執行下列指令測試是否正常：\n1$ xdg-open https://samkuo.me\n可以開啟 Windows 預設瀏覽器 (如 Chrome)，並連到山姆鍋的個人部落格的話則表示運作成功 :-)\n以上是在 Ubuntu 20.04 WSL 發行版本上測試，很顯然也應該只對使用 ‘xdg-open’ 的程式有效。另外，如果 WSL 系統已經安裝了 Linux 原生桌面環境 (如 xfce4), 由於’xdg-open’會優先試圖使用 Linux 桌面環境的設定來開啟瀏覽器，會導致經過好幾分鐘後才會開啟 Windows 預設的瀏覽器。\n小結\n山姆鍋原先並沒有預期這樣的作法可以在 WSL 環境中正常運作，純粹只是抱著實驗看看的想法。至於可以運作的原因，由於 WSL 本身就支援從 Ｌinux 環境直接啟動 Windows 原生程式，個人猜測 Ubuntu WSL 發行版本可能對於 ‘xdg-open’ 剛好有特別支援。不管如何，WSL 作為開發環境的可行性又更高了一點。\n","dateCreated":"2020-05-04T10:11:41+08:00","dateModified":"2020-05-04T10:11:41+08:00","datePublished":"2020-05-04T10:11:41+08:00","description":"在使用 Hexo 撰寫部落格文章或者開發 Web 應用時常常會需要開啟瀏覽器來檢視結果。Hexo 或者 Web 應用開發工具除了支援啟動後端服務外也支援自動啟動系統預設的瀏覽器，但由於在 WSL 環境預設並沒有圖形桌面環境，自然無法開啟瀏覽器。本文山姆鍋將說明如何讓 WSL 中的程式可以自動開啟 Windows 系統預設的瀏覽器。","headline":"讓程式從 WSL 環境自動開啟 Windows 系統的瀏覽器","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2020/05/launch-windows-default-browser-from-inside-wsl/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","/contact","/sitemap"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2020/05/launch-windows-default-browser-from-inside-wsl/","keywords":"xdg-open, WSL"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","/contact","/sitemap"],"image":"logo.png"},"articleBody":"在使用 Hexo 撰寫部落格文章或者開發 Web 應用時常常會需要開啟瀏覽器來檢視結果。Hexo 或者 Web 應用開發工具除了支援啟動後端服務外也支援自動啟動系統預設的瀏覽器，但由於在 WSL 環境預設並沒有圖形桌面環境，自然無法開啟瀏覽器。本文山姆鍋將說明如何讓 WSL 中的程式可以自動開啟 Windows 系統預設的瀏覽器。\n\n要讓程式自動開啟瀏覽器通常會有特別的參數設定。例如：Hexo 可執行下列指令啟動本地網頁服務並開啟預設的瀏覽器來連到網址 “http://127.0.0.1:4000”。\n1hexo server --open\n但由於上述原因並不能如預期運作。所以，往往需要手動開啟 Windows 上的瀏覽器並輸入網址來開啟網頁，雖然不算大問題，但是也太不方便。\n探索\n稍微研究一下 Linux 上程式如何開啟預設瀏覽器的問題，可以了解像是上述 hexo server --open 指令內部其實通常是透過 ‘xdg-open’ 這個程式來開啟桌面環境預設的應用程式。例如： xdg-open https://google.com 試圖開啟瀏覽器連結到 ‘https://google.com’ 這個網址。‘xdg-open’ 則會根據環境盡可能達成開啟應用的目的。\n實現\n在 WSL Ubuntu 環境中，‘xdg-open’ 包含在’xdg-utils’ 這個套件中。執行下列指令安裝 ‘xdg-utils’ 套件：\n1$ sudo apt install xdg-utils\n在命令列執行下列指令測試是否正常：\n1$ xdg-open https://samkuo.me\n可以開啟 Windows 預設瀏覽器 (如 Chrome)，並連到山姆鍋的個人部落格的話則表示運作成功 :-)\n以上是在 Ubuntu 20.04 WSL 發行版本上測試，很顯然也應該只對使用 ‘xdg-open’ 的程式有效。另外，如果 WSL 系統已經安裝了 Linux 原生桌面環境 (如 xfce4), 由於’xdg-open’會優先試圖使用 Linux 桌面環境的設定來開啟瀏覽器，會導致經過好幾分鐘後才會開啟 Windows 預設的瀏覽器。\n小結\n山姆鍋原先並沒有預期這樣的作法可以在 WSL 環境中正常運作，純粹只是抱著實驗看看的想法。至於可以運作的原因，由於 WSL 本身就支援從 Ｌinux 環境直接啟動 Windows 原生程式，個人猜測 Ubuntu WSL 發行版本可能對於 ‘xdg-open’ 剛好有特別支援。不管如何，WSL 作為開發環境的可行性又更高了一點。\n","dateCreated":"2020-05-04T10:11:41+08:00","dateModified":"2020-05-04T10:11:41+08:00","datePublished":"2020-05-04T10:11:41+08:00","description":"在使用 Hexo 撰寫部落格文章或者開發 Web 應用時常常會需要開啟瀏覽器來檢視結果。Hexo 或者 Web 應用開發工具除了支援啟動後端服務外也支援自動啟動系統預設的瀏覽器，但由於在 WSL 環境預設並沒有圖形桌面環境，自然無法開啟瀏覽器。本文山姆鍋將說明如何讓 WSL 中的程式可以自動開啟 Windows 系統預設的瀏覽器。","headline":"讓程式從 WSL 環境自動開啟 Windows 系統的瀏覽器","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2020/05/launch-windows-default-browser-from-inside-wsl/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","/contact","/sitemap"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2020/05/launch-windows-default-browser-from-inside-wsl/","keywords":"xdg-open, WSL"}</script>
     <meta name="description" content="在使用 Hexo 撰寫部落格文章或者開發 Web 應用時常常會需要開啟瀏覽器來檢視結果。Hexo 或者 Web 應用開發工具除了支援啟動後端服務外也支援自動啟動系統預設的瀏覽器，但由於在 WSL 環境預設並沒有圖形桌面環境，自然無法開啟瀏覽器。本文山姆鍋將說明如何讓 WSL 中的程式可以自動開啟 Windows 系統預設的瀏覽器。">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="讓程式從 WSL 環境自動開啟 Windows 系統的瀏覽器">
@@ -259,22 +259,6 @@
                         >
                         <i class="sidebar-button-icon fab fa-facebook" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Facebook</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a
-                            class="sidebar-button-link "
-                            href="https://tw.linkedin.com/in/sampot"
-                            
-                                target="_blank"
-                            
-                            rel="noopener"
-                            title="LinkedIn"
-                        >
-                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">LinkedIn</span>
                     </a>
             </li>
             

@@ -19,7 +19,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","/contact","/sitemap"],"image":"logo.png"},"articleBody":"部落格文章常常需要連到其他內部文章，Jekyll/Octopress 提供 post_url 標籤來簡化內部文章連結的建立。由於山姆鍋在使用這個標籤時遇到一些問題，本文是為了協助那些同樣遇到問題的人避免再浪費時間。\n\n安裝 post_url 插件\nJekyll 提供的 post_url 聽說跟 Octopress 不太相容。但我實際使用，這個問題應該已經不存在。如果您使用 Jekyll 的 post_url 內建標籤遇到問題，可以嘗試使用下列方法安裝。\n\n從 GitHub 上下載這個 post_url.rb 檔案。\n放到您 Octopress 的 plugins 目錄。\n\npost_url 使用的語法如下：\n1[Post Name]({% post_url 2013-05-30-start-up %})\n其中，'2013-05-30-start-up’要換成被連結文章的檔名，但不要包含副檔名 (.md/.markdown, 等等)。\n更換成 kramdown 剖析器 (parser)\n按照上述步驟後，在文章中加入 post_url 標籤，您可能會遇到這個錯誤：\n12345678Liquid Exception: can't convert nil into String in atom.xml/Users/sam/.rbenv/versions/1.9.3-p194/lib/ruby/1.9.1/time.rb:265:in `_parse'/Users/sam/.rbenv/versions/1.9.3-p194/lib/ruby/1.9.1/time.rb:265:in `parse'/Users/sam/workspace/blog.eavatar.com/plugins/post_link.rb:11:in `initialize'/Users/sam/workspace/blog.eavatar.com/plugins/post_link.rb:31:in `new'...\nOctopress 預設使用的 Markdown 剖析器 (parser)，也就是 rdiscount，才會遇到這個問題。所以，只好更換成 kramdown 這個剖析器。\n在 _config.yml 檔案中，將 ‘markdown: rdistcount’ 換成 ‘markdown: kramdown’\n12#markdown: rdiscountmarkdown: kramdown\n如果您沒有裝過，使用下列指令安裝 kramdown。\n1$ gem install kramdown\n小結\n本來認為應該很簡單的工作，想不到出了一些意外。幸好，網路上許多先進不吝分享，才能快速解決問題。\n參考來源\nInternal links to posts\n","dateCreated":"2013-06-14T09:49:00+08:00","dateModified":"2018-08-19T12:25:24+08:00","datePublished":"2013-06-14T09:49:00+08:00","description":"部落格文章常常需要連到其他內部文章，Jekyll/Octopress 提供 post_url 標籤來簡化內部文章連結的建立。由於山姆鍋在使用這個標籤時遇到一些問題，本文是為了協助那些同樣遇到問題的人避免再浪費時間。","headline":"在 Octopress 中使用 post_url 來簡化內部文章連接","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/06/use-post-url-internal-link-octopress/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","https://tw.linkedin.com/in/sampot","/contact","/sitemap"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2013/06/use-post-url-internal-link-octopress/","keywords":"Octopress, Jekyll"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","/contact","/sitemap"],"image":"logo.png"},"articleBody":"部落格文章常常需要連到其他內部文章，Jekyll/Octopress 提供 post_url 標籤來簡化內部文章連結的建立。由於山姆鍋在使用這個標籤時遇到一些問題，本文是為了協助那些同樣遇到問題的人避免再浪費時間。\n\n安裝 post_url 插件\nJekyll 提供的 post_url 聽說跟 Octopress 不太相容。但我實際使用，這個問題應該已經不存在。如果您使用 Jekyll 的 post_url 內建標籤遇到問題，可以嘗試使用下列方法安裝。\n\n從 GitHub 上下載這個 post_url.rb 檔案。\n放到您 Octopress 的 plugins 目錄。\n\npost_url 使用的語法如下：\n1[Post Name]({% post_url 2013-05-30-start-up %})\n其中，'2013-05-30-start-up’要換成被連結文章的檔名，但不要包含副檔名 (.md/.markdown, 等等)。\n更換成 kramdown 剖析器 (parser)\n按照上述步驟後，在文章中加入 post_url 標籤，您可能會遇到這個錯誤：\n12345678Liquid Exception: can't convert nil into String in atom.xml/Users/sam/.rbenv/versions/1.9.3-p194/lib/ruby/1.9.1/time.rb:265:in `_parse'/Users/sam/.rbenv/versions/1.9.3-p194/lib/ruby/1.9.1/time.rb:265:in `parse'/Users/sam/workspace/blog.eavatar.com/plugins/post_link.rb:11:in `initialize'/Users/sam/workspace/blog.eavatar.com/plugins/post_link.rb:31:in `new'...\nOctopress 預設使用的 Markdown 剖析器 (parser)，也就是 rdiscount，才會遇到這個問題。所以，只好更換成 kramdown 這個剖析器。\n在 _config.yml 檔案中，將 ‘markdown: rdistcount’ 換成 ‘markdown: kramdown’\n12#markdown: rdiscountmarkdown: kramdown\n如果您沒有裝過，使用下列指令安裝 kramdown。\n1$ gem install kramdown\n小結\n本來認為應該很簡單的工作，想不到出了一些意外。幸好，網路上許多先進不吝分享，才能快速解決問題。\n參考來源\nInternal links to posts\n","dateCreated":"2013-06-14T09:49:00+08:00","dateModified":"2018-08-19T12:25:24+08:00","datePublished":"2013-06-14T09:49:00+08:00","description":"部落格文章常常需要連到其他內部文章，Jekyll/Octopress 提供 post_url 標籤來簡化內部文章連結的建立。由於山姆鍋在使用這個標籤時遇到一些問題，本文是為了協助那些同樣遇到問題的人避免再浪費時間。","headline":"在 Octopress 中使用 post_url 來簡化內部文章連接","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/06/use-post-url-internal-link-octopress/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","/contact","/sitemap"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2013/06/use-post-url-internal-link-octopress/","keywords":"Octopress, Jekyll"}</script>
     <meta name="description" content="描述如何在Octopress中使用post_url以及遇到的問題。">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="在 Octopress 中使用 post_url 來簡化內部文章連接">
@@ -261,22 +261,6 @@
                         >
                         <i class="sidebar-button-icon fab fa-facebook" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Facebook</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a
-                            class="sidebar-button-link "
-                            href="https://tw.linkedin.com/in/sampot"
-                            
-                                target="_blank"
-                            
-                            rel="noopener"
-                            title="LinkedIn"
-                        >
-                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">LinkedIn</span>
                     </a>
             </li>
             
