@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://samkuo.me/"/>
-  <updated>2020-06-10T05:42:44.176Z</updated>
+  <updated>2020-06-16T02:09:58.688Z</updated>
   <id>https://samkuo.me/</id>
   
   <author>
@@ -15,6 +15,33 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>我的 K8S DevOps 實驗環境 - 服務負載均衡器</title>
+    <link href="https://samkuo.me/post/2020/06/my-k8s-devops-lab-service-load-balancers/"/>
+    <id>https://samkuo.me/post/2020/06/my-k8s-devops-lab-service-load-balancers/</id>
+    <published>2020-06-16T01:55:04.000Z</published>
+    <updated>2020-06-16T02:09:58.688Z</updated>
+    
+    <summary type="html">
+    
+      &lt;p&gt;本文屬於「&lt;a href=&quot;/post/2020/05/my-k8s-devops-lab-env/&quot;&gt;我的 K8S DevOps 實驗環境&lt;/a&gt;」文章系列，說明如何利用 MetalLB 來作為此實驗環境的服務負載均衡器方案，看看這個 K8S 裸機負載均衡器是否可以不負眾望。&lt;/p&gt;
+    
+    </summary>
+    
+    
+    
+      <category term="Kubernetes" scheme="https://samkuo.me/tag/kubernetes/"/>
+    
+      <category term="DevOps" scheme="https://samkuo.me/tag/devops/"/>
+    
+      <category term="SPK Cluster" scheme="https://samkuo.me/tag/spk-cluster/"/>
+    
+      <category term="Loadbalaner" scheme="https://samkuo.me/tag/loadbalaner/"/>
+    
+      <category term="MetalLB" scheme="https://samkuo.me/tag/metallb/"/>
+    
+  </entry>
   
   <entry>
     <title>建構精簡版的 Deno 容器</title>
@@ -46,7 +73,7 @@
     <link href="https://samkuo.me/post/2020/06/my-k8s-devops-lab-node-installation/"/>
     <id>https://samkuo.me/post/2020/06/my-k8s-devops-lab-node-installation/</id>
     <published>2020-06-08T03:20:50.000Z</published>
-    <updated>2020-06-08T03:20:50.407Z</updated>
+    <updated>2020-06-13T14:27:31.760Z</updated>
     
     <summary type="html">
     
@@ -491,33 +518,6 @@
       <category term="Continuous delivery" scheme="https://samkuo.me/tag/continuous-delivery/"/>
     
       <category term="Continuous deployment" scheme="https://samkuo.me/tag/continuous-deployment/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Shippable CI 上 Docker-compose 的難題</title>
-    <link href="https://samkuo.me/post/2016/04/shippable-ci-docker-compose/"/>
-    <id>https://samkuo.me/post/2016/04/shippable-ci-docker-compose/</id>
-    <published>2016-04-16T08:40:00.000Z</published>
-    <updated>2018-08-29T12:19:36.961Z</updated>
-    
-    <summary type="html">
-    
-      &lt;p&gt;如同多數使用 Docker 容器來部署應用的團隊一樣，山姆鍋也使用 Docker-compose 啟動一組相關的容器來進行整合測試。這樣的測試會在開發者工作機以及持續整合主機上執行。 但是，如果您跟山姆鍋一樣使用 Shippable 這家 CI 服務的話，您可能同樣會遇到一些小麻煩。&lt;/p&gt;
-    
-    </summary>
-    
-    
-      <category term="Software Development" scheme="https://samkuo.me/category/software-development/"/>
-    
-    
-      <category term="Continuous integration" scheme="https://samkuo.me/tag/continuous-integration/"/>
-    
-      <category term="Shippable" scheme="https://samkuo.me/tag/shippable/"/>
-    
-      <category term="Docker Compose" scheme="https://samkuo.me/tag/docker-compose/"/>
-    
-      <category term="CI" scheme="https://samkuo.me/tag/ci/"/>
     
   </entry>
   
