@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://samkuo.me/"/>
-  <updated>2020-06-16T02:09:58.688Z</updated>
+  <updated>2020-06-23T01:08:47.258Z</updated>
   <id>https://samkuo.me/</id>
   
   <author>
@@ -15,6 +15,33 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Ubuntu 上 Vagrant+Libvirt 虛擬環境</title>
+    <link href="https://samkuo.me/post/2020/06/vagrant-libvirt-ubuntu-devops-env/"/>
+    <id>https://samkuo.me/post/2020/06/vagrant-libvirt-ubuntu-devops-env/</id>
+    <published>2020-06-23T01:08:47.000Z</published>
+    <updated>2020-06-23T01:08:47.258Z</updated>
+    
+    <summary type="html">
+    
+      &lt;p&gt;在 「&lt;a href=&quot;/post/2020/05/my-k8s-devops-lab-env/&quot; title=&quot;我的 K8S DevOps 實驗環境 - 基礎篇&quot;&gt;我的 K8S DevOps 實驗環境 - 基礎篇&lt;/a&gt;」 提到: Vagrant+Libvirt 也是值得考慮的桌面等級虛擬化方案。理論上，在同樣硬體規格下，KVM虛擬機的效能會比 VirtualBox 來得高。所以，對於已經有 Linux 環境的人，使用這個組合應該比較有吸引力。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="DevOps" scheme="https://samkuo.me/category/devops/"/>
+    
+    
+      <category term="Ubuntu" scheme="https://samkuo.me/tag/ubuntu/"/>
+    
+      <category term="vagrant" scheme="https://samkuo.me/tag/vagrant/"/>
+    
+      <category term="kvm" scheme="https://samkuo.me/tag/kvm/"/>
+    
+      <category term="libvirt" scheme="https://samkuo.me/tag/libvirt/"/>
+    
+  </entry>
   
   <entry>
     <title>我的 K8S DevOps 實驗環境 - 服務負載均衡器</title>
@@ -489,35 +516,6 @@
       <category term="hexo" scheme="https://samkuo.me/tag/hexo/"/>
     
       <category term="pelican" scheme="https://samkuo.me/tag/pelican/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>容器化應用持續交付</title>
-    <link href="https://samkuo.me/post/2016/04/containerized-app-continuous-delivery/"/>
-    <id>https://samkuo.me/post/2016/04/containerized-app-continuous-delivery/</id>
-    <published>2016-04-18T07:45:00.000Z</published>
-    <updated>2020-05-03T22:00:22.904Z</updated>
-    
-    <summary type="html">
-    
-      &lt;p&gt;自從山姆鍋決定採用容器化技術作為應用部署的方案後，很多的細節需要設計跟決定，為了避免太專注細節， 決定先設計出計畫採用的持續軟體交付流程。由於每個團隊的使用的工具跟系統可能差異很大， 為了讓本文可以適用其他團隊，先以抽象流程來描述然後才說明山姆鍋採用的方案。&lt;/p&gt;
-    
-    </summary>
-    
-    <content src="https://samkuo.me//media/shared/continuous-delivery.png" type="image" />
-    
-    
-      <category term="Service Operations" scheme="https://samkuo.me/category/service-operations/"/>
-    
-    
-      <category term="container" scheme="https://samkuo.me/tag/container/"/>
-    
-      <category term="Continuous integration" scheme="https://samkuo.me/tag/continuous-integration/"/>
-    
-      <category term="Continuous delivery" scheme="https://samkuo.me/tag/continuous-delivery/"/>
-    
-      <category term="Continuous deployment" scheme="https://samkuo.me/tag/continuous-deployment/"/>
     
   </entry>
   
