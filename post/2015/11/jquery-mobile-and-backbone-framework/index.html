@@ -1,0 +1,1205 @@
+
+<!DOCTYPE html>
+<html lang="zh-tw">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="我是山姆鍋">
+    <title>簡單好用！JQM 跟 Backbone 做 Web 用戶介面 - 我是山姆鍋</title>
+    <meta name="author" content="Sampot (山姆鍋)">
+    
+    
+        <link rel="icon" href="https://samkuo.me/images/favicon.png">
+    
+    
+        
+            <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
+        
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","/contact","/sitemap"],"image":"logo.png"},"articleBody":"山姆鍋對 JavaScript 大多數框架都不算熟悉，但因為《我。影化身》專案需要提供 Web 介面， 不得已也要選擇符合自己需要的框架來運用一下。幸好，我的目標只是一個相對簡單的使用者介面， 讓這個過程縮短不少時間，最後決定使用 JQuery Mobile + Backbone 這樣的框架組合。\n\n為什麼選擇使用 Web 用戶介面？\n《我。影化身》專案有桌面環境用戶介面的需求，也嘗試過使用 Qt\n這種跨平台的程式庫。 但山姆鍋對於產生的發行包因為這樣就要多將近\n20MB 的大小一直覺得耿耿於懷，雖然這只是個人偏好問題，\n還是希望有一個較輕量的跨平台用戶介面。\n另外一個做法就是使用各個平台的特有程式庫來開發 UI，對於 Python\n程式，這表示：\n\n在 Windows 使用 PyWin32\n 在 OS X 使用 PyObjC\n 在 Linux 使用 PyGObject\n\n理論上是可行，但要同時使用不同 API 在不同平台開發 UI, 只要 UI\n稍微複雜點，\n開發的困難度就會需要每個平台一個專職工程師了。《我。影化身》的確有使用上述\n程式庫來整合桌面環境的訊息通知機制以及選單，但要開發完整\nUI，即使像是《我。影化身》這種設定不需要複雜 UI\n的程式，難度還是太高了。其它如 Toga, PyGUI 等等特殊的跨平台 UI\n程式庫都因為缺乏專案所需的功能而無法採用。\n不管原因為何，最後決定使用 Web 技術來提供跨平台 UI,\n似乎也是很合理的方案。\n為什麼選擇 JQuery Mobile + Backbone?\n由於專業上需要，一直以來山姆鍋都有持續在關注 JavaScript 應用框架的發展，\n也常常對於如雨後春筍般出現的新框架感到無所適從，所以之前都僅止於了解，並沒有太多實際運用的經驗。\n如今要選擇專案所使用的框架，自然要先說說專案的需求：\n\n\n\n提供一個類似應用程式(App)的用戶介面\n\n:   因為這個專案就是個應用程式。\n\n\n\n\n不用太多 HTML5, CSS3 設計\n\n:   作為工程師，山姆鍋對於設計的美感真的不在行。\n\n\n\n\n使用現有的用戶介面元件\n\n:   希望開發的方式可以使用元件概念撰寫，也就是有明確的 Button, List,\n    Table 這樣的概念。\n\n\n\n\n同時支援桌面、平板以及手機裝置\n\n:   沒有太多時間使用不同的框架。\n\n應該也有其它方案符合需求，像是 Sencha Touch 等，但個人偏好 JQuery\nMobile。 作為 UI 框架，JQuery Mobile\n基本功能完整，但要開發應用總還是希望程式要有更好的結構，\n這就需要考慮採用其它應用框架來輔助，目前跟 JQuery Mobile\n搭配最好的看來是 Backbone。\n雖然網路上有許多關於 JQuery Mobile + Backbone 的教學文章，JQuery Mobile\n官網甚至有提供示範案例，但這些例子大多假設專案需求龐大，硬是要使用\nRequireJS 來提供模組化開發機制。 對於《我。影化身》這樣的專案來說，使用\nRequireJS 總有點太過了 [1] 。 雖然網路上也找得到關於只使用 JQuery Mobile\n\nBackbone 的範例，但事情如果順利的話， 就不會有這篇文章了！\n\n問題出在哪？\n老實說，山姆鍋對 JavaScript 相關框架真的不熟，只是一邊開發一邊學習。\n對於網路找到的 JQuery Mobile + Backbone\n範例為何不能正常運作也沒有時間深入了解，\n也許是單純版本問題，或者只是山姆鍋眼睛脫窗哪裏沒有設定好！不管怎樣，本來認為一件簡單的事情，\n卡了一段時間後終於試出來一個可以運作的組合。\n除了 JQuery，JQM\n本身並不依賴其它程式庫，雖說是完整的框架，但因為它缺少其它 MV*\n應用框架的功能， 讓它其實更像 Twitter Bootstrap 這種 UI\n框架。為了開發完整的應用，通常還是搭配 Backbone 這樣的應用框架。\n但因為 JQM 有自己的頁面路由 (page\nrouting) 的機制，所以需要設定讓它不處理這部分功能，而由 Backbone\n全權處理。JQM 相關的設定在 /js/jqm-config.js 這個檔案：\n12345678910111213// JQM config$(document).on(\"mobileinit\", function () {    $.mobile.ajaxEnabled = false;    $.mobile.linkBindingEnabled = false;    $.mobile.hashListeningEnabled = false;    $.mobile.pushStateEnabled = false;    $.mobile.defaultPageTransition = \"fade\";    $.mobile.autoInitializePage = false;    $(\"div[data-role='page']\").on(\"pagehide\", function (event, ui) {        $(event.currentTarget).remove();    });});\n\n\n\n\\'mobileinit\\' 事件\n\n:   在 JQM 完成初始化前會呼叫此事件，所以在此設定 JQM。\n\n\n\n\najaxEnabled, linkBindingEnabled, pushStateEnabled 都設為 false\n\n:   分別讓 JQM 不使用 Ajax 方式動態載入頁面, 不處理超連結點選事件,\n    以及瀏覽器的導航歷史管理(navigation history)，這些都會干擾\n    Backbone 的運作。\n\n\n\n\nhashListeningEnabled 設為 false\n\n:   告訴 JQM 不要處理瀏覽器 URL hash 更動事件。 URL\n    hash就是瀏覽器網址中 \\'\\#\\' 那個部分，\n    這個部分按照規範是不會傳給後端伺服器，只能在網頁中存取。JQM 跟\n    Backbone 就是利用這個 hash 來決定要使用的頁面。\n\n\n\n\n由於 JQM 不再負責頁面導航管理，需要由我們自己完成舊的頁面資料從 DOM 中移除的工作\n\n:   `pagehide` 事件處理便是用來完成這個工作。\n\n有了這樣的設定，基本上就可以使用 Backbone\n來處理前端頁面導航以及其它功能。\n其它注意事項\n有幾個在實際開發中遇到的問題：\n\n\n\n動態產生 JQM 頁面內容時，可能會發現網頁呈現不太正常\n\n:   這點在專案樣板中沒有實例。這是因為 JQM\n    沒有機會套用樣式到新增的網頁元素，需要特別通知 JQM:\n\n    1$(this.el).trigger(\"create\");\n\n    如果您有其它更好的方式，請不吝指教。\n\n\n\n\n新版本的更換頁面方式\n\n:   新版本的 JQM 管理頁面的方式有更動，改為下列方式：\n\n    1$(\":mobile-pagecontainer\").pagecontainer( \"change\", $(page.el), { changeHash: false});\n\n    網路上找到的文章大多使用舊的方法，也就是：\n\n    1$.mobile.changePage($(page.el), {changeHash:false});\n\n\n\n\njqm-config.js 的引入順序\n\n:   `/js/jqm-config.js` 是用來設定 JQM, 它必須在 JQuery\n    之後， JQM 之前在網頁中引入，如:\n\n123&lt;script src=\"/js/jquery.min.js\"&gt;&lt;/script&gt;&lt;script src=\"/js/jqm-config.js\"&gt;&lt;/script&gt;&lt;script src=\"/js/jquery.mobile.min.js\"&gt;&lt;/script&gt;\nJQM + Backbone 專案樣板\n為了方便未來使用，山姆鍋在 GitHub\n上整理了一個專案樣板：https://github.com/sampot/jqm-backbone-template\n想要更實際的例子？那就請直接參考《我。影化身》的前端用戶介面實作 (webfront)：https://github.com/eavatar/eavatar-me\n。\n結語\n山姆鍋其實很喜歡 AngularJS\n這個應用框架，但對於它的運作方式不是很了解，所以不在這個專案採用。\n在實際使用後，發現 JQM + Backbone\n這樣的組合還蠻不錯的：夠簡單、運作流程容易理解。 對於只需要簡單 Web UI\n的應用專案，這是個不錯的選擇。\n參考資料\n\n\n\nUsing Backbone.js with jQuery Mobile\nhttp://coenraets.org/blog/2012/03/using-backbone-js-with-jquery-mobile/\n\n\n\n\n\n\n\n 如果預期專案需要多人一起開發或者功能較複雜，建議考慮使用 RequireJS。 ↩︎\n\n\n\n","dateCreated":"2015-11-10T09:34:00+08:00","dateModified":"2020-03-02T18:20:45+08:00","datePublished":"2015-11-10T09:34:00+08:00","description":"山姆鍋對 JavaScript 大多數框架都不算熟悉，但因為《我。影化身》專案需要提供 Web 介面， 不得已也要選擇符合自己需要的框架來運用一下。幸好，我的目標只是一個相對簡單的使用者介面， 讓這個過程縮短不少時間，最後決定使用 JQuery Mobile + Backbone 這樣的框架組合。","headline":"簡單好用！JQM 跟 Backbone 做 Web 用戶介面","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2015/11/jquery-mobile-and-backbone-framework/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","/contact","/sitemap"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2015/11/jquery-mobile-and-backbone-framework/","keywords":"Mobile, JQuery, JQM, Backbone, Framework, JavaScript"}</script>
+    <meta name="description" content="山姆鍋對 JavaScript 大多數框架都不算熟悉，但因為《我。影化身》專案需要提供 Web 介面， 不得已也要選擇符合自己需要的框架來運用一下。幸好，我的目標只是一個相對簡單的使用者介面， 讓這個過程縮短不少時間，最後決定使用 JQuery Mobile + Backbone 這樣的框架組合。">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="簡單好用！JQM 跟 Backbone 做 Web 用戶介面">
+<meta property="og:url" content="https://samkuo.me/post/2015/11/jquery-mobile-and-backbone-framework/">
+<meta property="og:site_name" content="我是山姆鍋">
+<meta property="og:description" content="山姆鍋對 JavaScript 大多數框架都不算熟悉，但因為《我。影化身》專案需要提供 Web 介面， 不得已也要選擇符合自己需要的框架來運用一下。幸好，我的目標只是一個相對簡單的使用者介面， 讓這個過程縮短不少時間，最後決定使用 JQuery Mobile + Backbone 這樣的框架組合。">
+<meta property="og:locale" content="zh_TW">
+<meta property="article:published_time" content="2015-11-10T01:34:00.000Z">
+<meta property="article:modified_time" content="2020-03-02T10:20:45.802Z">
+<meta property="article:author" content="Sampot (山姆鍋)">
+<meta property="article:tag" content="Mobile">
+<meta property="article:tag" content="JQuery">
+<meta property="article:tag" content="JQM">
+<meta property="article:tag" content="Backbone">
+<meta property="article:tag" content="Framework">
+<meta property="article:tag" content="JavaScript">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:creator" content="@sampotkuo">
+<meta property="fb:app_id" content="1538037013031361">
+    
+    
+        
+    
+    <meta property="og:image" content="https://samkuo.me/images/featured_image.jpg"/>
+    
+    
+    
+    <!--STYLES-->
+    
+<link rel="stylesheet" href="/assets/css/style-lfspghztdttlloh4nly9hmp3cqmehlzaagf5ften7wo63faxiltzljjm4fb0.min.css">
+
+    <!--STYLES END-->
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-41152700-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-41152700-1');
+    </script>
+
+
+    
+
+    
+        
+    
+</head>
+
+    <body>
+        <div id="fb-root"></div>
+        <script async defer crossorigin="anonymous"
+            src="https://connect.facebook.net/zh_TW/sdk.js#xfbml=1&version=v7.0&appId=1538037013031361&autoLogAppEvents=1"></script>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+<header id="header" data-behavior="5">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a
+            class="header-title-link"
+            href="/"
+            aria-label=""
+        >
+        <img class="header-avatar-picture" src="/images/logo32.png" alt="作者的圖片" />
+            我是山姆鍋
+        </a>
+    </div>
+    
+        
+            <a
+                class="header-right-icon open-algolia-search"
+                href="#search"
+                aria-label="打開鏈接: /#search"
+            >
+        
+        
+            <i class="fa fa-search fa-lg"></i>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="5">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a
+                    href="/#about"
+                    aria-label="閱讀有關作者的更多信息"
+                >
+                    <img class="sidebar-profile-picture" src="/images/logo.png" alt="作者的圖片"/>
+                </a>
+                <h4 class="sidebar-profile-name">Sampot (山姆鍋)</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>個人部落格， 記錄與分享一些軟體開發與運維相關資訊， 偶爾也會碎念一下</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/"
+                            
+                            rel="noopener"
+                            title="首頁"
+                        >
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">首頁</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-categories"
+                            
+                            rel="noopener"
+                            title="分類"
+                        >
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">分類</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-tags"
+                            
+                            rel="noopener"
+                            title="標籤"
+                        >
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">標籤</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-archives"
+                            
+                            rel="noopener"
+                            title="所有文章"
+                        >
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">所有文章</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link open-algolia-search"
+                            href="#search"
+                            
+                            rel="noopener"
+                            title="搜尋"
+                        >
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">搜尋</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/about"
+                            
+                            rel="noopener"
+                            title="關於"
+                        >
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">關於</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://github.com/sampot"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="GitHub"
+                        >
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://twitter.com/sampotkuo"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Twitter"
+                        >
+                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Twitter</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://facebook.com/sampotkuo"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Facebook"
+                        >
+                        <i class="sidebar-button-icon fab fa-facebook" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Facebook</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/contact"
+                            
+                            rel="noopener"
+                            title="聯絡"
+                        >
+                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">聯絡</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/sitemap"
+                            
+                            rel="noopener"
+                            title="網站導覽"
+                        >
+                        <i class="sidebar-button-icon fa fa-sitemap" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">網站導覽</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://feedly.com/i/subscription/feed/https://samkuo.me/atom.xml"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Atom"
+                        >
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Atom</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="5"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            簡單好用！JQM 跟 Backbone 做 Web 用戶介面
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2015-11-10T09:34:00+08:00">
+	
+		    11月 10, 2015
+    	
+    </time>
+    
+        <span>分類 </span>
+        
+    <a class="category-link" href="/category/software-development/">Software Development</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <div class="alert info no-icon">
+                我是山姆鍋 <div class="fb-like" data-href="https://www.facebook.com/sampotkuo" data-width="" data-layout="standard" data-action="like" data-size="large" data-share="false"></div>
+            </div>
+
+            <p>山姆鍋對 JavaScript 大多數框架都不算熟悉，但因為《我。影化身》專案需要提供 Web 介面， 不得已也要選擇符合自己需要的框架來運用一下。幸好，我的目標只是一個相對簡單的使用者介面， 讓這個過程縮短不少時間，最後決定使用 JQuery Mobile + Backbone 這樣的框架組合。</p>
+<a id="more"></a>
+<h2 id="為什麼選擇使用-Web-用戶介面">為什麼選擇使用 Web 用戶介面？</h2>
+<p>《我。影化身》專案有桌面環境用戶介面的需求，也嘗試過使用 Qt<br>
+這種跨平台的程式庫。 但山姆鍋對於產生的發行包因為這樣就要多將近<br>
+20MB 的大小一直覺得耿耿於懷，雖然這只是個人偏好問題，<br>
+還是希望有一個較輕量的跨平台用戶介面。</p>
+<p>另外一個做法就是使用各個平台的特有程式庫來開發 UI，對於 Python<br>
+程式，這表示：</p>
+<ul>
+<li>在 Windows 使用 PyWin32</li>
+<li> 在 OS X 使用 PyObjC</li>
+<li> 在 Linux 使用 PyGObject</li>
+</ul>
+<p>理論上是可行，但要同時使用不同 API 在不同平台開發 UI, 只要 UI<br>
+稍微複雜點，<br>
+開發的困難度就會需要每個平台一個專職工程師了。《我。影化身》的確有使用上述<br>
+程式庫來整合桌面環境的訊息通知機制以及選單，但要開發完整<br>
+UI，即使像是《我。影化身》這種設定不需要複雜 UI<br>
+的程式，難度還是太高了。其它如 Toga, PyGUI 等等特殊的跨平台 UI<br>
+程式庫都因為缺乏專案所需的功能而無法採用。</p>
+<p>不管原因為何，最後決定使用 Web 技術來提供跨平台 UI,<br>
+似乎也是很合理的方案。</p>
+<h2 id="為什麼選擇-JQuery-Mobile-Backbone">為什麼選擇 JQuery Mobile + Backbone?</h2>
+<p>由於專業上需要，一直以來山姆鍋都有持續在關注 JavaScript 應用框架的發展，<br>
+也常常對於如雨後春筍般出現的新框架感到無所適從，所以之前都僅止於了解，並沒有太多實際運用的經驗。<br>
+如今要選擇專案所使用的框架，自然要先說說專案的需求：</p>
+<ol>
+<li></li>
+</ol>
+<pre><code>提供一個類似應用程式(App)的用戶介面
+
+:   因為這個專案就是個應用程式。
+</code></pre>
+<ol start="2">
+<li></li>
+</ol>
+<pre><code>不用太多 HTML5, CSS3 設計
+
+:   作為工程師，山姆鍋對於設計的美感真的不在行。
+</code></pre>
+<ol start="3">
+<li></li>
+</ol>
+<pre><code>使用現有的用戶介面元件
+
+:   希望開發的方式可以使用元件概念撰寫，也就是有明確的 Button, List,
+    Table 這樣的概念。
+</code></pre>
+<ol start="4">
+<li></li>
+</ol>
+<pre><code>同時支援桌面、平板以及手機裝置
+
+:   沒有太多時間使用不同的框架。
+</code></pre>
+<p>應該也有其它方案符合需求，像是 Sencha Touch 等，但個人偏好 JQuery<br>
+Mobile。 作為 UI 框架，JQuery Mobile<br>
+基本功能完整，但要開發應用總還是希望程式要有更好的結構，<br>
+這就需要考慮採用其它應用框架來輔助，目前跟 JQuery Mobile<br>
+搭配最好的看來是 Backbone。</p>
+<p>雖然網路上有許多關於 JQuery Mobile + Backbone 的教學文章，JQuery Mobile<br>
+官網甚至有提供示範案例，但這些例子大多假設專案需求龐大，硬是要使用<br>
+RequireJS 來提供模組化開發機制。 對於《我。影化身》這樣的專案來說，使用<br>
+RequireJS 總有點太過了 <sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup> 。 雖然網路上也找得到關於只使用 JQuery Mobile</p>
+<ul>
+<li>Backbone 的範例，但事情如果順利的話， 就不會有這篇文章了！</li>
+</ul>
+<h2 id="問題出在哪">問題出在哪？</h2>
+<p>老實說，山姆鍋對 JavaScript 相關框架真的不熟，只是一邊開發一邊學習。<br>
+對於網路找到的 JQuery Mobile + Backbone<br>
+範例為何不能正常運作也沒有時間深入了解，<br>
+也許是單純版本問題，或者只是山姆鍋眼睛脫窗哪裏沒有設定好！不管怎樣，本來認為一件簡單的事情，<br>
+卡了一段時間後終於試出來一個可以運作的組合。</p>
+<p>除了 JQuery，JQM<br>
+本身並不依賴其它程式庫，雖說是完整的框架，但因為它缺少其它 MV*<br>
+應用框架的功能， 讓它其實更像 Twitter Bootstrap 這種 UI<br>
+框架。為了開發完整的應用，通常還是搭配 Backbone 這樣的應用框架。</p>
+<p>但因為 JQM 有自己的頁面路由 (page<br>
+routing) 的機制，所以需要設定讓它不處理這部分功能，而由 Backbone<br>
+全權處理。JQM 相關的設定在 <code>/js/jqm-config.js</code> 這個檔案：</p>
+<figure class="highlight javascript"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// JQM config</span></span><br><span class="line">$(<span class="built_in">document</span>).on(<span class="string">"mobileinit"</span>, <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>{</span><br><span class="line">    $.mobile.ajaxEnabled = <span class="literal">false</span>;</span><br><span class="line">    $.mobile.linkBindingEnabled = <span class="literal">false</span>;</span><br><span class="line">    $.mobile.hashListeningEnabled = <span class="literal">false</span>;</span><br><span class="line">    $.mobile.pushStateEnabled = <span class="literal">false</span>;</span><br><span class="line">    $.mobile.defaultPageTransition = <span class="string">"fade"</span>;</span><br><span class="line">    $.mobile.autoInitializePage = <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">    $(<span class="string">"div[data-role='page']"</span>).on(<span class="string">"pagehide"</span>, <span class="function"><span class="keyword">function</span> (<span class="params">event, ui</span>) </span>{</span><br><span class="line">        $(event.currentTarget).remove();</span><br><span class="line">    });</span><br><span class="line">});</span><br></pre></td></tr></tbody></table></figure>
+<ul>
+<li></li>
+</ul>
+<pre><code>\'mobileinit\' 事件
+
+:   在 JQM 完成初始化前會呼叫此事件，所以在此設定 JQM。
+</code></pre>
+<ul>
+<li></li>
+</ul>
+<pre><code>ajaxEnabled, linkBindingEnabled, pushStateEnabled 都設為 false
+
+:   分別讓 JQM 不使用 Ajax 方式動態載入頁面, 不處理超連結點選事件,
+    以及瀏覽器的導航歷史管理(navigation history)，這些都會干擾
+    Backbone 的運作。
+</code></pre>
+<ul>
+<li></li>
+</ul>
+<pre><code>hashListeningEnabled 設為 false
+
+:   告訴 JQM 不要處理瀏覽器 URL hash 更動事件。 URL
+    hash就是瀏覽器網址中 \'\#\' 那個部分，
+    這個部分按照規範是不會傳給後端伺服器，只能在網頁中存取。JQM 跟
+    Backbone 就是利用這個 hash 來決定要使用的頁面。
+</code></pre>
+<ul>
+<li></li>
+</ul>
+<pre><code>由於 JQM 不再負責頁面導航管理，需要由我們自己完成舊的頁面資料從 DOM 中移除的工作
+
+:   `pagehide` 事件處理便是用來完成這個工作。
+</code></pre>
+<p>有了這樣的設定，基本上就可以使用 Backbone<br>
+來處理前端頁面導航以及其它功能。</p>
+<h2 id="其它注意事項">其它注意事項</h2>
+<p>有幾個在實際開發中遇到的問題：</p>
+<ol>
+<li></li>
+</ol>
+<pre><code>動態產生 JQM 頁面內容時，可能會發現網頁呈現不太正常
+
+:   這點在專案樣板中沒有實例。這是因為 JQM
+    沒有機會套用樣式到新增的網頁元素，需要特別通知 JQM:
+
+    <figure class="highlight javascript"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$(<span class="keyword">this</span>.el).trigger(<span class="string">"create"</span>);</span><br></pre></td></tr></tbody></table></figure>
+
+    如果您有其它更好的方式，請不吝指教。
+</code></pre>
+<ol start="2">
+<li></li>
+</ol>
+<pre><code>新版本的更換頁面方式
+
+:   新版本的 JQM 管理頁面的方式有更動，改為下列方式：
+
+    <figure class="highlight javascript"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$(<span class="string">":mobile-pagecontainer"</span>).pagecontainer( <span class="string">"change"</span>, $(page.el), { <span class="attr">changeHash</span>: <span class="literal">false</span>});</span><br></pre></td></tr></tbody></table></figure>
+
+    網路上找到的文章大多使用舊的方法，也就是：
+
+    <figure class="highlight javascript"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$.mobile.changePage($(page.el), {<span class="attr">changeHash</span>:<span class="literal">false</span>});</span><br></pre></td></tr></tbody></table></figure>
+</code></pre>
+<ol start="3">
+<li></li>
+</ol>
+<pre><code>jqm-config.js 的引入順序
+
+:   `/js/jqm-config.js` 是用來設定 JQM, 它必須在 JQuery
+    之後， JQM 之前在網頁中引入，如:
+</code></pre>
+<figure class="highlight html"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"/js/jquery.min.js"</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"/js/jqm-config.js"</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"/js/jquery.mobile.min.js"</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure>
+<h2 id="JQM-Backbone-專案樣板">JQM + Backbone 專案樣板</h2>
+<p>為了方便未來使用，山姆鍋在 GitHub<br>
+上整理了一個專案樣板：<a href="https://github.com/sampot/jqm-backbone-template" target="_blank" rel="noopener">https://github.com/sampot/jqm-backbone-template</a></p>
+<p>想要更實際的例子？那就請直接參考《我。影化身》的前端用戶介面實作 (webfront)：<a href="https://github.com/eavatar/eavatar-me" target="_blank" rel="noopener">https://github.com/eavatar/eavatar-me</a><br>
+。</p>
+<h2 id="結語">結語</h2>
+<p>山姆鍋其實很喜歡 AngularJS<br>
+這個應用框架，但對於它的運作方式不是很了解，所以不在這個專案採用。<br>
+在實際使用後，發現 JQM + Backbone<br>
+這樣的組合還蠻不錯的：夠簡單、運作流程容易理解。 對於只需要簡單 Web UI<br>
+的應用專案，這是個不錯的選擇。</p>
+<h2 id="參考資料">參考資料</h2>
+<ul>
+<li>
+<dl>
+<dt>Using Backbone.js with jQuery Mobile</dt>
+<dd><a href="http://coenraets.org/blog/2012/03/using-backbone-js-with-jquery-mobile/" target="_blank" rel="noopener">http://coenraets.org/blog/2012/03/using-backbone-js-with-jquery-mobile/</a></dd>
+</dl>
+</li>
+</ul>
+<hr>
+<hr class="footnotes-sep">
+<section class="footnotes">
+<ol class="footnotes-list">
+<li id="fn1" class="footnote-item"><p> 如果預期專案需要多人一起開發或者功能較複雜，建議考慮使用 RequireJS。 <a href="#fnref1" class="footnote-backref">↩︎</a></p>
+</li>
+</ol>
+</section>
+
+            
+
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">標籤</span><br/>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tag/backbone/" rel="tag">Backbone</a> <a class="tag tag--primary tag--small t-link" href="/tag/framework/" rel="tag">Framework</a> <a class="tag tag--primary tag--small t-link" href="/tag/jqm/" rel="tag">JQM</a> <a class="tag tag--primary tag--small t-link" href="/tag/jquery/" rel="tag">JQuery</a> <a class="tag tag--primary tag--small t-link" href="/tag/javascript/" rel="tag">JavaScript</a> <a class="tag tag--primary tag--small t-link" href="/tag/mobile/" rel="tag">Mobile</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/post/2015/11/buildbot-continuous-integration-for-python/"
+                    data-tooltip="使用 Buildbot 進行持續整合與軟體打包工作"
+                    aria-label="上一篇: 使用 Buildbot 進行持續整合與軟體打包工作"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/post/2015/11/web-scraping-with-beautifulsoup/"
+                    data-tooltip="台灣期貨指數即時報價 - 使用 BeautifulSoup4"
+                    aria-label="下一篇: 台灣期貨指數即時報價 - 使用 BeautifulSoup4"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://samkuo.me/post/2015/11/jquery-mobile-and-backbone-framework/"
+                    title="分享到 Facebook"
+                    aria-label="分享到 Facebook"
+                >
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://twitter.com/intent/tweet?text=https://samkuo.me/post/2015/11/jquery-mobile-and-backbone-framework/"
+                    title="分享到 Twitter"
+                    aria-label="分享到 Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https://samkuo.me/post/2015/11/jquery-mobile-and-backbone-framework/"
+                    title="global.share_on_linkedin"
+                    aria-label="global.share_on_linkedin"
+                >
+                    <i class="fab fa-linkedin" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#disqus_thread"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript" target="_blank" rel="noopener">comments powered by Disqus.</a></noscript>
+</div>
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2022 Sampot (山姆鍋). All Rights Reserved.
+    </span>
+    <br/>
+        <a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW"><img
+                alt="創用 CC 授權條款" style="border-width:0"
+                src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+        除另有標示，本著作係採用<a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW">創用 CC
+            姓名標示-非商業性-相同方式分享 4.0 國際 授權條款</a>授權。
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="5">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/post/2015/11/buildbot-continuous-integration-for-python/"
+                    data-tooltip="使用 Buildbot 進行持續整合與軟體打包工作"
+                    aria-label="上一篇: 使用 Buildbot 進行持續整合與軟體打包工作"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/post/2015/11/web-scraping-with-beautifulsoup/"
+                    data-tooltip="台灣期貨指數即時報價 - 使用 BeautifulSoup4"
+                    aria-label="下一篇: 台灣期貨指數即時報價 - 使用 BeautifulSoup4"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://samkuo.me/post/2015/11/jquery-mobile-and-backbone-framework/"
+                    title="分享到 Facebook"
+                    aria-label="分享到 Facebook"
+                >
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://twitter.com/intent/tweet?text=https://samkuo.me/post/2015/11/jquery-mobile-and-backbone-framework/"
+                    title="分享到 Twitter"
+                    aria-label="分享到 Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https://samkuo.me/post/2015/11/jquery-mobile-and-backbone-framework/"
+                    title="global.share_on_linkedin"
+                    aria-label="global.share_on_linkedin"
+                >
+                    <i class="fab fa-linkedin" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#disqus_thread"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="5">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://www.facebook.com/sharer/sharer.php?u=https://samkuo.me/post/2015/11/jquery-mobile-and-backbone-framework/"
+                        aria-label="分享到 Facebook"
+                    >
+                        <i class="fab fa-facebook" aria-hidden="true"></i><span>分享到 Facebook</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://twitter.com/intent/tweet?text=https://samkuo.me/post/2015/11/jquery-mobile-and-backbone-framework/"
+                        aria-label="分享到 Twitter"
+                    >
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>分享到 Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https://samkuo.me/post/2015/11/jquery-mobile-and-backbone-framework/"
+                        aria-label="global.share_on_linkedin"
+                    >
+                        <i class="fab fa-linkedin" aria-hidden="true"></i><span>global.share_on_linkedin</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/images/logo.png" alt="作者的圖片"/>
+        
+            <h4 id="about-card-name">Sampot (山姆鍋)</h4>
+        
+            <div id="about-card-bio"><p>個人部落格， 記錄與分享一些軟體開發與運維相關資訊， 偶爾也會碎念一下</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>IT 自由工作者</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                台灣/台北
+            </div>
+        
+    </div>
+</div>
+
+        
+            <div id="algolia-search-modal" class="modal-container">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="close-button"><i class="fa fa-times"></i></span>
+            <a href="https://algolia.com" target="_blank" rel="noopener" class="searchby-algolia text-color-light link-unstyled">
+                <span class="searchby-algolia-text text-color-light text-small">by</span>
+                <img class="searchby-algolia-logo" src="/assets/images/logo-algolia-nebula-blue-full.svg">
+            </a>
+            <i class="search-icon fa fa-search"></i>
+            <form id="algolia-search-form">
+                <input type="text" id="algolia-search-input" name="search"
+                    class="form-control input--large search-input" placeholder="Search "
+                    />
+            </form>
+        </div>
+        <div class="modal-body">
+            <div class="no-result text-color-light text-center">沒有找到文章</div>
+            <div class="results">
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2012/03/set-up-mysql-master-master-replication/"
+                            aria-label=": 設定 MySQL Master-Master 複製"
+                        >
+                            <h3 class="media-heading">設定 MySQL Master-Master 複製</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2012年3月3日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>本文簡單說明如何設定兩台 MySQL server，讓它們彼此互相備份資料 (Master-master 模式)。雖然這樣的設定通常是支援高可用性 (high availability) 平台的一部分，但本文不包含如何完成其他 HA 的工作。設定兩台 MySQL 伺服器互相備份，主要目的就是要確認資料的安全性；同時也提高可用性。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2012/04/use-pacemaker-two-node-ha-cluster/"
+                            aria-label=": 使用 Pacemaker 建構雙節點叢集系統"
+                        >
+                            <h3 class="media-heading">使用 Pacemaker 建構雙節點叢集系統</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2012年4月6日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>想要達到系統高可用性 (high availability) 的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2012/04/build-cluster-filesystem-with-glusterfs-ubuntu/"
+                            aria-label=": 使用 GlusterFS 在 Ubuntu 上建構雙節點叢集檔案系統"
+                        >
+                            <h3 class="media-heading">使用 GlusterFS 在 Ubuntu 上建構雙節點叢集檔案系統</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2012年4月23日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案 (圖檔，CSS 等等) 可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點 (single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2012/04/scale-wordpress-with-hyperdb/"
+                            aria-label=": 使用 HyperDB 加強 WordPress 網站的資料庫擴充性"
+                        >
+                            <h3 class="media-heading">使用 HyperDB 加強 WordPress 網站的資料庫擴充性</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2012年4月23日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>對於流量高的 Wordpress 網站來說，資料庫往往是第一個出現的瓶頸。針對資料庫擴充性的問題，本文介紹 HyperDB 這個解決方案。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2012/04/create-lnmp-environment-with-nginx/"
+                            aria-label=": 在 Linode 上使用 Nginx 架設 LNMP 環境"
+                        >
+                            <h3 class="media-heading">在 Linode 上使用 Nginx 架設 LNMP 環境</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2012年4月30日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>Apache HTTPd 是很好的網站伺服器，但是對於 CPU 跟記憶體的要求較高，對於架設在 VPS 上面網站來說， 需要一個更輕量級的解決方案。越來越多人選擇使用 Nginx 架設網站，主要考量便是它的快速、穩定以及輕量的特性。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2012/05/support-sending-mail-php-linux-vps-exim/"
+                            aria-label=": Linux VPS PHP 網站可以發送信件"
+                        >
+                            <h3 class="media-heading">Linux VPS PHP 網站可以發送信件</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2012年5月8日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>PHP 架站軟體通常需要用到寄信功能，例如：通知站長有新的迴響需要審核。使用虛擬主機來架站的讀者一定會納悶：<br>
+不管是 WordPress，Drupal 或者其他 PHP<br>
+架站軟體不是都不用另外設定就可以寄信？為什麼需要特地提到這件事情。<br>
+話說山姆鍋的主機採用的是 Linode VPS，很多事情都需要自己來，唉！<br>
+如果您的網站主機跟山姆鍋一樣是 VPS 或者專屬伺服器，那這篇文章也許對您有幫助。<br>
+由於不是要做為公司的郵件伺服器，山姆鍋希望除了讓 PHP 架站軟體送信外，不再作其它用途。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2013/04/start-up/"
+                            aria-label=": 影化身科技有限公司成立"
+                        >
+                            <h3 class="media-heading">影化身科技有限公司成立</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2013年4月24日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>2013 年 4 月 24 日，影化身科技有限公司登記成立，致力於提供雲端服務平台。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2013/05/shi-yong-octopresszuo-wei-bo-ke-ping-tai/"
+                            aria-label=": 使用 Octopress 作為部落格平台"
+                        >
+                            <h3 class="media-heading">使用 Octopress 作為部落格平台</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2013年5月23日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>由於沒有需要太多動態功能，所以，嘗試使用靜態部落格平台 Octopress 來寫文章。「艾米部落」<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup> 一路從 Joomla, Drupal, WordPress 到現在的 Octopress，也算是換了不少平台。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2013/05/use-static-site-generator-for-company-site/"
+                            aria-label=": 使用靜態網頁產生器來管理公司網站"
+                        >
+                            <h3 class="media-heading">使用靜態網頁產生器來管理公司網站</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2013年5月28日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>對於不需要動態功能的網站而言，使用像是 Drupal、WordPress 之類的架站軟體，感覺有點大材小用。對於可以接受不使用「所見即所得」編輯器的人，靜態網站產生器應該是個可以接受的方案。 雖說是靜態網站，缺少很多功能，但像是公司或者行銷網站往往也不需要這些。況且， 靜態網站有諸多動態網站所沒有的功能，如：</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2013/05/exchange-name-card-with-eavatar-me/"
+                            aria-label=": 如何利用「我．影化身」服務交換名片"
+                        >
+                            <h3 class="media-heading">如何利用「我．影化身」服務交換名片</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2013年5月29日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>今天從 MR JAMIE 上讀到一篇文章：「從今天開始，請 email 你的名片給我吧！」這讓我想到，與其使用 Email，使用「我．影化身」來代替，不是也很適當？</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+            </div>
+        </div>
+        <div class="modal-footer">
+            <p class="results-count text-medium"
+                data-message-zero="沒有找到文章"
+                data-message-one="找到 1 篇文章"
+                data-message-other="找到 {n} 篇文章">
+                找到 134 篇文章
+            </p>
+        </div>
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+
+<script src="/assets/js/script-597bjprixrfzrennpanwcwfnulsqaw08wvkzphw7gk8dqunvgzd9nn3nvsu9.min.js"></script>
+
+<!--SCRIPTS END-->
+
+
+    
+        <script>
+          var disqus_config = function() {
+            this.page.url = 'https://samkuo.me/post/2015/11/jquery-mobile-and-backbone-framework/';
+              
+            this.page.identifier = 'post/2015/11/jquery-mobile-and-backbone-framework/';
+              
+          };
+          (function() {
+            var d = document, s = d.createElement('script');
+            var disqus_shortname = 'sampotkuo';
+            s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+          })();
+        </script>
+    
+
+
+
+    
+<script src="/assets/js/moment-with-locales.js"></script>
+
+    
+<script src="/assets/js/algoliasearch.js"></script>
+
+    <script>
+      var algoliaClient = algoliasearch('OIWK4CBFS4', 'f676051199368fe5f161c9012b7edaf6');
+      var algoliaIndex = algoliaClient.initIndex('MyBlogIndex');
+    </script>
+
+
+    </body>
+</html>

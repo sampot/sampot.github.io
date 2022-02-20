@@ -1,0 +1,1252 @@
+
+<!DOCTYPE html>
+<html lang="zh-tw">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="我是山姆鍋">
+    <title>一個通用 Web 應用架構 - 我是山姆鍋</title>
+    <meta name="author" content="Sampot (山姆鍋)">
+    
+    
+        <link rel="icon" href="https://samkuo.me/images/favicon.png">
+    
+    
+        
+            <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
+        
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","/contact","/sitemap"],"image":"logo.png"},"articleBody":"在經歷大大小小不同專案後，除了有特殊要求的系統外 (如需符合 PCI-DSS 的第三方支付服務、即時影音串流等), 大部分的 Web 應用架構其實都是大同小異。本文提供一個通用的 Web 應用架構作為參考，希望可以符合 80% 以上 Web 專案的需求。\n\n山姆鍋是從解決實務需求為出發點，使用的一些名詞也許不符合教科書般的定義。例如：山姆鍋常常自己也搞不太清楚「系統架構」、「軟體架構」與「網路架構」該不該在同一份文件呈現？所以，可以預期山姆鍋使用的一些名詞可能會跟您認知的有所差異，為了減少混淆會先針對重要的名詞加以定義。\n由於軟體架構的抽象性，多數參與開發的人員並不清楚架構的必要性。其實不管有沒有文件化，每個軟體都存在著架構。本文就是希望描述一個通用的 Web 軟體架構，協助對應用架構比較沒經驗的新創團隊有一個建構藍圖作為參考。另一方面，為了讓讀者對抽象的元件有較具體的概念，會盡可能描述該元件實作的常見選項，但不可能面面俱到，還煩請在留言處提供補充建議。\n\n名詞定義\n山姆鍋對於軟體架構的定義很簡單：「說明系統中各個元件怎麼兜起來」。問題是：「什麼是系統？」、「什麼是元件？」，都是抽象化的名詞常常讓人搞不懂意思。\n在軟體開發領域，「系統 (system)」就是子系統 (subsystem) 跟元件的組合，簡單地講：系統跟子系統只用用來將元件分組的，因為人類無法領解太過複雜的對象，傾向於將這樣整體巨觀的對象拆解成比較小的單元。以軟體開發來說，「運作中的 web 軟體」就是一個整體巨觀的對象。系統是不是一定要包含子系統？子系統要不要包含更小的子系統？這些都需要根據複雜度來考量，通常由架構師負責規劃出可以被理解的組成階層。\n「元件 (component)」是另一個在不同場合被過度使用，抽象化也很高的名詞。隨著後期經驗的累積，在架構這個軟體層級，本文山姆鍋統一將元件視為可以獨立開發以及部署的單元。所以，MySQL 資料庫是個元件；微服務 (microservice) 也是元件。\n「應用平台 (application platform)」提供應用所需的執行環境。以容器化應用 (containerized applications) 的話，通常會採用 Kubernetes 這樣的容器調度系統來作為應用平台基礎。\n「部署環境」：根據軟體開發週期的不同階段以及使用者角色的不同，會有多個的應用平台作為部署的標的。常見的部署環境可分為「開發環境」、「測試環境 (QA environment)」、「生產環境 (production environment)」等等。\n「持續部署 (continuous deployment)」指將經過品質確保的應用元件持續且自動地部署到生產環境，每次元件部署就會產生一個新的版本與原先版本並存一段時間。透過 feature flag 等機制，完成部署不代表已經釋出 (released) 給終端使用者。讓生產環境的部署與釋出分開的作法，允許團隊使用 canary 或 blue green 等不同發行 (release) 策略來降低造成對終端用戶大規模衝擊的風險。\n前提假設\n本文所提的架構設計基於下列假設：\n\nWeb 應用按照 The Twelve Factors App 原則設計。\n採用 Client-server 網路架構。\n採用 Kubernetes 作為應用平台，工程師有自己本機的開發環境。\n團隊可以根據元件特性，自由選擇實作的程式語言、框架跟資料存儲。\n\n設計目標\n\n自建應用平台只使用開源軟體。\n具備移植性 (portability) 可以自建應用平台或者選擇雲端託管服務 (EKS、GKE、AKS)。\n具備可用性 (availability) 與擴充性 (scalability)。\n\n架構設計\n雖然架構設計盡量抽象化，但一個務實的架構師其實在設計階段，心中或多或少已經有元件實作的選項。這點通常也沒什麼問題，甚至可以說是優點之一。畢竟，您不會希望架構設計只是設計，無法轉換成對應的實作吧！所以，山姆鍋其實都是從已經知道元件具體如何實現才加以抽象化描述，因為山姆鍋知道團隊一定會有人 (例如: IT 工程師) 提出某某元件應該採用哪個產品等等問題。\n下圖是本文所提的 Web 應用架構圖：\n\n\n應用客戶端 (Application clients)\n由於本文描述 Web 應用架構，應用客戶端自然是透過 Web 瀏覽器來執行。應用客戶端按照實作方式不同可以分成下列幾種：\n\n\n多頁式 Web 應用：藉由在後端動態產生網頁的 HTML 來實現使用者介面，使用者每次的點選動作都會發出新的請求來產生新頁面。\n\n\n單頁式 Ｗeb 應用 (Single Page Application; SPA)：透過 Ajax 機制在不換頁的情況下，動態部分修改網頁內容來呈現使用者介面。相較於傳統多頁式應用提高使用者介面的反應速度。\n\n\n漸進式 Web 應用 (Progressive Web Application; PWA)：比單頁式 Web 應用更進一步，利用新技術 (如 service worker, web push 等) 讓 Web 應用更接近原生 (行動) 應用的使用體驗。\n\n\n對於新專案建議以 PWA 作為客戶端的實現方式，PWA 應用框架常見方案：\n\nVue.js\nReact\nAngular\n\n部署觀點\nWeb 應用的客戶端元件雖然在瀏覽器中執行，但所需的程式碼及資源檔 (e.g. CSS/images) 是以「應用服務」元件形式部署在平台，當瀏覽器存取才下載到客戶端呈現或執行。根據客戶端的特性，呈現頁面可能同時會有客戶端以及服務端邏輯。例如：多頁式應用，每頁都是由後端服務動態產生；新型態的 PWA 也可能為了搜尋引擎優化 (SEO) 目的而進行服務端渲染 (Server-Side Rendering; SSR)。\n\n安全觀點\n應用客戶端的程式碼與資源檔只能透過安全連線 (HTTPS) 被下載。同樣地，在瀏覽器執行的程式碼只透過安全連線 (HTTPS/WSS) 與服務端通訊。\n\n域名服務 (Domain Name Service; DNS)\n域名服務是使用者存取應用的第一個網路環節，應用客戶端要存取後端應用服務需要將域名解析 (resolve) 成 IP 位址才能實際透過網路存取。「域名服務」通常需要跟「內容交付網路」搭配，在客戶端解析域名時，根據客戶端所在的地點以及網路狀態來回傳適當的伺服器節點。\n不在此架構涵括範圍，但如果應用部署在多個資料中心，DNS 也是實現全球負載均衡的必要機制。\n雲端常見的方案：\n\nCloudFlare\nAWS Route 53\n\n由於 DNS 對於應用服務的可用性扮演至關重要的地位，新創團隊沒有資源實現全球高可用的域名服務，應該選擇採用雲端服務。這裡的域名服務是提供給客戶端使用，跟應用平台內部的域名服務是分開的。\n內容交付網路 (Content Delivery Network; CDN)\n「內容交付網路」，也就是 CDN，負責將客戶端需要的資源檔案或程式碼快取到世界各地的邊緣 (edge) 資料中心來減少客戶端存取的延遲以及提高應用的處理容量跟可靠性。此外，CDN 服務供應商通常也提供 Web 應用防火牆 (web application firewall; WAF) 服務來強化 web 應用的安全性。應用如果是面向全球的使用者，則 CDN 的使用應該視為必要。\n雲端常見的方案：\n\nCloudFlare CDN\nAWS CloudFront\nＧoogle Cloud CDN\n\n在過往應用系統要能夠使用 CDN 是門檻相當高的事情，主要是費用問題。由於經濟型以及免費的 CDN 服務已經很常見，且 CDN 是實現應用高擴充性中重要的元件，因此被納入此架構中。\n網路負載均衡器 (Network Load balancer)\n支援第四層 (TCP/UDP) 的網路負載均衡，根據連線的 IP 與 Port 將請求平均轉送 (forward) 給應用平台內的各個「邊緣代理 (edge proxy)」。\n開源常見的方案：\n\nHAProxy: 配合 Hearbeat 或者 Keepalived 藉由 Virtual IP 機制可提供容錯。\nMetalLB: 與 K8S 有良好整合，但目前還是 beta 狀態。\n\n常見的雲端託管服務都有整合各家的網路負載服務器，只要在 K8S 中部署型態 (type) 為 LoadBalancer 的服務 (service) 資源就可以建立對應的負載均衡服務。\n邊緣代理 (Edge Proxy)\n負責應用平台請求的進入點，通常俱備下列功能：\n\n提供與客戶端的加密安全連線 (SSL termination)。\n將請求轉送到正確的上游 (upstream) 的應用控制器或服務元件。\n請求限速 (Rate limit): 避免單一來源 (e.g. 同一 IP 或用戶) 同一時間發出太多請求，部分是為了防堵「阻斷服務 (DoS)」。\n存取控制 (Access control)：驗證請求中的 token 來決定是否允許存取。\n標示請求識別碼：針對每個進入平台的請求給予唯一識別碼，讓追蹤系統可以關聯同一個請求在不同元件的資訊。\n\n開源常見的方案：\n\nNginx\nKong\n\n此元件利用 Kubernetes 的 Ingress controller 實現。\n應用控制器 (Application Controller)\n此架構中的選擇性 (optional) 元件，負責：\n\n將 HTTP 請求轉發給應用的不同元件。\n根據負載來伸縮 (scale) 應用元件副本 (replica) 數量：實際上通常由另一個元件負責，但此架構將兩者合併。\n\n開源常見的方案：\n\nKnative Serving\nOpenFaaS\n\n雖然習慣將這樣的方案稱為 Function as a Service (FaaS) 框架，此架構利用這些框架擴展 Kubernetes 對於應用元件的生命週期管理功能。如果需要更彈性的自動擴容 (autoscaling)，包括從零擴容 (scale from zero) 的能力，則可以在平台中使用「應用控制器」。\n應用服務 (Application Service)\n一個 Web 應用由一個以上的「應用服務」組成，單體結構 (monolithic) 的應用只有一個應用服務，但並不是說有多個應用服務就是屬於微服務架構 (microservices)。在此架構並沒有對應用服務的數量以及結構加以限制，應用服務可以是一個「功能 (function)」、微服務、或者是包含整個應用邏輯的單體。應用服務包含不適合在客戶端實現的商務邏輯 (business logic) 以及領域模型 (domain model)，通常由開發團隊內部開發，但就算是外包只要是應用特有 (application-specific) 的元件都屬於這一類，也應該採取相同架構規範。\n實作應用服務常用的程式語言：\n\nPython\nGo\nJava\nJavaScript/TypeScript\nRuby\nPHP\nC#\n\n除了實現應用邏輯所需的程式碼，應用服務也需要明確指定相依的套件名稱與版本，在 CI/CD 的 pipeline 就完成應用製品 (artifact) 的封裝工作，如產生容器的映像檔並推送到容器儲存庫 (container registry) 中。除了開發環境外，其餘的部署都只能使用封裝好的容器映像檔來進行。\n另外，只要是熱門的程式語言，選擇哪一種則按照團隊成員已經熟悉為準，初期不用為了執行效能或為符合流行趨勢來選擇。\n部署觀點\n每個應用服務都是以容器映像 (container image) 形式包裝 (package) 跟分發 (delivery)，容器已包含應用服務執行時期 (runtime) 以及相依的程式庫、執行檔等。一般原則是不建議在部署環境才建置 (build) 應用服務，一些 FaaS 方案（如 Fission) 支援在部署環境中才建置功能 (funtion) 容器用以執行對應的功能。雖然可以免除容器儲存庫 (container registry) 的需求，但並無法保證每次建置時相依的套件可以正常取得。如果應用有多個部署環境，也會增加組態飄移 (configuration drift) 的可能。\n\n安全觀點\n為了避免應用元件所在的主機 / 容器被入侵後將機密資料送出，應用服務不應該直接存取網路上的第三方服務。也就是說：應用服務元件所需要的服務都只能由「支援服務」或者「支援存儲」來提供。如此可以透過防火牆或者網路策略 (Network policy) 等機制來限制只有合法授權元件可以存取。\n\n支援服務 (Backing Services)\n泛指由第三方所提供套裝軟體或者雲端供應商提供的網路服務。通常「支援服務」的整備 (provision) 流程是運維團隊建立所需的「支援服務」實例後，將該服務實例與應用服務進行綁定 (binding)。理想上，應用元件不需要了解背後的整備流程。\n以 MySQL 資料庫為例：「整備」包含部署 MySQL 服務軟體 (或者申請雲端資料庫服務)、建立資料庫，產生應用連線的帳密跟設定存取權限等；「綁定」則是將存取 MySQL 資料庫所需的服務位址、連線帳密等資訊以 ConfigMap 或者 Secret 資源形式讓應用服務可以取得。\n簡單的整備流程可以手動安裝，也可以透過 Service Catalog 來自動進行。\n支援存儲 (Backing Stores)\n架構上同樣屬於支援服務，但由於負責提供應用狀態存放與查詢所需的機制，跟其它無狀態的支援服務在部署與安全策略明顯不同，架構上特別分開描述。「支援存儲」按照應用對資料的永續性 (persistence)、資料結構、查詢效能等不同需求會有不同適用的存儲方案。\n\n「資料存儲服務」提供應用永久性或半永久性資料的存放空間，同時需要提供應用透過網路協定來快速查詢與處理資料的功能。\n「資料快取服務」提供應用暫時性的資料存放空間，提供快速查詢常用資料機制以達到縮減請求處理時間的目的。\n「搜尋索引服務」提供全文檢索功能，對於想提供使用者 ad-hoc 資料查詢功能的應用特別需要。\n「共享檔案系統」提供可由多節點同時存取的網路檔案存取服務，傳統上透過 NFS 來提供。Web 應用常用來存放使用者上傳的媒體檔案。\n「物件存儲服務」由 AWS S3 服務引起流行的存儲模式，適合非結構化、大量的二進位物件 (blob) 檔案存取。由於物件儲存高可用性以及擴展性，在現代化的 Web 應用，常用來取代「共享檔案系統」的角色。\n\n此架構設計允許應用元件選擇最適合的存儲方案，但是否真得需要根據資料特性來選擇？這要由團隊自行決定。極端而言，有些應用將所有資料包括檔案都存放在一個關聯式資料庫來集中管理，對效能、可用性以及擴充性當然有不好的作用，但是粗暴簡單。\n常見支援存儲\n應用服務為無狀態元件，所以 Web 應用總是需要某些「支援存儲」來存放狀態資料，本節提出幾種常見的支援存儲。\n資料存儲 (Data Stores)\n資料存儲或者說資料庫 (database) 按照資料模型的不同可分為「關聯式資料庫 (RDBM)」與非關聯式資料庫 (NoSQL) 兩大類。\nWikipedia 對於關聯式資料庫的定義：\n\n關聯式資料庫（英語：Relational database），是建立在關聯模型基礎上的資料庫，藉助於集合代數等數學概念和方法來處理資料庫中的資料。現實世界中的各種實體以及實體之間的各種聯絡均用關聯模型來表示。關聯模型是由埃德加・科德於 1970 年首先提出的，並配合「科德十二定律」。現如今雖然對此模型有一些批評意見，但它還是資料儲存的傳統標準。標準資料查詢語言 SQL 就是一種基於關聯式資料庫的語言，這種語言執行對關聯式資料庫中資料的檢索和操作。\n\nWikipedia 對於 NoSQL 的簡短說明：\n\nNOSQL (Not Only SQL) 是對不同於傳統的關聯式資料庫的資料庫管理系統的統稱。\n允許部分資料使用 SQL 系統儲存，而其他資料允許使用 NOSQL 系統儲存。其資料儲存可以不需要固定的表格模式以及中介資料 (metadata)，也經常會避免使用 SQL 的 JOIN 操作，一般有水平可延伸性的特徵。\n\n選擇哪類型來作為應用的資料庫可以根據需求與運維能力而定。作為一般原則：由於關聯式資料庫技術最為成熟以及使用廣泛，新創團隊應該優先採用。\n開源常見的方案：\n\nMySQL\nPostgreSQL\nMongoDB\nRedis\n\nRedis 適用不需要 Ad-hoc 查詢，可以接受短時間 (如 1 秒）資料丟失風險的應用情境。\n資料快取 (Data Cache)\n資料快取服務提供應用元件暫時性 (transient) 資料的存放服務，用來減少需要存取資料庫的次數以達到提高服務請求的效率。例如使用者的會期資料 (session data) 在每個網頁請求都需要存取，就可以放在資料快取中減少查詢時間。\n開源常見方案：\n\nRedis\nMemcached\n\n由於 Redis 具備多樣性功能，山姆鍋傾向於使用 Redis, 在某些情境甚至可以作為 key-value 資料庫使用。\n搜尋索引 (Search Index)\n如果應用需要提供全文檢索 (full-text search) 功能，由於資料庫對於全文檢索的支援相對陽春，應用也許需要使用專門的搜尋引擎 (search engine) 軟體來符合查詢效能的需求。\n開源常見的方案：\n\nElasticsearch\nSolr。\n\n共享檔案系統 (Shared Filesystem)\n在分散式應用架構中，常見的一個需求是：使用者上傳的檔案 (通常是圖檔) 要讓應用的多個節點可以存取，傳統上可以透過網路檔案系統 (如 NFS) 來提供。使用共享檔案系統的主要好處在於熟悉以及方便開發，讀寫本地跟遠端掛載的檔案操作差異不大。\n開源常見的方案\n\nGlusterFS\nCeph FS\n\n由於雲端供應商較少提供共享檔案系統服務，如果使用共享檔案系統就需要自行部署。因此，如果可行建議採用「物件存儲」代替。\n物件存儲 (Object Storage)\n相對於共享檔案系統雖然需要透過 API 來進行檔案操作，由於難度不高並不會增加太多額外負擔 (overhead)。使用雲端物件存儲服務還具備高可用以及高可靠的優勢，檔案存放在雲端物件存儲通常也方便與 CDN 整合 (e.g. AWS CloudFront + S3)。在本地開發上，MinIO 提供相容的功能可以方便整合測試。\n開源常見的方案：\n\nMinIO\nCeph RGW\n\n由於雲端物件存儲服務按量計費，且有經濟的選項，如 DigitalOcean 的 Spaces。原則上，即使是自建應用平台也建議採用雲端物件存儲服務。\n常見支援服務\n不同 Web 應用需要的支援服務差異頗大，但還是有幾種「支援服務」常需要用到。\n訊息傳遞服務 (Messaging service)\n「訊息傳遞服務」提供應用元件間一對ㄧ (queue)、一對多 (publish-subscribe) 等多種通訊模式的訊息傳遞機制。此服務的應用場景之一是應用將實現請求不需要立即完成的工作透過佇列 (queue) 派送給背景程序執行，如此可以減少客戶端等待時間。幾乎沒有一個高擴充性 (highly scalable) 的系統找不到訊息傳遞服務的存在。所以，熟悉跟了解訊息互動模式，更重要的是事件驅動 (event-driven) 概念，對於設計高可用以及高擴充性的應用相當關鍵。\n開源常見的方案：\n\nKafka\nRabbitMQ\nNATS\nRedis\n\nRedis 真的是多用途的軟體，在小規模的應用也常看到作為訊息傳遞服務。山姆鍋不負責任建議：如果沒有特別需要的話，可以選擇 NATS Streaming Server。\n郵件寄送服務 (Email Delivery Service)\n此服務提供應用發送電子郵件所需的功能，讓 Web 應用發送諸如：「使用者信箱確認信件」、「密碼重置信件」等電子郵件。由於垃圾信氾濫，自建郵件服務信件送達機率越來越低，建議採用雲端服務。\n雲端常見的方案：\n\nSendGrid\nSendinBlue\n\n應用需透過 SMTPS 協定與郵件寄送服務溝通避免供應商鎖定 (vendor lock-in) 以及方便測試。開發環境會需要利用 MailSluper 這類工具來進行模擬跟除錯。\n安全觀點\n對應 “應用服務元件不能直接存取第三方服務 “這個限制，須在應用平台 (生產環境) 部署對應的代理 (proxy) 服務，與雲端服務連線只能由此代理進行。對應用元件而言，郵件寄送服務是由此代理所提供，因為代理也是平台所管理的元件，存取控制可以一致地使用應用平台的機制實現 (如 Network policy, Service Mesh)。\n\n其它支援服務\n實務上應用平台至少還要部署應用監控、日誌等其它所需的服務，但由於不是應用元件執行所直接相依的服務，這裡就不特別說明。除此之外，就運維一個應用平台而言，服務網格 (service mesh)、分散式追蹤 (distributed tracing) 等用來提高應用系統可觀察性 (observability) 以及可靠性 (reliability) 的技術，都是團隊值得考慮投資的項目。\n元件間通訊機制\n應用元件並非獨立存在，彼此間免不了需要進行溝通，例如客戶端需要呼叫後端 API 來查詢資料；微服務需要呼叫另一個微服務來完成客戶端過來的請求。元件之間要能夠順利溝通，自然就需要有規範的通訊協定，本節針對幾個情境提出常見選項。\n客戶端 - 服務端\n雖然可以做到一定離線 (offline) 操作能力，但 Web 應用的客戶端總是免不了需要跟後端服務溝通的。下面幾個通訊協定以及適用的情境：\n\nREST (HTTPS): 適合由客戶端發起進行查詢或者操作的 API 請求。\nWebsocket (WSS): 適合客戶端與服務端需要即時雙向的通訊，如即時股價回報。\ngRPC (HTTP/2): 適合客戶端是行動應用或者其它 Thick clients。\n\n服務端 - 服務端\n應用服務元件之間的通訊機制如果是同步的請求回應 (request-response) 互動模式，雖然看起來 gRPC 是不二選擇，但 REST API 或者 JSON-RPC 其實也是簡單務實的作法。\n除非對網路流量優化或者訊息 schema 驗證有特別的需求，不然應用服務元件間非同步通訊則建議以 JSON 為訊息的格式，夠彈性也方便找問題。\n小結\n山姆鍋希望本文所提的 Web 應用架構剛好足夠 (just enough) 適用多數 Web 專案的需要。新創團隊想要一開始就使用先進 (state-of-the-art) 的技術框架作為賣點之一，雖然可以理解但同時也會增加不必要的風險。畢竟軟體的價值發生在實際交付使用者的時候，初期投資太多在酷炫技術對使用者並沒有實際效益。針對新創團隊，即使目標是微服務架構，山姆鍋仍建議從單體式應用服務作為開始，在實際掌握領域 (domain) 如何適當劃分的經驗後，再過渡到微服務架構應該是比較保險的作法。採用微服務架構的話，可以評估是否以及哪個時間點導入「服務網格 (service mesh)」機制。\n","dateCreated":"2020-05-07T10:57:52+08:00","dateModified":"2020-05-31T17:19:47+08:00","datePublished":"2020-05-07T10:57:52+08:00","description":"在經歷大大小小不同專案後，除了有特殊要求的系統外 (如需符合 PCI-DSS 的第三方支付服務、即時影音串流等), 大部分的 Web 應用架構其實都是大同小異。本文提供一個通用的 Web 應用架構作為參考，希望可以符合 80% 以上 Web 專案的需求。","headline":"一個通用 Web 應用架構","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2020/05/generic-web-software-architecture/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","/contact","/sitemap"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2020/05/generic-web-software-architecture/","keywords":"Kubernetes, Software architecture, Web Application platform"}</script>
+    <meta name="description" content="在經歷大大小小不同專案後，除了有特殊要求的系統外 (如需符合 PCI-DSS 的第三方支付服務、即時影音串流等), 大部分的 Web 應用架構其實都是大同小異。本文提供一個通用的 Web 應用架構作為參考，希望可以符合 80% 以上 Web 專案的需求。">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="一個通用 Web 應用架構">
+<meta property="og:url" content="https://samkuo.me/post/2020/05/generic-web-software-architecture/">
+<meta property="og:site_name" content="我是山姆鍋">
+<meta property="og:description" content="在經歷大大小小不同專案後，除了有特殊要求的系統外 (如需符合 PCI-DSS 的第三方支付服務、即時影音串流等), 大部分的 Web 應用架構其實都是大同小異。本文提供一個通用的 Web 應用架構作為參考，希望可以符合 80% 以上 Web 專案的需求。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://samkuo.me/post/2020/05/generic-web-software-architecture/generic-web-architecture.png">
+<meta property="article:published_time" content="2020-05-07T02:57:52.000Z">
+<meta property="article:modified_time" content="2020-05-31T09:19:47.838Z">
+<meta property="article:author" content="Sampot (山姆鍋)">
+<meta property="article:tag" content="Kubernetes">
+<meta property="article:tag" content="Software architecture">
+<meta property="article:tag" content="Web Application platform">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://samkuo.me/post/2020/05/generic-web-software-architecture/generic-web-architecture.png">
+<meta name="twitter:creator" content="@sampotkuo">
+<meta property="fb:app_id" content="1538037013031361">
+    
+    
+        
+    
+    <meta property="og:image" content="https://samkuo.me/images/featured_image.jpg"/>
+    
+    
+    
+    <!--STYLES-->
+    
+<link rel="stylesheet" href="/assets/css/style-lfspghztdttlloh4nly9hmp3cqmehlzaagf5ften7wo63faxiltzljjm4fb0.min.css">
+
+    <!--STYLES END-->
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-41152700-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-41152700-1');
+    </script>
+
+
+    
+
+    
+        
+    
+</head>
+
+    <body>
+        <div id="fb-root"></div>
+        <script async defer crossorigin="anonymous"
+            src="https://connect.facebook.net/zh_TW/sdk.js#xfbml=1&version=v7.0&appId=1538037013031361&autoLogAppEvents=1"></script>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+<header id="header" data-behavior="5">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a
+            class="header-title-link"
+            href="/"
+            aria-label=""
+        >
+        <img class="header-avatar-picture" src="/images/logo32.png" alt="作者的圖片" />
+            我是山姆鍋
+        </a>
+    </div>
+    
+        
+            <a
+                class="header-right-icon open-algolia-search"
+                href="#search"
+                aria-label="打開鏈接: /#search"
+            >
+        
+        
+            <i class="fa fa-search fa-lg"></i>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="5">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a
+                    href="/#about"
+                    aria-label="閱讀有關作者的更多信息"
+                >
+                    <img class="sidebar-profile-picture" src="/images/logo.png" alt="作者的圖片"/>
+                </a>
+                <h4 class="sidebar-profile-name">Sampot (山姆鍋)</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>個人部落格， 記錄與分享一些軟體開發與運維相關資訊， 偶爾也會碎念一下</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/"
+                            
+                            rel="noopener"
+                            title="首頁"
+                        >
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">首頁</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-categories"
+                            
+                            rel="noopener"
+                            title="分類"
+                        >
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">分類</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-tags"
+                            
+                            rel="noopener"
+                            title="標籤"
+                        >
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">標籤</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-archives"
+                            
+                            rel="noopener"
+                            title="所有文章"
+                        >
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">所有文章</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link open-algolia-search"
+                            href="#search"
+                            
+                            rel="noopener"
+                            title="搜尋"
+                        >
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">搜尋</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/about"
+                            
+                            rel="noopener"
+                            title="關於"
+                        >
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">關於</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://github.com/sampot"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="GitHub"
+                        >
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://twitter.com/sampotkuo"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Twitter"
+                        >
+                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Twitter</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://facebook.com/sampotkuo"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Facebook"
+                        >
+                        <i class="sidebar-button-icon fab fa-facebook" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Facebook</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/contact"
+                            
+                            rel="noopener"
+                            title="聯絡"
+                        >
+                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">聯絡</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/sitemap"
+                            
+                            rel="noopener"
+                            title="網站導覽"
+                        >
+                        <i class="sidebar-button-icon fa fa-sitemap" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">網站導覽</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://feedly.com/i/subscription/feed/https://samkuo.me/atom.xml"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Atom"
+                        >
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Atom</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="5"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            一個通用 Web 應用架構
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2020-05-07T10:57:52+08:00">
+	
+		    5月 07, 2020
+    	
+    </time>
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <div class="alert info no-icon">
+                我是山姆鍋 <div class="fb-like" data-href="https://www.facebook.com/sampotkuo" data-width="" data-layout="standard" data-action="like" data-size="large" data-share="false"></div>
+            </div>
+
+            <p>在經歷大大小小不同專案後，除了有特殊要求的系統外 (如需符合 PCI-DSS 的第三方支付服務、即時影音串流等), 大部分的 Web 應用架構其實都是大同小異。本文提供一個通用的 Web 應用架構作為參考，希望可以符合 80% 以上 Web 專案的需求。</p>
+<a id="more"></a>
+<p>山姆鍋是從解決實務需求為出發點，使用的一些名詞也許不符合教科書般的定義。例如：山姆鍋常常自己也搞不太清楚「系統架構」、「軟體架構」與「網路架構」該不該在同一份文件呈現？所以，可以預期山姆鍋使用的一些名詞可能會跟您認知的有所差異，為了減少混淆會先針對重要的名詞加以定義。</p>
+<p>由於軟體架構的抽象性，多數參與開發的人員並不清楚架構的必要性。其實不管有沒有文件化，每個軟體都存在著架構。本文就是希望描述一個通用的 Web 軟體架構，協助對應用架構比較沒經驗的新創團隊有一個建構藍圖作為參考。另一方面，為了讓讀者對抽象的元件有較具體的概念，會盡可能描述該元件實作的常見選項，但不可能面面俱到，還煩請在留言處提供補充建議。</p>
+<h1 id="table-of-contents">目錄</h1><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#名詞定義"><span class="toc-text">名詞定義</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#前提假設"><span class="toc-text">前提假設</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#設計目標"><span class="toc-text">設計目標</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#架構設計"><span class="toc-text">架構設計</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#應用客戶端-Application-clients"><span class="toc-text">應用客戶端 (Application clients)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#域名服務-Domain-Name-Service-DNS"><span class="toc-text">域名服務 (Domain Name Service; DNS)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#內容交付網路-Content-Delivery-Network-CDN"><span class="toc-text">內容交付網路 (Content Delivery Network; CDN)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#網路負載均衡器-Network-Load-balancer"><span class="toc-text">網路負載均衡器 (Network Load balancer)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#邊緣代理-Edge-Proxy"><span class="toc-text">邊緣代理 (Edge Proxy)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#應用控制器-Application-Controller"><span class="toc-text">應用控制器 (Application Controller)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#應用服務-Application-Service"><span class="toc-text">應用服務 (Application Service)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#支援服務-Backing-Services"><span class="toc-text">支援服務 (Backing Services)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#支援存儲-Backing-Stores"><span class="toc-text">支援存儲 (Backing Stores)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#常見支援存儲"><span class="toc-text">常見支援存儲</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#資料存儲-Data-Stores"><span class="toc-text">資料存儲 (Data Stores)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#資料快取-Data-Cache"><span class="toc-text">資料快取 (Data Cache)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#搜尋索引-Search-Index"><span class="toc-text">搜尋索引 (Search Index)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#共享檔案系統-Shared-Filesystem"><span class="toc-text">共享檔案系統 (Shared Filesystem)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#物件存儲-Object-Storage"><span class="toc-text">物件存儲 (Object Storage)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#常見支援服務"><span class="toc-text">常見支援服務</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#訊息傳遞服務-Messaging-service"><span class="toc-text">訊息傳遞服務 (Messaging service)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#郵件寄送服務-Email-Delivery-Service"><span class="toc-text">郵件寄送服務 (Email Delivery Service)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#其它支援服務"><span class="toc-text">其它支援服務</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#元件間通訊機制"><span class="toc-text">元件間通訊機制</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#客戶端-服務端"><span class="toc-text">客戶端 - 服務端</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#服務端-服務端"><span class="toc-text">服務端 - 服務端</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#小結"><span class="toc-text">小結</span></a></li></ol>
+<h2 id="名詞定義">名詞定義</h2>
+<p>山姆鍋對於軟體架構的定義很簡單：「說明系統中各個元件怎麼兜起來」。問題是：「什麼是系統？」、「什麼是元件？」，都是抽象化的名詞常常讓人搞不懂意思。</p>
+<p>在軟體開發領域，「系統 (system)」就是子系統 (subsystem) 跟元件的組合，簡單地講：系統跟子系統只用用來將元件分組的，因為人類無法領解太過複雜的對象，傾向於將這樣整體巨觀的對象拆解成比較小的單元。以軟體開發來說，「運作中的 web 軟體」就是一個整體巨觀的對象。系統是不是一定要包含子系統？子系統要不要包含更小的子系統？這些都需要根據複雜度來考量，通常由架構師負責規劃出可以被理解的組成階層。</p>
+<p>「元件 (component)」是另一個在不同場合被過度使用，抽象化也很高的名詞。隨著後期經驗的累積，在架構這個軟體層級，本文山姆鍋統一將元件視為可以獨立開發以及部署的單元。所以，MySQL 資料庫是個元件；微服務 (microservice) 也是元件。</p>
+<p>「應用平台 (application platform)」提供應用所需的執行環境。以容器化應用 (containerized applications) 的話，通常會採用 Kubernetes 這樣的容器調度系統來作為應用平台基礎。</p>
+<p>「部署環境」：根據軟體開發週期的不同階段以及使用者角色的不同，會有多個的應用平台作為部署的標的。常見的部署環境可分為「開發環境」、「測試環境 (QA environment)」、「生產環境 (production environment)」等等。</p>
+<p>「持續部署 (continuous deployment)」指將經過品質確保的應用元件持續且自動地部署到生產環境，每次元件部署就會產生一個新的版本與原先版本並存一段時間。透過 feature flag 等機制，完成部署不代表已經釋出 (released) 給終端使用者。讓生產環境的部署與釋出分開的作法，允許團隊使用 canary 或 blue green 等不同發行 (release) 策略來降低造成對終端用戶大規模衝擊的風險。</p>
+<h2 id="前提假設">前提假設</h2>
+<p>本文所提的架構設計基於下列假設：</p>
+<ol>
+<li>Web 應用按照 <a href="https://12factor.net/" target="_blank" rel="noopener">The Twelve Factors App</a> 原則設計。</li>
+<li>採用 Client-server 網路架構。</li>
+<li>採用 Kubernetes 作為應用平台，工程師有自己本機的開發環境。</li>
+<li>團隊可以根據元件特性，自由選擇實作的程式語言、框架跟資料存儲。</li>
+</ol>
+<h2 id="設計目標">設計目標</h2>
+<ul>
+<li>自建應用平台只使用開源軟體。</li>
+<li>具備移植性 (portability) 可以自建應用平台或者選擇雲端託管服務 (EKS、GKE、AKS)。</li>
+<li>具備可用性 (availability) 與擴充性 (scalability)。</li>
+</ul>
+<h2 id="架構設計">架構設計</h2>
+<p>雖然架構設計盡量抽象化，但一個務實的架構師其實在設計階段，心中或多或少已經有元件實作的選項。這點通常也沒什麼問題，甚至可以說是優點之一。畢竟，您不會希望架構設計只是設計，無法轉換成對應的實作吧！所以，山姆鍋其實都是從已經知道元件具體如何實現才加以抽象化描述，因為山姆鍋知道團隊一定會有人 (例如: IT 工程師) 提出某某元件應該採用哪個產品等等問題。</p>
+<p>下圖是本文所提的 Web 應用架構圖：</p>
+<hr>
+<div class="figure " style="width:;"><a class="fancybox" href="generic-web-architecture.png" title="" data-caption="" data-fancybox="default"><img class="fig-img" src="generic-web-architecture.png" alt=""></a></div>
+<h3 id="應用客戶端-Application-clients">應用客戶端 (Application clients)</h3>
+<p>由於本文描述 Web 應用架構，應用客戶端自然是透過 Web 瀏覽器來執行。應用客戶端按照實作方式不同可以分成下列幾種：</p>
+<ol>
+<li>
+<p>多頁式 Web 應用：藉由在後端動態產生網頁的 HTML 來實現使用者介面，使用者每次的點選動作都會發出新的請求來產生新頁面。</p>
+</li>
+<li>
+<p>單頁式 Ｗeb 應用 (Single Page Application; SPA)：透過 Ajax 機制在不換頁的情況下，動態部分修改網頁內容來呈現使用者介面。相較於傳統多頁式應用提高使用者介面的反應速度。</p>
+</li>
+<li>
+<p>漸進式 Web 應用 (Progressive Web Application; PWA)：比單頁式 Web 應用更進一步，利用新技術 (如 service worker, web push 等) 讓 Web 應用更接近原生 (行動) 應用的使用體驗。</p>
+</li>
+</ol>
+<p>對於新專案建議以 PWA 作為客戶端的實現方式，PWA 應用框架常見方案：</p>
+<ul>
+<li><a href="https://vuejs.org/" target="_blank" rel="noopener">Vue.js</a></li>
+<li><a href="https://zh-hant.reactjs.org/" target="_blank" rel="noopener">React</a></li>
+<li><a href="https://angular.io/" target="_blank" rel="noopener">Angular</a></li>
+</ul>
+<div class="alert info no-icon"><p><em>部署觀點</em><br>
+Web 應用的客戶端元件雖然在瀏覽器中執行，但所需的程式碼及資源檔 (e.g. CSS/images) 是以「應用服務」元件形式部署在平台，當瀏覽器存取才下載到客戶端呈現或執行。根據客戶端的特性，呈現頁面可能同時會有客戶端以及服務端邏輯。例如：多頁式應用，每頁都是由後端服務動態產生；新型態的 PWA 也可能為了搜尋引擎優化 (SEO) 目的而進行服務端渲染 (Server-Side Rendering; SSR)。</p>
+</div>
+<div class="alert info no-icon"><p><em>安全觀點</em><br>
+應用客戶端的程式碼與資源檔只能透過安全連線 (HTTPS) 被下載。同樣地，在瀏覽器執行的程式碼只透過安全連線 (HTTPS/WSS) 與服務端通訊。</p>
+</div>
+<h3 id="域名服務-Domain-Name-Service-DNS">域名服務 (Domain Name Service; DNS)</h3>
+<p>域名服務是使用者存取應用的第一個網路環節，應用客戶端要存取後端應用服務需要將域名解析 (resolve) 成 IP 位址才能實際透過網路存取。「域名服務」通常需要跟「內容交付網路」搭配，在客戶端解析域名時，根據客戶端所在的地點以及網路狀態來回傳適當的伺服器節點。</p>
+<p>不在此架構涵括範圍，但如果應用部署在多個資料中心，DNS 也是實現全球負載均衡的必要機制。</p>
+<p><em>雲端常見的方案：</em></p>
+<ul>
+<li>CloudFlare</li>
+<li>AWS Route 53</li>
+</ul>
+<p>由於 DNS 對於應用服務的可用性扮演至關重要的地位，新創團隊沒有資源實現全球高可用的域名服務，應該選擇採用雲端服務。這裡的域名服務是提供給客戶端使用，跟應用平台內部的域名服務是分開的。</p>
+<h3 id="內容交付網路-Content-Delivery-Network-CDN">內容交付網路 (Content Delivery Network; CDN)</h3>
+<p>「內容交付網路」，也就是 CDN，負責將客戶端需要的資源檔案或程式碼快取到世界各地的邊緣 (edge) 資料中心來減少客戶端存取的延遲以及提高應用的處理容量跟可靠性。此外，CDN 服務供應商通常也提供 Web 應用防火牆 (web application firewall; WAF) 服務來強化 web 應用的安全性。應用如果是面向全球的使用者，則 CDN 的使用應該視為必要。</p>
+<p><em>雲端常見的方案：</em></p>
+<ul>
+<li>CloudFlare CDN</li>
+<li>AWS CloudFront</li>
+<li>Ｇoogle Cloud CDN</li>
+</ul>
+<p>在過往應用系統要能夠使用 CDN 是門檻相當高的事情，主要是費用問題。由於經濟型以及免費的 CDN 服務已經很常見，且 CDN 是實現應用高擴充性中重要的元件，因此被納入此架構中。</p>
+<h3 id="網路負載均衡器-Network-Load-balancer">網路負載均衡器 (Network Load balancer)</h3>
+<p>支援第四層 (TCP/UDP) 的網路負載均衡，根據連線的 IP 與 Port 將請求平均轉送 (forward) 給應用平台內的各個「邊緣代理 (edge proxy)」。</p>
+<p><em>開源常見的方案：</em></p>
+<ul>
+<li><a href="https://github.com/haproxy/haproxy" target="_blank" rel="noopener">HAProxy</a>: 配合 <a href="http://www.linux-ha.org/wiki/Heartbeat" target="_blank" rel="noopener">Hearbeat</a> 或者 <a href="https://www.keepalived.org/" target="_blank" rel="noopener">Keepalived</a> 藉由 <a href="https://en.wikipedia.org/wiki/Virtual_IP_address" target="_blank" rel="noopener">Virtual IP</a> 機制可提供容錯。</li>
+<li><a href="https://github.com/metallb/metallb" target="_blank" rel="noopener">MetalLB</a>: 與 K8S 有良好整合，但目前還是 beta 狀態。</li>
+</ul>
+<p>常見的雲端託管服務都有整合各家的網路負載服務器，只要在 K8S 中部署型態 (type) 為 <code>LoadBalancer</code> 的服務 (service) 資源就可以建立對應的負載均衡服務。</p>
+<h3 id="邊緣代理-Edge-Proxy">邊緣代理 (Edge Proxy)</h3>
+<p>負責應用平台請求的進入點，通常俱備下列功能：</p>
+<ol>
+<li>提供與客戶端的加密安全連線 (SSL termination)。</li>
+<li>將請求轉送到正確的上游 (upstream) 的應用控制器或服務元件。</li>
+<li>請求限速 (Rate limit): 避免單一來源 (e.g. 同一 IP 或用戶) 同一時間發出太多請求，部分是為了防堵「阻斷服務 (DoS)」。</li>
+<li>存取控制 (Access control)：驗證請求中的 token 來決定是否允許存取。</li>
+<li>標示請求識別碼：針對每個進入平台的請求給予唯一識別碼，讓追蹤系統可以關聯同一個請求在不同元件的資訊。</li>
+</ol>
+<p><em>開源常見的方案：</em></p>
+<ul>
+<li><a href="https://github.com/kubernetes/ingress-nginx" target="_blank" rel="noopener">Nginx</a></li>
+<li><a href="https://github.com/Kong/kubernetes-ingress-controller" target="_blank" rel="noopener">Kong</a></li>
+</ul>
+<p>此元件利用 Kubernetes 的 Ingress controller 實現。</p>
+<h3 id="應用控制器-Application-Controller">應用控制器 (Application Controller)</h3>
+<p>此架構中的選擇性 (optional) 元件，負責：</p>
+<ol>
+<li>將 HTTP 請求轉發給應用的不同元件。</li>
+<li>根據負載來伸縮 (scale) 應用元件副本 (replica) 數量：實際上通常由另一個元件負責，但此架構將兩者合併。</li>
+</ol>
+<p><em>開源常見的方案：</em></p>
+<ul>
+<li><a href="https://github.com/knative/serving" target="_blank" rel="noopener">Knative Serving</a></li>
+<li><a href="https://github.com/openfaas/faas" target="_blank" rel="noopener">OpenFaaS</a></li>
+</ul>
+<p>雖然習慣將這樣的方案稱為 Function as a Service (FaaS) 框架，此架構利用這些框架擴展 Kubernetes 對於應用元件的生命週期管理功能。如果需要更彈性的自動擴容 (autoscaling)，包括從零擴容 (scale from zero) 的能力，則可以在平台中使用「應用控制器」。</p>
+<h3 id="應用服務-Application-Service">應用服務 (Application Service)</h3>
+<p>一個 Web 應用由一個以上的「應用服務」組成，單體結構 (monolithic) 的應用只有一個應用服務，但並不是說有多個應用服務就是屬於微服務架構 (microservices)。在此架構並沒有對應用服務的數量以及結構加以限制，應用服務可以是一個「功能 (function)」、微服務、或者是包含整個應用邏輯的單體。應用服務包含不適合在客戶端實現的商務邏輯 (business logic) 以及領域模型 (domain model)，通常由開發團隊內部開發，但就算是外包只要是應用特有 (application-specific) 的元件都屬於這一類，也應該採取相同架構規範。</p>
+<p><em>實作應用服務常用的程式語言：</em></p>
+<ul>
+<li>Python</li>
+<li>Go</li>
+<li>Java</li>
+<li>JavaScript/TypeScript</li>
+<li>Ruby</li>
+<li>PHP</li>
+<li>C#</li>
+</ul>
+<p>除了實現應用邏輯所需的程式碼，應用服務也需要明確指定相依的套件名稱與版本，在 CI/CD 的 pipeline 就完成應用製品 (artifact) 的封裝工作，如產生容器的映像檔並推送到容器儲存庫 (container registry) 中。除了開發環境外，其餘的部署都只能使用封裝好的容器映像檔來進行。</p>
+<p>另外，只要是熱門的程式語言，選擇哪一種則按照團隊成員已經熟悉為準，初期不用為了執行效能或為符合流行趨勢來選擇。</p>
+<div class="alert info no-icon"><p><em>部署觀點</em><br>
+每個應用服務都是以容器映像 (container image) 形式包裝 (package) 跟分發 (delivery)，容器已包含應用服務執行時期 (runtime) 以及相依的程式庫、執行檔等。一般原則是不建議在部署環境才建置 (build) 應用服務，一些 FaaS 方案（如 Fission) 支援在部署環境中才建置功能 (funtion) 容器用以執行對應的功能。雖然可以免除容器儲存庫 (container registry) 的需求，但並無法保證每次建置時相依的套件可以正常取得。如果應用有多個部署環境，也會增加組態飄移 (configuration drift) 的可能。</p>
+</div>
+<div class="alert info no-icon"><p><em>安全觀點</em><br>
+為了避免應用元件所在的主機 / 容器被入侵後將機密資料送出，應用服務不應該直接存取網路上的第三方服務。也就是說：應用服務元件所需要的服務都只能由「支援服務」或者「支援存儲」來提供。如此可以透過防火牆或者網路策略 (Network policy) 等機制來限制只有合法授權元件可以存取。</p>
+</div>
+<h3 id="支援服務-Backing-Services">支援服務 (Backing Services)</h3>
+<p>泛指由第三方所提供套裝軟體或者雲端供應商提供的網路服務。通常「支援服務」的整備 (provision) 流程是運維團隊建立所需的「支援服務」實例後，將該服務實例與應用服務進行綁定 (binding)。理想上，應用元件不需要了解背後的整備流程。</p>
+<p>以 MySQL 資料庫為例：「整備」包含部署 MySQL 服務軟體 (或者申請雲端資料庫服務)、建立資料庫，產生應用連線的帳密跟設定存取權限等；「綁定」則是將存取 MySQL 資料庫所需的服務位址、連線帳密等資訊以 <a href="https://kubernetes.io/docs/concepts/configuration/configmap/#configmap-object" target="_blank" rel="noopener">ConfigMap</a> 或者 <a href="https://kubernetes.io/docs/concepts/configuration/secret/" target="_blank" rel="noopener">Secret</a> 資源形式讓應用服務可以取得。</p>
+<p>簡單的整備流程可以手動安裝，也可以透過 <a href="https://kubernetes.io/docs/concepts/extend-kubernetes/service-catalog/" target="_blank" rel="noopener">Service Catalog</a> 來自動進行。</p>
+<h3 id="支援存儲-Backing-Stores">支援存儲 (Backing Stores)</h3>
+<p>架構上同樣屬於支援服務，但由於負責提供應用狀態存放與查詢所需的機制，跟其它無狀態的支援服務在部署與安全策略明顯不同，架構上特別分開描述。「支援存儲」按照應用對資料的永續性 (persistence)、資料結構、查詢效能等不同需求會有不同適用的存儲方案。</p>
+<ul>
+<li>「資料存儲服務」提供應用永久性或半永久性資料的存放空間，同時需要提供應用透過網路協定來快速查詢與處理資料的功能。</li>
+<li>「資料快取服務」提供應用暫時性的資料存放空間，提供快速查詢常用資料機制以達到縮減請求處理時間的目的。</li>
+<li>「搜尋索引服務」提供全文檢索功能，對於想提供使用者 ad-hoc 資料查詢功能的應用特別需要。</li>
+<li>「共享檔案系統」提供可由多節點同時存取的網路檔案存取服務，傳統上透過 NFS 來提供。Web 應用常用來存放使用者上傳的媒體檔案。</li>
+<li>「物件存儲服務」由 AWS S3 服務引起流行的存儲模式，適合非結構化、大量的二進位物件 (blob) 檔案存取。由於物件儲存高可用性以及擴展性，在現代化的 Web 應用，常用來取代「共享檔案系統」的角色。</li>
+</ul>
+<p>此架構設計允許應用元件選擇最適合的存儲方案，但是否真得需要根據資料特性來選擇？這要由團隊自行決定。極端而言，有些應用將所有資料包括檔案都存放在一個關聯式資料庫來集中管理，對效能、可用性以及擴充性當然有不好的作用，但是粗暴簡單。</p>
+<h2 id="常見支援存儲">常見支援存儲</h2>
+<p>應用服務為無狀態元件，所以 Web 應用總是需要某些「支援存儲」來存放狀態資料，本節提出幾種常見的支援存儲。</p>
+<h3 id="資料存儲-Data-Stores">資料存儲 (Data Stores)</h3>
+<p>資料存儲或者說資料庫 (database) 按照資料模型的不同可分為「關聯式資料庫 (RDBM)」與非關聯式資料庫 (NoSQL) 兩大類。</p>
+<p>Wikipedia 對於關聯式資料庫的定義：</p>
+<blockquote>
+<p>關聯式資料庫（英語：Relational database），是建立在關聯模型基礎上的資料庫，藉助於集合代數等數學概念和方法來處理資料庫中的資料。現實世界中的各種實體以及實體之間的各種聯絡均用關聯模型來表示。關聯模型是由埃德加・科德於 1970 年首先提出的，並配合「科德十二定律」。現如今雖然對此模型有一些批評意見，但它還是資料儲存的傳統標準。標準資料查詢語言 SQL 就是一種基於關聯式資料庫的語言，這種語言執行對關聯式資料庫中資料的檢索和操作。</p>
+</blockquote>
+<p>Wikipedia 對於 NoSQL 的簡短說明：</p>
+<blockquote>
+<p>NOSQL (Not Only SQL) 是對不同於傳統的關聯式資料庫的資料庫管理系統的統稱。</p>
+<p>允許部分資料使用 SQL 系統儲存，而其他資料允許使用 NOSQL 系統儲存。其資料儲存可以不需要固定的表格模式以及中介資料 (metadata)，也經常會避免使用 SQL 的 JOIN 操作，一般有水平可延伸性的特徵。</p>
+</blockquote>
+<p>選擇哪類型來作為應用的資料庫可以根據需求與運維能力而定。作為一般原則：由於關聯式資料庫技術最為成熟以及使用廣泛，新創團隊應該優先採用。</p>
+<p><em>開源常見的方案：</em></p>
+<ul>
+<li><a href="https://github.com/mysql/mysql-server" target="_blank" rel="noopener">MySQL</a></li>
+<li><a href="https://www.postgresql.org/" target="_blank" rel="noopener">PostgreSQL</a></li>
+<li><a href="https://github.com/mongodb/mongo" target="_blank" rel="noopener">MongoDB</a></li>
+<li><a href="https://github.com/antirez/redis" target="_blank" rel="noopener">Redis</a></li>
+</ul>
+<p>Redis 適用不需要 Ad-hoc 查詢，可以接受短時間 (如 1 秒）資料丟失風險的應用情境。</p>
+<h3 id="資料快取-Data-Cache">資料快取 (Data Cache)</h3>
+<p>資料快取服務提供應用元件暫時性 (transient) 資料的存放服務，用來減少需要存取資料庫的次數以達到提高服務請求的效率。例如使用者的會期資料 (session data) 在每個網頁請求都需要存取，就可以放在資料快取中減少查詢時間。</p>
+<p>開源常見方案：</p>
+<ul>
+<li><a href="https://github.com/antirez/redis" target="_blank" rel="noopener">Redis</a></li>
+<li><a href="https://github.com/memcached/memcached" target="_blank" rel="noopener">Memcached</a></li>
+</ul>
+<p>由於 Redis 具備多樣性功能，山姆鍋傾向於使用 Redis, 在某些情境甚至可以作為 key-value 資料庫使用。</p>
+<h3 id="搜尋索引-Search-Index">搜尋索引 (Search Index)</h3>
+<p>如果應用需要提供全文檢索 (full-text search) 功能，由於資料庫對於全文檢索的支援相對陽春，應用也許需要使用專門的搜尋引擎 (search engine) 軟體來符合查詢效能的需求。</p>
+<p><em>開源常見的方案：</em></p>
+<ul>
+<li><a href="https://github.com/elastic/elasticsearch" target="_blank" rel="noopener">Elasticsearch</a></li>
+<li><a href="https://github.com/apache/lucene-solr/" target="_blank" rel="noopener">Solr</a>。</li>
+</ul>
+<h3 id="共享檔案系統-Shared-Filesystem">共享檔案系統 (Shared Filesystem)</h3>
+<p>在分散式應用架構中，常見的一個需求是：使用者上傳的檔案 (通常是圖檔) 要讓應用的多個節點可以存取，傳統上可以透過網路檔案系統 (如 NFS) 來提供。使用共享檔案系統的主要好處在於熟悉以及方便開發，讀寫本地跟遠端掛載的檔案操作差異不大。</p>
+<p><em>開源常見的方案</em></p>
+<ul>
+<li><a href="https://github.com/gluster/glusterfs" target="_blank" rel="noopener">GlusterFS</a></li>
+<li><a href="https://docs.ceph.com/docs/master/cephfs/" target="_blank" rel="noopener">Ceph FS</a></li>
+</ul>
+<p>由於雲端供應商較少提供共享檔案系統服務，如果使用共享檔案系統就需要自行部署。因此，如果可行建議採用「物件存儲」代替。</p>
+<h3 id="物件存儲-Object-Storage">物件存儲 (Object Storage)</h3>
+<p>相對於共享檔案系統雖然需要透過 API 來進行檔案操作，由於難度不高並不會增加太多額外負擔 (overhead)。使用雲端物件存儲服務還具備高可用以及高可靠的優勢，檔案存放在雲端物件存儲通常也方便與 CDN 整合 (e.g. AWS CloudFront + S3)。在本地開發上，MinIO 提供相容的功能可以方便整合測試。</p>
+<p><em>開源常見的方案：</em></p>
+<ul>
+<li><a href="https://min.io/" target="_blank" rel="noopener">MinIO</a></li>
+<li><a href="https://ceph.io/ceph-storage/object-storage/" target="_blank" rel="noopener">Ceph RGW</a></li>
+</ul>
+<p>由於雲端物件存儲服務按量計費，且有經濟的選項，如 DigitalOcean 的 <a href="https://www.digitalocean.com/products/spaces/" target="_blank" rel="noopener">Spaces</a>。原則上，即使是自建應用平台也建議採用雲端物件存儲服務。</p>
+<h2 id="常見支援服務">常見支援服務</h2>
+<p>不同 Web 應用需要的支援服務差異頗大，但還是有幾種「支援服務」常需要用到。</p>
+<h3 id="訊息傳遞服務-Messaging-service">訊息傳遞服務 (Messaging service)</h3>
+<p>「訊息傳遞服務」提供應用元件間一對ㄧ (queue)、一對多 (publish-subscribe) 等多種通訊模式的訊息傳遞機制。此服務的應用場景之一是應用將實現請求不需要立即完成的工作透過佇列 (queue) 派送給背景程序執行，如此可以減少客戶端等待時間。幾乎沒有一個高擴充性 (highly scalable) 的系統找不到訊息傳遞服務的存在。所以，熟悉跟了解訊息互動模式，更重要的是事件驅動 (event-driven) 概念，對於設計高可用以及高擴充性的應用相當關鍵。</p>
+<p><em>開源常見的方案：</em></p>
+<ul>
+<li><a href="https://github.com/apache/kafka" target="_blank" rel="noopener">Kafka</a></li>
+<li><a href="https://github.com/rabbitmq/rabbitmq-server" target="_blank" rel="noopener">RabbitMQ</a></li>
+<li><a href="https://github.com/nats-io/nats-streaming-server" target="_blank" rel="noopener">NATS</a></li>
+<li><a href="https://github.com/antirez/redis" target="_blank" rel="noopener">Redis</a></li>
+</ul>
+<p>Redis 真的是多用途的軟體，在小規模的應用也常看到作為訊息傳遞服務。山姆鍋不負責任建議：如果沒有特別需要的話，可以選擇 NATS Streaming Server。</p>
+<h3 id="郵件寄送服務-Email-Delivery-Service">郵件寄送服務 (Email Delivery Service)</h3>
+<p>此服務提供應用發送電子郵件所需的功能，讓 Web 應用發送諸如：「使用者信箱確認信件」、「密碼重置信件」等電子郵件。由於垃圾信氾濫，自建郵件服務信件送達機率越來越低，建議採用雲端服務。</p>
+<p><em>雲端常見的方案：</em></p>
+<ul>
+<li><a href="https://sendgrid.com/" target="_blank" rel="noopener">SendGrid</a></li>
+<li><a href="https://www.sendinblue.com/" target="_blank" rel="noopener">SendinBlue</a></li>
+</ul>
+<p>應用需透過 SMTPS 協定與郵件寄送服務溝通避免供應商鎖定 (vendor lock-in) 以及方便測試。開發環境會需要利用 <a href="https://github.com/derekahn/mailslurper" target="_blank" rel="noopener">MailSluper</a> 這類工具來進行模擬跟除錯。</p>
+<div class="alert info no-icon"><p><em>安全觀點</em><br>
+對應 “應用服務元件不能直接存取第三方服務 “這個限制，須在應用平台 (生產環境) 部署對應的代理 (proxy) 服務，與雲端服務連線只能由此代理進行。對應用元件而言，郵件寄送服務是由此代理所提供，因為代理也是平台所管理的元件，存取控制可以一致地使用應用平台的機制實現 (如 Network policy, Service Mesh)。</p>
+</div>
+<h2 id="其它支援服務">其它支援服務</h2>
+<p>實務上應用平台至少還要部署應用監控、日誌等其它所需的服務，但由於不是應用元件執行所直接相依的服務，這裡就不特別說明。除此之外，就運維一個應用平台而言，服務網格 (service mesh)、分散式追蹤 (distributed tracing) 等用來提高應用系統可觀察性 (observability) 以及可靠性 (reliability) 的技術，都是團隊值得考慮投資的項目。</p>
+<h2 id="元件間通訊機制">元件間通訊機制</h2>
+<p>應用元件並非獨立存在，彼此間免不了需要進行溝通，例如客戶端需要呼叫後端 API 來查詢資料；微服務需要呼叫另一個微服務來完成客戶端過來的請求。元件之間要能夠順利溝通，自然就需要有規範的通訊協定，本節針對幾個情境提出常見選項。</p>
+<h3 id="客戶端-服務端">客戶端 - 服務端</h3>
+<p>雖然可以做到一定離線 (offline) 操作能力，但 Web 應用的客戶端總是免不了需要跟後端服務溝通的。下面幾個通訊協定以及適用的情境：</p>
+<ul>
+<li>REST (HTTPS): 適合由客戶端發起進行查詢或者操作的 API 請求。</li>
+<li>Websocket (WSS): 適合客戶端與服務端需要即時雙向的通訊，如即時股價回報。</li>
+<li>gRPC (HTTP/2): 適合客戶端是行動應用或者其它 <a href="https://en.wikipedia.org/wiki/Fat_client" target="_blank" rel="noopener">Thick clients</a>。</li>
+</ul>
+<h3 id="服務端-服務端">服務端 - 服務端</h3>
+<p>應用服務元件之間的通訊機制如果是同步的請求回應 (request-response) 互動模式，雖然看起來 gRPC 是不二選擇，但 REST API 或者 JSON-RPC 其實也是簡單務實的作法。</p>
+<p>除非對網路流量優化或者訊息 schema 驗證有特別的需求，不然應用服務元件間非同步通訊則建議以 JSON 為訊息的格式，夠彈性也方便找問題。</p>
+<h2 id="小結">小結</h2>
+<p>山姆鍋希望本文所提的 Web 應用架構剛好足夠 (just enough) 適用多數 Web 專案的需要。新創團隊想要一開始就使用先進 (state-of-the-art) 的技術框架作為賣點之一，雖然可以理解但同時也會增加不必要的風險。畢竟軟體的價值發生在實際交付使用者的時候，初期投資太多在酷炫技術對使用者並沒有實際效益。針對新創團隊，即使目標是微服務架構，山姆鍋仍建議從單體式應用服務作為開始，在實際掌握領域 (domain) 如何適當劃分的經驗後，再過渡到微服務架構應該是比較保險的作法。採用微服務架構的話，可以評估是否以及哪個時間點導入「服務網格 (service mesh)」機制。</p>
+
+            
+
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">標籤</span><br/>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tag/kubernetes/" rel="tag">Kubernetes</a> <a class="tag tag--primary tag--small t-link" href="/tag/software-architecture/" rel="tag">Software architecture</a> <a class="tag tag--primary tag--small t-link" href="/tag/web-application-platform/" rel="tag">Web Application platform</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/post/2020/05/windows-terminal-default-wsl-ubuntu-shell/"
+                    data-tooltip="設定 Windows Terminal 作為 WSL 操作介面"
+                    aria-label="上一篇: 設定 Windows Terminal 作為 WSL 操作介面"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/post/2020/05/launch-windows-default-browser-from-inside-wsl/"
+                    data-tooltip="讓程式從 WSL 環境自動開啟 Windows 系統的瀏覽器"
+                    aria-label="下一篇: 讓程式從 WSL 環境自動開啟 Windows 系統的瀏覽器"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://samkuo.me/post/2020/05/generic-web-software-architecture/"
+                    title="分享到 Facebook"
+                    aria-label="分享到 Facebook"
+                >
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://twitter.com/intent/tweet?text=https://samkuo.me/post/2020/05/generic-web-software-architecture/"
+                    title="分享到 Twitter"
+                    aria-label="分享到 Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https://samkuo.me/post/2020/05/generic-web-software-architecture/"
+                    title="global.share_on_linkedin"
+                    aria-label="global.share_on_linkedin"
+                >
+                    <i class="fab fa-linkedin" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#disqus_thread"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="目錄">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript" target="_blank" rel="noopener">comments powered by Disqus.</a></noscript>
+</div>
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2022 Sampot (山姆鍋). All Rights Reserved.
+    </span>
+    <br/>
+        <a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW"><img
+                alt="創用 CC 授權條款" style="border-width:0"
+                src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+        除另有標示，本著作係採用<a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW">創用 CC
+            姓名標示-非商業性-相同方式分享 4.0 國際 授權條款</a>授權。
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="5">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/post/2020/05/windows-terminal-default-wsl-ubuntu-shell/"
+                    data-tooltip="設定 Windows Terminal 作為 WSL 操作介面"
+                    aria-label="上一篇: 設定 Windows Terminal 作為 WSL 操作介面"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/post/2020/05/launch-windows-default-browser-from-inside-wsl/"
+                    data-tooltip="讓程式從 WSL 環境自動開啟 Windows 系統的瀏覽器"
+                    aria-label="下一篇: 讓程式從 WSL 環境自動開啟 Windows 系統的瀏覽器"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://samkuo.me/post/2020/05/generic-web-software-architecture/"
+                    title="分享到 Facebook"
+                    aria-label="分享到 Facebook"
+                >
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://twitter.com/intent/tweet?text=https://samkuo.me/post/2020/05/generic-web-software-architecture/"
+                    title="分享到 Twitter"
+                    aria-label="分享到 Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https://samkuo.me/post/2020/05/generic-web-software-architecture/"
+                    title="global.share_on_linkedin"
+                    aria-label="global.share_on_linkedin"
+                >
+                    <i class="fab fa-linkedin" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#disqus_thread"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="目錄">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="5">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://www.facebook.com/sharer/sharer.php?u=https://samkuo.me/post/2020/05/generic-web-software-architecture/"
+                        aria-label="分享到 Facebook"
+                    >
+                        <i class="fab fa-facebook" aria-hidden="true"></i><span>分享到 Facebook</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://twitter.com/intent/tweet?text=https://samkuo.me/post/2020/05/generic-web-software-architecture/"
+                        aria-label="分享到 Twitter"
+                    >
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>分享到 Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https://samkuo.me/post/2020/05/generic-web-software-architecture/"
+                        aria-label="global.share_on_linkedin"
+                    >
+                        <i class="fab fa-linkedin" aria-hidden="true"></i><span>global.share_on_linkedin</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/images/logo.png" alt="作者的圖片"/>
+        
+            <h4 id="about-card-name">Sampot (山姆鍋)</h4>
+        
+            <div id="about-card-bio"><p>個人部落格， 記錄與分享一些軟體開發與運維相關資訊， 偶爾也會碎念一下</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>IT 自由工作者</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                台灣/台北
+            </div>
+        
+    </div>
+</div>
+
+        
+            <div id="algolia-search-modal" class="modal-container">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="close-button"><i class="fa fa-times"></i></span>
+            <a href="https://algolia.com" target="_blank" rel="noopener" class="searchby-algolia text-color-light link-unstyled">
+                <span class="searchby-algolia-text text-color-light text-small">by</span>
+                <img class="searchby-algolia-logo" src="/assets/images/logo-algolia-nebula-blue-full.svg">
+            </a>
+            <i class="search-icon fa fa-search"></i>
+            <form id="algolia-search-form">
+                <input type="text" id="algolia-search-input" name="search"
+                    class="form-control input--large search-input" placeholder="Search "
+                    />
+            </form>
+        </div>
+        <div class="modal-body">
+            <div class="no-result text-color-light text-center">沒有找到文章</div>
+            <div class="results">
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2012/03/set-up-mysql-master-master-replication/"
+                            aria-label=": 設定 MySQL Master-Master 複製"
+                        >
+                            <h3 class="media-heading">設定 MySQL Master-Master 複製</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2012年3月3日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>本文簡單說明如何設定兩台 MySQL server，讓它們彼此互相備份資料 (Master-master 模式)。雖然這樣的設定通常是支援高可用性 (high availability) 平台的一部分，但本文不包含如何完成其他 HA 的工作。設定兩台 MySQL 伺服器互相備份，主要目的就是要確認資料的安全性；同時也提高可用性。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2012/04/use-pacemaker-two-node-ha-cluster/"
+                            aria-label=": 使用 Pacemaker 建構雙節點叢集系統"
+                        >
+                            <h3 class="media-heading">使用 Pacemaker 建構雙節點叢集系統</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2012年4月6日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>想要達到系統高可用性 (high availability) 的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2012/04/build-cluster-filesystem-with-glusterfs-ubuntu/"
+                            aria-label=": 使用 GlusterFS 在 Ubuntu 上建構雙節點叢集檔案系統"
+                        >
+                            <h3 class="media-heading">使用 GlusterFS 在 Ubuntu 上建構雙節點叢集檔案系統</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2012年4月23日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案 (圖檔，CSS 等等) 可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點 (single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2012/04/scale-wordpress-with-hyperdb/"
+                            aria-label=": 使用 HyperDB 加強 WordPress 網站的資料庫擴充性"
+                        >
+                            <h3 class="media-heading">使用 HyperDB 加強 WordPress 網站的資料庫擴充性</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2012年4月23日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>對於流量高的 Wordpress 網站來說，資料庫往往是第一個出現的瓶頸。針對資料庫擴充性的問題，本文介紹 HyperDB 這個解決方案。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2012/04/create-lnmp-environment-with-nginx/"
+                            aria-label=": 在 Linode 上使用 Nginx 架設 LNMP 環境"
+                        >
+                            <h3 class="media-heading">在 Linode 上使用 Nginx 架設 LNMP 環境</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2012年4月30日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>Apache HTTPd 是很好的網站伺服器，但是對於 CPU 跟記憶體的要求較高，對於架設在 VPS 上面網站來說， 需要一個更輕量級的解決方案。越來越多人選擇使用 Nginx 架設網站，主要考量便是它的快速、穩定以及輕量的特性。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2012/05/support-sending-mail-php-linux-vps-exim/"
+                            aria-label=": Linux VPS PHP 網站可以發送信件"
+                        >
+                            <h3 class="media-heading">Linux VPS PHP 網站可以發送信件</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2012年5月8日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>PHP 架站軟體通常需要用到寄信功能，例如：通知站長有新的迴響需要審核。使用虛擬主機來架站的讀者一定會納悶：<br>
+不管是 WordPress，Drupal 或者其他 PHP<br>
+架站軟體不是都不用另外設定就可以寄信？為什麼需要特地提到這件事情。<br>
+話說山姆鍋的主機採用的是 Linode VPS，很多事情都需要自己來，唉！<br>
+如果您的網站主機跟山姆鍋一樣是 VPS 或者專屬伺服器，那這篇文章也許對您有幫助。<br>
+由於不是要做為公司的郵件伺服器，山姆鍋希望除了讓 PHP 架站軟體送信外，不再作其它用途。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2013/04/start-up/"
+                            aria-label=": 影化身科技有限公司成立"
+                        >
+                            <h3 class="media-heading">影化身科技有限公司成立</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2013年4月24日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>2013 年 4 月 24 日，影化身科技有限公司登記成立，致力於提供雲端服務平台。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2013/05/shi-yong-octopresszuo-wei-bo-ke-ping-tai/"
+                            aria-label=": 使用 Octopress 作為部落格平台"
+                        >
+                            <h3 class="media-heading">使用 Octopress 作為部落格平台</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2013年5月23日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>由於沒有需要太多動態功能，所以，嘗試使用靜態部落格平台 Octopress 來寫文章。「艾米部落」<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup> 一路從 Joomla, Drupal, WordPress 到現在的 Octopress，也算是換了不少平台。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2013/05/use-static-site-generator-for-company-site/"
+                            aria-label=": 使用靜態網頁產生器來管理公司網站"
+                        >
+                            <h3 class="media-heading">使用靜態網頁產生器來管理公司網站</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2013年5月28日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>對於不需要動態功能的網站而言，使用像是 Drupal、WordPress 之類的架站軟體，感覺有點大材小用。對於可以接受不使用「所見即所得」編輯器的人，靜態網站產生器應該是個可以接受的方案。 雖說是靜態網站，缺少很多功能，但像是公司或者行銷網站往往也不需要這些。況且， 靜態網站有諸多動態網站所沒有的功能，如：</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2013/05/exchange-name-card-with-eavatar-me/"
+                            aria-label=": 如何利用「我．影化身」服務交換名片"
+                        >
+                            <h3 class="media-heading">如何利用「我．影化身」服務交換名片</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2013年5月29日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>今天從 MR JAMIE 上讀到一篇文章：「從今天開始，請 email 你的名片給我吧！」這讓我想到，與其使用 Email，使用「我．影化身」來代替，不是也很適當？</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+            </div>
+        </div>
+        <div class="modal-footer">
+            <p class="results-count text-medium"
+                data-message-zero="沒有找到文章"
+                data-message-one="找到 1 篇文章"
+                data-message-other="找到 {n} 篇文章">
+                找到 134 篇文章
+            </p>
+        </div>
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+
+<script src="/assets/js/script-597bjprixrfzrennpanwcwfnulsqaw08wvkzphw7gk8dqunvgzd9nn3nvsu9.min.js"></script>
+
+<!--SCRIPTS END-->
+
+
+    
+        <script>
+          var disqus_config = function() {
+            this.page.url = 'https://samkuo.me/post/2020/05/generic-web-software-architecture/';
+              
+            this.page.identifier = 'post/2020/05/generic-web-software-architecture/';
+              
+          };
+          (function() {
+            var d = document, s = d.createElement('script');
+            var disqus_shortname = 'sampotkuo';
+            s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+          })();
+        </script>
+    
+
+
+
+    
+<script src="/assets/js/moment-with-locales.js"></script>
+
+    
+<script src="/assets/js/algoliasearch.js"></script>
+
+    <script>
+      var algoliaClient = algoliasearch('OIWK4CBFS4', 'f676051199368fe5f161c9012b7edaf6');
+      var algoliaIndex = algoliaClient.initIndex('MyBlogIndex');
+    </script>
+
+
+    </body>
+</html>

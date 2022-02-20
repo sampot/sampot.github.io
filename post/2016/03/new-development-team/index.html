@@ -1,0 +1,1067 @@
+
+<!DOCTYPE html>
+<html lang="zh-tw">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="我是山姆鍋">
+    <title>建立研發團隊比想像中的還要難 100 倍以上 - 我是山姆鍋</title>
+    <meta name="author" content="Sampot (山姆鍋)">
+    
+    
+        <link rel="icon" href="https://samkuo.me/images/favicon.png">
+    
+    
+        
+            <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
+        
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","/contact","/sitemap"],"image":"logo.png"},"articleBody":"山姆鍋的「懶惰病」看來還蠻嚴重的，轉眼離上一篇文章已經是三個多月的事情了！雖然不是最久的紀錄，但這樣還蠻誇張的。這段時間山姆鍋在台北開始了新的工作， 莫名奇妙就在做手機軟體開發，沒多久卻「漂流」到新竹清大育成中心， 負責成立並管理一個研發團隊。\n\n不管是不是計畫趕不上變化，話說成立這個研發團隊到底是為了什麼目的？ 山姆鍋就用面試時會回答的官方答案：「本團隊是以開發手遊加值的軟體與服務為主軸， 屬於公司內部創業，預期要成長茁壯為獨當一面的新創公司。」 既然是團隊，那團隊的任務就必須清楚才能讓成員知道方向。\n團隊任務\n此團隊目標在建立一個手遊影音分享平台，做到：\n\n讓同遊戲的玩家可以分享遊戲技巧與心得，不用再為卡關受苦。\n遊戲開發者可以建立遊戲專屬頻道與其玩家互動，提高遊戲黏著度。\n讓遊戲高手或主播可以建立節目 (直播或點播) 與粉絲分享，並創造營收。\n\n是的，我們知道已經有公司在做類似的服務，但就讓我們假設競爭是好事。\n關鍵技術\n要完成最終的平台需要幾個關鍵技術，底下是山姆鍋歸納的結果：\n\n手遊畫面與聲音同步擷取後錄製與直播所需的 SDK。\n手機端使用者介面 (webview-based) 提供玩家與社群的功能。\n遊戲影音分享網站前端 (browser-based)：讓同遊戲的玩家可以分享遊戲技巧與討論心得等等。\n遊戲影音分享網站後端：提供身份認證、視訊資料儲存、分佈與串流等功能。\n\n其中一個直播串流採用的技術是 HTTP Live Streaming，在之前的文章有分享過相關應用。\n召募對象\n對於開發工程師，不管是在學生或者全職人員，山姆鍋的最基本的要求：\n\n對手機軟體開發有興趣\n不怕技術挑戰\n為了任務願意學習新東西\n\n山姆鍋認為一個人如果對於做的事情沒有興趣或者熱情，最好的情況下也只是有平庸的表現。 不管是基於對技術的熱情或者對高薪的追求，要從事軟體開發這種需要不斷學習的工作， 還真的要有內在動機才能堅持下去。\n為什麼需要不怕技術挑戰？因為需要使用到手機平台比較底層的 API 才能實現相關的功能。 例如：要能夠達到至少每秒 30 張遊戲畫面擷取，還要同時做聲音輸入並錄製成影像檔。 這些都不是一般 App 開發會用到的，未來還有直播串流等相關要求，技術難度肯定是有的。\n需要學習新東西這點基本上是廢話，但就是有人認為學校教的就夠了！ 我們歡迎沒有工作經驗的人加入，只要您夠聰明又願意學習。\n為什麼要使用 C++?\n在找 iOS/Android 開發工程師時常被問到：為什麼不是 Java 或者 Objective C， 而是要找熟悉 Ｃ＋＋ 的人？主要是基於下列原因：\n\n為了跨平台共用程式：是的，我們需要支援多個行動平台，iOS 跟 Android\n是最主要的兩個。\n為了執行效率：除了 C，我想不到其他主流語言比 C++ 快。\n支援物件導向：比 C 提供更高階的抽象化來解決問題，比較好維護。\n需要跟 Cocos2d-x 等遊戲引擎整合：這些引擎大多是以 C++ 開發。\n\n為什麼一定要已經熟悉 C++?\n這是因為山姆鍋有個人偏見：認為 C++ 是主流程式語言裡面最難學會的。對於一個新創團隊來說， 訓練一個工程師從頭開始學 C++ 到上手，恐怕是不實際的期望。山姆鍋自己也還在持續學習 C++ 當中，有機會再來分享 C++ 跨手機平台開發 App 的經驗。 基於這個原因，已經熟悉 C++ 的高手自然就成為主要目標。這不代表說不需要會其它技能， 只是會 Java 或 Objective C，有開發過手機 app 這些都只是加分， 並不在山姆鍋找夥伴的必要條件中。\n為什麼要使用 MacBook Pro 作為開發機？\n山姆鍋思考事情通常都很務實，使用 MacBook 可不是因為有雅痞的 fu。理由是因為只有 Apple 的機器可以合法用來開發 iOS 相關軟體，想知道為什麼請去問 Apple 這家公司！ 用了好幾年 Ubuntu 的山姆鍋也只好轉到 OSX 的作業環境下。 不過老實講， MacBook 也沒什麼好抱怨，可以方便使用眾多的開源軟體又有良好的桌面整合環境。所以， 團隊成員以 MacBook Pro 作為主要開發機就這樣定案了。\n需要一定在辦公室工作嗎？\n這點因人而異，但基本上，每週還是需要有一定比例的時間在辦公室。隨著對團隊的工作流程更加熟悉， 加上本身夠自律，不用到辦公室的時間自然可以加長。\n小結\n這段時間以來，雖然想過找人不容易，但還是比預期的困難許多，其中有些原因還是自作自受。 不管怎樣，山不轉路轉，暫時找不到適合的夥伴，那就將部分開發工作外包。在工作的時間跟地點， 山姆鍋的老闆願意支持可以有這麼高的彈性，這點在台灣應該也算是少見。\n","dateCreated":"2016-03-23T12:39:00+08:00","dateModified":"2018-08-29T23:50:46+08:00","datePublished":"2016-03-23T12:39:00+08:00","description":"山姆鍋的「懶惰病」看來還蠻嚴重的，轉眼離上一篇文章已經是三個多月的事情了！雖然不是最久的紀錄，但這樣還蠻誇張的。這段時間山姆鍋在台北開始了新的工作， 莫名奇妙就在做手機軟體開發，沒多久卻「漂流」到新竹清大育成中心， 負責成立並管理一個研發團隊。","headline":"建立研發團隊比想像中的還要難 100 倍以上","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2016/03/new-development-team/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","/contact","/sitemap"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2016/03/new-development-team/","keywords":"軟體工程師, 實習生"}</script>
+    <meta name="description" content="山姆鍋的「懶惰病」看來還蠻嚴重的，轉眼離上一篇文章已經是三個多月的事情了！雖然不是最久的紀錄，但這樣還蠻誇張的。這段時間山姆鍋在台北開始了新的工作， 莫名奇妙就在做手機軟體開發，沒多久卻「漂流」到新竹清大育成中心， 負責成立並管理一個研發團隊。">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="建立研發團隊比想像中的還要難 100 倍以上">
+<meta property="og:url" content="https://samkuo.me/post/2016/03/new-development-team/">
+<meta property="og:site_name" content="我是山姆鍋">
+<meta property="og:description" content="山姆鍋的「懶惰病」看來還蠻嚴重的，轉眼離上一篇文章已經是三個多月的事情了！雖然不是最久的紀錄，但這樣還蠻誇張的。這段時間山姆鍋在台北開始了新的工作， 莫名奇妙就在做手機軟體開發，沒多久卻「漂流」到新竹清大育成中心， 負責成立並管理一個研發團隊。">
+<meta property="og:locale" content="zh_TW">
+<meta property="article:published_time" content="2016-03-23T04:39:00.000Z">
+<meta property="article:modified_time" content="2018-08-29T15:50:46.112Z">
+<meta property="article:author" content="Sampot (山姆鍋)">
+<meta property="article:tag" content="軟體工程師">
+<meta property="article:tag" content="實習生">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:creator" content="@sampotkuo">
+<meta property="fb:app_id" content="1538037013031361">
+    
+    
+        
+    
+    <meta property="og:image" content="https://samkuo.me/images/featured_image.jpg"/>
+    
+    
+    
+    <!--STYLES-->
+    
+<link rel="stylesheet" href="/assets/css/style-lfspghztdttlloh4nly9hmp3cqmehlzaagf5ften7wo63faxiltzljjm4fb0.min.css">
+
+    <!--STYLES END-->
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-41152700-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-41152700-1');
+    </script>
+
+
+    
+
+    
+        
+    
+</head>
+
+    <body>
+        <div id="fb-root"></div>
+        <script async defer crossorigin="anonymous"
+            src="https://connect.facebook.net/zh_TW/sdk.js#xfbml=1&version=v7.0&appId=1538037013031361&autoLogAppEvents=1"></script>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+<header id="header" data-behavior="5">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a
+            class="header-title-link"
+            href="/"
+            aria-label=""
+        >
+        <img class="header-avatar-picture" src="/images/logo32.png" alt="作者的圖片" />
+            我是山姆鍋
+        </a>
+    </div>
+    
+        
+            <a
+                class="header-right-icon open-algolia-search"
+                href="#search"
+                aria-label="打開鏈接: /#search"
+            >
+        
+        
+            <i class="fa fa-search fa-lg"></i>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="5">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a
+                    href="/#about"
+                    aria-label="閱讀有關作者的更多信息"
+                >
+                    <img class="sidebar-profile-picture" src="/images/logo.png" alt="作者的圖片"/>
+                </a>
+                <h4 class="sidebar-profile-name">Sampot (山姆鍋)</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>個人部落格， 記錄與分享一些軟體開發與運維相關資訊， 偶爾也會碎念一下</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/"
+                            
+                            rel="noopener"
+                            title="首頁"
+                        >
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">首頁</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-categories"
+                            
+                            rel="noopener"
+                            title="分類"
+                        >
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">分類</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-tags"
+                            
+                            rel="noopener"
+                            title="標籤"
+                        >
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">標籤</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-archives"
+                            
+                            rel="noopener"
+                            title="所有文章"
+                        >
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">所有文章</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link open-algolia-search"
+                            href="#search"
+                            
+                            rel="noopener"
+                            title="搜尋"
+                        >
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">搜尋</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/about"
+                            
+                            rel="noopener"
+                            title="關於"
+                        >
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">關於</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://github.com/sampot"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="GitHub"
+                        >
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://twitter.com/sampotkuo"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Twitter"
+                        >
+                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Twitter</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://facebook.com/sampotkuo"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Facebook"
+                        >
+                        <i class="sidebar-button-icon fab fa-facebook" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Facebook</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/contact"
+                            
+                            rel="noopener"
+                            title="聯絡"
+                        >
+                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">聯絡</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/sitemap"
+                            
+                            rel="noopener"
+                            title="網站導覽"
+                        >
+                        <i class="sidebar-button-icon fa fa-sitemap" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">網站導覽</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://feedly.com/i/subscription/feed/https://samkuo.me/atom.xml"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Atom"
+                        >
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Atom</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="5"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            建立研發團隊比想像中的還要難 100 倍以上
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2016-03-23T12:39:00+08:00">
+	
+		    3月 23, 2016
+    	
+    </time>
+    
+        <span>分類 </span>
+        
+    <a class="category-link" href="/category/teamwork/">Teamwork</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <div class="alert info no-icon">
+                我是山姆鍋 <div class="fb-like" data-href="https://www.facebook.com/sampotkuo" data-width="" data-layout="standard" data-action="like" data-size="large" data-share="false"></div>
+            </div>
+
+            <p>山姆鍋的「懶惰病」看來還蠻嚴重的，轉眼離上一篇文章已經是三個多月的事情了！雖然不是最久的紀錄，但這樣還蠻誇張的。這段時間山姆鍋在台北開始了新的工作， 莫名奇妙就在做手機軟體開發，沒多久卻「漂流」到新竹清大育成中心， 負責成立並管理一個研發團隊。</p>
+<a id="more"></a>
+<p>不管是不是計畫趕不上變化，話說成立這個研發團隊到底是為了什麼目的？ 山姆鍋就用面試時會回答的官方答案：「本團隊是以開發手遊加值的軟體與服務為主軸， 屬於公司內部創業，預期要成長茁壯為獨當一面的新創公司。」 既然是團隊，那團隊的任務就必須清楚才能讓成員知道方向。</p>
+<h2 id="團隊任務">團隊任務</h2>
+<p>此團隊目標在建立一個手遊影音分享平台，做到：</p>
+<ul>
+<li>讓同遊戲的玩家可以分享遊戲技巧與心得，不用再為卡關受苦。</li>
+<li>遊戲開發者可以建立遊戲專屬頻道與其玩家互動，提高遊戲黏著度。</li>
+<li>讓遊戲高手或主播可以建立節目 (直播或點播) 與粉絲分享，並創造營收。</li>
+</ul>
+<p>是的，我們知道已經有公司在做類似的服務，但就讓我們假設競爭是好事。</p>
+<h2 id="關鍵技術">關鍵技術</h2>
+<p>要完成最終的平台需要幾個關鍵技術，底下是山姆鍋歸納的結果：</p>
+<ul>
+<li>手遊畫面與聲音同步擷取後錄製與直播所需的 SDK。</li>
+<li>手機端使用者介面 (webview-based) 提供玩家與社群的功能。</li>
+<li>遊戲影音分享網站前端 (browser-based)：讓同遊戲的玩家可以分享遊戲技巧與討論心得等等。</li>
+<li>遊戲影音分享網站後端：提供身份認證、視訊資料儲存、分佈與串流等功能。</li>
+</ul>
+<p>其中一個直播串流採用的技術是 HTTP Live Streaming，在之前的文章有分享過相關應用。</p>
+<h2 id="召募對象">召募對象</h2>
+<p>對於開發工程師，不管是在學生或者全職人員，山姆鍋的最基本的要求：</p>
+<ul>
+<li>對手機軟體開發有興趣</li>
+<li>不怕技術挑戰</li>
+<li>為了任務願意學習新東西</li>
+</ul>
+<p>山姆鍋認為一個人如果對於做的事情沒有興趣或者熱情，最好的情況下也只是有平庸的表現。 不管是基於對技術的熱情或者對高薪的追求，要從事軟體開發這種需要不斷學習的工作， 還真的要有內在動機才能堅持下去。</p>
+<p>為什麼需要不怕技術挑戰？因為需要使用到手機平台比較底層的 API 才能實現相關的功能。 例如：要能夠達到至少每秒 30 張遊戲畫面擷取，還要同時做聲音輸入並錄製成影像檔。 這些都不是一般 App 開發會用到的，未來還有直播串流等相關要求，技術難度肯定是有的。</p>
+<p>需要學習新東西這點基本上是廢話，但就是有人認為學校教的就夠了！ 我們歡迎沒有工作經驗的人加入，只要您夠聰明又願意學習。</p>
+<h3 id="為什麼要使用-C">為什麼要使用 C++?</h3>
+<p>在找 iOS/Android 開發工程師時常被問到：為什麼不是 Java 或者 Objective C， 而是要找熟悉 Ｃ＋＋ 的人？主要是基於下列原因：</p>
+<ol>
+<li>為了跨平台共用程式：是的，我們需要支援多個行動平台，iOS 跟 Android<br>
+是最主要的兩個。</li>
+<li>為了執行效率：除了 C，我想不到其他主流語言比 C++ 快。</li>
+<li>支援物件導向：比 C 提供更高階的抽象化來解決問題，比較好維護。</li>
+<li>需要跟 Cocos2d-x 等遊戲引擎整合：這些引擎大多是以 C++ 開發。</li>
+</ol>
+<h3 id="為什麼一定要已經熟悉-C">為什麼一定要已經熟悉 C++?</h3>
+<p>這是因為山姆鍋有個人偏見：認為 C++ 是主流程式語言裡面最難學會的。對於一個新創團隊來說， 訓練一個工程師從頭開始學 C++ 到上手，恐怕是不實際的期望。山姆鍋自己也還在持續學習 C++ 當中，有機會再來分享 C++ 跨手機平台開發 App 的經驗。 基於這個原因，已經熟悉 C++ 的高手自然就成為主要目標。這不代表說不需要會其它技能， 只是會 Java 或 Objective C，有開發過手機 app 這些都只是加分， 並不在山姆鍋找夥伴的必要條件中。</p>
+<h3 id="為什麼要使用-MacBook-Pro-作為開發機？">為什麼要使用 MacBook Pro 作為開發機？</h3>
+<p>山姆鍋思考事情通常都很務實，使用 MacBook 可不是因為有雅痞的 fu。理由是因為只有 Apple 的機器可以合法用來開發 iOS 相關軟體，想知道為什麼請去問 Apple 這家公司！ 用了好幾年 Ubuntu 的山姆鍋也只好轉到 OSX 的作業環境下。 不過老實講， MacBook 也沒什麼好抱怨，可以方便使用眾多的開源軟體又有良好的桌面整合環境。所以， 團隊成員以 MacBook Pro 作為主要開發機就這樣定案了。</p>
+<h3 id="需要一定在辦公室工作嗎？">需要一定在辦公室工作嗎？</h3>
+<p>這點因人而異，但基本上，每週還是需要有一定比例的時間在辦公室。隨著對團隊的工作流程更加熟悉， 加上本身夠自律，不用到辦公室的時間自然可以加長。</p>
+<h2 id="小結">小結</h2>
+<p>這段時間以來，雖然想過找人不容易，但還是比預期的困難許多，其中有些原因還是自作自受。 不管怎樣，山不轉路轉，暫時找不到適合的夥伴，那就將部分開發工作外包。在工作的時間跟地點， 山姆鍋的老闆願意支持可以有這麼高的彈性，這點在台灣應該也算是少見。</p>
+
+            
+
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">標籤</span><br/>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tag/%E5%AF%A6%E7%BF%92%E7%94%9F/" rel="tag">實習生</a> <a class="tag tag--primary tag--small t-link" href="/tag/%E8%BB%9F%E9%AB%94%E5%B7%A5%E7%A8%8B%E5%B8%AB/" rel="tag">軟體工程師</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/post/2016/04/docker-golang-awesome/"
+                    data-tooltip="Docker + Golang = Awesome"
+                    aria-label="上一篇: Docker + Golang = Awesome"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/post/2015/12/http-live-streaming-on-osx-camera-with-python/"
+                    data-tooltip="在 MacBook 上使用 Python 作實況視訊串流"
+                    aria-label="下一篇: 在 MacBook 上使用 Python 作實況視訊串流"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://samkuo.me/post/2016/03/new-development-team/"
+                    title="分享到 Facebook"
+                    aria-label="分享到 Facebook"
+                >
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://twitter.com/intent/tweet?text=https://samkuo.me/post/2016/03/new-development-team/"
+                    title="分享到 Twitter"
+                    aria-label="分享到 Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https://samkuo.me/post/2016/03/new-development-team/"
+                    title="global.share_on_linkedin"
+                    aria-label="global.share_on_linkedin"
+                >
+                    <i class="fab fa-linkedin" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#disqus_thread"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript" target="_blank" rel="noopener">comments powered by Disqus.</a></noscript>
+</div>
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2022 Sampot (山姆鍋). All Rights Reserved.
+    </span>
+    <br/>
+        <a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW"><img
+                alt="創用 CC 授權條款" style="border-width:0"
+                src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+        除另有標示，本著作係採用<a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW">創用 CC
+            姓名標示-非商業性-相同方式分享 4.0 國際 授權條款</a>授權。
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="5">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/post/2016/04/docker-golang-awesome/"
+                    data-tooltip="Docker + Golang = Awesome"
+                    aria-label="上一篇: Docker + Golang = Awesome"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/post/2015/12/http-live-streaming-on-osx-camera-with-python/"
+                    data-tooltip="在 MacBook 上使用 Python 作實況視訊串流"
+                    aria-label="下一篇: 在 MacBook 上使用 Python 作實況視訊串流"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://samkuo.me/post/2016/03/new-development-team/"
+                    title="分享到 Facebook"
+                    aria-label="分享到 Facebook"
+                >
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://twitter.com/intent/tweet?text=https://samkuo.me/post/2016/03/new-development-team/"
+                    title="分享到 Twitter"
+                    aria-label="分享到 Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https://samkuo.me/post/2016/03/new-development-team/"
+                    title="global.share_on_linkedin"
+                    aria-label="global.share_on_linkedin"
+                >
+                    <i class="fab fa-linkedin" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#disqus_thread"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="5">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://www.facebook.com/sharer/sharer.php?u=https://samkuo.me/post/2016/03/new-development-team/"
+                        aria-label="分享到 Facebook"
+                    >
+                        <i class="fab fa-facebook" aria-hidden="true"></i><span>分享到 Facebook</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://twitter.com/intent/tweet?text=https://samkuo.me/post/2016/03/new-development-team/"
+                        aria-label="分享到 Twitter"
+                    >
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>分享到 Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https://samkuo.me/post/2016/03/new-development-team/"
+                        aria-label="global.share_on_linkedin"
+                    >
+                        <i class="fab fa-linkedin" aria-hidden="true"></i><span>global.share_on_linkedin</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/images/logo.png" alt="作者的圖片"/>
+        
+            <h4 id="about-card-name">Sampot (山姆鍋)</h4>
+        
+            <div id="about-card-bio"><p>個人部落格， 記錄與分享一些軟體開發與運維相關資訊， 偶爾也會碎念一下</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>IT 自由工作者</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                台灣/台北
+            </div>
+        
+    </div>
+</div>
+
+        
+            <div id="algolia-search-modal" class="modal-container">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="close-button"><i class="fa fa-times"></i></span>
+            <a href="https://algolia.com" target="_blank" rel="noopener" class="searchby-algolia text-color-light link-unstyled">
+                <span class="searchby-algolia-text text-color-light text-small">by</span>
+                <img class="searchby-algolia-logo" src="/assets/images/logo-algolia-nebula-blue-full.svg">
+            </a>
+            <i class="search-icon fa fa-search"></i>
+            <form id="algolia-search-form">
+                <input type="text" id="algolia-search-input" name="search"
+                    class="form-control input--large search-input" placeholder="Search "
+                    />
+            </form>
+        </div>
+        <div class="modal-body">
+            <div class="no-result text-color-light text-center">沒有找到文章</div>
+            <div class="results">
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2012/03/set-up-mysql-master-master-replication/"
+                            aria-label=": 設定 MySQL Master-Master 複製"
+                        >
+                            <h3 class="media-heading">設定 MySQL Master-Master 複製</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2012年3月3日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>本文簡單說明如何設定兩台 MySQL server，讓它們彼此互相備份資料 (Master-master 模式)。雖然這樣的設定通常是支援高可用性 (high availability) 平台的一部分，但本文不包含如何完成其他 HA 的工作。設定兩台 MySQL 伺服器互相備份，主要目的就是要確認資料的安全性；同時也提高可用性。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2012/04/use-pacemaker-two-node-ha-cluster/"
+                            aria-label=": 使用 Pacemaker 建構雙節點叢集系統"
+                        >
+                            <h3 class="media-heading">使用 Pacemaker 建構雙節點叢集系統</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2012年4月6日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>想要達到系統高可用性 (high availability) 的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2012/04/build-cluster-filesystem-with-glusterfs-ubuntu/"
+                            aria-label=": 使用 GlusterFS 在 Ubuntu 上建構雙節點叢集檔案系統"
+                        >
+                            <h3 class="media-heading">使用 GlusterFS 在 Ubuntu 上建構雙節點叢集檔案系統</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2012年4月23日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案 (圖檔，CSS 等等) 可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點 (single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2012/04/scale-wordpress-with-hyperdb/"
+                            aria-label=": 使用 HyperDB 加強 WordPress 網站的資料庫擴充性"
+                        >
+                            <h3 class="media-heading">使用 HyperDB 加強 WordPress 網站的資料庫擴充性</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2012年4月23日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>對於流量高的 Wordpress 網站來說，資料庫往往是第一個出現的瓶頸。針對資料庫擴充性的問題，本文介紹 HyperDB 這個解決方案。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2012/04/create-lnmp-environment-with-nginx/"
+                            aria-label=": 在 Linode 上使用 Nginx 架設 LNMP 環境"
+                        >
+                            <h3 class="media-heading">在 Linode 上使用 Nginx 架設 LNMP 環境</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2012年4月30日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>Apache HTTPd 是很好的網站伺服器，但是對於 CPU 跟記憶體的要求較高，對於架設在 VPS 上面網站來說， 需要一個更輕量級的解決方案。越來越多人選擇使用 Nginx 架設網站，主要考量便是它的快速、穩定以及輕量的特性。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2012/05/support-sending-mail-php-linux-vps-exim/"
+                            aria-label=": Linux VPS PHP 網站可以發送信件"
+                        >
+                            <h3 class="media-heading">Linux VPS PHP 網站可以發送信件</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2012年5月8日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>PHP 架站軟體通常需要用到寄信功能，例如：通知站長有新的迴響需要審核。使用虛擬主機來架站的讀者一定會納悶：<br>
+不管是 WordPress，Drupal 或者其他 PHP<br>
+架站軟體不是都不用另外設定就可以寄信？為什麼需要特地提到這件事情。<br>
+話說山姆鍋的主機採用的是 Linode VPS，很多事情都需要自己來，唉！<br>
+如果您的網站主機跟山姆鍋一樣是 VPS 或者專屬伺服器，那這篇文章也許對您有幫助。<br>
+由於不是要做為公司的郵件伺服器，山姆鍋希望除了讓 PHP 架站軟體送信外，不再作其它用途。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2013/04/start-up/"
+                            aria-label=": 影化身科技有限公司成立"
+                        >
+                            <h3 class="media-heading">影化身科技有限公司成立</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2013年4月24日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>2013 年 4 月 24 日，影化身科技有限公司登記成立，致力於提供雲端服務平台。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2013/05/shi-yong-octopresszuo-wei-bo-ke-ping-tai/"
+                            aria-label=": 使用 Octopress 作為部落格平台"
+                        >
+                            <h3 class="media-heading">使用 Octopress 作為部落格平台</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2013年5月23日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>由於沒有需要太多動態功能，所以，嘗試使用靜態部落格平台 Octopress 來寫文章。「艾米部落」<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup> 一路從 Joomla, Drupal, WordPress 到現在的 Octopress，也算是換了不少平台。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2013/05/use-static-site-generator-for-company-site/"
+                            aria-label=": 使用靜態網頁產生器來管理公司網站"
+                        >
+                            <h3 class="media-heading">使用靜態網頁產生器來管理公司網站</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2013年5月28日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>對於不需要動態功能的網站而言，使用像是 Drupal、WordPress 之類的架站軟體，感覺有點大材小用。對於可以接受不使用「所見即所得」編輯器的人，靜態網站產生器應該是個可以接受的方案。 雖說是靜態網站，缺少很多功能，但像是公司或者行銷網站往往也不需要這些。況且， 靜態網站有諸多動態網站所沒有的功能，如：</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2013/05/exchange-name-card-with-eavatar-me/"
+                            aria-label=": 如何利用「我．影化身」服務交換名片"
+                        >
+                            <h3 class="media-heading">如何利用「我．影化身」服務交換名片</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2013年5月29日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>今天從 MR JAMIE 上讀到一篇文章：「從今天開始，請 email 你的名片給我吧！」這讓我想到，與其使用 Email，使用「我．影化身」來代替，不是也很適當？</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+            </div>
+        </div>
+        <div class="modal-footer">
+            <p class="results-count text-medium"
+                data-message-zero="沒有找到文章"
+                data-message-one="找到 1 篇文章"
+                data-message-other="找到 {n} 篇文章">
+                找到 134 篇文章
+            </p>
+        </div>
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+
+<script src="/assets/js/script-597bjprixrfzrennpanwcwfnulsqaw08wvkzphw7gk8dqunvgzd9nn3nvsu9.min.js"></script>
+
+<!--SCRIPTS END-->
+
+
+    
+        <script>
+          var disqus_config = function() {
+            this.page.url = 'https://samkuo.me/post/2016/03/new-development-team/';
+              
+            this.page.identifier = 'post/2016/03/new-development-team/';
+              
+          };
+          (function() {
+            var d = document, s = d.createElement('script');
+            var disqus_shortname = 'sampotkuo';
+            s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+          })();
+        </script>
+    
+
+
+
+    
+<script src="/assets/js/moment-with-locales.js"></script>
+
+    
+<script src="/assets/js/algoliasearch.js"></script>
+
+    <script>
+      var algoliaClient = algoliasearch('OIWK4CBFS4', 'f676051199368fe5f161c9012b7edaf6');
+      var algoliaIndex = algoliaClient.initIndex('MyBlogIndex');
+    </script>
+
+
+    </body>
+</html>

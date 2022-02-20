@@ -1,0 +1,1066 @@
+
+<!DOCTYPE html>
+<html lang="zh-tw">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="我是山姆鍋">
+    <title>運用 Multipass 與 K3S 建立 Kubernetes 測試環境 - 我是山姆鍋</title>
+    <meta name="author" content="Sampot (山姆鍋)">
+    
+    
+        <link rel="icon" href="https://samkuo.me/images/favicon.png">
+    
+    
+        
+            <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
+        
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","/contact","/sitemap"],"image":"logo.png"},"articleBody":"\n\n前言\n本文目的在本地主機建構一個單節點的 Kubernetes 叢集環境以方便快速測試。雖然 Minikube 相當方便，但採用 Multipass 擁有更大彈性來客製化作業系統 (Ubuntu)，例如：安裝額外系統套件。幸運的是，Rancher Labs (開發 Rancher 的公司) 提供一個可以用在生產環境的精簡 Kubernetes 發行版本 K3S，重點是 “精簡” 以及 “生產環境”。所以，本文的另一個目的就是讓開發、測試與生產環境都可以使用相同的 K3S。\nMultipass 簡介\n根據官網說明，Multipass 是一個利用現有平台 (Windows、OS X、Linux) 原生虛擬機技術，在個人工作機上建置一個迷你雲 (mini-cloud)。 在 Windows 系統， Multipass 使用 Hyper-V、OS X 預設使用 Hyperkit 、而在 Linux 系統則預設使用 KVM 來作為虛擬化方案。如同 Docker Desktop 提供方便的工具來管理容器一般，Multipass 則是提供方便的工具來管理多個虛擬機，足夠應付大部分應用情境，如果需要本機較完整的虛擬機自動管理方案，山姆鍋建議使用 Vagrant。\nMultipass 安裝\n本文假設使用的本地環境是 OS X, 對於其它系統請參考 Multipass 官方文件。\n在已經安裝 Homebrew 的 OS X 的系統，只需要在終端機執行下列指令就可以安裝 Multipass:\n1$ brew cask install multipass\nK3S 簡介\nK3S 是 Rancher Labs 公司針對邊緣計算 (edge computing)、IoT 系統、K8S CI/CD 所推出的精簡 K8S 發行版本，特別支援 ARM 處理器架構，所以可以執行在 Raspberry 等單板電腦上。由於移除 K8S 中雲端環境的支援以及使用 SQLite 取代 etcd 等來將符合標準的 K8S 系統縮小到一個執行檔內。\n對於 K3S 的更好的中文介紹，可以參考 邊緣運算之容器管理工具 - K3s 之介紹與玩耍 這篇文章。\n本地 K8S 環境安裝\n建構虛擬機\n首先使用 Multipass 建構一個名為 k3s 的虛擬機：\n1$ multipass launch -n k3s\n可以看到 Launched: k3s 顯示訊息即表示虛擬機建構完成。\n\n預設是 1GB 的記憶體、5GB 的硬碟空間，如果需要調整可以參考 Multipass 文件。\n\n安裝 K3S\n1$ multipass exec k3s -- bash -c \"curl -sfL https://get.k3s.io | K3S_KUBECONFIG_MODE=644 sh -\"\n可以看到類似下面的輸出訊息:\n12345678910111213141516[INFO]  Finding latest release[INFO]  Using v1.17.4+k3s1 as release[INFO]  Downloading hash https://github.com/rancher/k3s/releases/download/v1.17.4+k3s1/sha256sum-amd64.txt[INFO]  Downloading binary https://github.com/rancher/k3s/releases/download/v1.17.4+k3s1/k3s[INFO]  Verifying binary download[INFO]  Installing k3s to /usr/local/bin/k3s[INFO]  Creating /usr/local/bin/kubectl symlink to k3s[INFO]  Creating /usr/local/bin/crictl symlink to k3s[INFO]  Creating /usr/local/bin/ctr symlink to k3s[INFO]  Creating killall script /usr/local/bin/k3s-killall.sh[INFO]  Creating uninstall script /usr/local/bin/k3s-uninstall.sh[INFO]  env: Creating environment file /etc/systemd/system/k3s.service.env[INFO]  systemd: Creating service file /etc/systemd/system/k3s.service[INFO]  systemd: Enabling k3s unitCreated symlink /etc/systemd/system/multi-user.target.wants/k3s.service → /etc/systemd/system/k3s.service.[INFO]  systemd: Starting k3s\n設定 Kubectl\n雖然可以使用 multipass shell k3s 進入虛擬機環境執行 kubectl, 但使用本地的 kubectl 來操作 K8S 還是比較符合需求。\n本文假設本地主機已經有安裝 kubectl 命令列工具，如果還沒有安裝，可參考這篇文章。\n在終端機執行下列指令：\n1$ multipass info k3s\n顯示的訊息中，IPv4 那行即為虛擬機的 IP 位址，透過這個位址本地主機可以跟虛擬機進行連線。本文虛擬主機的 IP 位址為 $K3S_NODE_IP。\n執行下列指令將 K3S 的 kubeconfig 檔案複製到本機：\n1$ multipass exec k3s sudo cat /etc/rancher/k3s/k3s.yaml &gt; ~/.kube/k3s.yaml\n由於 k3s.yaml 使用 127.0.0.1 來跟 API server 溝通，需要改成虛擬機的真實 IP 位址才能正常存取。可以使用文件編輯器來將 127.0.0.1 更換成 ＄K3S_NODE_IP，或者使用下列指令：\n1＄sed -i '' \"s/127.0.0.1/$K3S_NODE_IP/\" ~/.kube/k3s.yaml\n驗證 kubectl 是否可正常連線，執行下列指令：\n1$ kubectl --kubeconfig ~/.kube/k3s.yaml get nodes\n如果看到類似下面輸出，則表示單節點 K8S 環境正常運行中：\n12NAME   STATUS   ROLES    AGE   VERSIONk3s    Ready    master   27m   v1.17.4+k3s1\n為了方便操作，可以設定 KUBECONFIG 環境變數，\n1export KUBECONFIG=~/.kube/k3s.yaml\n如此，就有一個基本的 Kubernetes 運行環境了！\n下面是將上述步驟自動化的腳本 (k3s-launch.sh)：\n123456789101112131415#!/bin/bashmultipass launch -n k3smultipass exec k3s -- bash -c \"curl -sfL https://get.k3s.io | K3S_KUBECONFIG_MODE=644 sh -\"multipass exec k3s sudo cat /etc/rancher/k3s/k3s.yaml &gt; ~/.kube/k3s.yamlK3S_NODE_IP=$(multipass info k3s | grep IPv4 | awk '{print $2}')sed -i '' \"s/127.0.0.1/$K3S_NODE_IP/\" ~/.kube/k3s.yamlechoecho \"K3s cluster is ready !\"echo\n解除安裝\n如果要清除 K3S 虛擬機，只需要執行下列指令：\n12$ multipass delete k3s$ multipass purge\n小結\n本文雖然只說明單節點 K8S 叢集的建置，但透過 Multipass + K3S 其實可以建置多節點，甚至高可用的 K8S 叢集。在第一次啟用上，Multipass + K3S 也比 Minikube 明顯稍快，畢竟 Minikube 需要下載以及執行更多元件。","dateCreated":"2020-04-06T09:21:18+08:00","dateModified":"2020-04-06T12:30:48+08:00","datePublished":"2020-04-06T09:21:18+08:00","description":"雖然已經有 Docker Desktop、Minikube 等可以提供 K8S 本機的測試環境，但最近才發現 Canonical 公司 (Ubuntu 的發行商) 提供 Multipass 這個輕量級的跨平台虛擬機管理方案，標榜跟 Docker Desktop 一樣容易使用。由於 Ubuntu 也是山姆鍋偏好的部署環境作業系統，如果能夠從開發、測試到生產環境都使用相同的作業系統，也許是個好主意。因此，嘗試使用 Multipass 來建置 K8S 本地開發、測試環境。","headline":"運用 Multipass 與 K3S 建立 Kubernetes 測試環境","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2020/04/multipass-k3s-kubernetes-dev-env/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","/contact","/sitemap"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2020/04/multipass-k3s-kubernetes-dev-env/","keywords":"K3S, Container, multipass, K8S"}</script>
+    <meta name="description" content="雖然已經有 Docker Desktop、Minikube 等可以提供 K8S 本機的測試環境，但最近才發現 Canonical 公司 (Ubuntu 的發行商) 提供 Multipass 這個輕量級的跨平台虛擬機管理方案，標榜跟 Docker Desktop 一樣容易使用。由於 Ubuntu 也是山姆鍋偏好的部署環境作業系統，如果能夠從開發、測試到生產環境都使用相同的作業系統，也許是個好主意。因">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="運用 Multipass 與 K3S 建立 Kubernetes 測試環境">
+<meta property="og:url" content="https://samkuo.me/post/2020/04/multipass-k3s-kubernetes-dev-env/">
+<meta property="og:site_name" content="我是山姆鍋">
+<meta property="og:description" content="雖然已經有 Docker Desktop、Minikube 等可以提供 K8S 本機的測試環境，但最近才發現 Canonical 公司 (Ubuntu 的發行商) 提供 Multipass 這個輕量級的跨平台虛擬機管理方案，標榜跟 Docker Desktop 一樣容易使用。由於 Ubuntu 也是山姆鍋偏好的部署環境作業系統，如果能夠從開發、測試到生產環境都使用相同的作業系統，也許是個好主意。因">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://rancher.com/docs/img/rancher/k3s-architecture-single-server.png">
+<meta property="article:published_time" content="2020-04-06T01:21:18.000Z">
+<meta property="article:modified_time" content="2020-04-06T04:30:48.336Z">
+<meta property="article:author" content="Sampot (山姆鍋)">
+<meta property="article:tag" content="K3S">
+<meta property="article:tag" content="Container">
+<meta property="article:tag" content="multipass">
+<meta property="article:tag" content="K8S">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://rancher.com/docs/img/rancher/k3s-architecture-single-server.png">
+<meta name="twitter:creator" content="@sampotkuo">
+<meta property="fb:app_id" content="1538037013031361">
+    
+    
+        
+    
+    <meta property="og:image" content="https://samkuo.me/images/featured_image.jpg"/>
+    
+    
+    
+    <!--STYLES-->
+    
+<link rel="stylesheet" href="/assets/css/style-lfspghztdttlloh4nly9hmp3cqmehlzaagf5ften7wo63faxiltzljjm4fb0.min.css">
+
+    <!--STYLES END-->
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-41152700-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-41152700-1');
+    </script>
+
+
+    
+
+    
+        
+    
+</head>
+
+    <body>
+        <div id="fb-root"></div>
+        <script async defer crossorigin="anonymous"
+            src="https://connect.facebook.net/zh_TW/sdk.js#xfbml=1&version=v7.0&appId=1538037013031361&autoLogAppEvents=1"></script>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+<header id="header" data-behavior="5">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a
+            class="header-title-link"
+            href="/"
+            aria-label=""
+        >
+        <img class="header-avatar-picture" src="/images/logo32.png" alt="作者的圖片" />
+            我是山姆鍋
+        </a>
+    </div>
+    
+        
+            <a
+                class="header-right-icon open-algolia-search"
+                href="#search"
+                aria-label="打開鏈接: /#search"
+            >
+        
+        
+            <i class="fa fa-search fa-lg"></i>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="5">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a
+                    href="/#about"
+                    aria-label="閱讀有關作者的更多信息"
+                >
+                    <img class="sidebar-profile-picture" src="/images/logo.png" alt="作者的圖片"/>
+                </a>
+                <h4 class="sidebar-profile-name">Sampot (山姆鍋)</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>個人部落格， 記錄與分享一些軟體開發與運維相關資訊， 偶爾也會碎念一下</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/"
+                            
+                            rel="noopener"
+                            title="首頁"
+                        >
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">首頁</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-categories"
+                            
+                            rel="noopener"
+                            title="分類"
+                        >
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">分類</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-tags"
+                            
+                            rel="noopener"
+                            title="標籤"
+                        >
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">標籤</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-archives"
+                            
+                            rel="noopener"
+                            title="所有文章"
+                        >
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">所有文章</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link open-algolia-search"
+                            href="#search"
+                            
+                            rel="noopener"
+                            title="搜尋"
+                        >
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">搜尋</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/about"
+                            
+                            rel="noopener"
+                            title="關於"
+                        >
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">關於</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://github.com/sampot"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="GitHub"
+                        >
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://twitter.com/sampotkuo"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Twitter"
+                        >
+                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Twitter</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://facebook.com/sampotkuo"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Facebook"
+                        >
+                        <i class="sidebar-button-icon fab fa-facebook" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Facebook</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/contact"
+                            
+                            rel="noopener"
+                            title="聯絡"
+                        >
+                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">聯絡</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/sitemap"
+                            
+                            rel="noopener"
+                            title="網站導覽"
+                        >
+                        <i class="sidebar-button-icon fa fa-sitemap" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">網站導覽</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://feedly.com/i/subscription/feed/https://samkuo.me/atom.xml"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Atom"
+                        >
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Atom</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="5"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            運用 Multipass 與 K3S 建立 Kubernetes 測試環境
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2020-04-06T09:21:18+08:00">
+	
+		    4月 06, 2020
+    	
+    </time>
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <div class="alert info no-icon">
+                我是山姆鍋 <div class="fb-like" data-href="https://www.facebook.com/sampotkuo" data-width="" data-layout="standard" data-action="like" data-size="large" data-share="false"></div>
+            </div>
+
+            <!-- excerpt -->
+<div class="figure " style="width:;"><img class="fig-img" src="https://rancher.com/docs/img/rancher/k3s-architecture-single-server.png" alt=""></div>
+<h2 id="前言">前言</h2>
+<p>本文目的在本地主機建構一個單節點的 Kubernetes 叢集環境以方便快速測試。雖然 Minikube 相當方便，但採用 Multipass 擁有更大彈性來客製化作業系統 (Ubuntu)，例如：安裝額外系統套件。幸運的是，Rancher Labs (開發 Rancher 的公司) 提供一個可以用在生產環境的精簡 Kubernetes 發行版本 K3S，重點是 “精簡” 以及 “生產環境”。所以，本文的另一個目的就是讓開發、測試與生產環境都可以使用相同的 K3S。</p>
+<h2 id="Multipass-簡介">Multipass 簡介</h2>
+<p>根據官網說明，Multipass 是一個利用現有平台 (Windows、OS X、Linux) 原生虛擬機技術，在個人工作機上建置一個迷你雲 (mini-cloud)。 在 Windows 系統， Multipass 使用 Hyper-V、OS X 預設使用 Hyperkit 、而在 Linux 系統則預設使用 KVM 來作為虛擬化方案。如同 Docker Desktop 提供方便的工具來管理容器一般，Multipass 則是提供方便的工具來管理多個虛擬機，足夠應付大部分應用情境，如果需要本機較完整的虛擬機自動管理方案，山姆鍋建議使用 Vagrant。</p>
+<h2 id="Multipass-安裝">Multipass 安裝</h2>
+<p>本文假設使用的本地環境是 OS X, 對於其它系統請參考 Multipass <a href="https://multipass.run/docs" target="_blank" rel="noopener">官方文件</a>。</p>
+<p>在已經安裝 Homebrew 的 OS X 的系統，只需要在終端機執行下列指令就可以安裝 Multipass:</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ brew cask install multipass</span><br></pre></td></tr></tbody></table></figure>
+<h2 id="K3S-簡介">K3S 簡介</h2>
+<p>K3S 是 Rancher Labs 公司針對邊緣計算 (edge computing)、IoT 系統、K8S CI/CD 所推出的精簡 K8S 發行版本，特別支援 ARM 處理器架構，所以可以執行在 Raspberry 等單板電腦上。由於移除 K8S 中雲端環境的支援以及使用 SQLite 取代 etcd 等來將符合標準的 K8S 系統縮小到一個執行檔內。</p>
+<p>對於 K3S 的更好的中文介紹，可以參考 <a href="https://bestsamina.github.io/posts/2019-10-10-k3s-intro-and-play/" target="_blank" rel="noopener">邊緣運算之容器管理工具 - K3s 之介紹與玩耍</a> 這篇文章。</p>
+<h2 id="本地-K8S-環境安裝">本地 K8S 環境安裝</h2>
+<h3 id="建構虛擬機">建構虛擬機</h3>
+<p>首先使用 Multipass 建構一個名為 k3s 的虛擬機：</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ multipass launch -n k3s</span><br></pre></td></tr></tbody></table></figure>
+<p>可以看到 <code>Launched: k3s</code> 顯示訊息即表示虛擬機建構完成。</p>
+<blockquote>
+<p>預設是 1GB 的記憶體、5GB 的硬碟空間，如果需要調整可以參考 Multipass 文件。</p>
+</blockquote>
+<h3 id="安裝-K3S">安裝 K3S</h3>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ multipass <span class="built_in">exec</span> k3s -- bash -c <span class="string">"curl -sfL https://get.k3s.io | K3S_KUBECONFIG_MODE=644 sh -"</span></span><br></pre></td></tr></tbody></table></figure>
+<p>可以看到類似下面的輸出訊息:</p>
+<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">[INFO]  Finding latest release</span><br><span class="line">[INFO]  Using v1.17.4+k3s1 as release</span><br><span class="line">[INFO]  Downloading hash https://github.com/rancher/k3s/releases/download/v1.17.4+k3s1/sha256sum-amd64.txt</span><br><span class="line">[INFO]  Downloading binary https://github.com/rancher/k3s/releases/download/v1.17.4+k3s1/k3s</span><br><span class="line">[INFO]  Verifying binary download</span><br><span class="line">[INFO]  Installing k3s to /usr/local/bin/k3s</span><br><span class="line">[INFO]  Creating /usr/local/bin/kubectl symlink to k3s</span><br><span class="line">[INFO]  Creating /usr/local/bin/crictl symlink to k3s</span><br><span class="line">[INFO]  Creating /usr/local/bin/ctr symlink to k3s</span><br><span class="line">[INFO]  Creating killall script /usr/local/bin/k3s-killall.sh</span><br><span class="line">[INFO]  Creating uninstall script /usr/local/bin/k3s-uninstall.sh</span><br><span class="line">[INFO]  env: Creating environment file /etc/systemd/system/k3s.service.env</span><br><span class="line">[INFO]  systemd: Creating service file /etc/systemd/system/k3s.service</span><br><span class="line">[INFO]  systemd: Enabling k3s unit</span><br><span class="line">Created symlink /etc/systemd/system/multi-user.target.wants/k3s.service → /etc/systemd/system/k3s.service.</span><br><span class="line">[INFO]  systemd: Starting k3s</span><br></pre></td></tr></tbody></table></figure>
+<h3 id="設定-Kubectl">設定 Kubectl</h3>
+<p>雖然可以使用 <code>multipass shell k3s</code> 進入虛擬機環境執行 kubectl, 但使用本地的 kubectl 來操作 K8S 還是比較符合需求。</p>
+<p>本文假設本地主機已經有安裝 kubectl 命令列工具，如果還沒有安裝，可參考<a href="https://docs.aws.amazon.com/zh_tw/eks/latest/userguide/install-kubectl.html" target="_blank" rel="noopener">這篇文章</a>。</p>
+<p>在終端機執行下列指令：</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ multipass info k3s</span><br></pre></td></tr></tbody></table></figure>
+<p>顯示的訊息中，<code>IPv4</code> 那行即為虛擬機的 IP 位址，透過這個位址本地主機可以跟虛擬機進行連線。本文虛擬主機的 IP 位址為 $K3S_NODE_IP。</p>
+<p>執行下列指令將 K3S 的 kubeconfig 檔案複製到本機：</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ multipass <span class="built_in">exec</span> k3s sudo cat /etc/rancher/k3s/k3s.yaml &gt; ~/.kube/k3s.yaml</span><br></pre></td></tr></tbody></table></figure>
+<p>由於 k3s.yaml 使用 127.0.0.1 來跟 API server 溝通，需要改成虛擬機的真實 IP 位址才能正常存取。可以使用文件編輯器來將 127.0.0.1 更換成 ＄K3S_NODE_IP，或者使用下列指令：</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">＄sed -i <span class="string">''</span> <span class="string">"s/127.0.0.1/<span class="variable">$K3S_NODE_IP</span>/"</span> ~/.kube/k3s.yaml</span><br></pre></td></tr></tbody></table></figure>
+<p>驗證 kubectl 是否可正常連線，執行下列指令：</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ kubectl --kubeconfig ~/.kube/k3s.yaml get nodes</span><br></pre></td></tr></tbody></table></figure>
+<p>如果看到類似下面輸出，則表示單節點 K8S 環境正常運行中：</p>
+<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">NAME   STATUS   ROLES    AGE   VERSION</span><br><span class="line">k3s    Ready    master   27m   v1.17.4+k3s1</span><br></pre></td></tr></tbody></table></figure>
+<p>為了方便操作，可以設定 <code>KUBECONFIG</code> 環境變數，</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> KUBECONFIG=~/.kube/k3s.yaml</span><br></pre></td></tr></tbody></table></figure>
+<p>如此，就有一個基本的 Kubernetes 運行環境了！</p>
+<p>下面是將上述步驟自動化的腳本 (<a href="http://k3s-launch.sh" target="_blank" rel="noopener">k3s-launch.sh</a>)：</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line">multipass launch -n k3s</span><br><span class="line"></span><br><span class="line">multipass <span class="built_in">exec</span> k3s -- bash -c <span class="string">"curl -sfL https://get.k3s.io | K3S_KUBECONFIG_MODE=644 sh -"</span></span><br><span class="line"></span><br><span class="line">multipass <span class="built_in">exec</span> k3s sudo cat /etc/rancher/k3s/k3s.yaml &gt; ~/.kube/k3s.yaml</span><br><span class="line"></span><br><span class="line">K3S_NODE_IP=$(multipass info k3s | grep IPv4 | awk <span class="string">'{print $2}'</span>)</span><br><span class="line"></span><br><span class="line">sed -i <span class="string">''</span> <span class="string">"s/127.0.0.1/<span class="variable">$K3S_NODE_IP</span>/"</span> ~/.kube/k3s.yaml</span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"K3s cluster is ready !"</span></span><br><span class="line"><span class="built_in">echo</span></span><br></pre></td></tr></tbody></table></figure>
+<h2 id="解除安裝">解除安裝</h2>
+<p>如果要清除 K3S 虛擬機，只需要執行下列指令：</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ multipass delete k3s</span><br><span class="line">$ multipass purge</span><br></pre></td></tr></tbody></table></figure>
+<h2 id="小結">小結</h2>
+<p>本文雖然只說明單節點 K8S 叢集的建置，但透過 Multipass + K3S 其實可以建置多節點，甚至高可用的 K8S 叢集。在第一次啟用上，Multipass + K3S 也比 Minikube 明顯稍快，畢竟 Minikube 需要下載以及執行更多元件。</p>
+            
+
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">標籤</span><br/>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tag/container/" rel="tag">Container</a> <a class="tag tag--primary tag--small t-link" href="/tag/k3s/" rel="tag">K3S</a> <a class="tag tag--primary tag--small t-link" href="/tag/k8s/" rel="tag">K8S</a> <a class="tag tag--primary tag--small t-link" href="/tag/multipass/" rel="tag">multipass</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/post/2020/04/dev-env-docker-wsl2-k3d-vs-code/"
+                    data-tooltip="Docker Desktop for WSL2 容器化開發環境"
+                    aria-label="上一篇: Docker Desktop for WSL2 容器化開發環境"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/post/2020/04/kubernetes-is-for-startup/"
+                    data-tooltip="Web 新創也該使用 Kubernetes"
+                    aria-label="下一篇: Web 新創也該使用 Kubernetes"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://samkuo.me/post/2020/04/multipass-k3s-kubernetes-dev-env/"
+                    title="分享到 Facebook"
+                    aria-label="分享到 Facebook"
+                >
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://twitter.com/intent/tweet?text=https://samkuo.me/post/2020/04/multipass-k3s-kubernetes-dev-env/"
+                    title="分享到 Twitter"
+                    aria-label="分享到 Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https://samkuo.me/post/2020/04/multipass-k3s-kubernetes-dev-env/"
+                    title="global.share_on_linkedin"
+                    aria-label="global.share_on_linkedin"
+                >
+                    <i class="fab fa-linkedin" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#disqus_thread"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript" target="_blank" rel="noopener">comments powered by Disqus.</a></noscript>
+</div>
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2022 Sampot (山姆鍋). All Rights Reserved.
+    </span>
+    <br/>
+        <a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW"><img
+                alt="創用 CC 授權條款" style="border-width:0"
+                src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+        除另有標示，本著作係採用<a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW">創用 CC
+            姓名標示-非商業性-相同方式分享 4.0 國際 授權條款</a>授權。
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="5">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/post/2020/04/dev-env-docker-wsl2-k3d-vs-code/"
+                    data-tooltip="Docker Desktop for WSL2 容器化開發環境"
+                    aria-label="上一篇: Docker Desktop for WSL2 容器化開發環境"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/post/2020/04/kubernetes-is-for-startup/"
+                    data-tooltip="Web 新創也該使用 Kubernetes"
+                    aria-label="下一篇: Web 新創也該使用 Kubernetes"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://samkuo.me/post/2020/04/multipass-k3s-kubernetes-dev-env/"
+                    title="分享到 Facebook"
+                    aria-label="分享到 Facebook"
+                >
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://twitter.com/intent/tweet?text=https://samkuo.me/post/2020/04/multipass-k3s-kubernetes-dev-env/"
+                    title="分享到 Twitter"
+                    aria-label="分享到 Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https://samkuo.me/post/2020/04/multipass-k3s-kubernetes-dev-env/"
+                    title="global.share_on_linkedin"
+                    aria-label="global.share_on_linkedin"
+                >
+                    <i class="fab fa-linkedin" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#disqus_thread"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="5">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://www.facebook.com/sharer/sharer.php?u=https://samkuo.me/post/2020/04/multipass-k3s-kubernetes-dev-env/"
+                        aria-label="分享到 Facebook"
+                    >
+                        <i class="fab fa-facebook" aria-hidden="true"></i><span>分享到 Facebook</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://twitter.com/intent/tweet?text=https://samkuo.me/post/2020/04/multipass-k3s-kubernetes-dev-env/"
+                        aria-label="分享到 Twitter"
+                    >
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>分享到 Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https://samkuo.me/post/2020/04/multipass-k3s-kubernetes-dev-env/"
+                        aria-label="global.share_on_linkedin"
+                    >
+                        <i class="fab fa-linkedin" aria-hidden="true"></i><span>global.share_on_linkedin</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/images/logo.png" alt="作者的圖片"/>
+        
+            <h4 id="about-card-name">Sampot (山姆鍋)</h4>
+        
+            <div id="about-card-bio"><p>個人部落格， 記錄與分享一些軟體開發與運維相關資訊， 偶爾也會碎念一下</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>IT 自由工作者</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                台灣/台北
+            </div>
+        
+    </div>
+</div>
+
+        
+            <div id="algolia-search-modal" class="modal-container">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="close-button"><i class="fa fa-times"></i></span>
+            <a href="https://algolia.com" target="_blank" rel="noopener" class="searchby-algolia text-color-light link-unstyled">
+                <span class="searchby-algolia-text text-color-light text-small">by</span>
+                <img class="searchby-algolia-logo" src="/assets/images/logo-algolia-nebula-blue-full.svg">
+            </a>
+            <i class="search-icon fa fa-search"></i>
+            <form id="algolia-search-form">
+                <input type="text" id="algolia-search-input" name="search"
+                    class="form-control input--large search-input" placeholder="Search "
+                    />
+            </form>
+        </div>
+        <div class="modal-body">
+            <div class="no-result text-color-light text-center">沒有找到文章</div>
+            <div class="results">
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2012/03/set-up-mysql-master-master-replication/"
+                            aria-label=": 設定 MySQL Master-Master 複製"
+                        >
+                            <h3 class="media-heading">設定 MySQL Master-Master 複製</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2012年3月3日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>本文簡單說明如何設定兩台 MySQL server，讓它們彼此互相備份資料 (Master-master 模式)。雖然這樣的設定通常是支援高可用性 (high availability) 平台的一部分，但本文不包含如何完成其他 HA 的工作。設定兩台 MySQL 伺服器互相備份，主要目的就是要確認資料的安全性；同時也提高可用性。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2012/04/use-pacemaker-two-node-ha-cluster/"
+                            aria-label=": 使用 Pacemaker 建構雙節點叢集系統"
+                        >
+                            <h3 class="media-heading">使用 Pacemaker 建構雙節點叢集系統</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2012年4月6日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>想要達到系統高可用性 (high availability) 的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2012/04/build-cluster-filesystem-with-glusterfs-ubuntu/"
+                            aria-label=": 使用 GlusterFS 在 Ubuntu 上建構雙節點叢集檔案系統"
+                        >
+                            <h3 class="media-heading">使用 GlusterFS 在 Ubuntu 上建構雙節點叢集檔案系統</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2012年4月23日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案 (圖檔，CSS 等等) 可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點 (single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2012/04/scale-wordpress-with-hyperdb/"
+                            aria-label=": 使用 HyperDB 加強 WordPress 網站的資料庫擴充性"
+                        >
+                            <h3 class="media-heading">使用 HyperDB 加強 WordPress 網站的資料庫擴充性</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2012年4月23日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>對於流量高的 Wordpress 網站來說，資料庫往往是第一個出現的瓶頸。針對資料庫擴充性的問題，本文介紹 HyperDB 這個解決方案。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2012/04/create-lnmp-environment-with-nginx/"
+                            aria-label=": 在 Linode 上使用 Nginx 架設 LNMP 環境"
+                        >
+                            <h3 class="media-heading">在 Linode 上使用 Nginx 架設 LNMP 環境</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2012年4月30日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>Apache HTTPd 是很好的網站伺服器，但是對於 CPU 跟記憶體的要求較高，對於架設在 VPS 上面網站來說， 需要一個更輕量級的解決方案。越來越多人選擇使用 Nginx 架設網站，主要考量便是它的快速、穩定以及輕量的特性。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2012/05/support-sending-mail-php-linux-vps-exim/"
+                            aria-label=": Linux VPS PHP 網站可以發送信件"
+                        >
+                            <h3 class="media-heading">Linux VPS PHP 網站可以發送信件</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2012年5月8日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>PHP 架站軟體通常需要用到寄信功能，例如：通知站長有新的迴響需要審核。使用虛擬主機來架站的讀者一定會納悶：<br>
+不管是 WordPress，Drupal 或者其他 PHP<br>
+架站軟體不是都不用另外設定就可以寄信？為什麼需要特地提到這件事情。<br>
+話說山姆鍋的主機採用的是 Linode VPS，很多事情都需要自己來，唉！<br>
+如果您的網站主機跟山姆鍋一樣是 VPS 或者專屬伺服器，那這篇文章也許對您有幫助。<br>
+由於不是要做為公司的郵件伺服器，山姆鍋希望除了讓 PHP 架站軟體送信外，不再作其它用途。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2013/04/start-up/"
+                            aria-label=": 影化身科技有限公司成立"
+                        >
+                            <h3 class="media-heading">影化身科技有限公司成立</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2013年4月24日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>2013 年 4 月 24 日，影化身科技有限公司登記成立，致力於提供雲端服務平台。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2013/05/shi-yong-octopresszuo-wei-bo-ke-ping-tai/"
+                            aria-label=": 使用 Octopress 作為部落格平台"
+                        >
+                            <h3 class="media-heading">使用 Octopress 作為部落格平台</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2013年5月23日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>由於沒有需要太多動態功能，所以，嘗試使用靜態部落格平台 Octopress 來寫文章。「艾米部落」<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup> 一路從 Joomla, Drupal, WordPress 到現在的 Octopress，也算是換了不少平台。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2013/05/use-static-site-generator-for-company-site/"
+                            aria-label=": 使用靜態網頁產生器來管理公司網站"
+                        >
+                            <h3 class="media-heading">使用靜態網頁產生器來管理公司網站</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2013年5月28日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>對於不需要動態功能的網站而言，使用像是 Drupal、WordPress 之類的架站軟體，感覺有點大材小用。對於可以接受不使用「所見即所得」編輯器的人，靜態網站產生器應該是個可以接受的方案。 雖說是靜態網站，缺少很多功能，但像是公司或者行銷網站往往也不需要這些。況且， 靜態網站有諸多動態網站所沒有的功能，如：</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2013/05/exchange-name-card-with-eavatar-me/"
+                            aria-label=": 如何利用「我．影化身」服務交換名片"
+                        >
+                            <h3 class="media-heading">如何利用「我．影化身」服務交換名片</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2013年5月29日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>今天從 MR JAMIE 上讀到一篇文章：「從今天開始，請 email 你的名片給我吧！」這讓我想到，與其使用 Email，使用「我．影化身」來代替，不是也很適當？</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+            </div>
+        </div>
+        <div class="modal-footer">
+            <p class="results-count text-medium"
+                data-message-zero="沒有找到文章"
+                data-message-one="找到 1 篇文章"
+                data-message-other="找到 {n} 篇文章">
+                找到 134 篇文章
+            </p>
+        </div>
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+
+<script src="/assets/js/script-597bjprixrfzrennpanwcwfnulsqaw08wvkzphw7gk8dqunvgzd9nn3nvsu9.min.js"></script>
+
+<!--SCRIPTS END-->
+
+
+    
+        <script>
+          var disqus_config = function() {
+            this.page.url = 'https://samkuo.me/post/2020/04/multipass-k3s-kubernetes-dev-env/';
+              
+            this.page.identifier = 'post/2020/04/multipass-k3s-kubernetes-dev-env/';
+              
+          };
+          (function() {
+            var d = document, s = d.createElement('script');
+            var disqus_shortname = 'sampotkuo';
+            s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+          })();
+        </script>
+    
+
+
+
+    
+<script src="/assets/js/moment-with-locales.js"></script>
+
+    
+<script src="/assets/js/algoliasearch.js"></script>
+
+    <script>
+      var algoliaClient = algoliasearch('OIWK4CBFS4', 'f676051199368fe5f161c9012b7edaf6');
+      var algoliaIndex = algoliaClient.initIndex('MyBlogIndex');
+    </script>
+
+
+    </body>
+</html>

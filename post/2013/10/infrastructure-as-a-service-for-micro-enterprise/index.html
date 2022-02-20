@@ -1,0 +1,1060 @@
+
+<!DOCTYPE html>
+<html lang="zh-tw">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="我是山姆鍋">
+    <title>微型企業之雲端虛擬服務器 - 我是山姆鍋</title>
+    <meta name="author" content="Sampot (山姆鍋)">
+    
+        <meta name="keywords" content="IaaS,Infrastructure-as-a-service">
+    
+    
+        <link rel="icon" href="https://samkuo.me/images/favicon.png">
+    
+    
+        
+            <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
+        
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","/contact","/sitemap"],"image":"logo.png"},"articleBody":"「基礎設施即服務」提供執行軟體所需的計算、儲存與通訊資源，通常透過虛擬化技術來將底層硬體的差異予以隱藏，讓軟體可以平順地執行。在過去需要從取得服務器硬體、連上電源與網路、安裝作業系統的需求，現在只要提供需要何種作業系統、需要的記憶體與硬碟空間，幾分鐘就可以準備好一台全新服務器。雖然聽起來很不錯，但是對微型企業來說，選擇供應商該注意哪些事項？本文屬於 「善用雲端服務，微型企業的自強之道」系列文章之一。\n\n說到「基礎設施即服務」，最有名的當然就屬 Amazon EC2 了。隨著時間的演進，有越來越多的廠商投入這個領域，讓「基礎設施即服務」成為目前雲端服務最成熟的商務模式之一。為了方便討論，對於「基礎設施」，山姆鍋只限制在像 EC2 這樣的服務。其中，最主要的特點有：\n\n按照使用量收費 (usage-based charge)。\n提供 API 可以隨時隨地啟用與釋放資源。\n可以安裝各種軟體。\n\n因此，虛擬主機不在考慮範圍內，而 VPS 供應商只要有提供上述的特點，也會被列入考慮。網路上有許多供應商，下面只是「影化身科技」目前考慮採用的三家，不代表他們一定優於其他廠商：\nAmazon EC2\nAmazon Web Services 中的 EC2 (Elastic Compute Cloud) 算是最早期提供這類服務的廠商，除了基本的 EC2，它現在更提供許多相關的基礎服務，對於想要一站式 (one-stop) 服務的公司，Amazon Web Service 可以說是目前不二選擇。\n\n多種服務器規格可以選擇。\n支援眾多的基礎服務。\n涵括許多資料中心。\n支援服務器負載均衡服務。\n提供高可用性備援機制。\n\n就算不使用 EC2，它的其餘服務對於微型企業來說也很有吸引力，例如：Amazon S3 可說是便宜又好用的儲存服務。對於無法完全採用「平台即服務」來部署系統的微型企業，Amazon Web Services 絕對是值得去熟悉的服務。\nLinode\n性價比算是很高的 VPS 供應商，後來因應雲端計算的趨勢也開放 API 以及按時間收費模式。多數用戶對其客戶服務給予高度肯定，但最近幾次的安全漏洞以及 DigitalOcean 開始威脅到它的市場。Linode 的主要特點有：\n\n提供許多資料中心可以選擇。\n提供服務器負載均衡服務 (load balancing service)。\n提供雙機故障備援 (IP failover, 需要客服協助)。\n對於像「影化身平台」這種需要全球部署的雲端服務而言，Linode 算是經濟實惠的選擇。\n\nDigitalOcean\n跟 Linode 一樣是一家 VPS 供應商，也提供 API 以及採用按時收費模式。跟 Linode 比較，最大特點在於它全部的服務器使用的都是 SSD 硬碟，對於資料存取，理論上是比傳統硬碟快上許多。另外，由於在同樣價格下，提供的規格通常也比 Linode 優惠，所以，應該會讓 Linode 開始緊張才對。\n相對於 Linode，DigitalOcean 目前有下列的限制：\n\n不支援負載均衡服務 (load balancing service)。\n不支持雙機故障備援。\n可以選擇的資料中心很少。\n\n吸引山姆鍋的當然是它同樣規格比較便宜且採用的是 SSD 硬碟這點，對於支援性質的服務器會優先考慮採用。\n小結\n最近 Google 也開始提供它自己的 Compute Engine 服務，對於微型企業來說這可是好事，畢竟越多競爭者就越能確保提供經濟實惠的服務。\n","dateCreated":"2013-10-25T20:29:00+08:00","dateModified":"2020-03-08T09:49:39+08:00","datePublished":"2013-10-25T20:29:00+08:00","description":"「基礎設施即服務」提供執行軟體所需的計算、儲存與通訊資源，通常透過虛擬化技術來將底層硬體的差異予以隱藏，讓軟體可以平順地執行。在過去需要從取得服務器硬體、連上電源與網路、安裝作業系統的需求，現在只要提供需要何種作業系統、需要的記憶體與硬碟空間，幾分鐘就可以準備好一台全新服務器。雖然聽起來很不錯，但是對微型企業來說，選擇供應商該注意哪些事項？本文屬於 「善用雲端服務，微型企業的自強之道」系列文章之一。","headline":"微型企業之雲端虛擬服務器","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2013/10/infrastructure-as-a-service-for-micro-enterprise/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","/contact","/sitemap"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2013/10/infrastructure-as-a-service-for-micro-enterprise/","keywords":"Infrastructure, IaaS"}</script>
+    <meta name="description" content="山姆鍋針對「影化身科技」這種微型企業的需求，選擇三家「基礎設施即服務」供應商。">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="微型企業之雲端虛擬服務器">
+<meta property="og:url" content="https://samkuo.me/post/2013/10/infrastructure-as-a-service-for-micro-enterprise/">
+<meta property="og:site_name" content="我是山姆鍋">
+<meta property="og:description" content="山姆鍋針對「影化身科技」這種微型企業的需求，選擇三家「基礎設施即服務」供應商。">
+<meta property="og:locale" content="zh_TW">
+<meta property="article:published_time" content="2013-10-25T12:29:00.000Z">
+<meta property="article:modified_time" content="2020-03-08T01:49:39.905Z">
+<meta property="article:author" content="Sampot (山姆鍋)">
+<meta property="article:tag" content="IaaS">
+<meta property="article:tag" content="Infrastructure-as-a-service">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:creator" content="@sampotkuo">
+<meta property="fb:app_id" content="1538037013031361">
+    
+    
+        
+    
+    <meta property="og:image" content="https://samkuo.me/images/featured_image.jpg"/>
+    
+    
+    
+    <!--STYLES-->
+    
+<link rel="stylesheet" href="/assets/css/style-lfspghztdttlloh4nly9hmp3cqmehlzaagf5ften7wo63faxiltzljjm4fb0.min.css">
+
+    <!--STYLES END-->
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-41152700-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-41152700-1');
+    </script>
+
+
+    
+
+    
+        
+    
+</head>
+
+    <body>
+        <div id="fb-root"></div>
+        <script async defer crossorigin="anonymous"
+            src="https://connect.facebook.net/zh_TW/sdk.js#xfbml=1&version=v7.0&appId=1538037013031361&autoLogAppEvents=1"></script>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+<header id="header" data-behavior="5">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a
+            class="header-title-link"
+            href="/"
+            aria-label=""
+        >
+        <img class="header-avatar-picture" src="/images/logo32.png" alt="作者的圖片" />
+            我是山姆鍋
+        </a>
+    </div>
+    
+        
+            <a
+                class="header-right-icon open-algolia-search"
+                href="#search"
+                aria-label="打開鏈接: /#search"
+            >
+        
+        
+            <i class="fa fa-search fa-lg"></i>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="5">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a
+                    href="/#about"
+                    aria-label="閱讀有關作者的更多信息"
+                >
+                    <img class="sidebar-profile-picture" src="/images/logo.png" alt="作者的圖片"/>
+                </a>
+                <h4 class="sidebar-profile-name">Sampot (山姆鍋)</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>個人部落格， 記錄與分享一些軟體開發與運維相關資訊， 偶爾也會碎念一下</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/"
+                            
+                            rel="noopener"
+                            title="首頁"
+                        >
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">首頁</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-categories"
+                            
+                            rel="noopener"
+                            title="分類"
+                        >
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">分類</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-tags"
+                            
+                            rel="noopener"
+                            title="標籤"
+                        >
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">標籤</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-archives"
+                            
+                            rel="noopener"
+                            title="所有文章"
+                        >
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">所有文章</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link open-algolia-search"
+                            href="#search"
+                            
+                            rel="noopener"
+                            title="搜尋"
+                        >
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">搜尋</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/about"
+                            
+                            rel="noopener"
+                            title="關於"
+                        >
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">關於</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://github.com/sampot"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="GitHub"
+                        >
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://twitter.com/sampotkuo"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Twitter"
+                        >
+                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Twitter</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://facebook.com/sampotkuo"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Facebook"
+                        >
+                        <i class="sidebar-button-icon fab fa-facebook" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Facebook</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/contact"
+                            
+                            rel="noopener"
+                            title="聯絡"
+                        >
+                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">聯絡</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/sitemap"
+                            
+                            rel="noopener"
+                            title="網站導覽"
+                        >
+                        <i class="sidebar-button-icon fa fa-sitemap" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">網站導覽</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://feedly.com/i/subscription/feed/https://samkuo.me/atom.xml"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Atom"
+                        >
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Atom</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="5"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            微型企業之雲端虛擬服務器
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2013-10-25T20:29:00+08:00">
+	
+		    10月 25, 2013
+    	
+    </time>
+    
+        <span>分類 </span>
+        
+    <a class="category-link" href="/category/service-operations/">Service Operations</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <div class="alert info no-icon">
+                我是山姆鍋 <div class="fb-like" data-href="https://www.facebook.com/sampotkuo" data-width="" data-layout="standard" data-action="like" data-size="large" data-share="false"></div>
+            </div>
+
+            <p>「基礎設施即服務」提供執行軟體所需的計算、儲存與通訊資源，通常透過虛擬化技術來將底層硬體的差異予以隱藏，讓軟體可以平順地執行。在過去需要從取得服務器硬體、連上電源與網路、安裝作業系統的需求，現在只要提供需要何種作業系統、需要的記憶體與硬碟空間，幾分鐘就可以準備好一台全新服務器。雖然聽起來很不錯，但是對微型企業來說，選擇供應商該注意哪些事項？本文屬於 <a href="/post/2013/06/infrastructure-software-shop-with-cloud-services/">「善用雲端服務，微型企業的自強之道」</a>系列文章之一。</p>
+<a id="more"></a>
+<p>說到「基礎設施即服務」，最有名的當然就屬 Amazon EC2 了。隨著時間的演進，有越來越多的廠商投入這個領域，讓「基礎設施即服務」成為目前雲端服務最成熟的商務模式之一。為了方便討論，對於「基礎設施」，山姆鍋只限制在像 EC2 這樣的服務。其中，最主要的特點有：</p>
+<ol>
+<li>按照使用量收費 (usage-based charge)。</li>
+<li>提供 API 可以隨時隨地啟用與釋放資源。</li>
+<li>可以安裝各種軟體。</li>
+</ol>
+<p>因此，虛擬主機不在考慮範圍內，而 VPS 供應商只要有提供上述的特點，也會被列入考慮。網路上有許多供應商，下面只是「影化身科技」目前考慮採用的三家，不代表他們一定優於其他廠商：</p>
+<h3 id="Amazon-EC2"><a href="http://aws.amazon.com/ec2/" target="_blank" rel="noopener">Amazon EC2</a></h3>
+<p>Amazon Web Services 中的 EC2 (Elastic Compute Cloud) 算是最早期提供這類服務的廠商，除了基本的 EC2，它現在更提供許多相關的基礎服務，對於想要一站式 (one-stop) 服務的公司，Amazon Web Service 可以說是目前不二選擇。</p>
+<ol>
+<li>多種服務器規格可以選擇。</li>
+<li>支援眾多的基礎服務。</li>
+<li>涵括許多資料中心。</li>
+<li>支援服務器負載均衡服務。</li>
+<li>提供高可用性備援機制。</li>
+</ol>
+<p>就算不使用 EC2，它的其餘服務對於微型企業來說也很有吸引力，例如：Amazon S3 可說是便宜又好用的儲存服務。對於無法完全採用「平台即服務」來部署系統的微型企業，Amazon Web Services 絕對是值得去熟悉的服務。</p>
+<h3 id="Linode"><a href="https://www.linode.com/" target="_blank" rel="noopener">Linode</a></h3>
+<p>性價比算是很高的 VPS 供應商，後來因應雲端計算的趨勢也開放 API 以及按時間收費模式。多數用戶對其客戶服務給予高度肯定，但最近幾次的安全漏洞以及 DigitalOcean 開始威脅到它的市場。Linode 的主要特點有：</p>
+<ol>
+<li>提供許多資料中心可以選擇。</li>
+<li>提供服務器負載均衡服務 (load balancing service)。</li>
+<li>提供雙機故障備援 (IP failover, 需要客服協助)。<br>
+對於像「影化身平台」這種需要全球部署的雲端服務而言，Linode 算是經濟實惠的選擇。</li>
+</ol>
+<h3 id="DigitalOcean"><a href="https://www.digitalocean.com/" target="_blank" rel="noopener">DigitalOcean</a></h3>
+<p>跟 Linode 一樣是一家 VPS 供應商，也提供 API 以及採用按時收費模式。跟 Linode 比較，最大特點在於它全部的服務器使用的都是 SSD 硬碟，對於資料存取，理論上是比傳統硬碟快上許多。另外，由於在同樣價格下，提供的規格通常也比 Linode 優惠，所以，應該會讓 Linode 開始緊張才對。<br>
+相對於 Linode，DigitalOcean 目前有下列的限制：</p>
+<ol>
+<li>不支援負載均衡服務 (load balancing service)。</li>
+<li>不支持雙機故障備援。</li>
+<li>可以選擇的資料中心很少。</li>
+</ol>
+<p>吸引山姆鍋的當然是它同樣規格比較便宜且採用的是 SSD 硬碟這點，對於支援性質的服務器會優先考慮採用。</p>
+<h3 id="小結">小結</h3>
+<p>最近 Google 也開始提供它自己的 Compute Engine 服務，對於微型企業來說這可是好事，畢竟越多競爭者就越能確保提供經濟實惠的服務。</p>
+
+            
+
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">標籤</span><br/>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tag/iaas/" rel="tag">IaaS</a> <a class="tag tag--primary tag--small t-link" href="/tag/infrastructure/" rel="tag">Infrastructure</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/post/2013/10/google-docs-document-management-system/"
+                    data-tooltip="微型企業之雲端文件管理系統"
+                    aria-label="上一篇: 微型企業之雲端文件管理系統"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/post/2013/10/amazon-s3-as-maven-repository-with-gradle/"
+                    data-tooltip="運用 Amazon S3 作為 Maven 套件倉儲 - Gradle 篇"
+                    aria-label="下一篇: 運用 Amazon S3 作為 Maven 套件倉儲 - Gradle 篇"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://samkuo.me/post/2013/10/infrastructure-as-a-service-for-micro-enterprise/"
+                    title="分享到 Facebook"
+                    aria-label="分享到 Facebook"
+                >
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://twitter.com/intent/tweet?text=https://samkuo.me/post/2013/10/infrastructure-as-a-service-for-micro-enterprise/"
+                    title="分享到 Twitter"
+                    aria-label="分享到 Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https://samkuo.me/post/2013/10/infrastructure-as-a-service-for-micro-enterprise/"
+                    title="global.share_on_linkedin"
+                    aria-label="global.share_on_linkedin"
+                >
+                    <i class="fab fa-linkedin" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#disqus_thread"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript" target="_blank" rel="noopener">comments powered by Disqus.</a></noscript>
+</div>
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2022 Sampot (山姆鍋). All Rights Reserved.
+    </span>
+    <br/>
+        <a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW"><img
+                alt="創用 CC 授權條款" style="border-width:0"
+                src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+        除另有標示，本著作係採用<a rel="license"
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW">創用 CC
+            姓名標示-非商業性-相同方式分享 4.0 國際 授權條款</a>授權。
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="5">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/post/2013/10/google-docs-document-management-system/"
+                    data-tooltip="微型企業之雲端文件管理系統"
+                    aria-label="上一篇: 微型企業之雲端文件管理系統"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/post/2013/10/amazon-s3-as-maven-repository-with-gradle/"
+                    data-tooltip="運用 Amazon S3 作為 Maven 套件倉儲 - Gradle 篇"
+                    aria-label="下一篇: 運用 Amazon S3 作為 Maven 套件倉儲 - Gradle 篇"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://samkuo.me/post/2013/10/infrastructure-as-a-service-for-micro-enterprise/"
+                    title="分享到 Facebook"
+                    aria-label="分享到 Facebook"
+                >
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://twitter.com/intent/tweet?text=https://samkuo.me/post/2013/10/infrastructure-as-a-service-for-micro-enterprise/"
+                    title="分享到 Twitter"
+                    aria-label="分享到 Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https://samkuo.me/post/2013/10/infrastructure-as-a-service-for-micro-enterprise/"
+                    title="global.share_on_linkedin"
+                    aria-label="global.share_on_linkedin"
+                >
+                    <i class="fab fa-linkedin" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#disqus_thread"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="5">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://www.facebook.com/sharer/sharer.php?u=https://samkuo.me/post/2013/10/infrastructure-as-a-service-for-micro-enterprise/"
+                        aria-label="分享到 Facebook"
+                    >
+                        <i class="fab fa-facebook" aria-hidden="true"></i><span>分享到 Facebook</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://twitter.com/intent/tweet?text=https://samkuo.me/post/2013/10/infrastructure-as-a-service-for-micro-enterprise/"
+                        aria-label="分享到 Twitter"
+                    >
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>分享到 Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https://samkuo.me/post/2013/10/infrastructure-as-a-service-for-micro-enterprise/"
+                        aria-label="global.share_on_linkedin"
+                    >
+                        <i class="fab fa-linkedin" aria-hidden="true"></i><span>global.share_on_linkedin</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/images/logo.png" alt="作者的圖片"/>
+        
+            <h4 id="about-card-name">Sampot (山姆鍋)</h4>
+        
+            <div id="about-card-bio"><p>個人部落格， 記錄與分享一些軟體開發與運維相關資訊， 偶爾也會碎念一下</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>IT 自由工作者</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                台灣/台北
+            </div>
+        
+    </div>
+</div>
+
+        
+            <div id="algolia-search-modal" class="modal-container">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="close-button"><i class="fa fa-times"></i></span>
+            <a href="https://algolia.com" target="_blank" rel="noopener" class="searchby-algolia text-color-light link-unstyled">
+                <span class="searchby-algolia-text text-color-light text-small">by</span>
+                <img class="searchby-algolia-logo" src="/assets/images/logo-algolia-nebula-blue-full.svg">
+            </a>
+            <i class="search-icon fa fa-search"></i>
+            <form id="algolia-search-form">
+                <input type="text" id="algolia-search-input" name="search"
+                    class="form-control input--large search-input" placeholder="Search "
+                    />
+            </form>
+        </div>
+        <div class="modal-body">
+            <div class="no-result text-color-light text-center">沒有找到文章</div>
+            <div class="results">
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2012/03/set-up-mysql-master-master-replication/"
+                            aria-label=": 設定 MySQL Master-Master 複製"
+                        >
+                            <h3 class="media-heading">設定 MySQL Master-Master 複製</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2012年3月3日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>本文簡單說明如何設定兩台 MySQL server，讓它們彼此互相備份資料 (Master-master 模式)。雖然這樣的設定通常是支援高可用性 (high availability) 平台的一部分，但本文不包含如何完成其他 HA 的工作。設定兩台 MySQL 伺服器互相備份，主要目的就是要確認資料的安全性；同時也提高可用性。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2012/04/use-pacemaker-two-node-ha-cluster/"
+                            aria-label=": 使用 Pacemaker 建構雙節點叢集系統"
+                        >
+                            <h3 class="media-heading">使用 Pacemaker 建構雙節點叢集系統</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2012年4月6日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>想要達到系統高可用性 (high availability) 的需求，自然免不了需要採用現成的解決方案。本文說明如何利用 Pacemaker/heartbeat 來建構一個雙節點的從其系統。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2012/04/build-cluster-filesystem-with-glusterfs-ubuntu/"
+                            aria-label=": 使用 GlusterFS 在 Ubuntu 上建構雙節點叢集檔案系統"
+                        >
+                            <h3 class="media-heading">使用 GlusterFS 在 Ubuntu 上建構雙節點叢集檔案系統</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2012年4月23日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>在網站的叢集系統中，除了資料庫需要讓各個伺服器存取外，常常也會需要讓檔案 (圖檔，CSS 等等) 可以被叢集中的伺服器存取。 傳統上，常常使用 NFS 伺服器來達到此目的，但 NFS 本身往往成為單一失敗點 (single point of failure)。 本文介紹 GlusterFS 來建構一個簡單的雙節點叢集檔案系統，具備高可用性、高擴充性等特性。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2012/04/scale-wordpress-with-hyperdb/"
+                            aria-label=": 使用 HyperDB 加強 WordPress 網站的資料庫擴充性"
+                        >
+                            <h3 class="media-heading">使用 HyperDB 加強 WordPress 網站的資料庫擴充性</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2012年4月23日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>對於流量高的 Wordpress 網站來說，資料庫往往是第一個出現的瓶頸。針對資料庫擴充性的問題，本文介紹 HyperDB 這個解決方案。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2012/04/create-lnmp-environment-with-nginx/"
+                            aria-label=": 在 Linode 上使用 Nginx 架設 LNMP 環境"
+                        >
+                            <h3 class="media-heading">在 Linode 上使用 Nginx 架設 LNMP 環境</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2012年4月30日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>Apache HTTPd 是很好的網站伺服器，但是對於 CPU 跟記憶體的要求較高，對於架設在 VPS 上面網站來說， 需要一個更輕量級的解決方案。越來越多人選擇使用 Nginx 架設網站，主要考量便是它的快速、穩定以及輕量的特性。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2012/05/support-sending-mail-php-linux-vps-exim/"
+                            aria-label=": Linux VPS PHP 網站可以發送信件"
+                        >
+                            <h3 class="media-heading">Linux VPS PHP 網站可以發送信件</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2012年5月8日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>PHP 架站軟體通常需要用到寄信功能，例如：通知站長有新的迴響需要審核。使用虛擬主機來架站的讀者一定會納悶：<br>
+不管是 WordPress，Drupal 或者其他 PHP<br>
+架站軟體不是都不用另外設定就可以寄信？為什麼需要特地提到這件事情。<br>
+話說山姆鍋的主機採用的是 Linode VPS，很多事情都需要自己來，唉！<br>
+如果您的網站主機跟山姆鍋一樣是 VPS 或者專屬伺服器，那這篇文章也許對您有幫助。<br>
+由於不是要做為公司的郵件伺服器，山姆鍋希望除了讓 PHP 架站軟體送信外，不再作其它用途。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2013/04/start-up/"
+                            aria-label=": 影化身科技有限公司成立"
+                        >
+                            <h3 class="media-heading">影化身科技有限公司成立</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2013年4月24日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>2013 年 4 月 24 日，影化身科技有限公司登記成立，致力於提供雲端服務平台。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2013/05/shi-yong-octopresszuo-wei-bo-ke-ping-tai/"
+                            aria-label=": 使用 Octopress 作為部落格平台"
+                        >
+                            <h3 class="media-heading">使用 Octopress 作為部落格平台</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2013年5月23日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>由於沒有需要太多動態功能，所以，嘗試使用靜態部落格平台 Octopress 來寫文章。「艾米部落」<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup> 一路從 Joomla, Drupal, WordPress 到現在的 Octopress，也算是換了不少平台。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2013/05/use-static-site-generator-for-company-site/"
+                            aria-label=": 使用靜態網頁產生器來管理公司網站"
+                        >
+                            <h3 class="media-heading">使用靜態網頁產生器來管理公司網站</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2013年5月28日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>對於不需要動態功能的網站而言，使用像是 Drupal、WordPress 之類的架站軟體，感覺有點大材小用。對於可以接受不使用「所見即所得」編輯器的人，靜態網站產生器應該是個可以接受的方案。 雖說是靜態網站，缺少很多功能，但像是公司或者行銷網站往往也不需要這些。況且， 靜態網站有諸多動態網站所沒有的功能，如：</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://samkuo.me/post/2013/05/exchange-name-card-with-eavatar-me/"
+                            aria-label=": 如何利用「我．影化身」服務交換名片"
+                        >
+                            <h3 class="media-heading">如何利用「我．影化身」服務交換名片</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2013年5月29日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>今天從 MR JAMIE 上讀到一篇文章：「從今天開始，請 email 你的名片給我吧！」這讓我想到，與其使用 Email，使用「我．影化身」來代替，不是也很適當？</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+            </div>
+        </div>
+        <div class="modal-footer">
+            <p class="results-count text-medium"
+                data-message-zero="沒有找到文章"
+                data-message-one="找到 1 篇文章"
+                data-message-other="找到 {n} 篇文章">
+                找到 134 篇文章
+            </p>
+        </div>
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+
+<script src="/assets/js/script-597bjprixrfzrennpanwcwfnulsqaw08wvkzphw7gk8dqunvgzd9nn3nvsu9.min.js"></script>
+
+<!--SCRIPTS END-->
+
+
+    
+        <script>
+          var disqus_config = function() {
+            this.page.url = 'https://samkuo.me/post/2013/10/infrastructure-as-a-service-for-micro-enterprise/';
+              
+            this.page.identifier = 'post/2013/10/infrastructure-as-a-service-for-micro-enterprise/';
+              
+          };
+          (function() {
+            var d = document, s = d.createElement('script');
+            var disqus_shortname = 'sampotkuo';
+            s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+          })();
+        </script>
+    
+
+
+
+    
+<script src="/assets/js/moment-with-locales.js"></script>
+
+    
+<script src="/assets/js/algoliasearch.js"></script>
+
+    <script>
+      var algoliaClient = algoliasearch('OIWK4CBFS4', 'f676051199368fe5f161c9012b7edaf6');
+      var algoliaIndex = algoliaClient.initIndex('MyBlogIndex');
+    </script>
+
+
+    </body>
+</html>
