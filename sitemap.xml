@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://samkuo.me/post/2022/02/postgresql-event-bus-follow-up/</loc>
+    
+    <lastmod>2022-02-21T23:10:21.629Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://samkuo.me/post/2022/02/postgresql-event-bus/</loc>
     
     <lastmod>2022-02-20T13:44:08.854Z</lastmod>

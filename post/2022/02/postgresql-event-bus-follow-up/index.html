@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="我是山姆鍋">
-    <title>高可擴展的任務執行架構需求 - 我是山姆鍋</title>
+    <title>PostgreSQL 事件總線實作驗證 (後續) - 我是山姆鍋</title>
     <meta name="author" content="Sampot (山姆鍋)">
     
     
@@ -17,19 +17,17 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","/contact","/sitemap"],"image":"logo.png"},"articleBody":"最近山姆鍋在思考一個大型網路系統架構設計的問題，為什麼是大型網路？因為沒有機會實作，只好紙上談兵幻想一下。 這裡所指的「大型網路」是指可擴展到支持上萬個以上節點 (node) 的網路架構，為什麼要設計這樣的架構？\n\n系統架構理所當然是為了支援軟體應用的需要而設計，針對軟體應用的特性才能選擇適當的架構。 山姆鍋在思考的問題是一個可以執行不同任務 (task execution) 的網路服務。首先，來看看服務的簡單描述。\n關聯文章：利用 BitTorrent DHT 來控制殭屍網路\n服務描述\n這個軟體服務允許客戶端部署 (deploy) 不定個數的代理人 (agent) 到隨機或者特定節點 (或稱主機)， 代理人，也可以稱為工作者 (worker)，實際負責任務的執行。代理人具備下列特性：\n\n\n\n單一任務導向：\n每個不同的代理人專注在單一目的，如：擷取網頁內容。代理人的執行邏輯由一個腳本 (script) 所提供， 這裡假設腳本使用的是 Python [1] 。\n\n\n\n\n可以有限數量地派生 (spawn) 其他代理人：\n此代理人成為被派生的代理人的監管人 (supervisor)。\n\n\n\n\n只可以與其他代理人透過訊息 (message) 溝通：\n代理人只可以透過其他代理人的「參考 (reference)」來傳送訊息，「參考」隱藏代理人的通訊位址等資訊。\n\n\n\n聽起來是不是有點熟悉？沒錯，代理人採用的正是「參與者模式 (Actor model) [2] 」。 比較特別的一點：客戶端 (client)，也就是派遣代理人到此服務的程式，會被視為整個代理人樹狀階層的根節點 (root)。\n由於系統架構通常是用來達成軟體的非功能需求 (non-functional requirements)，因此，\n先來了解一下這樣的軟體服務，山姆鍋設定了哪些需求？ [3]\n非功能需求\n\n\n負載均衡 (load distribution):\n\n代理人要盡可能平均分散到不同的節點。雖然每個代理人所執行的任務 (task) 對於系統的負載不同， 但將代理人隨機分散到不同的節點，從長遠來看，可以盡可能善用系統資源。\n\n\n\n高可用性 (highly available):\n\n如果一個代理人故障或逾時，監管人 (上層代理人) 會收到通知，監管人可以決定是否派生其他代理人來取代。\n客戶端是整個代理人階層 (hierarchy) 的最高監管人，所以，高可用性最終需要客戶端軟體配合。\n\n\n\n高可擴展性 (highly scalable)：\n\n整個服務需要可以同時支持大量的客戶端，根據客戶端以及代理人數量可以擴充節點來容納需求。\n\n\n\n容忍網路分割 (network partition)：\n\n服務節點組成的網路間可以有網路分割的情形出現，整體服務應該要不受影響，也就是說：不影響可用性。\n\n\n\n支援跨資料中心 (cross data centers):\n\n在雲端軟體服務時代，跨資料中心的支援應該列入考慮。這也是第 4 點需求重要的原因。\n\n\n\n代理人間可以位置無關 (location transparency) 方式溝通:\n\n雖然代理人不需要支援在節點間移動 (mobile)，但為了負載均衡，代理人的所在節點可以是隨機決定的。\n\n\n\n結語\n山姆鍋最終目的是要設計一個高可擴展、高可用的的系統架構來支持一個提供任務執行的軟體服務。 本文只簡單描述一下這樣服務的用法與非功能需求。\n架構設計續篇: 高可擴展的任務執行架構設計\n參考資料\n\n參與者模式。\n\n\n\n\n為什麼假設腳本使用 Python？其中一個原因是山姆鍋只知道如何用 Python 實現一個超輕量級沙盒 (sandbox) 環境， 每個代理人一個軟體容器 (Software container) 的模式，如 Docker，還是太過耗費資源。 ↩︎\n\nActor model: https://en.wikipedia.org/wiki/Actor_model ↩︎\n\n因為是紙上談兵，山姆鍋只好自己當起客戶代表。 ↩︎\n\n\n\n","dateCreated":"2015-09-25T09:43:00+08:00","dateModified":"2020-03-08T10:21:37+08:00","datePublished":"2015-09-25T09:43:00+08:00","description":"最近山姆鍋在思考一個大型網路系統架構設計的問題，為什麼是大型網路？因為沒有機會實作，只好紙上談兵幻想一下。 這裡所指的「大型網路」是指可擴展到支持上萬個以上節點 (node) 的網路架構，為什麼要設計這樣的架構？","headline":"高可擴展的任務執行架構需求","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2015/09/architecture-requirements-of-highly-scalable-task-execution/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","/contact","/sitemap"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2015/09/architecture-requirements-of-highly-scalable-task-execution/","keywords":"Grid, Agent"}</script>
-    <meta name="description" content="最近山姆鍋在思考一個大型網路系統架構設計的問題，為什麼是大型網路？因為沒有機會實作，只好紙上談兵幻想一下。 這裡所指的「大型網路」是指可擴展到支持上萬個以上節點 (node) 的網路架構，為什麼要設計這樣的架構？">
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","/contact","/sitemap"],"image":"logo.png"},"articleBody":"這篇 「PostgreSQL 事件總線 (event bus) 實作驗證」文章意外地在臉書引起一些負面評價。究其原因，可能是山姆鍋對於實際使用情境跟與其搭配的產品特性說明不夠清楚所導致。雖然 “I know what I’m doing”, 但為了避免該篇文章被視為誤人子弟的負面教材，只好再來平反一下。\n\n首先，山姆鍋正在開發的軟體產品對於稽核紀錄 (auditing log) 有特別的要求，其中一個需求是使用者對資料的所有修改動作都要有對應的稽核紀錄。概念上，資料庫中資料的修改都是一種「事件 (event)」，而這樣的事件，除了產生稽核紀錄外，也有很多其它潛在用途。所以，山姆鍋選擇以非同步方式將這些事件送給其它元件來負責後續處理，其中一個便是負責產生稽核紀錄，這也是為何前篇文章中，「產生安全稽核紀錄」被列在第一項應用的原因。\n關於事件的傳遞，如果選擇在資料庫修改交易完成後，以訊息服務 (如 RabbitMQ/Kafka) 來傳遞事件，會先面臨一個不常發生但棘手的問題：資料修改了，但事件沒送出。事件沒送出，可能是臨時的網路問題或者傳送的程序異常終止，原因不一而足。為了避開這個問題，山姆鍋選擇將事件隨同資料修改在同一個交易 (transaction) 中完成，如此，確保事件的發生被正確紀錄，且這些事件也會長期存放在資料庫中 (最終太舊的資料會被清除，但不影響這裡的論述)。但接下來的問題便是：其它需要處理這些事件的元件 (也稱為事件消費者 /consumer) 要如何即時地收到這些事件通知？如何按照事件發生的時間順序，不遺漏地處理這些事件？\n從上面的描述可知，事件的資料已經存在資料庫中，且歷史事件也可能因為新的需求而被重新處理。在說明如何解決上述問題前，就需要先說明這個 Event bus 的設計所要支援的產品特性。這個軟體產品是針對中小型企業內部使用的系統，實際使用者是 IT 工程師，且由 IT 工程師自行安裝以及運維。所以，可以假設這個產品的同時在線使用人數不高，對多數客戶來說可能是個位數。雖然此軟體可以跑在 3 台來實現高可用需求，但在最精簡的配置，整個系統的所有服務要能夠跑在一台伺服器上。所以，自然會希望這個軟體需要的服務元件越少越好，但其中一定有的服務元件是 PostgreSQL (主資料庫)，跟 Redis (Cache)。\n關於通知元件有新事件發生的作法，大致有考慮以下三個方案：\n\nRedis Streams\nRabbitMQ\nKafka\n\n基於上述架構精簡化的原因，加上不能假設企業的 IT 工程師有能力維護一套 Kafka 系統，Kafka 很早就被排除在方案之外。Redis 的 AOF persistence (預設 fsync 時間為 1 秒) 以及 replication 並無法保證在 Redis carsh 時資料不會遺失。不過這點在這裡不是問題，因為實際的事件資料已經存在 PostgreSQL, 這裡 Redis/RabbitMQ 只是用來分發 / 通知新的事件。\nEvent consumer 一開始執行 (或者跟訊息服務斷線) 會先確認自己取得對應 subscription 的處理資格 (透過 distributed lock), 然後便是從 PostgreSQL 處理歷史資料，等到歷史資料處理完畢，才會接收新事件處理。所以，Redis Streams 跟 RabbitMQ 其實都是可行的方案，不過細心的讀者應該已經猜到山姆鍋選擇的作法：就是 Redis Streams。原因很簡單，因為產品裡已經有 Redis 了！\n不過，為何上篇文章提到的 Event bus 沒有用 Redis Streams 而是全部使用 PostgreSQL 提供的機制？背後的原因是為了完成上面 PostgreSQL + Redis Streams 的事件處理架構，還需要有個元件 (底下稱為 Pumper) 負責將新的事件資料轉發到 Redis Streams, 而完成 Pumper 這個元件的要求就跟上篇文章中的 Event consumer 相同，需要即時知道有新事件，事件要按照時間順序處理且不能遺漏。為了備援，可能會有多個 Pumper 實例同時在執行，但同時間只能有一個在處理事件，這個可以使用 Distributed lock 來達成。至於通知，簡單的 pubsub 機制就可以實現。\nDistributed lock 以及 Pubsub 這兩個技術要求，Redis 以及 PostgreSQL 都可以提供支援。之所以選擇使用 PostgreSQL 方案，上篇文章作為方案驗證，單純使用 PostgreSQL 實作上比較簡單，但也適用在 consumer 數量不多的情況下。所以，PostgreSQL 自始至終都是作為 Event store 的用途，Event bus 的功能確實是投機取巧 (不用白不用？)。\n下面針對臉書上的一些反饋，山姆鍋提供一下自己的看法。\n“pg 這麼用，如果只是小貓二三隻的公司內部系統當然還死不了”\n不好意思，目標客戶真的是小貓二三隻。\n“db master 只有一台，要 Scale 一定要 down time”\nMaster 資料庫是這個產品的核心元件，如果主資料庫要硬體升級或者其他原因需要停機，整個服務都會停止。這跟有沒有把 PostgreSQL 作為 MQ 或者 locking server 對於可用性的結果都一樣。\n“db 只用來存需要 long term persistance 的 data”\n前面已經說明，PostgreSQL 用來長期存放事件資料。也許有讀者會認為：這不是跟 Event sourcing 的機制很像？沒錯，只不過在這個產品，Event store/bus 並不是要支援 Event sourcing。\n“這玩法就是 outbox pattern 的誤用啊”\nTransactional outbox 老實說是第一次聽到，雖然這樣的 Pattern 在 N 年前山姆鍋就已經知道，不過有了名稱，之後跟別人說明也比較方便了 :-)。\n小結\n作為一個工程師，山姆鍋常常跟團隊分享：選擇適合的方案來解決問題，而不是找尋 (自認) 完美的作法。了解工具的特性、分析優缺點、根據實際的使用情境挑選適當可行方案才是務實的作法。所謂「適當」，也就是知道自己的取捨是什麼，記得不存在所謂放諸四海皆準的通則。最後，如果 “You know what you are doing”, 不用擔心跟別人意見相左。\n","dateCreated":"2022-02-21T21:40:24+08:00","dateModified":"2022-02-22T07:10:21+08:00","datePublished":"2022-02-21T21:40:24+08:00","description":"這篇 「PostgreSQL 事件總線 (event bus) 實作驗證」文章意外地在臉書引起一些負面評價。究其原因，可能是山姆鍋對於實際使用情境跟與其搭配的產品特性說明不夠清楚所導致。雖然 “I know what I’m doing”, 但為了避免該篇文章被視為誤人子弟的負面教材，只好再來平反一下。","headline":"PostgreSQL 事件總線實作驗證 (後續)","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://samkuo.me/post/2022/02/postgresql-event-bus-follow-up/"},"publisher":{"@type":"Organization","name":"Sampot (山姆鍋)","sameAs":["https://github.com/sampot","https://twitter.com/sampotkuo","https://facebook.com/sampotkuo","/contact","/sitemap"],"image":"logo.png","logo":{"@type":"ImageObject","url":"logo.png"}},"url":"https://samkuo.me/post/2022/02/postgresql-event-bus-follow-up/"}</script>
+    <meta name="description" content="這篇 「PostgreSQL 事件總線 (event bus) 實作驗證」文章意外地在臉書引起一些負面評價。究其原因，可能是山姆鍋對於實際使用情境跟與其搭配的產品特性說明不夠清楚所導致。雖然 “I know what I’m doing”, 但為了避免該篇文章被視為誤人子弟的負面教材，只好再來平反一下。">
 <meta property="og:type" content="blog">
-<meta property="og:title" content="高可擴展的任務執行架構需求">
-<meta property="og:url" content="https://samkuo.me/post/2015/09/architecture-requirements-of-highly-scalable-task-execution/">
+<meta property="og:title" content="PostgreSQL 事件總線實作驗證 (後續)">
+<meta property="og:url" content="https://samkuo.me/post/2022/02/postgresql-event-bus-follow-up/">
 <meta property="og:site_name" content="我是山姆鍋">
-<meta property="og:description" content="最近山姆鍋在思考一個大型網路系統架構設計的問題，為什麼是大型網路？因為沒有機會實作，只好紙上談兵幻想一下。 這裡所指的「大型網路」是指可擴展到支持上萬個以上節點 (node) 的網路架構，為什麼要設計這樣的架構？">
+<meta property="og:description" content="這篇 「PostgreSQL 事件總線 (event bus) 實作驗證」文章意外地在臉書引起一些負面評價。究其原因，可能是山姆鍋對於實際使用情境跟與其搭配的產品特性說明不夠清楚所導致。雖然 “I know what I’m doing”, 但為了避免該篇文章被視為誤人子弟的負面教材，只好再來平反一下。">
 <meta property="og:locale" content="zh_TW">
-<meta property="article:published_time" content="2015-09-25T01:43:00.000Z">
-<meta property="article:modified_time" content="2020-03-08T02:21:37.127Z">
+<meta property="article:published_time" content="2022-02-21T13:40:24.000Z">
+<meta property="article:modified_time" content="2022-02-21T23:10:21.629Z">
 <meta property="article:author" content="Sampot (山姆鍋)">
-<meta property="article:tag" content="Grid">
-<meta property="article:tag" content="Agent">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:creator" content="@sampotkuo">
 <meta property="fb:app_id" content="1538037013031361">
@@ -327,22 +325,16 @@
         <div class="post-header main-content-wrap text-left">
     
         <h1 class="post-title">
-            高可擴展的任務執行架構需求
+            PostgreSQL 事件總線實作驗證 (後續)
         </h1>
     
     
         <div class="post-meta">
-    <time datetime="2015-09-25T09:43:00+08:00">
+    <time datetime="2022-02-21T21:40:24+08:00">
 	
-		    9月 25, 2015
+		    2月 21, 2022
     	
     </time>
-    
-        <span>分類 </span>
-        
-    <a class="category-link" href="/category/system-architecture/">System Architecture</a>
-
-
     
 </div>
 
@@ -356,93 +348,32 @@
                 我是山姆鍋 <div class="fb-like" data-href="https://www.facebook.com/sampotkuo" data-width="" data-layout="standard" data-action="like" data-size="large" data-share="false"></div>
             </div>
 
-            <p>最近山姆鍋在思考一個大型網路系統架構設計的問題，為什麼是大型網路？因為沒有機會實作，只好紙上談兵幻想一下。 這裡所指的「大型網路」是指可擴展到支持上萬個以上節點 (node) 的網路架構，為什麼要設計這樣的架構？</p>
+            <p>這篇 <a href="/post/2022/02/postgresql-event-bus/" title="「PostgreSQL 事件總線(event bus)實作驗證」">「PostgreSQL 事件總線 (event bus) 實作驗證」</a>文章意外地在臉書引起一些負面評價。究其原因，可能是山姆鍋對於實際使用情境跟與其搭配的產品特性說明不夠清楚所導致。雖然 “I know what I’m doing”, 但為了避免該篇文章被視為誤人子弟的負面教材，只好再來平反一下。</p>
 <a id="more"></a>
-<p>系統架構理所當然是為了支援軟體應用的需要而設計，針對軟體應用的特性才能選擇適當的架構。 山姆鍋在思考的問題是一個可以執行不同任務 (task execution) 的網路服務。首先，來看看服務的簡單描述。</p>
-<p><strong>關聯文章</strong>：<a href="/post/2015/09/wan-discovery-mainline-dht-bittorrent/">利用 BitTorrent DHT 來控制殭屍網路</a></p>
-<h2 id="服務描述">服務描述</h2>
-<p>這個軟體服務允許客戶端部署 (deploy) 不定個數的代理人 (agent) 到隨機或者特定節點 (或稱主機)， 代理人，也可以稱為工作者 (worker)，實際負責任務的執行。代理人具備下列特性：</p>
+<p>首先，山姆鍋正在開發的軟體產品對於稽核紀錄 (auditing log) 有特別的要求，其中一個需求是使用者對資料的所有修改動作都要有對應的稽核紀錄。概念上，資料庫中資料的修改都是一種「事件 (event)」，而這樣的事件，除了產生稽核紀錄外，也有很多其它潛在用途。所以，山姆鍋選擇以非同步方式將這些事件送給其它元件來負責後續處理，其中一個便是負責產生稽核紀錄，這也是為何前篇文章中，「產生安全稽核紀錄」被列在第一項應用的原因。</p>
+<p>關於事件的傳遞，如果選擇在資料庫修改交易完成後，以訊息服務 (如 RabbitMQ/Kafka) 來傳遞事件，會先面臨一個不常發生但棘手的問題：資料修改了，但事件沒送出。事件沒送出，可能是臨時的網路問題或者傳送的程序異常終止，原因不一而足。為了避開這個問題，山姆鍋選擇將事件隨同資料修改在同一個交易 (transaction) 中完成，如此，確保事件的發生被正確紀錄，且這些事件也會長期存放在資料庫中 (最終太舊的資料會被清除，但不影響這裡的論述)。但接下來的問題便是：其它需要處理這些事件的元件 (也稱為事件消費者 /consumer) 要如何即時地收到這些事件通知？如何按照事件發生的時間順序，不遺漏地處理這些事件？</p>
+<p>從上面的描述可知，事件的資料已經存在資料庫中，且歷史事件也可能因為新的需求而被重新處理。在說明如何解決上述問題前，就需要先說明這個 Event bus 的設計所要支援的產品特性。這個軟體產品是針對中小型企業內部使用的系統，實際使用者是 IT 工程師，且由 IT 工程師自行安裝以及運維。所以，可以假設這個產品的同時在線使用人數不高，對多數客戶來說可能是個位數。雖然此軟體可以跑在 3 台來實現高可用需求，但在最精簡的配置，整個系統的所有服務要能夠跑在一台伺服器上。所以，自然會希望這個軟體需要的服務元件越少越好，但其中一定有的服務元件是 PostgreSQL (主資料庫)，跟 Redis (Cache)。</p>
+<p>關於通知元件有新事件發生的作法，大致有考慮以下三個方案：</p>
 <ol>
-<li>
-<dl>
-<dt>單一任務導向：</dt>
-<dd>每個不同的代理人專注在單一目的，如：擷取網頁內容。代理人的執行邏輯由一個腳本 (script) 所提供， 這裡假設腳本使用的是 Python <sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup> 。</dd>
-</dl>
-</li>
-<li>
-<dl>
-<dt>可以有限數量地派生 (spawn) 其他代理人：</dt>
-<dd>此代理人成為被派生的代理人的監管人 (supervisor)。</dd>
-</dl>
-</li>
-<li>
-<dl>
-<dt>只可以與其他代理人透過訊息 (message) 溝通：</dt>
-<dd>代理人只可以透過其他代理人的「參考 (reference)」來傳送訊息，「參考」隱藏代理人的通訊位址等資訊。</dd>
-</dl>
-</li>
+<li>Redis Streams</li>
+<li>RabbitMQ</li>
+<li>Kafka</li>
 </ol>
-<p>聽起來是不是有點熟悉？沒錯，代理人採用的正是「參與者模式 (Actor model) <sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup> 」。 比較特別的一點：客戶端 (client)，也就是派遣代理人到此服務的程式，會被視為整個代理人樹狀階層的根節點 (root)。</p>
-<p>由於系統架構通常是用來達成軟體的非功能需求 (non-functional requirements)，因此，<br>
-先來了解一下這樣的軟體服務，山姆鍋設定了哪些需求？ <sup class="footnote-ref"><a href="#fn3" id="fnref3">[3]</a></sup></p>
-<h2 id="非功能需求">非功能需求</h2>
-<ol>
-<li>
-<p>負載均衡 (load distribution):</p>
-<blockquote>
-<p>代理人要盡可能平均分散到不同的節點。雖然每個代理人所執行的任務 (task) 對於系統的負載不同， 但將代理人隨機分散到不同的節點，從長遠來看，可以盡可能善用系統資源。</p>
-</blockquote>
-</li>
-<li>
-<p>高可用性 (highly available):</p>
-<blockquote>
-<p>如果一個代理人故障或逾時，監管人 (上層代理人) 會收到通知，監管人可以決定是否派生其他代理人來取代。<br>
-客戶端是整個代理人階層 (hierarchy) 的最高監管人，所以，高可用性最終需要客戶端軟體配合。</p>
-</blockquote>
-</li>
-<li>
-<p>高可擴展性 (highly scalable)：</p>
-<blockquote>
-<p>整個服務需要可以同時支持大量的客戶端，根據客戶端以及代理人數量可以擴充節點來容納需求。</p>
-</blockquote>
-</li>
-<li>
-<p>容忍網路分割 (network partition)：</p>
-<blockquote>
-<p>服務節點組成的網路間可以有網路分割的情形出現，整體服務應該要不受影響，也就是說：不影響可用性。</p>
-</blockquote>
-</li>
-<li>
-<p>支援跨資料中心 (cross data centers):</p>
-<blockquote>
-<p>在雲端軟體服務時代，跨資料中心的支援應該列入考慮。這也是第 4 點需求重要的原因。</p>
-</blockquote>
-</li>
-<li>
-<p>代理人間可以位置無關 (location transparency) 方式溝通:</p>
-<blockquote>
-<p>雖然代理人不需要支援在節點間移動 (mobile)，但為了負載均衡，代理人的所在節點可以是隨機決定的。</p>
-</blockquote>
-</li>
-</ol>
-<h2 id="結語">結語</h2>
-<p>山姆鍋最終目的是要設計一個高可擴展、高可用的的系統架構來支持一個提供任務執行的軟體服務。 本文只簡單描述一下這樣服務的用法與非功能需求。</p>
-<p><strong>架構設計續篇</strong>: <a href="/post/2015/09/architecture-design-of-highly-scalable-task-execution/">高可擴展的任務執行架構設計</a></p>
-<h2 id="參考資料">參考資料</h2>
-<blockquote>
-<p>參與者模式。</p>
-</blockquote>
-<hr class="footnotes-sep">
-<section class="footnotes">
-<ol class="footnotes-list">
-<li id="fn1" class="footnote-item"><p>為什麼假設腳本使用 Python？其中一個原因是山姆鍋只知道如何用 Python 實現一個超輕量級沙盒 (sandbox) 環境， 每個代理人一個軟體容器 (Software container) 的模式，如 Docker，還是太過耗費資源。 <a href="#fnref1" class="footnote-backref">↩︎</a></p>
-</li>
-<li id="fn2" class="footnote-item"><p><em>Actor model</em>: <a href="https://en.wikipedia.org/wiki/Actor_model" target="_blank" rel="noopener">https://en.wikipedia.org/wiki/Actor_model</a> <a href="#fnref2" class="footnote-backref">↩︎</a></p>
-</li>
-<li id="fn3" class="footnote-item"><p>因為是紙上談兵，山姆鍋只好自己當起客戶代表。 <a href="#fnref3" class="footnote-backref">↩︎</a></p>
-</li>
-</ol>
-</section>
+<p>基於上述架構精簡化的原因，加上不能假設企業的 IT 工程師有能力維護一套 Kafka 系統，Kafka 很早就被排除在方案之外。Redis 的 AOF persistence (預設 fsync 時間為 1 秒) 以及 replication 並無法保證在 Redis carsh 時資料不會遺失。不過這點在這裡不是問題，因為實際的事件資料已經存在 PostgreSQL, 這裡 Redis/RabbitMQ 只是用來分發 / 通知新的事件。</p>
+<p>Event consumer 一開始執行 (或者跟訊息服務斷線) 會先確認自己取得對應 subscription 的處理資格 (透過 distributed lock), 然後便是從 PostgreSQL 處理歷史資料，等到歷史資料處理完畢，才會接收新事件處理。所以，Redis Streams 跟 RabbitMQ 其實都是可行的方案，不過細心的讀者應該已經猜到山姆鍋選擇的作法：就是 Redis Streams。原因很簡單，因為產品裡已經有 Redis 了！</p>
+<p>不過，為何上篇文章提到的 Event bus 沒有用 Redis Streams 而是全部使用 PostgreSQL 提供的機制？背後的原因是為了完成上面 PostgreSQL + Redis Streams 的事件處理架構，還需要有個元件 (底下稱為 Pumper) 負責將新的事件資料轉發到 Redis Streams, 而完成 Pumper 這個元件的要求就跟上篇文章中的 Event consumer 相同，需要即時知道有新事件，事件要按照時間順序處理且不能遺漏。為了備援，可能會有多個 Pumper 實例同時在執行，但同時間只能有一個在處理事件，這個可以使用 Distributed lock 來達成。至於通知，簡單的 pubsub 機制就可以實現。</p>
+<p>Distributed lock 以及 Pubsub 這兩個技術要求，Redis 以及 PostgreSQL 都可以提供支援。之所以選擇使用 PostgreSQL 方案，上篇文章作為方案驗證，單純使用 PostgreSQL 實作上比較簡單，但也適用在 consumer 數量不多的情況下。所以，PostgreSQL 自始至終都是作為 Event store 的用途，Event bus 的功能確實是投機取巧 (不用白不用？)。</p>
+<p>下面針對臉書上的一些反饋，山姆鍋提供一下自己的看法。</p>
+<h3 id="“pg這麼用，如果只是小貓二三隻的公司內部系統當然還死不了”">“pg 這麼用，如果只是小貓二三隻的公司內部系統當然還死不了”</h3>
+<p>不好意思，目標客戶真的是小貓二三隻。</p>
+<h3 id="“db-master-只有一台，要-Scale-一定要-down-time”">“db master 只有一台，要 Scale 一定要 down time”</h3>
+<p>Master 資料庫是這個產品的核心元件，如果主資料庫要硬體升級或者其他原因需要停機，整個服務都會停止。這跟有沒有把 PostgreSQL 作為 MQ 或者 locking server 對於可用性的結果都一樣。</p>
+<h3 id="“db只用來存需要long-term-persistance的data”">“db 只用來存需要 long term persistance 的 data”</h3>
+<p>前面已經說明，PostgreSQL 用來長期存放事件資料。也許有讀者會認為：這不是跟 Event sourcing 的機制很像？沒錯，只不過在這個產品，Event store/bus 並不是要支援 Event sourcing。</p>
+<h3 id="“這玩法就是-outbox-pattern-的誤用啊”">“這玩法就是 outbox pattern 的誤用啊”</h3>
+<p><a href="https://microservices.io/patterns/data/transactional-outbox.html" target="_blank" rel="noopener">Transactional outbox</a> 老實說是第一次聽到，雖然這樣的 Pattern 在 N 年前山姆鍋就已經知道，不過有了名稱，之後跟別人說明也比較方便了 :-)。</p>
+<h2 id="小結">小結</h2>
+<p>作為一個工程師，山姆鍋常常跟團隊分享：選擇適合的方案來解決問題，而不是找尋 (自認) 完美的作法。了解工具的特性、分析優缺點、根據實際的使用情境挑選適當可行方案才是務實的作法。所謂「適當」，也就是知道自己的取捨是什麼，記得不存在所謂放諸四海皆準的通則。最後，如果 “You know what you are doing”, 不用擔心跟別人意見相左。</p>
 
             
 
@@ -451,27 +382,17 @@
     </div>
     <div id="post-footer" class="post-footer main-content-wrap">
         
-            <div class="post-footer-tags">
-                <span class="text-color-light text-small">標籤</span><br/>
-                
-    <a class="tag tag--primary tag--small t-link" href="/tag/agent/" rel="tag">Agent</a> <a class="tag tag--primary tag--small t-link" href="/tag/grid/" rel="tag">Grid</a>
-
-            </div>
-        
         
             <div class="post-actions-wrap">
     <nav>
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    
-                <a
-                    class="post-action-btn btn btn--default tooltip--top"
-                    href="/post/2015/09/architecture-design-of-highly-scalable-task-execution/"
-                    data-tooltip="高可擴展的任務執行架構設計"
-                    aria-label="上一篇: 高可擴展的任務執行架構設計"
-                >
-                    
+                    <a
+                        class="post-action-btn btn btn--disabled"
+                        aria-hidden="true"
+                    >
+                        
                         <i class="fa fa-angle-left" aria-hidden="true"></i>
                         <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
                     </a>
@@ -481,9 +402,9 @@
                     
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
-                    href="/post/2015/09/wan-discovery-mainline-dht-bittorrent/"
-                    data-tooltip="利用 BitTorrent DHT 來控制殭屍網路"
-                    aria-label="下一篇: 利用 BitTorrent DHT 來控制殭屍網路"
+                    href="/post/2022/02/postgresql-event-bus/"
+                    data-tooltip="PostgreSQL 事件總線 (event bus) 實作驗證"
+                    aria-label="下一篇: PostgreSQL 事件總線 (event bus) 實作驗證"
                 >
                     
                         <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
@@ -508,7 +429,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://samkuo.me/post/2015/09/architecture-requirements-of-highly-scalable-task-execution/"
+                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://samkuo.me/post/2022/02/postgresql-event-bus-follow-up/"
                     title="分享到 Facebook"
                     aria-label="分享到 Facebook"
                 >
@@ -521,7 +442,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://twitter.com/intent/tweet?text=https://samkuo.me/post/2015/09/architecture-requirements-of-highly-scalable-task-execution/"
+                    target="new" href="https://twitter.com/intent/tweet?text=https://samkuo.me/post/2022/02/postgresql-event-bus-follow-up/"
                     title="分享到 Twitter"
                     aria-label="分享到 Twitter"
                 >
@@ -534,7 +455,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https://samkuo.me/post/2015/09/architecture-requirements-of-highly-scalable-task-execution/"
+                    target="new" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https://samkuo.me/post/2022/02/postgresql-event-bus-follow-up/"
                     title="global.share_on_linkedin"
                     aria-label="global.share_on_linkedin"
                 >
@@ -601,14 +522,11 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    
-                <a
-                    class="post-action-btn btn btn--default tooltip--top"
-                    href="/post/2015/09/architecture-design-of-highly-scalable-task-execution/"
-                    data-tooltip="高可擴展的任務執行架構設計"
-                    aria-label="上一篇: 高可擴展的任務執行架構設計"
-                >
-                    
+                    <a
+                        class="post-action-btn btn btn--disabled"
+                        aria-hidden="true"
+                    >
+                        
                         <i class="fa fa-angle-left" aria-hidden="true"></i>
                         <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
                     </a>
@@ -618,9 +536,9 @@
                     
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
-                    href="/post/2015/09/wan-discovery-mainline-dht-bittorrent/"
-                    data-tooltip="利用 BitTorrent DHT 來控制殭屍網路"
-                    aria-label="下一篇: 利用 BitTorrent DHT 來控制殭屍網路"
+                    href="/post/2022/02/postgresql-event-bus/"
+                    data-tooltip="PostgreSQL 事件總線 (event bus) 實作驗證"
+                    aria-label="下一篇: PostgreSQL 事件總線 (event bus) 實作驗證"
                 >
                     
                         <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
@@ -645,7 +563,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://samkuo.me/post/2015/09/architecture-requirements-of-highly-scalable-task-execution/"
+                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://samkuo.me/post/2022/02/postgresql-event-bus-follow-up/"
                     title="分享到 Facebook"
                     aria-label="分享到 Facebook"
                 >
@@ -658,7 +576,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://twitter.com/intent/tweet?text=https://samkuo.me/post/2015/09/architecture-requirements-of-highly-scalable-task-execution/"
+                    target="new" href="https://twitter.com/intent/tweet?text=https://samkuo.me/post/2022/02/postgresql-event-bus-follow-up/"
                     title="分享到 Twitter"
                     aria-label="分享到 Twitter"
                 >
@@ -671,7 +589,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https://samkuo.me/post/2015/09/architecture-requirements-of-highly-scalable-task-execution/"
+                    target="new" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https://samkuo.me/post/2022/02/postgresql-event-bus-follow-up/"
                     title="global.share_on_linkedin"
                     aria-label="global.share_on_linkedin"
                 >
@@ -715,7 +633,7 @@
                     <a
                         class="share-option-btn"
                         target="new"
-                        href="https://www.facebook.com/sharer/sharer.php?u=https://samkuo.me/post/2015/09/architecture-requirements-of-highly-scalable-task-execution/"
+                        href="https://www.facebook.com/sharer/sharer.php?u=https://samkuo.me/post/2022/02/postgresql-event-bus-follow-up/"
                         aria-label="分享到 Facebook"
                     >
                         <i class="fab fa-facebook" aria-hidden="true"></i><span>分享到 Facebook</span>
@@ -728,7 +646,7 @@
                     <a
                         class="share-option-btn"
                         target="new"
-                        href="https://twitter.com/intent/tweet?text=https://samkuo.me/post/2015/09/architecture-requirements-of-highly-scalable-task-execution/"
+                        href="https://twitter.com/intent/tweet?text=https://samkuo.me/post/2022/02/postgresql-event-bus-follow-up/"
                         aria-label="分享到 Twitter"
                     >
                         <i class="fab fa-twitter" aria-hidden="true"></i><span>分享到 Twitter</span>
@@ -741,7 +659,7 @@
                     <a
                         class="share-option-btn"
                         target="new"
-                        href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https://samkuo.me/post/2015/09/architecture-requirements-of-highly-scalable-task-execution/"
+                        href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https://samkuo.me/post/2022/02/postgresql-event-bus-follow-up/"
                         aria-label="global.share_on_linkedin"
                     >
                         <i class="fab fa-linkedin" aria-hidden="true"></i><span>global.share_on_linkedin</span>
@@ -1073,9 +991,9 @@
     
         <script>
           var disqus_config = function() {
-            this.page.url = 'https://samkuo.me/post/2015/09/architecture-requirements-of-highly-scalable-task-execution/';
+            this.page.url = 'https://samkuo.me/post/2022/02/postgresql-event-bus-follow-up/';
               
-            this.page.identifier = 'post/2015/09/architecture-requirements-of-highly-scalable-task-execution/';
+            this.page.identifier = 'post/2022/02/postgresql-event-bus-follow-up/';
               
           };
           (function() {
