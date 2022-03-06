@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://samkuo.me/"/>
-  <updated>2022-03-06T03:34:45.592Z</updated>
+  <updated>2022-03-06T04:21:42.671Z</updated>
   <id>https://samkuo.me/</id>
   
   <author>
@@ -21,11 +21,11 @@
     <link href="https://samkuo.me/post/2022/03/airflow-as-a-scheduler/"/>
     <id>https://samkuo.me/post/2022/03/airflow-as-a-scheduler/</id>
     <published>2022-03-05T10:22:51.000Z</published>
-    <updated>2022-03-06T03:34:45.592Z</updated>
+    <updated>2022-03-06T04:21:42.671Z</updated>
     
     <summary type="html">
     
-      &lt;p&gt;Airflow 是一個流行的工作流程管理工具，常用來作為資料管線(data pipeline)以完成常見的 &lt;a href=&quot;https://zh.wikipedia.org/wiki/ETL&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;ETL&lt;/a&gt; 任務。本文山姆鍋示範如何以 Airflow 作為殺雞用牛刀、大材小用的例子。&lt;/p&gt;
+      &lt;p&gt;Airflow 是一個流行的工作流程管理工具，常用來作為資料管線 (data pipeline) 以完成常見的 &lt;a href=&quot;https://zh.wikipedia.org/wiki/ETL&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;ETL&lt;/a&gt; 任務。本文山姆鍋示範如何以 Airflow 作為殺雞用牛刀、大材小用的例子。&lt;/p&gt;
     
     </summary>
     
