@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://samkuo.me/"/>
-  <updated>2022-02-21T23:10:21.629Z</updated>
+  <updated>2022-03-06T03:34:45.592Z</updated>
   <id>https://samkuo.me/</id>
   
   <author>
@@ -15,6 +15,31 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>以 Airflow 作為排程服務</title>
+    <link href="https://samkuo.me/post/2022/03/airflow-as-a-scheduler/"/>
+    <id>https://samkuo.me/post/2022/03/airflow-as-a-scheduler/</id>
+    <published>2022-03-05T10:22:51.000Z</published>
+    <updated>2022-03-06T03:34:45.592Z</updated>
+    
+    <summary type="html">
+    
+      &lt;p&gt;Airflow 是一個流行的工作流程管理工具，常用來作為資料管線(data pipeline)以完成常見的 &lt;a href=&quot;https://zh.wikipedia.org/wiki/ETL&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;ETL&lt;/a&gt; 任務。本文山姆鍋示範如何以 Airflow 作為殺雞用牛刀、大材小用的例子。&lt;/p&gt;
+    
+    </summary>
+    
+    
+    
+      <category term="Docker" scheme="https://samkuo.me/tag/docker/"/>
+    
+      <category term="Airflow" scheme="https://samkuo.me/tag/airflow/"/>
+    
+      <category term="Scheduler" scheme="https://samkuo.me/tag/scheduler/"/>
+    
+      <category term="Workflow" scheme="https://samkuo.me/tag/workflow/"/>
+    
+  </entry>
   
   <entry>
     <title>PostgreSQL 事件總線實作驗證 (後續)</title>
@@ -38,11 +63,11 @@
     <link href="https://samkuo.me/post/2022/02/postgresql-event-bus/"/>
     <id>https://samkuo.me/post/2022/02/postgresql-event-bus/</id>
     <published>2022-02-20T11:52:38.000Z</published>
-    <updated>2022-02-20T13:44:08.854Z</updated>
+    <updated>2022-02-21T23:37:18.574Z</updated>
     
     <summary type="html">
     
-      &lt;p&gt;經過了多年後，因為工作的關係，山姆鍋終於又有動機寫 Python 相關的程式了。在目前開發的軟體產品上，用到事件驅動架構。其中關鍵的事件總線 (event bus)，由於是針對中小型企業的系統，就沒有考慮使用 Kafka 這樣的方案。經評估後，發現使用 PostgreSQL 來實現一個事件總線似乎是一個可行的方案。&lt;/p&gt;
+      &lt;p&gt;經過了多年後，因為工作的關係，山姆鍋終於又有動機寫 Python 相關的程式了。在目前開發的軟體產品上，用到事件驅動架構。其中關鍵的事件總線(event bus)，由於是針對中小型企業的系統，就沒有考慮使用 Kafka 這樣的方案。經評估後，發現使用 PostgreSQL 來實現一個事件總線似乎是一個可行的方案。&lt;/p&gt;
     
     </summary>
     
@@ -491,31 +516,6 @@
       <category term="iframely" scheme="https://samkuo.me/tag/iframely/"/>
     
       <category term="solr" scheme="https://samkuo.me/tag/solr/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>社群論壇軟體 NodeBB</title>
-    <link href="https://samkuo.me/post/2020/03/morden-web-forum-nodebb/"/>
-    <id>https://samkuo.me/post/2020/03/morden-web-forum-nodebb/</id>
-    <published>2020-03-20T03:04:45.000Z</published>
-    <updated>2020-03-20T06:33:10.464Z</updated>
-    
-    <summary type="html">
-    
-      &lt;p&gt;最近山姆鍋在建置業餘專案 &lt;a href=&quot;https://developers.tw&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;#呆丸開發者&lt;/a&gt;時，需要一個可以支援多對多溝通模式的 web 應用。幾經思考，覺得論壇軟體可以符合大部分需求。傳統的 web 論壇軟體雖然成熟，功能也完整，但網站需要符合 Mobile-first 的要求以及現代化的使用者體驗，所以需要跳脫傳統論壇軟體框架的選擇。可能合用且比較常見的有下列三個：&lt;a href=&quot;https://www.discourse.org/&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;Discourse&lt;/a&gt;、&lt;a href=&quot;https://nodebb.org/&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;NodeBB&lt;/a&gt; 以及 &lt;a href=&quot;https://flarum.org/&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;Flarum&lt;/a&gt;。本文並非三者的優缺點比較，僅是山姆鍋介紹 NodeBB 的哪些特點，讓它成為最後選擇。&lt;/p&gt;
-    
-    </summary>
-    
-    
-    
-      <category term="nodebb" scheme="https://samkuo.me/tag/nodebb/"/>
-    
-      <category term="redis" scheme="https://samkuo.me/tag/redis/"/>
-    
-      <category term="forum" scheme="https://samkuo.me/tag/forum/"/>
-    
-      <category term="mongosdb" scheme="https://samkuo.me/tag/mongosdb/"/>
     
   </entry>
   
